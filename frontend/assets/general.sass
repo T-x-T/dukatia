@@ -1,0 +1,88 @@
+@import "assets/_vars.sass"
+
+@font-face
+  font-family: "bold"
+  font-display: swap
+  src: url("./TitilliumWeb-Bold.ttf")
+
+@font-face
+  font-family: "semibold"
+  font-display: swap
+  src: url("./TitilliumWeb-SemiBold.ttf")
+
+@font-face
+  font-family: "regular"
+  font-display: swap
+  src: url("./TitilliumWeb-Regular.ttf")
+
+::selection
+  background: rgba(0,0,0,.5)
+  color: $heavy
+
+*
+  margin: 0
+  padding: 0
+  text-decoration: none
+  transition-duration: .1s
+
+p
+  @extend .regular
+
+li
+  list-style-type: none
+
+html
+  scroll-behavior: smooth
+  overflow-x: hidden !important
+  scrollbar-width: thin
+  scrollbar-color: $dark $bright
+  background: $bgdarkest
+  position: relative
+  color: $brightest
+
+h1
+  @extend .bold
+  color: $heavy
+  font-size: 45px
+
+h2, h3, h4
+  @extend .semibold
+
+h2
+  font-size: 40px
+
+h3
+  font-size: 36px
+
+h4
+  font-size: 32px
+
+table
+  width: 100%
+  border-collapse: separate
+  border-spacing: 0px
+  white-space: nowrap
+  text-align: center
+  select
+    height: 100%
+    right: 0
+    margin: 0
+    width: 100%
+  
+th
+  @extend .semibold
+  background: $darkest
+  font-size: 20px
+  border-bottom: 2px solid $heavydark
+
+tbody
+  @extend .regular
+
+tr
+  &:nth-child(even) td
+    background: $darkest
+  &:nth-child(odd) td
+    background: $darker
+    
+label
+  @extend .semibold
