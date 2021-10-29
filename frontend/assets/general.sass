@@ -25,12 +25,6 @@
   text-decoration: none
   transition-duration: .1s
 
-p
-  @extend .regular
-
-li
-  list-style-type: none
-
 html
   scroll-behavior: smooth
   overflow-x: hidden !important
@@ -39,6 +33,61 @@ html
   background: $bgdarkest
   position: relative
   color: $brightest
+
+p, span
+  @extend .regular
+
+li
+  list-style-type: none
+
+button
+  @extend .semibold
+  padding: 1px 4px 1px 4px
+  border-radius: 0px
+  border: none
+  box-shadow: 4px 4px 0px black
+  margin: 0px 6px 6px 0px
+  color: black
+  background: $heavydark
+  cursor: pointer
+  font-size: 16px
+  &:hover
+    background: $heavy
+    box-shadow: 6px 6px 0px black
+
+button.red
+  &:hover
+    background: $error
+
+button.green
+  &:hover
+    background: $success
+
+button.orange
+  &:hover
+    background: $warn
+
+select
+  @extend .semibold
+  margin: 4px
+  border-radius: 0px
+  border: none
+  background: $heavydark
+  color: black
+  font-size: 14px
+
+option
+  font-size: 12px
+
+input
+  background: $heavydark
+  border: none
+  padding: 2px 4px 2px 4px
+  margin: 4px
+  font-size: 14px
+  &:disabled
+    color: black
+    background: $dark
 
 h1
   @extend .bold

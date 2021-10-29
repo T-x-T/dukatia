@@ -2,17 +2,19 @@ import assert from "assert"
 import { Pool, PoolClient } from "pg";
 import database from "../../database/postgresql/index.js";
 import account from "../../lib/account/index.js";
-import { ICurrency } from "../../lib/currency/index.js";
 
 let db: PoolClient = null;
 let pool: Pool = null;
 let config: any = null;
 
-const currency: ICurrency = {
-	id: 0,
-	name: "Euro",
-	minorInMayor: 100,
-	symbol: "€"
+const testAccount = {
+	name: "testAccount",
+	defaultCurrency: 0
+}
+
+const testAccount2 = {
+	name: "testAccount",
+	defaultCurrency: 0
 }
 
 export default (_config: any) => config = _config;
@@ -40,11 +42,11 @@ describe("account", function() {
 
 	describe("add", function() {
 		it("doesnt reject", async function() {
-			await assert.doesNotReject(() => account.add({name: "testAccount", defaultCurrency: 0}));
+			await assert.doesNotReject(() => account.add(testAccount));
 		});
 
 		it("returns the newly added entry including the id", async function() {
-			const res = await account.add({name: "testAccount", defaultCurrency: 0});
+			const res = await account.add(testAccount);
 			
 			assert.strictEqual(res.name, "testAccount");
 			assert.strictEqual(res.defaultCurrency, 0);
@@ -54,8 +56,8 @@ describe("account", function() {
 
 	describe("getByName", function() {
 		it("returns only matching rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			const res = await account.getByName("testAccount");
 			assert.ok(res.length > 0);
@@ -65,45 +67,20 @@ describe("account", function() {
 
 	describe("getAll", function() {
 		it("returns all rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			const res = await account.getAll();
 			assert.strictEqual(res.length, 2);
-		});
-	});
-	
-	describe("deleteByName", function() {
-		it("only deletes rows with matching name", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-
-			await account.deleteByName("testAccount");
-
-			const res = await account.getAll();
-			assert.strictEqual(res.length, 2);
-		});
-
-		it("returns number of deleted rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-
-			const res = await account.deleteByName("testAccount");
-
-			assert.strictEqual(res, 2);
 		});
 	});
 
 	describe("deleteByid", function() {
 		it("only delete row with matching id", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			await account.deleteById(2);
 
@@ -115,10 +92,10 @@ describe("account", function() {
 		});
 
 		it("returns number of deleted rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			const res = await account.deleteById(2);
 
@@ -128,8 +105,8 @@ describe("account", function() {
 
 	describe("deleteAll", function() {
 		it("deletes all rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			await account.deleteAll();
 
@@ -138,12 +115,52 @@ describe("account", function() {
 		});
 
 		it("returns number of deleted rows", async function() {
-			await account.add({name: "testAccount", defaultCurrency: 0});
-			await account.add({name: "testAccount2", defaultCurrency: 0});
+			await account.add(testAccount);
+			await account.add(testAccount2);
 
 			const res = await account.deleteAll();
 
 			assert.strictEqual(res, 2);
+		});
+	});
+
+	describe("update", function() {
+		it("throws without an id", async function() {
+			await account.add(testAccount);
+
+			await assert.rejects(() => account.update(testAccount), new Error("no valid id specified"));
+		});
+
+		it("doesnt throw with correct input", async function() {
+			await account.add(testAccount);
+
+			await assert.doesNotReject(() => account.update({...testAccount, id: 0}));
+		});
+
+		it("throws when no transaction with id exists", async function() {
+			await account.add(testAccount);
+
+			await assert.rejects(() => account.update({...testAccount, id: 1}), new Error("no row with id: 1"));
+		});
+
+		it("correctly returns new values", async function() {
+			await account.add(testAccount);
+
+			const res = await account.update({...testAccount2, id: 0});
+
+			assert.strictEqual(res.name, testAccount2.name);
+			assert.strictEqual(res.defaultCurrency, testAccount2.defaultCurrency);
+		});
+
+		it("correctly sets new values", async function() {
+			await account.add(testAccount);
+
+			await account.update({...testAccount2, id: 0});
+			
+			const res = (await account.getByName(testAccount2.name))[0];
+
+			assert.strictEqual(res.name, testAccount2.name);
+			assert.strictEqual(res.defaultCurrency, testAccount2.defaultCurrency);
 		});
 	});
 

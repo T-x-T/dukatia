@@ -22,7 +22,7 @@ type ITransaction = {
 
 type IShallowTransaction = {
 	id?: number,
-	userId: number,
+	userId?: number,
 	accountId: number,
 	currencyId: number,
 	recipientId: number,
@@ -56,6 +56,17 @@ export default {
 
 	async getById(id: number) {
 		return (await database.getById(id)).map(x => turnRowIntoShallowTransaction(x));
+	},
+
+	async deleteById(id: number) {
+		return await database.deleteById(id);
+	},
+
+	async update(transaction: IShallowTransaction) {
+		if(!Number.isInteger(transaction.id)) throw new Error("no valid id specified");
+		const res = await database.update(transaction);
+		if(res.length === 0) throw new Error("no row with id: " + transaction.id);
+		return turnRowIntoShallowTransaction(res[0]);
 	}
 }
 

@@ -1,6 +1,6 @@
 import { IParsedReq } from "../../restApi/index.js";
 import router, { IExecutorResponse } from "../../restApi/router.js";
-import account, { IAccount, IShallowAccount } from "./index.js";
+import account, { IShallowAccount } from "./index.js";
 
 export default () => {
 	routes.forEach(x => x());
@@ -37,6 +37,44 @@ const routes = [
 					}
 				} catch(e) {
 					console.error(e);
+					return {
+						status: 500,
+						body: {error: e.message}
+					}
+				}
+			}
+		})
+	},
+
+	() => {
+		router.register({
+			authorized: true,
+			validatorFn: (req: IParsedReq) => req.path.startsWith("/accounts/") && req.method == "PUT",
+			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
+				const pathParts = req.path.split("/");
+				const id = parseInt(pathParts[pathParts.length - 1]);
+
+				if(typeof id != "number") {
+					return {
+						status: 400,
+						body: {error: "No valid id in url path found"}
+					}
+				}
+
+				const newAccount: IShallowAccount = {
+					id: id,
+					name: req.body.name,
+					defaultCurrency: req.body.defaultCurrency
+				}
+
+				try {
+					const res = await account.update(newAccount);
+
+					return {
+						status: 200,
+						body: res
+					}
+				} catch(e) {
 					return {
 						status: 500,
 						body: {error: e.message}

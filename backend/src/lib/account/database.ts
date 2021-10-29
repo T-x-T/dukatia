@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { IAccount, IShallowAccount } from "./index.js";
+import { IShallowAccount } from "./index.js";
 
 let pool: Pool = null;
 
@@ -30,10 +30,9 @@ export default {
 		return res;
 	},
 
-	async deleteFiltered(key: string, value: string | number) {
+	async deleteById(id: number) {
 		const db = await pool.connect();
-		//TODO: Fix possible SQL injection
-		const res = (await db.query("DELETE FROM public.\"Accounts\" WHERE " + key + " = $1;", [value])).rowCount;
+		const res = (await db.query("DELETE FROM public.\"Accounts\" WHERE id=$1;", [id])).rowCount;
 		db.release();
 		return res;
 	},
@@ -43,5 +42,12 @@ export default {
 		const res = (await db.query("DELETE FROM public.\"Accounts\";")).rowCount;
 		db.release();
 		return res;
-	}
+	},
+
+	async update(account: IShallowAccount) {
+		const db = await pool.connect();
+		const res = (await db.query("UPDATE public.\"Accounts\" SET name=$1, defaultcurrency=$2 WHERE id=$3 RETURNING *;", [account.name, account.defaultCurrency, account.id])).rows;
+		db.release();
+		return res;
+	},
 }

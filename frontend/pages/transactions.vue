@@ -1,52 +1,25 @@
 <template>
 	<div id="main">
 		<div id="table" v-if="mode=='table'">
+			<button class="green" @click="newTransaction">Add</button>
 			<CustomTable
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
 			/>
-			<form @submit.prevent="addTransaction">
-				<label for="amount">Amount:</label>
-				<input id="amount" type="number" step="0.01" v-model="amount">
-				
-				<label for="comment">Comment:</label>
-				<input id="comment" type="text" v-model="comment">
-				
-				<label for="account">Account:</label>
-				<select id="account" v-model="account">
-					<option v-for="(account, index) in $store.state.accounts" :key="index" :value="account.id">{{account.name}}</option>
-				</select>
-				
-				<label for="currency">Currency:</label>
-				<select id="account" v-model="currency">
-					<option v-for="(currency, index) in $store.state.currencies" :key="index" :value="currency.id">{{currency.name}}</option>
-				</select>
-				
-				<label for="recipient">Recipient:</label>
-				<select id="account" v-model="recipient">
-					<option v-for="(recipient, index) in $store.state.recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
-				</select>
-				
-				<button type="submit">Add</button>
-			</form>
 		</div>
 
 		<div v-if="mode=='details'" id="details">
-			<button @click="mode='table'">Back</button>
-			<p>{{selectedRow}}</p>
+			<TransactionDetails 
+				:transaction="selectedRow"
+				v-on:back="updateAndLoadTable"
+			/>
 		</div>
-
 	</div>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		amount: 0,
-		comment: "",
-		account: 0,
-		currency: 0,
-		recipient: 0,
 		tableData: {},
 		mode: "table",
 		selectedRow: {}
@@ -82,22 +55,32 @@ export default {
 			}
 		},
 
-		async addTransaction() {
-			await this.$axios.$post("/api/v1/transactions", {
-				accountId: this.account,
-				currencyId: this.currency,
-				recipientId: this.recipient,
-				timestamp: new Date(),
-				amount: Number(this.amount) * 100,
-				comment: this.comment
-			});
-			await this.$store.dispatch("fetchTransactions");
-			await this.updateTransactions();
+		rowClick(row) {
+			const rowFromStore = this.$store.state.transactions.filter(x => x.id == row[0])[0]
+			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100};
+			this.mode = "details";
 		},
 
-		rowClick(row) {
+		async newTransaction() {
+			this.selectedRow = {
+				id: "",
+				accountId: 0,
+				currencyId: 0,
+				recipientId: 0,
+				status: 1,
+				timestamp: new Date().toISOString(),
+				amount: 0,
+				comment: "",
+				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+			}
+
 			this.mode = "details";
-			this.selectedRow = this.$store.state.transactions.filter(x => x.id == row[0])[0];
+		},
+
+		async updateAndLoadTable() {
+			await this.$store.dispatch("fetchTransactions");
+			await this.updateTransactions();
+			this.mode = "table";
 		}
 	}
 }

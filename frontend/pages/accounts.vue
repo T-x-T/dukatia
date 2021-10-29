@@ -1,14 +1,19 @@
 <template>
 	<div id="main">
-		<CustomTable
-			:tableData="tableData"
-		/>
+		<div id="table" v-if="mode=='table'">
+			<button class="green" @click="newAccount">Add</button>
+			<CustomTable
+				:tableData="tableData"
+				v-on:rowClick="rowClick"
+			/>
+		</div>
 
-		<form @submit.prevent="addAccount">
-			<label for="name">Name:</label>
-			<input type="text" id="name" v-model="name">
-			<button type="submit">Add</button>
-		</form>
+		<div id="details" v-if="mode=='details'">
+			<AccountDetails
+				:account="selectedRow"
+				v-on:back="updateAndLoadTable"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -16,7 +21,8 @@
 export default {
 	data: () => ({
 		tableData: {},
-		name: ""
+		selectedRow: {},
+		mode: "table"
 	}),
 
 	async fetch() {
@@ -36,15 +42,28 @@ export default {
 				]))
 			}
 		},
+		
+		rowClick(row) {
+			const rowFromStore = this.$store.state.accounts.filter(x => x.id == row[0])[0];
+			const defaultCurrency = this.$store.state.currencies.filter(x => x.id == rowFromStore.defaultCurrency)[0]
+			this.selectedRow = {...rowFromStore, defaultCurrency: {...defaultCurrency}};
+			this.mode = "details";
+		},
 
-		async addAccount() {
-			await this.$axios.$post("/api/v1/accounts", {
-				name: this.name,
-				defaultCurrency: 0
-			});
+		async newAccount() {
+			this.selectedRow = {
+				id: "",
+				name: "",
+				defaultCurrency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+			}
 
+			this.mode = "details";
+		},
+
+		async updateAndLoadTable() {
 			await this.$store.dispatch("fetchAccounts");
 			await this.updateAccounts();
+			this.mode = "table";
 		}
 	}
 }

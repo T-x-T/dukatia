@@ -30,5 +30,19 @@ export default {
 		const res = (await db.query("SELECT * FROM public.\"Transactions\" WHERE id=$1;", [id])).rows;
 		db.release();
 		return res;
+	},
+
+	async deleteById(id: number) {
+		const db = await pool.connect();
+		const res = (await db.query("DELETE FROM public.\"Transactions\" WHERE id=$1;", [id])).rowCount;
+		db.release();
+		return res;
+	},
+
+	async update(transaction: IShallowTransaction) {
+		const db = await pool.connect();
+		const res = (await db.query("UPDATE public.\"Transactions\" SET account=$1, currency=$2, recipient=$3, status=$4, timestamp=$5, amount=$6, comment=$7 WHERE id=$8 RETURNING *;", [transaction.accountId, transaction.currencyId, transaction.recipientId, transaction.status, transaction.timestamp, transaction.amount, transaction.comment, transaction.id])).rows;
+		db.release();
+		return res;
 	}
 }

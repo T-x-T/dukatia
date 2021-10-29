@@ -26,31 +26,34 @@ export default {
 	},
 
 	async add(account: IShallowAccount) {
-		return turnRowIntoIAccount(await database.add(account));
+		return turnRowIntoIShallowAccount(await database.add(account));
 	},
 
 	async getByName(name: string) {
-		return (await database.getFiltered("name", name)).map(x => turnRowIntoIAccount(x));
+		return (await database.getFiltered("name", name)).map(x => turnRowIntoIShallowAccount(x));
 	},
 
 	async getAll() {
-		return (await database.getAll()).map(x => turnRowIntoIAccount(x));
-	},
-
-	async deleteByName(name: string) {
-		return await database.deleteFiltered("name", name);
+		return (await database.getAll()).map(x => turnRowIntoIShallowAccount(x));
 	},
 
 	async deleteById(id: number) {
-		return await database.deleteFiltered("id", id);
+		return await database.deleteById(id);
 	},
 
 	async deleteAll() {
 		return await database.deleteAll();
+	},
+
+	async update(account: IShallowAccount) {
+		if(!Number.isInteger(account.id)) throw new Error("no valid id specified");
+		const res = await database.update(account);
+		if(res.length === 0) throw new Error("no row with id: " + account.id);
+		return turnRowIntoIShallowAccount(res[0]);
 	}
 }
 
-function turnRowIntoIAccount(row: any): IAccount {
+function turnRowIntoIShallowAccount(row: any): IShallowAccount {
 	return {
 		id: row.id,
 		name: row.name,
