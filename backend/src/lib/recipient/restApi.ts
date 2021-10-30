@@ -43,5 +43,42 @@ const routes = [
 				}
 			}
 		})
+	},
+
+	() => {
+		router.register({
+			authorized: true,
+			validatorFn: (req: IParsedReq) => req.path.startsWith("/recipients/") && req.method == "PUT",
+			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
+				const pathParts = req.path.split("/");
+				const id = parseInt(pathParts[pathParts.length - 1]);
+
+				if(typeof id != "number") {
+					return {
+						status: 400,
+						body: {error: "No valid id in url path found"}
+					}
+				}
+
+				const newRecipient: IRecipient = {
+					id: id,
+					name: req.body.name
+				}
+
+				try {
+					const res = await recipient.update(newRecipient);
+
+					return {
+						status: 200,
+						body: res
+					}
+				} catch(e) {
+					return {
+						status: 500,
+						body: {error: e.message}
+					}
+				}
+			}
+		})
 	}
 ];

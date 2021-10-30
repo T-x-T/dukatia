@@ -137,7 +137,7 @@ describe("account", function() {
 			await assert.doesNotReject(() => account.update({...testAccount, id: 0}));
 		});
 
-		it("throws when no transaction with id exists", async function() {
+		it("throws when no account with id exists", async function() {
 			await account.add(testAccount);
 
 			await assert.rejects(() => account.update({...testAccount, id: 1}), new Error("no row with id: 1"));

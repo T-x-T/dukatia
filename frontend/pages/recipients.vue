@@ -1,14 +1,19 @@
 <template>
 	<div id="main">
-		<CustomTable
-			:tableData="tableData"
-		/>
+		<div id="table" v-if="mode=='table'">
+			<button class="green" @click="newRecipient">Add</button>
+			<CustomTable
+				:tableData="tableData"
+				v-on:rowClick="rowClick"
+			/>
+		</div>
 
-		<form @submit.prevent="addRecipient">
-			<label for="name">Name:</label>
-			<input type="text" id="name" v-model="name">
-			<button type="submit">Add</button>
-		</form>
+		<div id="details" v-if="mode=='details'">
+			<RecipientDetails 
+				:recipient="selectedRow"
+				v-on:back="updateAndLoadTable"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -16,7 +21,8 @@
 export default {
 	data: () => ({
 		tableData: {},
-		name: ""
+		selectedRow: {},
+		mode: "table"
 	}),
 
 	async fetch() {
@@ -35,14 +41,25 @@ export default {
 				]))
 			}
 		},
+		
+		rowClick(row) {
+			this.selectedRow = {...this.$store.state.recipients.filter(x => x.id == row[0])[0]};
+			this.mode = "details";
+		},
 
-		async addRecipient(){
-			await this.$axios.$post("/api/v1/recipients", {
-				name: this.name
-			});
+		async newRecipient() {
+			this.selectedRow = {
+				id: "",
+				name: ""
+			}
 
+			this.mode = "details";
+		},
+
+		async updateAndLoadTable() {
 			await this.$store.dispatch("fetchRecipients");
 			await this.updateRecipients();
+			this.mode = "table";
 		}
 	}
 }

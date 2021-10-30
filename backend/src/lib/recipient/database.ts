@@ -20,5 +20,12 @@ export default {
 		const res = (await db.query("INSERT INTO public.\"Recipients\" (id, name) VALUES (DEFAULT, $1) RETURNING *;", [recipient.name])).rows[0];
 		db.release();
 		return res;
+	},
+
+	async update(recipient: IRecipient) {
+		const db = await pool.connect();
+		const res = (await db.query("UPDATE public.\"Recipients\" SET name=$1 WHERE id=$2 RETURNING *;", [recipient.name, recipient.id])).rows;
+		db.release();
+		return res;
 	}
 }
