@@ -26,7 +26,7 @@ backend_test:
   script:
   - cd backend/dist
   - npm i
-  - NODE_ENV=testing ../node_modules/mocha/bin/mocha POSTGRES_HOST=$POSTGRES_HOST --exit -t 10000 test/index.js
+  - NODE_ENV=testing POSTGRES_HOST=$POSTGRES_HOST ../node_modules/mocha/bin/mocha --exit -t 10000 test/index.js
   dependencies:
     - compile_backend
 

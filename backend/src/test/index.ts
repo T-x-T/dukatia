@@ -7,14 +7,15 @@ process.on("unhandledRejection", (reason, promise) => {
 const config = {
 	"database": {
 		"user": "postgres",
-		"password": "password",
-		"host": "127.0.0.1",
+		"password": process.env.POSTGRES_PASSWORD ? process.env.POSTGRES_PASSWORD : "password",
+		"host": process.env.POSTGRES_HOST ? process.env.POSTGRES_HOST : "127.0.0.1",
 		"port": 5432,
-		"database": "txts_treasury_testing"
+		"database": "txts_treasury_staging"
 	},
 	"admin_username": "admin",
 	"admin_password": "password",
-	"pepper": "supersecret"
+	"pepper": "supersecret",
+	"api_port": 4000
 }
 
 import testUser from "./tests/user.js";
