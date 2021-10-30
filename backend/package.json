@@ -7,7 +7,8 @@
   "scripts": {
     "test": "cd dist && (NODE_ENV=testing mocha --exit -t 10000 test/index.js)",
     "compile": "tsc",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "prod": "cd dist && (NODE_ENV=prod node index.js)"
   },
   "author": "",
   "license": "ISC",

@@ -1,0 +1,58 @@
+stages:
+- compile
+- test
+- build
+
+compile_backend:
+  stage: compile
+  image: node:latest
+  script:
+    - cd backend
+    - npm i --dev
+    - npm run build
+  artifacts:
+    paths:
+      - backend/dist
+
+backend_test:
+  stage: test
+  image: node:latest
+  services:
+  - postgres:latest
+  script:
+  - cd backend
+  - npm i
+  - npm run test
+  dependencies:
+    - compile_backend
+
+build_backend:
+  image: docker:19.03.11
+  stage: build
+  services:
+  - docker:19.03.11-dind
+  variables:
+    IMAGE_TAG: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker build -t $IMAGE_TAG ./backend
+  - docker push $IMAGE_TAG
+  dependencies:
+    - compile_backend
+build_frontend:
+  image: docker:19.03.11
+  stage: build
+  services:
+  - docker:19.03.11-dind
+  variables:
+    IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG"
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker build -t $IMAGE_TAG ./frontend
+  - docker push $IMAGE_TAG
+  dependencies:
+    - compile_backend

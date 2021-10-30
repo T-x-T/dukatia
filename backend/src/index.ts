@@ -1,7 +1,4 @@
-//import * as entireConfig from "../config.json";
-
 //const envoirnment = process.env.NODE_ENV ? process.env.NODE_ENV : "staging";
-//const config = (entireConfig as any)[envoirnment];
 
 const config = {
 	"database": {
@@ -13,7 +10,8 @@ const config = {
 	},
 	"admin_username": "admin",
 	"admin_password": "password",
-	"pepper": "supersecret"
+	"pepper": "supersecret",
+	"api_port": 4000
 }
 
 import database from "./database/index.js";
@@ -21,7 +19,7 @@ const db = await database(config.database);
 console.log((await db.query("SELECT now()")).rows[0]);
 
 import restApi from "./restApi/index.js";
-restApi(4000);
+restApi(config.api_port);
 
 import currency from "./lib/currency/index.js";
 import user from "./lib/user/index.js";
