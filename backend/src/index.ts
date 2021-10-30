@@ -3,8 +3,8 @@
 const config = {
 	"database": {
 		"user": "postgres",
-		"password": "password",
-		"host": "127.0.0.1",
+		"password": process.env.POSTGRES_PASSWORD ? process.env.POSTGRES_PASSWORD : "password",
+		"host": process.env.POSTGRES_HOST ? process.env.POSTGRES_HOST : "127.0.0.1",
 		"port": 5432,
 		"database": "txts_treasury_staging"
 	},

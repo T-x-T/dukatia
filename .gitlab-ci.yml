@@ -1,5 +1,6 @@
 variables:
   POSTGRES_PASSWORD: password
+  POSTGRES_HOST: postgres
 
 stages:
 - compile
