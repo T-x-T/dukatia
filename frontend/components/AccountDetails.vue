@@ -17,13 +17,48 @@
 			<button class="green" @click="sendAccount">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>
 		</div>	
-	</div>	
+
+		<div id="table">
+			<CustomTable
+				:tableData="tableData"
+			/>
+		</div>
+	</div>
 </template>
 
 <script>
 export default {
+	data: () => ({
+		tableData: {}
+	}),
+
 	props: {
 		account: Object
+	},
+
+	mounted() {
+		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.accountId == this.account.id).map(x => {
+			x.account = this.$store.state.accounts.filter(a => a.id == x.accountId)[0];
+			x.currency = this.$store.state.currencies.filter(c => c.id == x.currencyId)[0];
+			x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipientId)[0];
+			return x;
+		});
+
+		this.tableData = {
+			headers: [
+				"ID", "User", "Account", "Recipient", "Status", "Timestamp", "Amount", "Comment"
+			],
+			rows: transactionsForDisplay.map(x => ([
+				x.id,
+				x.userId,
+				x.account.name,
+				x.recipient.name,
+				x.status === 1 ? "Completed" : "Withheld",
+				new Date(x.timestamp).toISOString().substring(0, 10),
+				`${x.amount / x.currency.minorinmayor}${x.currency.symbol}`,
+				x.comment
+			]))
+		}
 	},
 
 	methods: {
