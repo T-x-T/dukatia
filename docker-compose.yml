@@ -1,0 +1,24 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+  frontend:
+    image: registry.gitlab.com/t-x-t/txts-treasury/frontend:main
+    restart: always
+    environment:
+      API_HOST: backend
+    ports:
+      - "127.0.0.1:4000:4000"
+  backend:
+    image: registry.gitlab.com/t-x-t/txts-treasury/backend:main
+    restart: always
+    environment:
+      POSTGRES_HOST: postgres
+    ports:
+      - "127.0.0.1:3000:3000"
+    links:
+      - postgres
