@@ -21,6 +21,6 @@ export default {
     proxy: true
   },
   proxy: {
-    "/api": process.env.NODE_ENV === "prod" ? process.env.API_URL : "http://localhost:4000"
+    "/api": process.env.NODE_ENV === "prod" ? process.env.API_HOST : "http://localhost:4000"
 	}
 }
