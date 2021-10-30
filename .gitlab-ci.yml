@@ -1,3 +1,6 @@
+variables:
+  POSTGRES_PASSWORD=password
+
 stages:
 - compile
 - test
