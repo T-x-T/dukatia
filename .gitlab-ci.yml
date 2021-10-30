@@ -24,9 +24,9 @@ backend_test:
   services:
   - postgres:latest
   script:
-  - cd backend
+  - cd backend/dist
   - npm i
-  - NODE_ENV=testing mocha POSTGRES_HOST=$POSTGRES_HOST --exit -t 10000 test/index.js
+  - NODE_ENV=testing ../node_modules/mocha/bin/mocha POSTGRES_HOST=$POSTGRES_HOST --exit -t 10000 test/index.js
   dependencies:
     - compile_backend
 
