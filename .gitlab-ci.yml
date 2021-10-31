@@ -36,7 +36,7 @@ build_backend:
   services:
   - docker:19.03.11-dind
   variables:
-    IMAGE_TAG: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG"
+    IMAGE_TAG: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$IMAGE_VERSION"
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
@@ -51,7 +51,7 @@ build_frontend:
   services:
   - docker:19.03.11-dind
   variables:
-    IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG"
+    IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG-$IMAGE_VERSION"
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
