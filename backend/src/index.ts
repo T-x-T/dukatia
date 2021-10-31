@@ -2,16 +2,16 @@
 
 const config = {
 	"database": {
-		"user": "postgres",
+		"user": process.env.POSTGRES_USER ? process.env.POSTGRES_USER : "postgres",
 		"password": process.env.POSTGRES_PASSWORD ? process.env.POSTGRES_PASSWORD : "password",
 		"host": process.env.POSTGRES_HOST ? process.env.POSTGRES_HOST : "127.0.0.1",
-		"port": 5432,
-		"database": "txts_treasury_staging"
+		"port": process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT) : 5432,
+		"database": process.env.DATABASE_NAME ? process.env.DATABASE_NAME : "txts_treasury_staging"
 	},
-	"admin_username": "admin",
-	"admin_password": "password",
-	"pepper": "supersecret",
-	"api_port": 4000
+	"admin_username": process.env.ADMIN_USERNAME ? process.env.ADMIN_USERNAME : "admin",
+	"admin_password": process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD : "password",
+	"pepper": process.env.PEPPER ? process.env.PEPPER : "supersecret",
+	"api_port": process.env.PORT ? parseInt(process.env.PORT) : 4000
 }
 
 import database from "./database/index.js";

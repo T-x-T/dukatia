@@ -11,6 +11,7 @@ services:
     restart: always
     environment:
       API_HOST: http://backend:4000
+      PORT: 80
     ports:
       - "127.0.0.1:3000:3000"
   backend:
@@ -18,5 +19,9 @@ services:
     restart: always
     environment:
       POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: changeme
+      DATABASE_NAME: txts_treasury
+      ADMIN_PASSWORD: changeme
+      PEPPER: changeme
     links:
       - postgres
