@@ -1,5 +1,3 @@
-//const envoirnment = process.env.NODE_ENV ? process.env.NODE_ENV : "staging";
-
 const config = {
 	"database": {
 		"user": process.env.POSTGRES_USER ? process.env.POSTGRES_USER : "postgres",

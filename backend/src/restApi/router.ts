@@ -21,7 +21,13 @@ export default {
 		const matchedRoutes = routes.filter(x => x.validatorFn(req));
 		if(matchedRoutes.length === 0) return {status: 404};
 		if(matchedRoutes.length === 1) {
-			if(matchedRoutes[0].authorized) req.userId = await turnAccessTokenIntoUserId(req.cookies.get("accessToken"));
+			if(matchedRoutes[0].authorized) {
+				req.userId = await turnAccessTokenIntoUserId(req.cookies.get("accessToken"));
+				if(typeof req.userId != "number") return {
+					status: 401,
+					body: {error: "No valid accessToken cookie found"}
+				}
+			}
 			return await matchedRoutes[0].executorFn(req);
 		} else {
 			console.error("Multiple routes for request found", req, matchedRoutes.map(route => route.validatorFn.toString()));
