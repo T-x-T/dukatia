@@ -1,7 +1,7 @@
 export default {
   server: {
     host: "0.0.0.0",
-    port: process.env.PORT ? Number(process.env.PORT) : 3000
+    port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000
   },
   modules: [
     "@nuxtjs/axios"
@@ -18,9 +18,11 @@ export default {
     ]
   },
   axios: {
-    proxy: true
+    proxy: true,
+    baseURL: process.env.API_HOST ? process.env.API_HOST : "http://localhost:4000",
+    credentials: true
   },
   proxy: {
-    "/api": process.env.NODE_ENV === "prod" ? process.env.API_HOST : "http://localhost:4000"
+    "/api": process.env.API_HOST ? process.env.API_HOST : "http://localhost:4000"
 	}
 }

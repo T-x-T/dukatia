@@ -2,3 +2,4 @@ node_modules
 dist
 config.json
 .nuxt
+docker-compose-testing.yml

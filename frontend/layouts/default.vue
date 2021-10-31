@@ -2,12 +2,14 @@
 	<main>
 		<nav>
 			<h1>TxTs Treasury</h1>
-			<ul>
+			<ul v-if="loggedIn">
 				<li ref="dashboard" @click="currentRoute = 'dashboard'"><NuxtLink to="/">Dashboard</NuxtLink></li>
 				<li ref="transactions" @click="currentRoute = 'transactions'"><NuxtLink to="/transactions">Transactions</NuxtLink></li>
 				<li ref="accounts" @click="currentRoute = 'accounts'"><NuxtLink to="/accounts">Accounts</NuxtLink></li>
 				<li ref="recipients" @click="currentRoute = 'recipients'"><NuxtLink to="/recipients">Recipients</NuxtLink></li>
 				<li ref="currencies" @click="currentRoute = 'currencies'"><NuxtLink to="/currencies">Currencies</NuxtLink></li>
+				<br><br>
+				<li @click="logout"><a>Logout</a></li>
 			</ul>
 		</nav>
 		<div id="content">
@@ -19,7 +21,8 @@
 <script>
 export default {
 	data: () => ({
-		currentRoute: "dashboard"
+		currentRoute: "dashboard",
+		loggedIn: true
 	}),
 
 	async fetch() {
@@ -30,14 +33,25 @@ export default {
 	},
 
 	mounted() {
+		if(!document.cookie.includes("accessToken")) {
+			this.loggedIn = false;
+			this.$router.replace("/login");
+		}
 		this.currentRoute = this.$route.path.replace("/", "");
-		this.$refs[this.currentRoute].firstChild.classList.add("active");
+		this.$refs[this.currentRoute]?.firstChild.classList.add("active");
 	},
 
 	watch: {
 		currentRoute(newRoute, oldRoute) {
-			this.$refs[newRoute].firstChild.classList.add("active");
-			this.$refs[oldRoute].firstChild.classList.remove("active");
+			this.$refs[newRoute]?.firstChild.classList.add("active");
+			this.$refs[oldRoute]?.firstChild.classList.remove("active");
+		}
+	},
+
+	methods: {
+		logout() {
+			document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			location.reload();
 		}
 	}
 }
@@ -72,6 +86,7 @@ a
 	margin: 10px
 	margin-left: 20px
 	transition-duration: 0.2s
+	cursor: pointer
 	&:hover
 		color: $heavy
 

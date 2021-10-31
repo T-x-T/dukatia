@@ -28,7 +28,7 @@ const routes = [
 					}
 				} else {
 					return {
-						status: 401,
+						status: 400,
 						body: {
 							error: "The provided credentials didnt match any registered user"
 						}
