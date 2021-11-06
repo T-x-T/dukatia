@@ -2,6 +2,7 @@
 	<div>
 		<h2>This is the Dashboard</h2>
 		<p>You have {{totalMoney}} monies</p>
+		<TotalBalanceOverTimeChart />
 	</div>
 </template>
 
