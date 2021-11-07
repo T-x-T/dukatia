@@ -3,7 +3,6 @@
 		<LineChart
 			:chartData="chartData"
 			:chartOptions="chartOptions"
-			:height="200"
 		/>
 	</div>
 </template>
@@ -14,6 +13,7 @@ export default {
 		chartData: {},
 		chartOptions: {
 			responsive: true,
+			maintainAspectRatio: false,
 			pointBackgroundColor: "rgba(255, 255, 255, 0)",
 			title:  {
 				display: true,
@@ -75,3 +75,8 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+div
+	height: 100%
+</style>
