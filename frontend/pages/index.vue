@@ -18,10 +18,13 @@
 				<p>You have {{totalMoney}} monies</p>		
 			</div>
 			<div class="gridItem large">
-				<TotalBalanceOverTimeChart />
+				<ChartBalancePerRecipientOverTime />
 			</div>
 			<div class="gridItem large">
-				<TotalBalanceOverTimeChart />
+				<ChartTotalBalanceOverTime />
+			</div>
+			<div class="gridItem large">
+				<ChartBalancePerAccountOverTime />
 			</div>
 		</div>
 	</div>
