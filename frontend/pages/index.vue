@@ -2,20 +2,8 @@
 	<div>
 		<h2>This is the Dashboard</h2>
 		<div id="grid">
-			<div class="gridItem">
-				<p>You have {{totalMoney}} monies</p>		
-			</div>
-			<div class="gridItem">
-				<p>You have {{totalMoney}} monies</p>		
-			</div>
-			<div class="gridItem">
-				<p>You have {{totalMoney}} monies</p>		
-			</div>
-			<div class="gridItem">
-				<p>You have {{totalMoney}} monies</p>		
-			</div>
-			<div class="gridItem">
-				<p>You have {{totalMoney}} monies</p>		
+			<div class="gridItem" v-for="(c, i) in $store.state.currencies" :key="i">
+				<TotalBalance :currencyId="c.id"/>	
 			</div>
 			<div class="gridItem large">
 				<ChartBalancePerRecipientOverTime />
