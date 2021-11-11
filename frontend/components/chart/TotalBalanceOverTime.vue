@@ -24,6 +24,7 @@ export default {
 	data: () => ({
 		fromDate: null,
 		toDate: null,
+		colors: {},
 		chartData: {},
 		chartOptions: {
 			responsive: true,
@@ -133,17 +134,18 @@ export default {
 					data: data,
 					cubicInterpolationMode: "monotone",
 					fill: false,
-					borderColor: `#${this.generateRandomColor()}ff`
+					borderColor: `#${this.colors[currency.id] ? this.colors[currency.id] : this.generateRandomColor(currency.id)}ff`
 				});
 			});
 		},
 
-		generateRandomColor() {
+		generateRandomColor(key) {
 			const chars = "0123456789abcdef";
 			let output = "";
 			for(let i = 0; i < 6; i++) {
 				output += chars.charAt(Math.floor(Math.random() * chars.length));
 			}
+			this.colors[key] = output;
 			return output;
 		}
 	}

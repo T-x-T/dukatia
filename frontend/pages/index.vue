@@ -6,10 +6,10 @@
 				<TotalBalance :currencyId="c.id"/>	
 			</div>
 			<div class="gridItem large">
-				<ChartBalancePerRecipientOverTime />
+				<ChartTotalBalanceOverTime />
 			</div>
 			<div class="gridItem large">
-				<ChartTotalBalanceOverTime />
+				<ChartBalancePerRecipientOverTime />
 			</div>
 			<div class="gridItem large">
 				<ChartBalancePerAccountOverTime />
