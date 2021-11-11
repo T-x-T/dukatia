@@ -37,11 +37,30 @@ export default {
 					type: "time",
 					time: {
 						unit: "day"
+					},
+					ticks: {
+						fontColor: "#ddd"
+					},
+					gridLines: {
+						color: "#fff5",
+						drawBoder: false
+					}
+				}],
+				yAxes: [{
+					ticks: {
+						fontColor: "#ddd"
+					},
+					gridLines: {
+						color: "#fff5",
+						drawBorder: false
 					}
 				}]
 			},
 			legend: {
-				position: "bottom"
+				position: "bottom",
+				labels: {
+					fontColor: "#fff"
+				}
 			}
 		}
 	}),
@@ -111,13 +130,23 @@ export default {
 				
 				if(data.length > 0) {
 					this.chartData.datasets.push({
-							label: account.name,
-							data: data,
-							cubicInterpolationMode: "monotone"
+						label: account.name,
+						data: data,
+						cubicInterpolationMode: "monotone",
+						fill: false,
+						borderColor: `#${this.generateRandomColor()}ff`
 					});
 				}
-				
 			});
+		},
+
+		generateRandomColor() {
+			const chars = "0123456789abcdef";
+			let output = "";
+			for(let i = 0; i < 6; i++) {
+				output += chars.charAt(Math.floor(Math.random() * chars.length));
+			}
+			return output;
 		}
 	}
 }

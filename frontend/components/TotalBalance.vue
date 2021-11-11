@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<p>{{amount}}{{symbol}}</p>
+		<p>Current Balance: <b>{{amount}}{{symbol}}</b></p>
 	</div>
 </template>
 
