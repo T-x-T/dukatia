@@ -62,13 +62,13 @@ export default {
 
 main
 	display: flex
+	height: fit-content
 	width: 100vw
 
 nav
 	background: $darkest
 	width: fit-content
 	min-height: 100vh
-	align-self: stretch
 	flex-shrink: 0
 	border-right: 2px solid $heavy
 	h1
