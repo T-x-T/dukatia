@@ -1,10 +1,27 @@
 <template>
 	<div id="main">
 		<div id="table" v-if="mode=='table'">
-			<button class="green" @click="newTransaction">Add</button>
+			<div>
+				<button class="green" @click="newTransaction">Add</button>
+			</div>
+			<div v-if="selectedRows.length > 0" id="batchEditContainer">
+				<div id="batchEdit">
+					<label for="account">Account:</label>
+					<select id="account" v-model="batchAccountId">
+						<option v-for="(account, index) in $store.state.accounts" :key="index" :value="account.id">{{account.name}}</option>
+					</select>
+
+					<label for="account">Recipient:</label>
+					<select id="account" v-model="batchRecipientId">
+						<option v-for="(recipient, index) in $store.state.recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
+					</select>
+					<button class="green" @click="applyBatchEdit()">Edit selected rows</button>
+				</div>		
+			</div>
 			<CustomTable
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
+				v-on:rowSelect="rowSelect"
 			/>
 		</div>
 
@@ -22,7 +39,10 @@ export default {
 	data: () => ({
 		tableData: {},
 		mode: "table",
-		selectedRow: {}
+		selectedRow: {},
+		selectedRows: [],
+		batchAccountId: null,
+		batchRecipientId: null
 	}),
 
 	async fetch() {
@@ -61,6 +81,11 @@ export default {
 			this.mode = "details";
 		},
 
+		rowSelect(rows) {
+			this.selectedRows = null;
+			this.selectedRows = rows;
+		},
+
 		async newTransaction() {
 			this.selectedRow = {
 				id: "",
@@ -77,10 +102,34 @@ export default {
 			this.mode = "details";
 		},
 
+		async applyBatchEdit() {
+			await Promise.all(this.selectedRows.map(async row => {
+				let transaction = {...this.$store.state.transactions.filter(x => row && x.id === row[0])[0]};
+				transaction.accountId = Number.isInteger(this.batchAccountId) ? this.batchAccountId : transaction.accountId;
+				transaction.recipientId = Number.isInteger(this.batchRecipientId) ? this.batchRecipientId : transaction.recipientId;
+
+
+				const transactionData = {
+					accountId: transaction.accountId,
+					currencyId: transaction.currencyId,
+					recipientId: transaction.recipientId,
+					status: transaction.status,
+					timestamp: transaction.timestamp,
+					amount: transaction.amount,
+					comment: transaction.comment
+				}
+				await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transactionData);
+			}));
+			this.batchAccountId = null;
+			this.batchRecipientId = null;
+			setTimeout(() => this.updateAndLoadTable(), 100);
+		},
+
 		async updateAndLoadTable() {
 			await this.$store.dispatch("fetchTransactions");
 			await this.updateTransactions();
-			this.mode = "table";
+			this.mode = "";
+			setImmediate(() => this.mode = "table");
 		}
 	}
 }
@@ -88,5 +137,18 @@ export default {
 
 <style lang="sass" scoped>
 @import "assets/_vars.sass"
+
+div#batchEditContainer
+	position: fixed
+	display: flex
+	justify-content: center
+	align-items: center
+	bottom: 0px
+	left: 0px
+	width: 100vw
+	padding: 10px
+	background: rgba(0, 0, 0, 0.5)
+	backdrop-filter: blur(5px) saturate(20%)
+	box-shadow: 0px 0px 15px black
 
 </style>

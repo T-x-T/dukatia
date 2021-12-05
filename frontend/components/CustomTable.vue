@@ -2,6 +2,7 @@
 	<table>
 		<thead>
 			<tr>
+				<th><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
 				<th v-for="(header, index) in tableData.headers" :key="index">
 					<p @click="sort(index)">{{header}}</p>
 					<input v-model="filters[index]" @input="filter()">
@@ -9,8 +10,9 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr v-for="(row, index) in rowsForDisplay" :key="index" @click="$emit('rowClick', row)">
-				<td v-for="(cell, index) in row" :key="index">{{cell}}</td>
+			<tr v-for="(row, index) in rowsForDisplay" :key="index">
+				<td><input type="checkbox" v-model="selectedRows[index]"></td>
+				<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 			</tr>
 		</tbody>
 	</table>
@@ -22,7 +24,9 @@ export default {
 		rows: [],
 		sorted: [],
 		filters: [],
-		rowsForDisplay: []
+		rowsForDisplay: [],
+		selectedRows: [],
+		allRowsSelected: false
 	}),
 
 	props: {
@@ -32,6 +36,8 @@ export default {
 	mounted() {
 		this.rows = this.tableData.rows;
 		this.rowsForDisplay = this.rows;
+
+		this.fillSelectedRows();
 	},
 
 	watch: {
@@ -42,7 +48,18 @@ export default {
 	},
 
 	methods: {
+		fillSelectedRows() {
+			this.selectedRows = [];
+			this.rowsForDisplay.forEach(() => this.selectedRows.push(false));
+		},
+
+		selectAllRows() {
+			this.allRowsSelected = !this.allRowsSelected;
+			this.selectedRows = this.selectedRows.map(() => this.allRowsSelected);
+		},
+
 		sort(i) {
+			this.fillSelectedRows();
 			if(this.sorted[i]) {
 				if(this.sorted[i] == "asc") {
 					this.sorted[i] = "desc";
@@ -82,12 +99,22 @@ export default {
 		},
 
 		filter() {
+			this.fillSelectedRows();
 			this.rowsForDisplay = this.rows;
 			for(let i = 0; i < this.filters.length; i++) {
 				if(!this.filters[i]) continue;
 				this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toString().toLowerCase().includes(this.filters[i].toLowerCase()));
 			}
-		},
+		}
+	},
+	watch: {
+		selectedRows() {
+			let selectedRowContents = [];
+			this.selectedRows.forEach((selected, i) => {
+				if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
+			});
+			this.$emit("rowSelect", selectedRowContents);
+		}
 	}
 }
 </script>
