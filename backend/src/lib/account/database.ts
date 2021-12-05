@@ -15,10 +15,9 @@ export default {
 		return res;
 	},
 
-	async getFiltered(key: string, value: string) {
+	async getById(id: number) {
 		const db = await pool.connect();
-		//TODO: Fix possible SQL injection
-		const res = (await db.query("SELECT * FROM public.\"Accounts\" WHERE " + key + " = $1;", [value])).rows;
+		const res = (await db.query("SELECT * FROM public.\"Accounts\" WHERE id = $1;", [id])).rows[0];
 		db.release();
 		return res;
 	},

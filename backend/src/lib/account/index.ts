@@ -29,8 +29,8 @@ export default {
 		return turnRowIntoIShallowAccount(await database.add(account));
 	},
 
-	async getByName(name: string) {
-		return (await database.getFiltered("name", name)).map(x => turnRowIntoIShallowAccount(x));
+	async getById(id: number) {
+		return turnRowIntoIShallowAccount(await database.getById(id));
 	},
 
 	async getAll() {
