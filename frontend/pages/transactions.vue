@@ -59,12 +59,17 @@ export default {
 			});
 
 			this.tableData = {
-				headers: [
-					"ID", "User", "Account", "Recipient", "Status", "Timestamp", "Amount", "Comment"
+				columns: [
+					{name: "ID", type: "number"},
+					{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
+					{name: "Recipient", type: "choice", options: [...new Set(this.$store.state.recipients.map(x => x.name))]},
+					{name: "Status", type: "choice", options: ["Completed"]},
+					{name: "Timestamp", type: "date"},
+					{name: "Amount", type: "number"},
+					{name: "Comment", type: "string"}
 				],
 				rows: transactionsForDisplay.map(x => ([
 					x.id,
-					x.userId,
 					x.account.name,
 					x.recipient.name,
 					x.status === 1 ? "Completed" : "Withheld",
