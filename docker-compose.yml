@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: password
   frontend:
-    image: registry.gitlab.com/t-x-t/txts-treasury/frontend:main-0.2.0
+    image: registry.gitlab.com/t-x-t/txts-treasury/frontend:main-0.3.0
     restart: always
     environment:
       API_HOST: http://backend:4000
@@ -15,7 +15,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
   backend:
-    image: registry.gitlab.com/t-x-t/txts-treasury/backend:main-0.2.0
+    image: registry.gitlab.com/t-x-t/txts-treasury/backend:main-0.3.0
     restart: always
     environment:
       POSTGRES_HOST: postgres
