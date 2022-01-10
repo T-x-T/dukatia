@@ -2,18 +2,23 @@
 	<table>
 		<thead>
 			<tr>
-				<th><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
+				<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
 				<th v-for="(header, index) in tableData.columns" :key="index">
-					<p @click="sort(index)">{{header.name}}</p>
 					<div v-if="Number.isInteger(openFilter)" class="clickTarget" @click="openFilter = null"></div>
 					
+					<p @click="updateSort(index)">{{header.name}}
+						<svg v-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+						<svg v-else-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
+						<svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+					</p>
+
 					<div v-if="header.type == 'choice'" class="columnHeaderWrapper">
 						<div>
 							<select v-model="filters[index].value" @change="filter()">
 								<option value=""></option>
 								<option v-for="(item, index) in header.options" :key="index" :value="item">{{item}}</option>
 							</select>
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						</div>
 
 						<div v-if="openFilter === index" class="filterPopout">
@@ -33,7 +38,7 @@
 							<input type="date" v-model="filters[index].start" @input="filter()">
 							-
 							<input type="date" v-model="filters[index].end" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						</div>
 
 						<div v-if="openFilter === index" class="filterPopout">
@@ -51,7 +56,7 @@
 					<div v-if="header.type == 'number'" class="columnHeaderWrapper">
 						<div>
 							<input type="number" v-model="filters[index].value" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						</div>
 
 						<div v-if="openFilter === index" class="filterPopout">
@@ -73,7 +78,7 @@
 					<div v-if="header.type == 'string'" class="columnHeaderWrapper">
 						<div>
 							<input v-model="filters[index].value" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						</div>
 
 						<div v-if="openFilter === index" class="filterPopout">
@@ -117,7 +122,7 @@
 		</thead>
 		<tbody>
 			<tr v-for="(row, index) in rowsForDisplay" :key="index">
-				<td><input type="checkbox" v-model="selectedRows[index]"></td>
+				<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 				<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 			</tr>
 		</tbody>
@@ -128,7 +133,7 @@
 export default {
 	data: () => ({
 		rows: [],
-		sorted: [],
+		currentSort: [],
 		filters: [],
 		rowsForDisplay: [],
 		selectedRows: [],
@@ -152,6 +157,7 @@ export default {
 			});
 		});
 		
+		this.applyDefaultSort();
 		this.fillSelectedRows();
 	},
 
@@ -173,25 +179,68 @@ export default {
 			this.selectedRows = this.selectedRows.map(() => this.allRowsSelected);
 		},
 
-		sort(i) {
-			this.fillSelectedRows();
-			if(this.sorted[i]) {
-				if(this.sorted[i] == "asc") {
-					this.sorted[i] = "desc";
+		applyDefaultSort() {
+			this.currentSort[0] = {
+				index: this.tableData.defaultSort.column,
+				direction: this.tableData.defaultSort.sort
+			}
+			this.sort(this.tableData.defaultSort.column)
+		},
+
+		updateSort(i) {
+			if(this.currentSort.filter(x => x.index === i).length !== 0) { //If column i is sorted
+				const currentSortPrio = this.currentSort.findIndex(x => x.index === i);
+				if(this.currentSort[currentSortPrio].direction === "asc") {
+					this.currentSort.splice(currentSortPrio, 1);
+					this.currentSort.unshift({
+						index: i,
+						direction: "desc"
+					});
+					this.sort();
 				} else {
-					this.sorted[i] = "asc";
+					this.currentSort.splice(currentSortPrio, 1);
+					if(this.currentSort.length === 0) {
+						this.applyDefaultSort();
+					} else {
+						this.sort();
+					}
+					return;
 				}
 			} else {
-				this.sorted[i] = "asc";
+				if(this.currentSort.length === 1 && this.currentSort[0].index === this.tableData.defaultSort.column && this.currentSort[0].direction === this.tableData.defaultSort.sort) { //If default sort is applied
+					this.currentSort.shift();
+				}
+				this.currentSort.unshift({
+					index: i,
+					direction: "asc"
+				});
+				this.sort();
 			}
+		},
 
-			const isNumber = this.rows.filter(x => !Number.isNaN(parseInt(x[i]))).length > 0 ? true : false;			
-			const reverseSort = this.sorted[i] == "asc" ? true : false;
+		sort() {
+			this.fillSelectedRows();
 
-			if(isNumber) {
-				this.sortNumberColumn(i, reverseSort);
-			} else {
-				this.sortStringColumn(i, reverseSort);
+			const columnType = this.tableData.columns[this.currentSort[0].index].type;	
+			const reverseSort = this.currentSort[0].direction == "desc" ? true : false;
+
+			switch(columnType) {
+				case "string": {
+					this.sortStringColumn(this.currentSort[0].index, reverseSort);
+					break;
+				}
+				case "number": {
+					this.sortNumberColumn(this.currentSort[0].index, reverseSort);
+					break;
+				}
+				case "date": {
+					this.sortDateColumn(this.currentSort[0].index, reverseSort);
+					break;
+				}
+				case "choice": {
+					this.sortStringColumn(this.currentSort[0].index, reverseSort);
+					break;
+				}
 			}
 		},
 
@@ -203,13 +252,19 @@ export default {
 
 		sortStringColumn(i, asc) {
 			this.rows.sort((a, b) => {
-				if(a[i] > b[i]) {
+				if(a[i].toLowerCase() > b[i].toLowerCase()) {
 					return asc ? 1 : -1;
-				} else if(a[i] < b[i]) {
+				} else if(a[i].toLowerCase() < b[i].toLowerCase()) {
 					return asc ? -1 : 1;
 				} else {
 					return 0;
 				}
+			});
+		},
+
+		sortDateColumn(i, asc) {
+			this.rows.sort((a, b) => {
+				return asc ? Date.parse(b[i]) - Date.parse(a[i]) : Date.parse(a[i]) - Date.parse(b[i]);
 			});
 		},
 

@@ -19,8 +19,16 @@ export default {
 	methods: {
 		async updateCurrencies() {
 			this.tableData = {
-				headers: [
-					"ID", "Name", "Symbol", "Minor in Mayor"
+				multiSelect: false,
+				defaultSort: {
+					column: 0,
+					sort: "asc"
+				},
+				columns: [
+					{name: "ID", type: "number"},
+					{name: "Name", type: "string"},
+					{name: "Symbol", type: "string"},
+					{name: "Minor in Mayor", type: "number"},
 				],
 				rows: this.$store.state.currencies.map(x => ([
 					x.id,

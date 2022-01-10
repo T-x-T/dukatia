@@ -32,8 +32,14 @@ export default {
 	methods: {
 		async updateRecipients() {
 			this.tableData = {
-				headers: [
-					"ID", "Name"
+				multiSelect: false,
+				defaultSort: {
+					column: 0,
+					sort: "asc"
+				},
+				columns: [
+					{name: "ID", type: "number"},
+					{name: "Name", type: "string"}
 				],
 				rows: this.$store.state.recipients.map(x => ([
 					x.id,

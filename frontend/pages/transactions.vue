@@ -11,8 +11,8 @@
 						<option v-for="(account, index) in $store.state.accounts" :key="index" :value="account.id">{{account.name}}</option>
 					</select>
 
-					<label for="account">Recipient:</label>
-					<select id="account" v-model="batchRecipientId">
+					<label for="recipient">Recipient:</label>
+					<select id="recipient" v-model="batchRecipientId">
 						<option v-for="(recipient, index) in $store.state.recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
 					</select>
 					<button class="green" @click="applyBatchEdit()">Edit selected rows</button>
@@ -59,6 +59,11 @@ export default {
 			});
 
 			this.tableData = {
+				multiSelect: true,
+				defaultSort: {
+					column: 0,
+					sort: "asc"
+				},
 				columns: [
 					{name: "ID", type: "number"},
 					{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
@@ -139,21 +144,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="sass" scoped>
-@import "assets/_vars.sass"
-
-div#batchEditContainer
-	position: fixed
-	display: flex
-	justify-content: center
-	align-items: center
-	bottom: 0px
-	left: 0px
-	width: 100vw
-	padding: 10px
-	background: rgba(0, 0, 0, 0.5)
-	backdrop-filter: blur(5px) saturate(20%)
-	box-shadow: 0px 0px 15px black
-
-</style>
