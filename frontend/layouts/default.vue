@@ -71,6 +71,7 @@ nav
 	min-height: 100vh
 	flex-shrink: 0
 	border-right: 2px solid $heavy
+	z-index: 10
 	h1
 		margin: 25px
 		cursor: pointer

@@ -1,5 +1,6 @@
 import { IParsedReq } from "../../restApi/index.js";
 import router, { IExecutorResponse } from "../../restApi/router.js";
+import account, { IAccount } from "../account/index.js";
 import transaction, { IShallowTransaction } from "./index.js";
 
 export default () => {
@@ -27,7 +28,6 @@ const routes = [
 				const newTransaction: IShallowTransaction = {
 					userId: req.userId,
 					accountId: req.body.accountId,
-					currencyId: req.body.currencyId,
 					recipientId: req.body.recipientId,
 					status: req.body.status,
 					timestamp: req.body.timestamp ? req.body.timestamp : new Date(),

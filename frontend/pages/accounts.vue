@@ -2,6 +2,7 @@
 	<div id="main">
 		<div id="table" v-if="mode=='table'">
 			<button class="green" @click="newAccount">Add</button>
+
 			<CustomTable
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
@@ -32,8 +33,15 @@ export default {
 	methods: {
 		async updateAccounts() {
 			this.tableData = {
-				headers: [
-					"ID", "Name", "Default Currency"
+				multiSelect: false,
+				defaultSort: {
+					column: 0,
+					sort: "asc"
+				},
+				columns: [
+					{name: "ID", type: "number"},
+					{name: "Name", type: "string"},
+					{name: "Currency", type: "choice", options: this.$store.state.currencies.map(x => x.name)}
 				],
 				rows: this.$store.state.accounts.map(x => ([
 					x.id,

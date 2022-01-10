@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { IAccount } from "../account";
+import account, { IAccount } from "../account/index.js";
 import { ICurrency } from "../currency";
 import { IRecipient } from "../recipient";
 import { ITag } from "../tag";
@@ -23,8 +23,8 @@ type ITransaction = {
 type IShallowTransaction = {
 	id?: number,
 	userId?: number,
+	currencyId?: number,
 	accountId: number,
-	currencyId: number,
 	recipientId: number,
 	status: ETransactionStatus,
 	timestamp: Date,
@@ -47,7 +47,8 @@ export default {
 
 	async add(transaction: IShallowTransaction) {
 		if(!Number.isInteger(transaction.amount)) throw new Error("Amount must be a non floating point integer");
-		return turnRowIntoShallowTransaction(await database.add(transaction));
+		const accountOfTransaction = await account.getById(transaction.accountId);
+		return turnRowIntoShallowTransaction(await database.add({...transaction, currencyId: accountOfTransaction.defaultCurrency}));
 	},
 
 	async getAll() {

@@ -54,14 +54,13 @@ describe("account", function() {
 		});
 	});
 
-	describe("getByName", function() {
+	describe("getById", function() {
 		it("returns only matching rows", async function() {
 			await account.add(testAccount);
 			await account.add(testAccount2);
 
-			const res = await account.getByName("testAccount");
-			assert.ok(res.length > 0);
-			assert.strictEqual(res[0].name, "testAccount");
+			const res = await account.getById(0);
+			assert.strictEqual(res.name, "testAccount");
 		});
 	});
 
@@ -157,7 +156,7 @@ describe("account", function() {
 
 			await account.update({...testAccount2, id: 0});
 			
-			const res = (await account.getByName(testAccount2.name))[0];
+			const res = (await account.getById(0));
 
 			assert.strictEqual(res.name, testAccount2.name);
 			assert.strictEqual(res.defaultCurrency, testAccount2.defaultCurrency);

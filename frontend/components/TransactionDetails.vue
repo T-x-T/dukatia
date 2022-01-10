@@ -8,13 +8,8 @@
 			<input type="text" id="id" disabled v-model="transaction.id">
 			<br>
 			<label for="account">Account:</label>
-			<select id="account" v-model="transaction.accountId">
+			<select id="account" v-model="transaction.accountId" @change="updateAccount">
 				<option v-for="(account, index) in $store.state.accounts" :key="index" :value="account.id">{{account.name}}</option>
-			</select>
-			<br>
-			<label for="currency">Currency:</label>
-			<select id="account" v-model="transaction.currencyId">
-				<option v-for="(currency, index) in $store.state.currencies" :key="index" :value="currency.id">{{currency.name}}</option>
 			</select>
 			<br>
 			<label for="recipient">Recipient:</label>
@@ -59,7 +54,6 @@ export default {
 		async sendTransaction() {
 			const transactionData = {
 				accountId: this.transaction.accountId,
-				currencyId: this.transaction.currencyId,
 				recipientId: this.transaction.recipientId,
 				status: this.transaction.status,
 				timestamp: this.transaction.timestamp,
@@ -74,6 +68,11 @@ export default {
 			}
 
 			this.$emit("back");
+		},
+
+		updateAccount() {
+			this.transaction.account = this.$store.state.accounts.filter(x => x.id === this.transaction.accountId)[0];
+			this.transaction.currency = this.$store.state.currencies.filter(x => x.id === this.transaction.account.defaultCurrency)[0];
 		}
 	}
 }
