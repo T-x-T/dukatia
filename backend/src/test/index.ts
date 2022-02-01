@@ -28,5 +28,7 @@ import testCurrency from "./tests/currency.js";
 testCurrency(config);
 import testRecipient from "./tests/recipient.js";
 testRecipient(config);
+import testTag from "./tests/tag.js";
+testTag(config);
 import testTransaction from "./tests/transaction.js";
 testTransaction(config);

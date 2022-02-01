@@ -25,6 +25,7 @@ import accessToken from "./lib/accessToken/index.js";
 import account from "./lib/account/index.js";
 import recipient from "./lib/recipient/index.js";
 import transaction from "./lib/transaction/index.js";
+import tag from "./lib/tag/index.js";
 
 await Promise.all([
 	currency.init(db),
@@ -32,5 +33,6 @@ await Promise.all([
 	accessToken.init(db),
 	account.init(db),
 	recipient.init(db),
+	tag.init(db),
 	transaction.init(db)
 ]);
