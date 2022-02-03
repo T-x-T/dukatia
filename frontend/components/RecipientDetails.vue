@@ -9,6 +9,12 @@
 			<label for="name">Name:</label>
 			<input type="text" id="name" v-model="recipient.name">
 			<br>
+			<label for="parent">Tag:</label>
+			<select id="parent" v-model="recipient.tagIds[0]">
+				<option value=""></option>
+				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
+			</select>
+			<br>
 			<button class="green" @click="sendRecipient">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>	
 		</div>
@@ -29,6 +35,10 @@ export default {
 
 	props: {
 		recipient: Object
+	},
+
+	fetch() {
+		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
 	},
 
 	mounted() {
@@ -59,10 +69,12 @@ export default {
 	methods: {
 		async sendRecipient() {
 			const recipientData = {
-				name: this.recipient.name
+				id: this.recipient.id,
+				name: this.recipient.name,
+				tagIds: Array.isArray(this.recipient.tagIds) && typeof this.recipient.tagIds[0] == "number" ? this.recipient.tagIds : undefined
 			}
 
-			if(this.recipient.id) {
+			if(typeof this.recipient.id == "number") {
 				await this.$axios.$put(`/api/v1/recipients/${this.recipient.id}`, recipientData);
 			} else {
 				await this.$axios.$post("/api/v1/recipients", recipientData);

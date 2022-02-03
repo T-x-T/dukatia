@@ -2,6 +2,7 @@ import assert from "assert"
 import { Pool, PoolClient } from "pg";
 import database from "../../database/postgresql/index.js";
 import account from "../../lib/account/index.js";
+import tag from "../../lib/tag/index.js";
 
 let db: PoolClient = null;
 let pool: Pool = null;
@@ -17,6 +18,10 @@ const testAccount2 = {
 	defaultCurrency: 0
 }
 
+const testTag = {
+	name: "test"
+}
+
 export default (_config: any) => config = _config;
 
 describe("account", function() {
@@ -29,6 +34,7 @@ describe("account", function() {
 		pool = await database.getPostgresqlConnection(config.database);
 		db = await pool.connect();
 		await account.init(pool);
+		await tag.init(pool);
 	});
 
 	this.afterAll("close database connection", async function() {
@@ -45,12 +51,32 @@ describe("account", function() {
 			await assert.doesNotReject(() => account.add(testAccount));
 		});
 
+		it("doesnt reject with single tag", async function() {
+			await tag.add(testTag);
+			await assert.doesNotReject(() => account.add({...testAccount, tagIds: [0]}));
+		});
+
+		it("doesnt reject with multiple tags", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await assert.doesNotReject(() => account.add({...testAccount, tagIds: [0, 2, 1]}));
+		});
+
 		it("returns the newly added entry including the id", async function() {
 			const res = await account.add(testAccount);
 			
 			assert.strictEqual(res.name, "testAccount");
 			assert.strictEqual(res.defaultCurrency, 0);
 			assert.strictEqual(typeof res.id, "number");
+		});
+
+		it("returns the newly added entry without tagIds", async function() {
+			await tag.add(testTag);
+			const res = await account.add({...testAccount, tagIds: [0]});
+
+			assert.strictEqual(res.id, 0);
+			assert.strictEqual(res.tagIds, undefined);
 		});
 	});
 
@@ -62,6 +88,31 @@ describe("account", function() {
 			const res = await account.getById(0);
 			assert.strictEqual(res.name, "testAccount");
 		});
+
+		it("returns single tag correctly", async function() {
+			await tag.add(testTag);
+			await account.add(testAccount);
+			await account.add({...testAccount2, tagIds: [0]});
+
+			const res = await account.getById(1);
+			assert.strictEqual(res.id, 1);
+			assert.deepStrictEqual(res.tagIds, [0]);
+		});
+
+		it("returns multiple tags correctly", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await account.add(testAccount);
+			await account.add({...testAccount2, tagIds: [0, 2, 1]});
+
+			const res = await account.getById(1);
+			assert.strictEqual(res.id, 1);
+			assert.strictEqual(res.tagIds.length, 3);
+			assert.ok(res.tagIds.includes(0));
+			assert.ok(res.tagIds.includes(1));
+			assert.ok(res.tagIds.includes(2));
+		});
 	});
 
 	describe("getAll", function() {
@@ -71,6 +122,31 @@ describe("account", function() {
 
 			const res = await account.getAll();
 			assert.strictEqual(res.length, 2);
+		});
+
+		it("returns single tag correctly", async function() {
+			await tag.add(testTag);
+			await account.add(testAccount);
+			await account.add({...testAccount2, tagIds: [0]});
+
+			const res = await account.getAll();
+			assert.strictEqual(res[1].id, 1);
+			assert.deepStrictEqual(res[1].tagIds, [0]);
+		});
+
+		it("returns multiple tags correctly", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await account.add(testAccount);
+			await account.add({...testAccount2, tagIds: [0, 2, 1]});
+
+			const res = await account.getAll();
+			assert.strictEqual(res[1].id, 1);
+			assert.strictEqual(res[1].tagIds.length, 3);
+			assert.ok(res[1].tagIds.includes(0));
+			assert.ok(res[1].tagIds.includes(1));
+			assert.ok(res[1].tagIds.includes(2));
 		});
 	});
 
@@ -160,6 +236,51 @@ describe("account", function() {
 
 			assert.strictEqual(res.name, testAccount2.name);
 			assert.strictEqual(res.defaultCurrency, testAccount2.defaultCurrency);
+		});
+
+		it("doesnt set tags when no tags have been set and should be set", async function() {
+			await tag.add(testTag);
+			await account.add(testAccount);
+
+			await account.update({...testAccount, id: 0});
+
+			const res = (await account.getAll())[0];
+
+			assert.strictEqual(res.tagIds, undefined);
+		});
+
+		it("removes tags when tags have been set", async function() {
+			await tag.add(testTag);
+			await account.add({...testAccount, tagIds: [0]});
+
+			await account.update({...testAccount, id: 0});
+
+			const res = (await account.getAll())[0];
+
+			assert.strictEqual(res.tagIds, undefined);
+		});
+
+		it("correctly sets tags when no tags have been set", async function() {
+			await tag.add(testTag);
+			await account.add(testAccount);
+
+			await account.update({...testAccount, id: 0, tagIds: [0]});
+
+			const res = (await account.getAll())[0];
+
+			assert.deepStrictEqual(res.tagIds, [0]);
+		});
+
+		it("correctly sets changed tags", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await account.add({...testAccount, tagIds: [0]});
+
+			await account.update({...testAccount, id: 0, tagIds: [1]});
+
+			const res = (await account.getAll())[0];
+
+			assert.deepStrictEqual(res.tagIds, [1]);
 		});
 	});
 

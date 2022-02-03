@@ -11,7 +11,7 @@
 			<br>
 			<label for="parent">Parent:</label>
 			<select id="parent" v-model="tag.parentId">
-				<option value="">No Parent</option>
+				<option value=""></option>
 				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
 			</select>
 			<br>
@@ -38,7 +38,7 @@ export default {
 				parentId: this.tag.parentId ? this.tag.parentId : undefined
 			}
 
-			if(this.tag.id) {
+			if(typeof this.tag.id == "number") {
 				await this.$axios.$put(`/api/v1/tags/${this.tag.id}`, tagData);
 			} else {
 				await this.$axios.$post("/api/v1/tags", tagData);

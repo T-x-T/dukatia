@@ -32,6 +32,12 @@
 			<label for="comment">Comment:</label>
 			<input type="text" id="comment" v-model="transaction.comment">
 			<br>
+			<label for="parent">Tag:</label>
+			<select id="parent" v-model="transaction.tagIds[0]">
+				<option value=""></option>
+				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
+			</select>
+			<br>
 			<button class="green" @click="sendTransaction">Save</button>
 			<button class="orange" @click="$emit('back')">Cancel</button>
 		</div>
@@ -42,6 +48,10 @@
 export default {
 	props: {
 		transaction: Object
+	},
+
+	fetch() {
+		this.transaction.tagIds = Array.isArray(this.transaction.tagIds) ? [...this.transaction.tagIds] : [null]
 	},
 
 	methods: {
@@ -55,13 +65,15 @@ export default {
 			const transactionData = {
 				accountId: this.transaction.accountId,
 				recipientId: this.transaction.recipientId,
+				currencyId: this.transaction.currencyId,
 				status: this.transaction.status,
 				timestamp: this.transaction.timestamp,
 				amount: this.transaction.amount * 100,
-				comment: this.transaction.comment
+				comment: this.transaction.comment,
+				tagIds: Array.isArray(this.transaction.tagIds) && typeof this.transaction.tagIds[0] == "number" ? this.transaction.tagIds : undefined
 			}
 
-			if(this.transaction.id) {
+			if(typeof this.transaction.id == "number") {
 				await this.$axios.$put(`/api/v1/transactions/${this.transaction.id}`, transactionData);
 			} else {
 				await this.$axios.$post("/api/v1/transactions", transactionData);

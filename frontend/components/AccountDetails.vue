@@ -14,6 +14,12 @@
 				<option v-for="(currency, index) in $store.state.currencies" :key="index" :value="currency.id">{{currency.name}}</option>
 			</select>
 			<br>
+			<label for="parent">Tag:</label>
+			<select id="parent" v-model="account.tagIds[0]">
+				<option value=""></option>
+				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
+			</select>
+			<br>
 			<button class="green" @click="sendAccount">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>
 		</div>	
@@ -34,6 +40,10 @@ export default {
 
 	props: {
 		account: Object
+	},
+
+	fetch() {
+		this.account.tagIds = Array.isArray(this.account.tagIds) ? [...this.account.tagIds] : [null]
 	},
 
 	mounted() {
@@ -65,9 +75,11 @@ export default {
 		async sendAccount() {
 			const accountData = {
 				name: this.account.name,
-				defaultCurrency: this.account.defaultCurrency.id
+				defaultCurrency: this.account.defaultCurrency.id,
+				tagIds: Array.isArray(this.account.tagIds) && typeof this.account.tagIds[0] == "number" ? this.account.tagIds : undefined
 			}
-			if(this.account.id) {
+			console.log(accountData)
+			if(typeof this.account.id == "number") {
 				await this.$axios.$put(`/api/v1/accounts/${this.account.id}`, accountData);
 			} else {
 				await this.$axios.$post("/api/v1/accounts", accountData);

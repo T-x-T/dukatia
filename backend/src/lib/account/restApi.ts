@@ -26,7 +26,8 @@ const routes = [
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				const newAccount: IShallowAccount = {
 					name: req.body.name,
-					defaultCurrency: req.body.defaultCurrency
+					defaultCurrency: req.body.defaultCurrency,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 				
 				try {
@@ -64,7 +65,8 @@ const routes = [
 				const newAccount: IShallowAccount = {
 					id: id,
 					name: req.body.name,
-					defaultCurrency: req.body.defaultCurrency
+					defaultCurrency: req.body.defaultCurrency,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
 				try {

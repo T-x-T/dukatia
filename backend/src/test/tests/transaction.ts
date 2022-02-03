@@ -5,6 +5,7 @@ import account from "../../lib/account/index.js";
 import recipient from "../../lib/recipient/index.js";
 import transaction, { IShallowTransaction } from "../../lib/transaction/index.js";
 import user from "../../lib/user/index.js";
+import tag from "../../lib/tag/index.js";
 
 let db: PoolClient = null;
 let pool: Pool = null;
@@ -34,6 +35,10 @@ const testTransaction2: IShallowTransaction = {
 	comment: "this is another comment"
 }
 
+const testTag = {
+	name: "test"
+}
+
 describe("transaction", function() {
 
 	this.beforeAll("clear Database", async function() {
@@ -47,6 +52,7 @@ describe("transaction", function() {
 		await transaction.init(pool);
 		await recipient.init(pool);
 		await account.init(pool);
+		await tag.init(pool);
 	});
 
 	this.afterAll("close database connection", async function() {
@@ -67,6 +73,32 @@ describe("transaction", function() {
 		it("rejects with floating point number as amount", async function() {
 			await assert.rejects(() => transaction.add({...testTransaction, amount: 123.45}), new Error("Amount must be a non floating point integer"));
 		});
+
+		it("doesnt reject with single tag", async function() {
+			await tag.add(testTag);
+			await assert.doesNotReject(() => transaction.add({...testTransaction, tagIds: [0]}));
+		});
+
+		it("doesnt reject with multiple tags", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await assert.doesNotReject(() => transaction.add({...testTransaction, tagIds: [0, 2, 1]}));
+		});
+
+		it("returns the newly added entry including the id", async function() {
+			const res = await transaction.add(testTransaction);
+			
+			assert.strictEqual(res.id, 0);
+		});
+
+		it("returns the newly added entry without tagIds", async function() {
+			await tag.add(testTag);
+			const res = await transaction.add({...testTransaction, tagIds: [0]});
+
+			assert.strictEqual(res.id, 0);
+			assert.strictEqual(res.tagIds, undefined);
+		});
 	});
 
 	describe("getAll", function() {
@@ -79,6 +111,31 @@ describe("transaction", function() {
 			
 			assert.strictEqual(res.length, 3);
 		});
+
+		it("returns single tag correctly", async function() {
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+			await transaction.add({...testTransaction, tagIds: [0]});
+
+			const res = await transaction.getAll();
+			assert.strictEqual(res[1].id, 1);
+			assert.deepStrictEqual(res[1].tagIds, [0]);
+		});
+
+		it("returns multiple tags correctly", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+			await transaction.add({...testTransaction, tagIds: [0, 2, 1]});
+
+			const res = await transaction.getAll();
+			assert.strictEqual(res[1].id, 1);
+			assert.strictEqual(res[1].tagIds.length, 3);
+			assert.ok(res[1].tagIds.includes(0));
+			assert.ok(res[1].tagIds.includes(1));
+			assert.ok(res[1].tagIds.includes(2));
+		});
 	});
 
 	describe("getById", function() {
@@ -87,9 +144,34 @@ describe("transaction", function() {
 			await transaction.add({...testTransaction, comment: "test"});
 			await transaction.add(testTransaction);
 
-			const res = await transaction.getAll();
+			const res = await transaction.getById(1);
 
-			assert.strictEqual(res[1].comment, "test");
+			assert.strictEqual(res.comment, "test");
+		});
+
+		it("returns single tag correctly", async function() {
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+			await transaction.add({...testTransaction, tagIds: [0]});
+
+			const res = await transaction.getById(1);
+			assert.strictEqual(res.id, 1);
+			assert.deepStrictEqual(res.tagIds, [0]);
+		});
+
+		it("returns multiple tags correctly", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+			await transaction.add({...testTransaction, tagIds: [0, 2, 1]});
+
+			const res = await transaction.getById(1);
+			assert.strictEqual(res.id, 1);
+			assert.strictEqual(res.tagIds.length, 3);
+			assert.ok(res.tagIds.includes(0));
+			assert.ok(res.tagIds.includes(1));
+			assert.ok(res.tagIds.includes(2));
 		});
 	});
 
@@ -169,7 +251,7 @@ describe("transaction", function() {
 
 			await transaction.update({...testTransaction2, id: 0});
 			
-			const res = (await transaction.getById(0))[0];
+			const res = (await transaction.getById(0));
 
 			assert.strictEqual(res.accountId, testTransaction2.accountId);
 			assert.strictEqual(res.amount, testTransaction2.amount);
@@ -178,6 +260,51 @@ describe("transaction", function() {
 			assert.strictEqual(res.recipientId, testTransaction2.recipientId);
 			assert.strictEqual(res.status, testTransaction2.status);
 			assert.deepStrictEqual(res.timestamp, testTransaction2.timestamp);
+		});
+
+		it("doesnt set tags when no tags have been set and should be set", async function() {
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+
+			await transaction.update({...testTransaction, id: 0});
+
+			const res = (await transaction.getAll())[0];
+
+			assert.strictEqual(res.tagIds, undefined);
+		});
+
+		it("removes tags when tags have been set", async function() {
+			await tag.add(testTag);
+			await transaction.add({...testTransaction, tagIds: [0]});
+
+			await transaction.update({...testTransaction, id: 0});
+
+			const res = (await transaction.getAll())[0];
+
+			assert.strictEqual(res.tagIds, undefined);
+		});
+
+		it("correctly sets tags when no tags have been set", async function() {
+			await tag.add(testTag);
+			await transaction.add(testTransaction);
+
+			await transaction.update({...testTransaction, id: 0, tagIds: [0]});
+
+			const res = (await transaction.getAll())[0];
+
+			assert.deepStrictEqual(res.tagIds, [0]);
+		});
+
+		it("correctly sets changed tags", async function() {
+			await tag.add(testTag);
+			await tag.add(testTag);
+			await transaction.add({...testTransaction, tagIds: [0]});
+
+			await transaction.update({...testTransaction, id: 0, tagIds: [1]});
+
+			const res = (await transaction.getAll())[0];
+
+			assert.deepStrictEqual(res.tagIds, [1]);
 		});
 	})
 

@@ -1,12 +1,11 @@
 import { Pool } from "pg";
-import { ITag } from "../tag";
 import database from "./database.js";
 import restApi from "./restApi.js";
 
 type IRecipient = {
 	id?: number,
 	name: string,
-	tags?: ITag[]
+	tagIds?: number[]
 }
 
 export type { IRecipient };
@@ -17,16 +16,15 @@ export default {
 		restApi();
 	},
 
-	async getAll() {
-		return await database.getAll();
+	async getAll(): Promise<IRecipient[]> {
+		return (await database.getAll()).map(x => turnRowIntoIRecipient(x));
 	},
 
 	async add(recipient: IRecipient): Promise<IRecipient> {
-		const res = await database.add(recipient);
-		return turnRowIntoIRecipient(res);
+		return turnRowIntoIRecipient(await database.add(recipient));
 	},
 
-	async update(recipient: IRecipient) {
+	async update(recipient: IRecipient): Promise<IRecipient> {
 		if(!Number.isInteger(recipient.id)) throw new Error("no valid id specified");
 		const res = await database.update(recipient);
 		if(res.length === 0) throw new Error("no row with id: " + recipient.id);
@@ -37,6 +35,7 @@ export default {
 function turnRowIntoIRecipient(row: any): IRecipient {
 	return {
 		id: row.id,
-		name: row.name
+		name: row.name,
+		tagIds: Array.isArray(row.tags) && row.tags[0] !== null ? row.tags : undefined
 	}
 }
