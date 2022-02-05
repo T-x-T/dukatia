@@ -39,11 +39,13 @@ export default {
 				},
 				columns: [
 					{name: "ID", type: "number"},
-					{name: "Name", type: "string"}
+					{name: "Name", type: "string"},
+					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
 				],
 				rows: this.$store.state.recipients.map(x => ([
 					x.id,
-					x.name
+					x.name,
+					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		},

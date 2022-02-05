@@ -8,12 +8,10 @@
 			<br>
 			<label for="name">Name:</label>
 			<input type="text" id="name" v-model="recipient.name">
-			<br>
-			<label for="parent">Tag:</label>
-			<select id="parent" v-model="recipient.tagIds[0]">
-				<option value=""></option>
-				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
-			</select>
+			<CustomSelect
+				:selectData="selectData"
+				v-on:update="tagUpdate"
+			/>
 			<br>
 			<button class="green" @click="sendRecipient">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>	
@@ -30,7 +28,8 @@
 <script>
 export default {
 	data: () => ({
-		tableData: {}
+		tableData: {},
+		selectData: {}
 	}),
 
 	props: {
@@ -41,7 +40,13 @@ export default {
 		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
 	},
 
-	mounted() {
+	created() {
+		this.selectData = {
+			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
+			selected: this.recipient.tagIds ? [...this.recipient.tagIds] : undefined,
+			label: "Tags:"
+		}
+
 		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.recipientId == this.recipient.id).map(x => {
 			x.account = this.$store.state.accounts.filter(a => a.id == x.accountId)[0];
 			x.currency = this.$store.state.currencies.filter(c => c.id == x.currencyId)[0];
@@ -81,6 +86,10 @@ export default {
 			}
 
 			this.$emit("back");
+		},
+
+		tagUpdate(selected) {
+			this.recipient.tagIds = selected;
 		}
 	}
 }
