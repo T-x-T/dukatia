@@ -35,7 +35,7 @@ export default {
 	props: {
 		recipient: Object
 	},
-	
+
 	created() {
 		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
 		this.selectData = {
@@ -52,18 +52,28 @@ export default {
 		});
 
 		this.tableData = {
-			headers: [
-				"ID", "User", "Account", "Recipient", "Status", "Timestamp", "Amount", "Comment"
+			multiSelect: false,
+			defaultSort: {
+				column: 0,
+				sort: "asc"
+			},
+			columns: [
+				{name: "ID", type: "number"},
+				{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
+				{name: "Recipient", type: "choice", options: [...new Set(this.$store.state.recipients.map(x => x.name))]},
+				{name: "Timestamp", type: "date"},
+				{name: "Amount", type: "number"},
+				{name: "Comment", type: "string"},
+				{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
 			],
 			rows: transactionsForDisplay.map(x => ([
 				x.id,
-				x.userId,
 				x.account.name,
 				x.recipient.name,
-				x.status === 1 ? "Completed" : "Withheld",
 				new Date(x.timestamp).toISOString().substring(0, 10),
 				`${x.amount / x.currency.minorinmayor}${x.currency.symbol}`,
-				x.comment
+				x.comment,
+				this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
 			]))
 		}
 	},
