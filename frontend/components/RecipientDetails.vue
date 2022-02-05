@@ -35,12 +35,9 @@ export default {
 	props: {
 		recipient: Object
 	},
-
-	fetch() {
-		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
-	},
-
+	
 	created() {
+		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
 		this.selectData = {
 			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
 			selected: this.recipient.tagIds ? [...this.recipient.tagIds] : undefined,

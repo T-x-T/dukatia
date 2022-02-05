@@ -31,12 +31,10 @@
 			<br>
 			<label for="comment">Comment:</label>
 			<input type="text" id="comment" v-model="transaction.comment">
-			<br>
-			<label for="parent">Tag:</label>
-			<select id="parent" v-model="transaction.tagIds[0]">
-				<option value=""></option>
-				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
-			</select>
+			<CustomSelect
+				:selectData="selectData"
+				v-on:update="tagUpdate"
+			/>
 			<br>
 			<button class="green" @click="sendTransaction">Save</button>
 			<button class="orange" @click="$emit('back')">Cancel</button>
@@ -46,12 +44,20 @@
 
 <script>
 export default {
+	data: () => ({
+		selectData: {}
+	}),
 	props: {
 		transaction: Object
 	},
 
-	fetch() {
+	created() {
 		this.transaction.tagIds = Array.isArray(this.transaction.tagIds) ? [...this.transaction.tagIds] : [null]
+		this.selectData = {
+			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
+			selected: this.transaction.tagIds ? [...this.transaction.tagIds] : undefined,
+			label: "Tags:"
+		}
 	},
 
 	methods: {
@@ -85,6 +91,10 @@ export default {
 		updateAccount() {
 			this.transaction.account = this.$store.state.accounts.filter(x => x.id === this.transaction.accountId)[0];
 			this.transaction.currency = this.$store.state.currencies.filter(x => x.id === this.transaction.account.defaultCurrency)[0];
+		},
+
+		tagUpdate(selected) {
+			this.transaction.tagIds = selected;
 		}
 	}
 }

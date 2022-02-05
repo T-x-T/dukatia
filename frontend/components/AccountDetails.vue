@@ -13,12 +13,10 @@
 			<select id="currency" v-model="account.defaultCurrency.id">
 				<option v-for="(currency, index) in $store.state.currencies" :key="index" :value="currency.id">{{currency.name}}</option>
 			</select>
-			<br>
-			<label for="parent">Tag:</label>
-			<select id="parent" v-model="account.tagIds[0]">
-				<option value=""></option>
-				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
-			</select>
+			<CustomSelect
+				:selectData="selectData"
+				v-on:update="tagUpdate"
+			/>
 			<br>
 			<button class="green" @click="sendAccount">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>
@@ -35,18 +33,22 @@
 <script>
 export default {
 	data: () => ({
-		tableData: {}
+		tableData: {},
+		selectData: {}
 	}),
 
 	props: {
 		account: Object
 	},
 
-	fetch() {
-		this.account.tagIds = Array.isArray(this.account.tagIds) ? [...this.account.tagIds] : [null]
-	},
+	created() {
+		this.account.tagIds = Array.isArray(this.account.tagIds) ? [...this.account.tagIds] : [null];
+		this.selectData = {
+			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
+			selected: this.account.tagIds ? [...this.account.tagIds] : undefined,
+			label: "Tags:"
+		}
 
-	mounted() {
 		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.accountId == this.account.id).map(x => {
 			x.account = this.$store.state.accounts.filter(a => a.id == x.accountId)[0];
 			x.currency = this.$store.state.currencies.filter(c => c.id == x.currencyId)[0];
@@ -86,6 +88,10 @@ export default {
 			}
 
 			this.$emit("back");
+		},
+		
+		tagUpdate(selected) {
+			this.account.tagIds = selected;
 		}
 	}
 }
