@@ -41,12 +41,14 @@ export default {
 				columns: [
 					{name: "ID", type: "number"},
 					{name: "Name", type: "string"},
-					{name: "Currency", type: "choice", options: this.$store.state.currencies.map(x => x.name)}
+					{name: "Currency", type: "choice", options: this.$store.state.currencies.map(x => x.name)},
+					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
 				],
 				rows: this.$store.state.accounts.map(x => ([
 					x.id,
 					x.name,
-					this.$store.state.currencies.filter(c => c.id == x.defaultCurrency)[0].name
+					this.$store.state.currencies.filter(c => c.id == x.defaultCurrency)[0].name,
+					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		},

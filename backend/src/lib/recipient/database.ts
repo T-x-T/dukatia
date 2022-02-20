@@ -10,7 +10,7 @@ export default {
 
 	async getAll() {
 		const db = await pool.connect(); 
-		const res = (await db.query("SELECT * FROM public.\"Recipients\"")).rows;
+		const res = (await db.query("SELECT r.id, r.name, r.user, array_agg(t.tag) as tags FROM public.\"Recipients\" r LEFT JOIN public.\"RecipientTags\" t ON r.id = t.recipient GROUP BY r.id;")).rows;
 		db.release();
 		return res;
 	},
@@ -18,6 +18,9 @@ export default {
 	async add(recipient: IRecipient) {
 		const db = await pool.connect(); 
 		const res = (await db.query("INSERT INTO public.\"Recipients\" (id, name) VALUES (DEFAULT, $1) RETURNING *;", [recipient.name])).rows[0];
+		if(recipient.tagIds) {
+			await Promise.all(recipient.tagIds.map((tagId) => db.query("INSERT INTO public.\"RecipientTags\" (recipient, tag) VALUES ($1, $2);", [res.id, tagId])));
+		}
 		db.release();
 		return res;
 	},
@@ -25,6 +28,10 @@ export default {
 	async update(recipient: IRecipient) {
 		const db = await pool.connect();
 		const res = (await db.query("UPDATE public.\"Recipients\" SET name=$1 WHERE id=$2 RETURNING *;", [recipient.name, recipient.id])).rows;
+		await db.query("DELETE FROM public.\"RecipientTags\" WHERE recipient=$1", [recipient.id]);
+		if(recipient.tagIds) {
+			await Promise.all(recipient.tagIds.map((tagId) => db.query("INSERT INTO public.\"RecipientTags\" (recipient, tag) VALUES ($1, $2);", [recipient.id, tagId])));
+		}
 		db.release();
 		return res;
 	}

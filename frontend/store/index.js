@@ -2,7 +2,8 @@ export const state = () => ({
 	accounts: [],
 	currencies: [],
 	recipients: [],
-	transactions: []
+	transactions: [],
+	tags: []
 });
 
 export const mutations = {
@@ -20,6 +21,10 @@ export const mutations = {
 
 	transactions(state, payload) {
 		state.transactions = payload;
+	},
+
+	tags(state, payload) {
+		state.tags = payload;
 	}
 }
 
@@ -51,6 +56,14 @@ export const actions = {
 	async fetchTransactions(context) {
 		try {
 			context.commit("transactions", (await this.$axios.$get("/api/v1/transactions/all")).sort((a, b) => a.id - b.id));
+		} catch(e) {
+			console.log(e)
+		}
+	},
+
+	async fetchTags(context) {
+		try {
+			context.commit("tags", (await this.$axios.$get("/api/v1/tags/all")).sort((a, b) => a.id - b.id));
 		} catch(e) {
 			console.log(e)
 		}

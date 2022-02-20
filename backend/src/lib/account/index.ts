@@ -14,7 +14,8 @@ type IAccount = {
 type IShallowAccount = {
 	id?: number,
 	name: string,
-	defaultCurrency: number
+	defaultCurrency: number,
+	tagIds?: number[]
 }
 
 export type { IAccount, IShallowAccount };
@@ -25,27 +26,27 @@ export default {
 		restApi();
 	},
 
-	async add(account: IShallowAccount) {
+	async add(account: IShallowAccount): Promise<IShallowAccount> {
 		return turnRowIntoIShallowAccount(await database.add(account));
 	},
 
-	async getById(id: number) {
+	async getById(id: number): Promise<IShallowAccount> {
 		return turnRowIntoIShallowAccount(await database.getById(id));
 	},
 
-	async getAll() {
+	async getAll(): Promise<IShallowAccount[]> {
 		return (await database.getAll()).map(x => turnRowIntoIShallowAccount(x));
 	},
 
-	async deleteById(id: number) {
+	async deleteById(id: number): Promise<number> {
 		return await database.deleteById(id);
 	},
 
-	async deleteAll() {
+	async deleteAll(): Promise<number> {
 		return await database.deleteAll();
 	},
 
-	async update(account: IShallowAccount) {
+	async update(account: IShallowAccount): Promise<IShallowAccount> {
 		if(!Number.isInteger(account.id)) throw new Error("no valid id specified");
 		const res = await database.update(account);
 		if(res.length === 0) throw new Error("no row with id: " + account.id);
@@ -57,6 +58,7 @@ function turnRowIntoIShallowAccount(row: any): IShallowAccount {
 	return {
 		id: row.id,
 		name: row.name,
-		defaultCurrency: row.defaultcurrency
+		defaultCurrency: row.defaultcurrency,
+		tagIds: Array.isArray(row.tags) && row.tags[0] !== null ? row.tags : undefined
 	}
 }

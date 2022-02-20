@@ -32,7 +32,8 @@ const routes = [
 					status: req.body.status,
 					timestamp: req.body.timestamp ? req.body.timestamp : new Date(),
 					amount: Number(req.body.amount),
-					comment: req.body.comment
+					comment: req.body.comment,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 				
 				try {
@@ -100,7 +101,8 @@ const routes = [
 					status: req.body.status,
 					timestamp: req.body.timestamp ? req.body.timestamp : new Date(),
 					amount: Number(req.body.amount),
-					comment: req.body.comment
+					comment: req.body.comment,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
 				try {

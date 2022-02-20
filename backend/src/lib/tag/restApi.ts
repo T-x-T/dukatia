@@ -1,6 +1,6 @@
 import { IParsedReq } from "../../restApi/index.js";
 import router, { IExecutorResponse } from "../../restApi/router.js";
-import account, { IShallowAccount } from "./index.js";
+import tag, { ITag } from "./index.js";
 
 export default () => {
 	routes.forEach(x => x());
@@ -10,10 +10,10 @@ const routes = [
 	() => {
 		router.register({
 			authorized: true,
-			validatorFn: (req: IParsedReq) => req.path == "/accounts/all" && req.method == "GET",
+			validatorFn: (req: IParsedReq) => req.path == "/tags/all" && req.method == "GET",
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				return {
-					body: await account.getAll(),
+					body: await tag.getAll(),
 					status: 200
 				}
 			}
@@ -22,16 +22,15 @@ const routes = [
 	() => {
 		router.register({
 			authorized: true,
-			validatorFn: (req: IParsedReq) => req.path == "/accounts" && req.method == "POST",
+			validatorFn: (req: IParsedReq) => req.path == "/tags" && req.method == "POST",
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
-				const newAccount: IShallowAccount = {
+				const newTag: ITag = {
 					name: req.body.name,
-					defaultCurrency: req.body.defaultCurrency,
-					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
+					parentId: req.body.parentId ? req.body.parentId : undefined
 				}
-				
+
 				try {
-					const res = await account.add(newAccount);
+					const res = await tag.add(newTag);
 					return {
 						status: 201,
 						body: res
@@ -46,37 +45,36 @@ const routes = [
 			}
 		})
 	},
-
 	() => {
 		router.register({
 			authorized: true,
-			validatorFn: (req: IParsedReq) => req.path.startsWith("/accounts/") && req.method == "PUT",
+			validatorFn: (req: IParsedReq) => req.path.startsWith("/tags/") && req.method == "PUT",
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				const pathParts = req.path.split("/");
 				const id = parseInt(pathParts[pathParts.length - 1]);
-
+				
 				if(typeof id != "number") {
 					return {
 						status: 400,
 						body: {error: "No valid id in url path found"}
 					}
 				}
-
-				const newAccount: IShallowAccount = {
+				
+				const newTag: ITag = {
 					id: id,
 					name: req.body.name,
-					defaultCurrency: req.body.defaultCurrency,
-					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
+					parentId: req.body.parentId ? req.body.parentId : undefined
 				}
-
+				
 				try {
-					const res = await account.update(newAccount);
-
+					const res = await tag.update(newTag);
+					
 					return {
 						status: 200,
 						body: res
 					}
 				} catch(e) {
+					console.error(e);
 					return {
 						status: 500,
 						body: {error: e.message}

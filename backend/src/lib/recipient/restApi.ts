@@ -25,7 +25,8 @@ const routes = [
 			validatorFn: (req: IParsedReq) => req.path == "/recipients" && req.method == "POST",
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				const newRecipient: IRecipient = {
-					name: req.body.name
+					name: req.body.name,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
 				try {
@@ -62,7 +63,8 @@ const routes = [
 
 				const newRecipient: IRecipient = {
 					id: id,
-					name: req.body.name
+					name: req.body.name,
+					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
 				try {

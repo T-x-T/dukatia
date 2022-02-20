@@ -7,6 +7,7 @@
 				<li ref="transactions" @click="currentRoute = 'transactions'"><NuxtLink to="/transactions">Transactions</NuxtLink></li>
 				<li ref="accounts" @click="currentRoute = 'accounts'"><NuxtLink to="/accounts">Accounts</NuxtLink></li>
 				<li ref="recipients" @click="currentRoute = 'recipients'"><NuxtLink to="/recipients">Recipients</NuxtLink></li>
+				<li ref="tags" @click="currentRoute = 'tags'"><NuxtLink to="/tags">Tags</NuxtLink></li>
 				<li ref="currencies" @click="currentRoute = 'currencies'"><NuxtLink to="/currencies">Currencies</NuxtLink></li>
 				<br><br>
 				<li @click="logout"><a>Logout</a></li>
@@ -29,6 +30,7 @@ export default {
 		await this.$store.dispatch("fetchAccounts");
 		await this.$store.dispatch("fetchCurrencies");
 		await this.$store.dispatch("fetchRecipients");
+		await this.$store.dispatch("fetchTags");
 		await this.$store.dispatch("fetchTransactions");
 	},
 
@@ -71,7 +73,6 @@ nav
 	min-height: 100vh
 	flex-shrink: 0
 	border-right: 2px solid $heavy
-	z-index: 10
 	h1
 		margin: 25px
 		cursor: pointer

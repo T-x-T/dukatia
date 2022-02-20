@@ -11,13 +11,13 @@ type ITransaction = {
 	id: number,
 	user: IUser,
 	account: IAccount,
-	tags: ITag[],
 	currency: ICurrency,
 	recipient: IRecipient,
 	status: ETransactionStatus
 	timestamp: Date,
 	amount: number,
 	comment?: string,
+	tagIds?: number[]
 }
 
 type IShallowTransaction = {
@@ -29,7 +29,8 @@ type IShallowTransaction = {
 	status: ETransactionStatus,
 	timestamp: Date,
 	amount: number,
-	comment?: string
+	comment?: string,
+	tagIds?: number[]
 }
 
 enum ETransactionStatus {
@@ -45,25 +46,25 @@ export default {
 		restApi();
 	},
 
-	async add(transaction: IShallowTransaction) {
+	async add(transaction: IShallowTransaction): Promise<IShallowTransaction> {
 		if(!Number.isInteger(transaction.amount)) throw new Error("Amount must be a non floating point integer");
 		const accountOfTransaction = await account.getById(transaction.accountId);
 		return turnRowIntoShallowTransaction(await database.add({...transaction, currencyId: accountOfTransaction.defaultCurrency}));
 	},
 
-	async getAll() {
+	async getAll(): Promise<IShallowTransaction[]> {
 		return (await database.getAll()).map(x => turnRowIntoShallowTransaction(x));
 	},
 
-	async getById(id: number) {
-		return (await database.getById(id)).map(x => turnRowIntoShallowTransaction(x));
+	async getById(id: number): Promise<IShallowTransaction> {
+		return turnRowIntoShallowTransaction(await database.getById(id));
 	},
 
-	async deleteById(id: number) {
+	async deleteById(id: number): Promise<number> {
 		return await database.deleteById(id);
 	},
 
-	async update(transaction: IShallowTransaction) {
+	async update(transaction: IShallowTransaction): Promise<IShallowTransaction> {
 		if(!Number.isInteger(transaction.id)) throw new Error("no valid id specified");
 		const res = await database.update(transaction);
 		if(res.length === 0) throw new Error("no row with id: " + transaction.id);
@@ -81,6 +82,7 @@ function turnRowIntoShallowTransaction(row: any): IShallowTransaction {
 		status: row.status,
 		timestamp: row.timestamp,
 		amount: row.amount,
-		comment: row.comment
+		comment: row.comment,
+		tagIds: Array.isArray(row.tags) && row.tags[0] !== null ? row.tags : undefined
 	}
 }

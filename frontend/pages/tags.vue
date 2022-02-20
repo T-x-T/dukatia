@@ -1,7 +1,7 @@
 <template>
 	<div id="main">
 		<div id="table" v-if="mode=='table'">
-			<button class="green" @click="newRecipient">Add</button>
+			<button class="green" @click="newTag()">Add</button>
 			<CustomTable
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
@@ -9,8 +9,8 @@
 		</div>
 
 		<div id="details" v-if="mode=='details'">
-			<RecipientDetails 
-				:recipient="selectedRow"
+			<TagDetails
+				:tag="selectedRow"
 				v-on:back="updateAndLoadTable"
 			/>
 		</div>
@@ -26,11 +26,11 @@ export default {
 	}),
 
 	async fetch() {
-		await this.updateRecipients();
+		await this.updateTags();
 	},
 
 	methods: {
-		async updateRecipients() {
+		async updateTags() {
 			this.tableData = {
 				multiSelect: false,
 				defaultSort: {
@@ -40,22 +40,22 @@ export default {
 				columns: [
 					{name: "ID", type: "number"},
 					{name: "Name", type: "string"},
-					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
+					{name: "Parent", type: "string"}
 				],
-				rows: this.$store.state.recipients.map(x => ([
+				rows: this.$store.state.tags.map(x => ([
 					x.id,
 					x.name,
-					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
+					this.$store.state.tags.filter(y => y.id === x.parentId)[0]?.name
 				]))
 			}
 		},
-		
+
 		rowClick(row) {
-			this.selectedRow = {...this.$store.state.recipients.filter(x => x.id == row[0])[0]};
+			this.selectedRow = {...this.$store.state.tags.filter(x => x.id == row[0])[0]};
 			this.mode = "details";
 		},
 
-		async newRecipient() {
+		async newTag() {
 			this.selectedRow = {
 				id: "",
 				name: ""
@@ -65,8 +65,8 @@ export default {
 		},
 
 		async updateAndLoadTable() {
-			await this.$store.dispatch("fetchRecipients");
-			await this.updateRecipients();
+			await this.$store.dispatch("fetchTags");
+			await this.updateTags();
 			this.mode = "table";
 		}
 	}

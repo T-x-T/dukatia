@@ -31,6 +31,10 @@
 			<br>
 			<label for="comment">Comment:</label>
 			<input type="text" id="comment" v-model="transaction.comment">
+			<CustomSelect
+				:selectData="selectData"
+				v-on:update="tagUpdate"
+			/>
 			<br>
 			<button class="green" @click="sendTransaction">Save</button>
 			<button class="orange" @click="$emit('back')">Cancel</button>
@@ -40,8 +44,20 @@
 
 <script>
 export default {
+	data: () => ({
+		selectData: {}
+	}),
 	props: {
 		transaction: Object
+	},
+
+	created() {
+		this.transaction.tagIds = Array.isArray(this.transaction.tagIds) ? [...this.transaction.tagIds] : [null]
+		this.selectData = {
+			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
+			selected: this.transaction.tagIds ? [...this.transaction.tagIds] : undefined,
+			label: "Tags:"
+		}
 	},
 
 	methods: {
@@ -55,13 +71,15 @@ export default {
 			const transactionData = {
 				accountId: this.transaction.accountId,
 				recipientId: this.transaction.recipientId,
+				currencyId: this.transaction.currencyId,
 				status: this.transaction.status,
 				timestamp: this.transaction.timestamp,
 				amount: this.transaction.amount * 100,
-				comment: this.transaction.comment
+				comment: this.transaction.comment,
+				tagIds: Array.isArray(this.transaction.tagIds) && typeof this.transaction.tagIds[0] == "number" ? this.transaction.tagIds : undefined
 			}
 
-			if(this.transaction.id) {
+			if(typeof this.transaction.id == "number") {
 				await this.$axios.$put(`/api/v1/transactions/${this.transaction.id}`, transactionData);
 			} else {
 				await this.$axios.$post("/api/v1/transactions", transactionData);
@@ -73,6 +91,10 @@ export default {
 		updateAccount() {
 			this.transaction.account = this.$store.state.accounts.filter(x => x.id === this.transaction.accountId)[0];
 			this.transaction.currency = this.$store.state.currencies.filter(x => x.id === this.transaction.account.defaultCurrency)[0];
+		},
+
+		tagUpdate(selected) {
+			this.transaction.tagIds = selected;
 		}
 	}
 }
