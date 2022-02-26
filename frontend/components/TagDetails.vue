@@ -15,8 +15,9 @@
 				<option v-for="(item, index) in $store.state.tags" :key="index" :value="item.id">{{item.name}}</option>
 			</select>
 			<br>
-			<button class="green" @click="sendTag">Save</button>
+			<button class="green" @click="sendTag(true)">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>
+			<button class="green" @click="sendTag(false)">Save and New</button>
 		</div>
 	</div>
 </template>
@@ -32,7 +33,7 @@ export default {
 	},
 
 	methods: {
-		async sendTag() {
+		async sendTag(goBack) {
 			const tagData = {
 				name: this.tag.name,
 				parentId: this.tag.parentId ? this.tag.parentId : undefined
@@ -44,7 +45,14 @@ export default {
 				await this.$axios.$post("/api/v1/tags", tagData);
 			}
 
-			this.$emit("back");
+			if(goBack) {
+				this.$emit("back");
+			} else {
+				this.tag = {
+					id: "",
+					name: ""
+				}
+			}
 		}
 	}
 }

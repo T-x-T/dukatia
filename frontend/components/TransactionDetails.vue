@@ -36,8 +36,9 @@
 				v-on:update="tagUpdate"
 			/>
 			<br>
-			<button class="green" @click="sendTransaction">Save</button>
+			<button class="green" @click="sendTransaction(true)">Save</button>
 			<button class="orange" @click="$emit('back')">Cancel</button>
+			<button class="green" @click="sendTransaction(false)">Save and New</button>
 		</div>
 	</div>
 </template>
@@ -67,7 +68,7 @@ export default {
 			this.$emit("back");
 		},
 
-		async sendTransaction() {
+		async sendTransaction(goBack) {
 			const transactionData = {
 				accountId: this.transaction.accountId,
 				recipientId: this.transaction.recipientId,
@@ -85,7 +86,21 @@ export default {
 				await this.$axios.$post("/api/v1/transactions", transactionData);
 			}
 
-			this.$emit("back");
+			if(goBack) {
+				this.$emit("back");
+			} else {
+				this.transaction = {
+					id: "",
+					accountId: 0,
+					currencyId: 0,
+					recipientId: 0,
+					status: 1,
+					timestamp: new Date().toISOString(),
+					amount: 0,
+					comment: "",
+					currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+				}
+			}
 		},
 
 		updateAccount() {

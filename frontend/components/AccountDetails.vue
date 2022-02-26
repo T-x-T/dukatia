@@ -18,8 +18,9 @@
 				v-on:update="tagUpdate"
 			/>
 			<br>
-			<button class="green" @click="sendAccount">Save</button>
+			<button class="green" @click="sendAccount(true)">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>
+			<button class="green" @click="sendAccount(false)">Save and New</button>
 		</div>	
 
 		<div id="table">
@@ -85,7 +86,7 @@ export default {
 	},
 
 	methods: {
-		async sendAccount() {
+		async sendAccount(goBack) {
 			const accountData = {
 				name: this.account.name,
 				defaultCurrency: this.account.defaultCurrencyId,
@@ -98,7 +99,16 @@ export default {
 				await this.$axios.$post("/api/v1/accounts", accountData);
 			}
 
-			this.$emit("back");
+			if(goBack) {
+				this.$emit("back");
+			} else {
+				this.account = {
+					id: "",
+					name: "",
+					defaultCurrency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+				}
+				this.account.defaultCurrencyId = this.account.defaultCurrency.id;
+			}	
 		},
 		
 		tagUpdate(selected) {

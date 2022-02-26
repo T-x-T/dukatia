@@ -13,8 +13,9 @@
 				v-on:update="tagUpdate"
 			/>
 			<br>
-			<button class="green" @click="sendRecipient">Save</button>
+			<button class="green" @click="sendRecipient(true)">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>	
+			<button class="green" @click="sendRecipient(false)">Save and New</button>
 		</div>
 
 		<div id="table">
@@ -79,7 +80,7 @@ export default {
 	},
 
 	methods: {
-		async sendRecipient() {
+		async sendRecipient(goBack) {
 			const recipientData = {
 				id: this.recipient.id,
 				name: this.recipient.name,
@@ -92,7 +93,14 @@ export default {
 				await this.$axios.$post("/api/v1/recipients", recipientData);
 			}
 
-			this.$emit("back");
+			if(goBack) {
+				this.$emit("back");
+			} else {
+				this.recipient = {
+					id: "",
+					name: ""
+				}
+			}
 		},
 
 		tagUpdate(selected) {
