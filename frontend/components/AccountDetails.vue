@@ -10,7 +10,7 @@
 			<input type="text" id="name" v-model="account.name">
 			<br>
 			<label for="currency">Currency:</label>
-			<select id="currency" v-model="account.defaultCurrency.id">
+			<select id="currency" v-model="account.defaultCurrencyId">
 				<option v-for="(currency, index) in $store.state.currencies" :key="index" :value="currency.id">{{currency.name}}</option>
 			</select>
 			<CustomSelect
@@ -42,6 +42,7 @@ export default {
 	},
 
 	created() {
+		this.account.defaultCurrencyId = this.account.defaultCurrency.id;
 		this.account.tagIds = Array.isArray(this.account.tagIds) ? [...this.account.tagIds] : [null];
 		this.selectData = {
 			options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
@@ -87,7 +88,7 @@ export default {
 		async sendAccount() {
 			const accountData = {
 				name: this.account.name,
-				defaultCurrency: this.account.defaultCurrency.id,
+				defaultCurrency: this.account.defaultCurrencyId,
 				tagIds: Array.isArray(this.account.tagIds) && typeof this.account.tagIds[0] == "number" ? this.account.tagIds : undefined
 			}
 			console.log(accountData)
