@@ -15,6 +15,7 @@ type IShallowAccount = {
 	id?: number,
 	name: string,
 	defaultCurrency: number,
+	userId: number,
 	tagIds?: number[]
 }
 
@@ -59,6 +60,7 @@ function turnRowIntoIShallowAccount(row: any): IShallowAccount {
 		id: row.id,
 		name: row.name,
 		defaultCurrency: row.defaultcurrency,
+		userId: row.user,
 		tagIds: Array.isArray(row.tags) && row.tags[0] !== null ? row.tags : undefined
 	}
 }

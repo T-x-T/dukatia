@@ -17,7 +17,7 @@ export default {
 
 	async add(recipient: IRecipient) {
 		const db = await pool.connect(); 
-		const res = (await db.query("INSERT INTO public.\"Recipients\" (id, name) VALUES (DEFAULT, $1) RETURNING *;", [recipient.name])).rows[0];
+		const res = (await db.query("INSERT INTO public.\"Recipients\" (id, name, \"user\") VALUES (DEFAULT, $1, $2) RETURNING *;", [recipient.name, recipient.userId])).rows[0];
 		if(recipient.tagIds) {
 			await Promise.all(recipient.tagIds.map((tagId) => db.query("INSERT INTO public.\"RecipientTags\" (recipient, tag) VALUES ($1, $2);", [res.id, tagId])));
 		}

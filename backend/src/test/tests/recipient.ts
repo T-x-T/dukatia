@@ -3,21 +3,25 @@ import { Pool, PoolClient } from "pg";
 import database from "../../database/postgresql/index.js";
 import recipient from "../../lib/recipient/index.js";
 import tag from "../../lib/tag/index.js";
+import user from "../../lib/user/index.js";
 
 let db: PoolClient = null;
 let pool: Pool = null;
 let config: any = null;
 
 const testRecipient = {
-	name: "test"
+	name: "test",
+	userId: 0
 }
 
 const testRecipient2 = {
-	name: "test2"
+	name: "test2",
+	userId: 0
 }
 
 const testTag = {
-	name: "test"
+	name: "test",
+	userId: 0
 }
 
 export default (_config: any) => config = _config;
@@ -32,6 +36,7 @@ describe("recipient", function() {
 		pool = await database.getPostgresqlConnection(config.database);
 		db = await pool.connect();
 		await recipient.init(pool);
+		await user.init(pool, config);
 		await tag.init(pool);
 	});
 

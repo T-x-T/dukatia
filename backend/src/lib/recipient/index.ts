@@ -5,6 +5,7 @@ import restApi from "./restApi.js";
 type IRecipient = {
 	id?: number,
 	name: string,
+	userId: number,
 	tagIds?: number[]
 }
 
@@ -36,6 +37,7 @@ function turnRowIntoIRecipient(row: any): IRecipient {
 	return {
 		id: row.id,
 		name: row.name,
+		userId: row.user,
 		tagIds: Array.isArray(row.tags) && row.tags[0] !== null ? row.tags : undefined
 	}
 }

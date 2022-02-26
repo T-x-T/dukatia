@@ -27,6 +27,7 @@ const routes = [
 				const newAccount: IShallowAccount = {
 					name: req.body.name,
 					defaultCurrency: req.body.defaultCurrency,
+					userId: req.userId,
 					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 				
@@ -66,6 +67,7 @@ const routes = [
 					id: id,
 					name: req.body.name,
 					defaultCurrency: req.body.defaultCurrency,
+					userId: req.userId,
 					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
