@@ -26,15 +26,13 @@ export default {
 		loggedIn: true
 	}),
 
-	async fetch() {
+	async mounted() {
 		await this.$store.dispatch("fetchAccounts");
 		await this.$store.dispatch("fetchCurrencies");
 		await this.$store.dispatch("fetchRecipients");
 		await this.$store.dispatch("fetchTags");
 		await this.$store.dispatch("fetchTransactions");
-	},
 
-	mounted() {
 		if(!document.cookie.includes("accessToken")) {
 			this.loggedIn = false;
 			this.$router.replace("/login");
