@@ -30,13 +30,19 @@ export default {
 	},
 
 	mounted() {
-		if(this.selectData.selected?.length > 0) {
-			this.selectData.selected.forEach(x => this.optionStates[x] = true);
-			this.updateDisplayText();
-		}
+		this.updateSelectData();
 	},
 
 	methods: {
+		updateSelectData() {
+			if(this.selectData.selected?.length > 0) {
+				this.selectData.selected.forEach(x => this.optionStates[x] = true);
+			} else {
+				this.optionStates = [];
+			}
+			this.updateDisplayText();
+		},
+
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
 			this.updateDisplayText();
@@ -61,6 +67,12 @@ export default {
 			});
 			if(this.displayText) this.displayText = this.displayText.slice(0, this.displayText.length - 2);
 		}
+	},
+
+	watch: {
+		selectData() {
+			this.updateSelectData();
+		}
 	}
 }
 </script>
@@ -69,7 +81,7 @@ export default {
 @import "assets/_vars.sass"
 
 #wrapper
-	width: fit-content		
+	width: fit-content	
 
 #input
 	svg

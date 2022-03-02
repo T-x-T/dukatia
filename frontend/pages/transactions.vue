@@ -87,7 +87,7 @@ export default {
 
 		rowClick(row) {
 			const rowFromStore = this.$store.state.transactions.filter(x => x.id == row[0])[0]
-			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100};
+			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -8)};
 			this.mode = "details";
 		},
 
@@ -103,7 +103,7 @@ export default {
 				currencyId: 0,
 				recipientId: 0,
 				status: 1,
-				timestamp: new Date().toISOString(),
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
 				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
