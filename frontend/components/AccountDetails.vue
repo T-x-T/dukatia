@@ -29,42 +29,8 @@ export default {
 		});
 
 		this.config = {
-			fields: [
-				{
-					label: "ID",
-					property: "id",
-					type: "number",
-					disabled: true
-				},
-				{
-					label: "Name",
-					property: "name",
-					type: "string",
-				},
-				{
-					label: "Currency",
-					property: "defaultCurrencyId",
-					type: "currency"
-				},
-				{
-					label: "Tags",
-					property: "tagIds",
-					type: "tags"
-				}
-			],
+			...this.$detailPageConfig.account,
 			data: this.account,
-			apiEndpoint: "/api/v1/accounts",
-			prepareForApi: (x) => ({
-				name: x.name,
-				defaultCurrency: x.defaultCurrencyId,
-				tagIds: Array.isArray(x.tagIds) && typeof x.tagIds[0] == "number" ? x.tagIds : undefined
-			}),
-			defaultData: {
-				id: "",
-				name: "",
-				defaultCurrency: this.$store.state.currencies.filter(x => x.id == 0)[0],
-				tagIds: []
-			},
 			resetDefaultCurrencyId: true,
 			tableData : {
 				multiSelect: false,

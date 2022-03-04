@@ -81,15 +81,16 @@ export default {
 @import "assets/_vars.sass"
 
 #wrapper
-	width: fit-content	
+	width: fit-content
+	display: inline-block	
 
 #input
 	svg
+		display: inline
 		color: white
 		height: 32px
-		position: relative
-		top: 10px
-		left: -40px
+		position: absolute
+		margin-left: -35px
 		&:hover
 			color: $heavy
 			cursor: pointer

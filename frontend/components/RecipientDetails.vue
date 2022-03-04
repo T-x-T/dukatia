@@ -28,36 +28,8 @@ export default {
 		});
 
 		this.config = {
-			fields: [
-				{
-					label: "ID",
-					property: "id",
-					type: "number",
-					disabled: true
-				},
-				{
-					label: "Name",
-					property: "name",
-					type: "string",
-				},
-				{
-					label: "Tags",
-					property: "tagIds",
-					type: "tags"
-				}
-			],
+			...this.$detailPageConfig.recipient,
 			data: this.recipient,
-			apiEndpoint: "/api/v1/recipients",
-			prepareForApi: (x) => ({
-				id: x.id,
-				name: x.name,
-				tagIds: Array.isArray(x.tagIds) && typeof x.tagIds[0] == "number" ? x.tagIds : undefined
-			}),
-			defaultData: {
-				id: "",
-				name: "",
-				tagIds: []
-			},
 			tableData: {
 				multiSelect: false,
 				defaultSort: {

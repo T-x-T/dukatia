@@ -31,12 +31,14 @@ export default {
 				{
 					label: "Account",
 					property: "accountId",
-					type: "account"
+					type: "account",
+					addNew: true
 				},
 				{
 					label: "Recipient",
 					property: "recipientId",
-					type: "recipient"
+					type: "recipient",
+					addNew: true
 				},
 				{
 					label: "Timestamp",
@@ -58,7 +60,8 @@ export default {
 				{
 					label: "Tags",
 					propety: "tagIds",
-					type: "tags"
+					type: "tags",
+					addNew: true
 				}
 			],
 			data: this.transaction,
@@ -84,7 +87,7 @@ export default {
 				comment: "",
 				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
 			},
-			deltable: true
+			deletable: true
 		}
 	}
 }
