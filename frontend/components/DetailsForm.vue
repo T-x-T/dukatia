@@ -93,6 +93,7 @@
 export default {
 	data: () => ({
 		subForm: null,
+		selectData: {}
 	}),
 
 	props: {
@@ -155,6 +156,7 @@ export default {
 				};
 				case 'tags': {
 					await this.$store.dispatch("fetchTags");
+					this.updateSelectData();
 					this.$detailPageConfig.tags.data = {...this.$detailPageConfig.tags.defaultData};
 				};
 			}
