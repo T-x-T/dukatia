@@ -1,6 +1,6 @@
 <template>
 	<div id="wrapper">
-		<div id="input" @click="toggleDropdown()">
+		<div id="input" @click="toggleDropdown()" @keypress="(e) => {if(e.keyCode == 32) toggleDropdown()}">
 			<label for="thething">{{this.selectData.label}}</label>
 			<input id="thething" type="text" v-model="displayText" readonly>
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
@@ -8,8 +8,8 @@
 		<div id="clickTarget" v-if="dropdown" @click="toggleDropdown()"></div>
 		<div id="dropdown" v-if="dropdown">
 			<ul>
-				<li v-for="(item, index) in selectData.options" :key="index" @click="toggleOption(item.id)">
-					<input type="checkbox" v-model="optionStates[index]">
+				<li v-for="(item, index) in selectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
+					<input type="checkbox" v-model="optionStates[index]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -45,7 +45,37 @@ export default {
 
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
+			this.$nextTick(() => this.$refs.dropdown0?.[0]?.focus());
 			this.updateDisplayText();
+		},
+
+		closeDropdown() {
+			this.dropdown = false;
+		},
+
+		openDropdown() {
+			this.dropdown = true;
+		},
+
+		focusOutDropdown(e) {
+			if(e.relatedTarget?.parentNode?.className != "listItem" && e.relatedTarget !== null) return this.closeDropdown();
+			if(e.relatedTarget === null) this.$nextTick(() => focus(e.target));
+		},
+
+		keypressDropdownInput(e) {
+			if(e.keyCode == 40) { //Down
+				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1) {
+					this.$refs["dropdown0"]?.[0]?.focus();
+				} else {
+					this.$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
+				}
+			} else if(e.keyCode == 38) { //Up
+				if(Number(e.target.id) - 1 < 0) {
+					this.$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
+				} else {
+					this.$refs["dropdown" + (Number(e.target.id) - 1)]?.[0]?.focus();
+				}
+			}
 		},
 
 		toggleOption(id) {
