@@ -124,7 +124,7 @@ export default {
 			if(goBack) {
 				this.$emit("back");
 			} else {
-				this.config.data = this.config.defaultData;
+				this.config.data = {...this.config.defaultData};
 				if(this.config.resetDefaultCurrencyId) this.config.data.defaultCurrencyId = this.config.data.defaultCurrency.id;
 				this.updateSelectData();
 			}
