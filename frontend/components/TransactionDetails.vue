@@ -72,7 +72,7 @@ export default {
 				currencyId: x.currencyId,
 				status: x.status,
 				timestamp: x.timestamp,
-				amount: Number(new String(x.amount).replace(".","")),
+				amount: Math.round(x.amount * 100),
 				comment: x.comment,
 				tagIds: Array.isArray(x.tagIds) && typeof x.tagIds[0] == "number" ? x.tagIds : undefined
 			}),
