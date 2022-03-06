@@ -64,12 +64,14 @@ export default {
 
 		keypressDropdownInput(e) {
 			if(e.keyCode == 40) { //Down
+				e.preventDefault();
 				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1) {
 					this.$refs["dropdown0"]?.[0]?.focus();
 				} else {
 					this.$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
 				}
 			} else if(e.keyCode == 38) { //Up
+				e.preventDefault();
 				if(Number(e.target.id) - 1 < 0) {
 					this.$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
 				} else {
