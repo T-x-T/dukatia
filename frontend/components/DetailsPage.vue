@@ -7,6 +7,7 @@
 			<DetailsForm
 				:config="config"
 				v-on:back="$emit('back')"
+				v-on:updateData="$emit('updateData')"
 			/>
 		</div>
 

@@ -124,6 +124,7 @@ export default {
 			if(goBack) {
 				this.$emit("back");
 			} else {
+				this.$emit("updateData");
 				this.config.data = {...this.config.defaultData};
 				this.$refs.forminput1[0].focus()
 				if(this.config.resetDefaultCurrencyId) this.config.data.defaultCurrencyId = this.config.data.defaultCurrency.id;

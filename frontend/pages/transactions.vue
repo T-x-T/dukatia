@@ -1,6 +1,6 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="mode=='table'">
+		<div id="table" v-if="tableOpen">
 			<div>
 				<button class="green" @click="newTransaction">Add</button>
 			</div>
@@ -25,10 +25,11 @@
 			/>
 		</div>
 
-		<div v-if="mode=='details'" id="details">
+		<div v-if="detailsOpen" id="details">
 			<TransactionDetails 
 				:transaction="selectedRow"
 				v-on:back="updateAndLoadTable"
+				v-on:updateData="updateTable"
 			/>
 		</div>
 	</div>
@@ -38,7 +39,8 @@
 export default {
 	data: () => ({
 		tableData: {},
-		mode: "table",
+		detailsOpen: false,
+		tableOpen: true,
 		selectedRow: {},
 		selectedRows: [],
 		batchAccountId: null,
@@ -61,8 +63,8 @@ export default {
 			this.tableData = {
 				multiSelect: true,
 				defaultSort: {
-					column: 0,
-					sort: "asc"
+					column: 3,
+					sort: "desc"
 				},
 				columns: [
 					{name: "ID", type: "number"},
@@ -88,7 +90,8 @@ export default {
 		rowClick(row) {
 			const rowFromStore = this.$store.state.transactions.filter(x => x.id == row[0])[0]
 			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -8)};
-			this.mode = "details";
+			this.detailsOpen = false;
+			this.$nextTick(() => this.detailsOpen = true);
 		},
 
 		rowSelect(rows) {
@@ -109,7 +112,7 @@ export default {
 				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
 			}
 
-			this.mode = "details";
+			this.detailsOpen = true;
 		},
 
 		async applyBatchEdit() {
@@ -137,10 +140,29 @@ export default {
 
 		async updateAndLoadTable() {
 			await this.$store.dispatch("fetchTransactions");
-			await this.updateTransactions();
-			this.mode = "";
-			setImmediate(() => this.mode = "table");
+			setTimeout(() => this.updateTransactions(), 100);
+			this.detailsOpen = false;
+		},
+
+		async updateTable() {
+			await this.$store.dispatch("fetchTransactions");
+			setTimeout(() => this.updateTransactions(), 100);
 		}
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+@import "assets/_vars.sass"
+
+div#main
+	display: flex
+	justify-content: space-between
+
+div#table
+	flex-grow: 1
+
+div#details
+	border-left: 2px solid $heavydark
+	padding-left: 8px
+</style>

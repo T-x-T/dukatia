@@ -161,13 +161,6 @@ export default {
 		this.fillSelectedRows();
 	},
 
-	watch: {
-		tableData() {
-			this.rows = this.tableData.rows;
-			this.rowsForDisplay = this.rows;
-		}
-	},
-
 	methods: {
 		fillSelectedRows() {
 			this.selectedRows = [];
@@ -337,6 +330,13 @@ export default {
 				if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
 			});
 			this.$emit("rowSelect", selectedRowContents);
+		},
+
+		tableData() {
+			this.rows = this.tableData.rows;
+			//this.rowsForDisplay = this.rows;
+			this.sort();
+			this.filter();
 		}
 	}
 }
