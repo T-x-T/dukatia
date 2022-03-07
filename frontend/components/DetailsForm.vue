@@ -171,7 +171,7 @@ export default {
 
 	watch: {
 		"config.data.recipientId": function(oldVal, newVal) {
-			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged) {
+			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged && typeof this.config.data.id != "number") {
 				const tagIdsOfRecipient = this.$store.state.recipients.filter(x => x.id === this.config.data.recipientId)[0].tagIds;
 				this.config.data.tagIds = tagIdsOfRecipient;
 				this.updateSelectData();
