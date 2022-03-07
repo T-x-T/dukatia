@@ -67,6 +67,7 @@ export default {
 			],
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
+			populateTagsUsingRecipient: true,
 			prepareForApi: (x) => ({
 				accountId: x.accountId,
 				recipientId: x.recipientId,

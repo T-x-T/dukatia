@@ -93,7 +93,8 @@
 export default {
 	data: () => ({
 		subForm: null,
-		selectData: {}
+		selectData: {},
+		tagsManuallyChanged: false
 	}),
 
 	props: {
@@ -111,6 +112,7 @@ export default {
 
 	methods: {
 		tagUpdate(selected) {
+			this.tagsManuallyChanged = true;
 			this.config.data.tagIds = selected;
 		},
 
@@ -164,6 +166,16 @@ export default {
 			}
 
 			this.subForm = null;
+		}
+	},
+
+	watch: {
+		"config.data.recipientId": function(oldVal, newVal) {
+			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged) {
+				const tagIdsOfRecipient = this.$store.state.recipients.filter(x => x.id === this.config.data.recipientId)[0].tagIds;
+				this.config.data.tagIds = tagIdsOfRecipient;
+				this.updateSelectData();
+			}
 		}
 	}
 }

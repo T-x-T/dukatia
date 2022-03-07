@@ -35,10 +35,9 @@ export default {
 
 	methods: {
 		updateSelectData() {
-			if(this.selectData.selected?.length > 0) {
+			this.optionStates = [];
+			if(this.selectData.selected) {
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
-			} else {
-				this.optionStates = [];
 			}
 			this.updateDisplayText();
 		},
