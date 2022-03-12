@@ -333,8 +333,10 @@ export default {
 				output += " ";
 				let total = 0;
 				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn].replace(currency.symbol, "")) : null);
-				output += total.toFixed(2);
-				output += currency.symbol;
+				if(total !== 0) {
+					output += total.toFixed(2);
+					output += currency.symbol;
+				}
 			});
 			return output;
 		}
