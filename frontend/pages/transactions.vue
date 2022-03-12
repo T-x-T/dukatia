@@ -114,7 +114,8 @@ export default {
 				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
 			}
 
-			this.detailsOpen = true;
+			this.detailsOpen = false;
+			this.$nextTick(() => this.detailsOpen = true);
 		},
 
 		async applyBatchEdit() {
