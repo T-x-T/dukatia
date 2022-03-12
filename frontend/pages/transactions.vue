@@ -124,17 +124,7 @@ export default {
 				transaction.accountId = Number.isInteger(this.batchAccountId) ? this.batchAccountId : transaction.accountId;
 				transaction.recipientId = Number.isInteger(this.batchRecipientId) ? this.batchRecipientId : transaction.recipientId;
 
-
-				const transactionData = {
-					accountId: transaction.accountId,
-					currencyId: transaction.currencyId,
-					recipientId: transaction.recipientId,
-					status: transaction.status,
-					timestamp: transaction.timestamp,
-					amount: transaction.amount,
-					comment: transaction.comment
-				}
-				await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transactionData);
+				await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transaction);
 			}));
 			this.batchAccountId = null;
 			this.batchRecipientId = null;
