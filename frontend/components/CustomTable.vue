@@ -33,6 +33,10 @@
 									<input type="radio" :id="`isnt${index}`" :name="`type${index}`" value="isnt" v-model="filters[index].option" @change="filter()">
 									<label :for="`isnt${index}`">Is not</label>
 								</div>
+								<div>
+									<input type="radio" :id="`contains${index}`" :name="`type${index}`" value="contains" v-model="filters[index].option" @change="filter()">
+									<label :for="`contains${index}`">Contains</label>
+								</div>
 							</div>
 						</div>
 
@@ -275,6 +279,9 @@ export default {
 					}
 					if(this.filters[i].option == "isnt") {
 						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() !== this.filters[i].value.toLowerCase());
+					}
+					if(this.filters[i].option == "contains") {
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes(this.filters[i].value.toLowerCase()));
 					}
 				}
 
