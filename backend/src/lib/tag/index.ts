@@ -5,6 +5,7 @@ import restApi from "./restApi.js";
 type ITag = {
 	id?: number,
 	name: string,
+	userId: number,
 	parentId?: number
 }
 
@@ -47,6 +48,7 @@ function turnRowIntoITag(row: any): ITag {
 	return {
 		id: row.id,
 		name: row.name,
+		userId: row.user,
 		parentId: typeof row.parent == "number" ? row.parent : undefined
 	}
 }

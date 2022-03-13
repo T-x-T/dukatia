@@ -10,7 +10,7 @@ export default {
 
 	async add(account: IShallowAccount) {
 		const db = await pool.connect();
-		const res = (await db.query("INSERT INTO public.\"Accounts\" (id, name, defaultcurrency) VALUES (DEFAULT, $1, $2) RETURNING *;", [account.name, account.defaultCurrency])).rows[0];
+		const res = (await db.query("INSERT INTO public.\"Accounts\" (id, name, defaultcurrency, \"user\") VALUES (DEFAULT, $1, $2, $3) RETURNING *;", [account.name, account.defaultCurrency, account.userId])).rows[0];
 		if(account.tagIds) {
 			await Promise.all(account.tagIds.map(tagId => db.query("INSERT INTO public.\"AccountTags\" (account, tag) VALUES ($1, $2);", [res.id, tagId])));
 		}

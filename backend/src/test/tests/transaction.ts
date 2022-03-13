@@ -36,7 +36,8 @@ const testTransaction2: IShallowTransaction = {
 }
 
 const testTag = {
-	name: "test"
+	name: "test",
+	userId: 0
 }
 
 describe("transaction", function() {
@@ -228,8 +229,8 @@ describe("transaction", function() {
 			await transaction.add(testTransaction);
 
 			
-			await account.add({name: "another account", defaultCurrency: 1});
-			await recipient.add({name: "another recipient"});
+			await account.add({name: "another account", defaultCurrency: 1, userId: 0});
+			await recipient.add({name: "another recipient", userId: 0});
 
 			const res = await transaction.update({...testTransaction2, id: 0});
 
@@ -246,8 +247,8 @@ describe("transaction", function() {
 			await transaction.add(testTransaction);
 
 			
-			await account.add({name: "another account", defaultCurrency: 1});
-			await recipient.add({name: "another recipient"});
+			await account.add({name: "another account", defaultCurrency: 1, userId: 0});
+			await recipient.add({name: "another recipient", userId: 0});
 
 			await transaction.update({...testTransaction2, id: 0});
 			

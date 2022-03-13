@@ -26,9 +26,9 @@ export default {
 		const db = await pool.connect();
 		let res;
 		if(typeof tag.parentId == "number") {
-			res = (await db.query("INSERT INTO public.\"Tags\" (id, name, parent) VALUES (DEFAULT, $1, $2) RETURNING *;", [tag.name, tag.parentId])).rows[0];
+			res = (await db.query("INSERT INTO public.\"Tags\" (id, name, parent, \"user\") VALUES (DEFAULT, $1, $2, $3) RETURNING *;", [tag.name, tag.parentId, tag.userId])).rows[0];
 		} else {
-			res = (await db.query("INSERT INTO public.\"Tags\" (id, name) VALUES (DEFAULT, $1) RETURNING *;", [tag.name])).rows[0];
+			res = (await db.query("INSERT INTO public.\"Tags\" (id, name, \"user\") VALUES (DEFAULT, $1, $2) RETURNING *;", [tag.name, tag.userId])).rows[0];
 		}
 		db.release();
 		return res;

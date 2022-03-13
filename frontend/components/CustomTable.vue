@@ -1,132 +1,140 @@
 <template>
-	<table>
-		<thead>
-			<tr>
-				<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
-				<th v-for="(header, index) in tableData.columns" :key="index">
-					<div v-if="Number.isInteger(openFilter)" class="clickTarget" @click="openFilter = null"></div>
-					
-					<p @click="updateSort(index)">{{header.name}}
-						<svg v-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
-						<svg v-else-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
-						<svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
-					</p>
+	<div>
+		<p>Count: {{rowsForDisplay.length}}</p>
+		<p v-if="tableData.displaySum">{{getSum()}}</p>
+		<table>
+			<thead>
+				<tr>
+					<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
+					<th v-for="(header, index) in tableData.columns" :key="index">
+						<div v-if="Number.isInteger(openFilter)" class="clickTarget" @click="openFilter = null"></div>
+						
+						<p @click="updateSort(index)">{{header.name}}
+							<svg v-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+							<svg v-else-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
+							<svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+						</p>
 
-					<div v-if="header.type == 'choice'" class="columnHeaderWrapper">
-						<div>
-							<select v-model="filters[index].value" @change="filter()">
-								<option value=""></option>
-								<option v-for="(item, index) in header.options" :key="index" :value="item">{{item}}</option>
-							</select>
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+						<div v-if="header.type == 'choice'" class="columnHeaderWrapper">
+							<div>
+								<select v-model="filters[index].value" @change="filter()">
+									<option value=""></option>
+									<option v-for="(item, index) in header.options" :key="index" :value="item">{{item}}</option>
+								</select>
+								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+							</div>
+
+							<div v-if="openFilter === index" class="filterPopout">
+								<div>
+									<input type="radio" :id="`is${index}`" :name="`type${index}`" value="is" v-model="filters[index].option" @change="filter()">
+									<label :for="`is${index}`">Is</label>
+								</div>
+								<div>
+									<input type="radio" :id="`isnt${index}`" :name="`type${index}`" value="isnt" v-model="filters[index].option" @change="filter()">
+									<label :for="`isnt${index}`">Is not</label>
+								</div>
+								<div>
+									<input type="radio" :id="`contains${index}`" :name="`type${index}`" value="contains" v-model="filters[index].option" @change="filter()">
+									<label :for="`contains${index}`">Contains</label>
+								</div>
+							</div>
 						</div>
 
-						<div v-if="openFilter === index" class="filterPopout">
+						<div v-if="header.type == 'date'" class="columnHeaderWrapper">
 							<div>
-								<input type="radio" :id="`is${index}`" :name="`type${index}`" value="is" v-model="filters[index].option" @change="filter()">
-								<label :for="`is${index}`">Is</label>
+								<input type="date" v-model="filters[index].start" @input="filter()">
+								-
+								<input type="date" v-model="filters[index].end" @input="filter()">
+								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 							</div>
-							<div>
-								<input type="radio" :id="`isnt${index}`" :name="`type${index}`" value="isnt" v-model="filters[index].option" @change="filter()">
-								<label :for="`isnt${index}`">Is not</label>
-							</div>
-						</div>
-					</div>
 
-					<div v-if="header.type == 'date'" class="columnHeaderWrapper">
-						<div>
-							<input type="date" v-model="filters[index].start" @input="filter()">
-							-
-							<input type="date" v-model="filters[index].end" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-						</div>
-
-						<div v-if="openFilter === index" class="filterPopout">
-							<div>
-								<input type="radio" :id="`between${index}`" :name="`type${index}`" value="between" v-model="filters[index].option" @change="filter()">
-								<label :for="`between${index}`">Between</label>
+							<div v-if="openFilter === index" class="filterPopout">
+								<div>
+									<input type="radio" :id="`between${index}`" :name="`type${index}`" value="between" v-model="filters[index].option" @change="filter()">
+									<label :for="`between${index}`">Between</label>
+								</div>
+								<div>
+									<input type="radio" :id="`outside${index}`" :name="`type${index}`" value="outside" v-model="filters[index].option" @change="filter()">
+									<label :for="`outside${index}`">Outside</label>
+								</div>
 							</div>
-							<div>
-								<input type="radio" :id="`outside${index}`" :name="`type${index}`" value="outside" v-model="filters[index].option" @change="filter()">
-								<label :for="`outside${index}`">Outside</label>
-							</div>
-						</div>
-					</div>
-
-					<div v-if="header.type == 'number'" class="columnHeaderWrapper">
-						<div>
-							<input type="number" v-model="filters[index].value" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 						</div>
 
-						<div v-if="openFilter === index" class="filterPopout">
+						<div v-if="header.type == 'number'" class="columnHeaderWrapper">
 							<div>
-								<input type="radio" :id="`exact${index}`" :name="`type${index}`" value="exact" v-model="filters[index].option" @change="filter()">
-								<label :for="`exact${index}`">Exact</label>
+								<input type="number" v-model="filters[index].value" @input="filter()">
+								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 							</div>
-							<div>
-								<input type="radio" :id="`less${index}`" :name="`type${index}`" value="less" v-model="filters[index].option" @change="filter()">
-								<label :for="`less${index}`">Less</label>
-							</div>
-							<div>
-								<input type="radio" :id="`more${index}`" :name="`type${index}`" value="more" v-model="filters[index].option" @change="filter()">
-								<label :for="`more${index}`">More</label>
-							</div>
-						</div>
-					</div>
 
-					<div v-if="header.type == 'string'" class="columnHeaderWrapper">
-						<div>
-							<input v-model="filters[index].value" @input="filter()">
-							<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+							<div v-if="openFilter === index" class="filterPopout">
+								<div>
+									<input type="radio" :id="`exact${index}`" :name="`type${index}`" value="exact" v-model="filters[index].option" @change="filter()">
+									<label :for="`exact${index}`">Exact</label>
+								</div>
+								<div>
+									<input type="radio" :id="`less${index}`" :name="`type${index}`" value="less" v-model="filters[index].option" @change="filter()">
+									<label :for="`less${index}`">Less</label>
+								</div>
+								<div>
+									<input type="radio" :id="`more${index}`" :name="`type${index}`" value="more" v-model="filters[index].option" @change="filter()">
+									<label :for="`more${index}`">More</label>
+								</div>
+							</div>
 						</div>
 
-						<div v-if="openFilter === index" class="filterPopout">
+						<div v-if="header.type == 'string'" class="columnHeaderWrapper">
 							<div>
-								<input type="radio" :id="`contains${index}`" :name="`type${index}`" value="contains" v-model="filters[index].option" @change="filter()">
-								<label :for="`contains${index}`">Contains</label>
+								<input v-model="filters[index].value" @input="filter()">
+								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 							</div>
-							<div>
-								<input type="radio" :id="`exact${index}`" :name="`type${index}`" value="exact" v-model="filters[index].option" @change="filter()">
-								<label :for="`exact${index}`">Exact</label>
-							</div>
-							<div>
-								<input type="radio" :id="`begins${index}`" :name="`type${index}`" value="begins" v-model="filters[index].option" @change="filter()">
-								<label :for="`begins${index}`">Begins with</label>
-							</div>
-							<div>
-								<input type="radio" :id="`ends${index}`" :name="`type${index}`" value="ends" v-model="filters[index].option" @change="filter()">
-								<label :for="`ends${index}`">Ends with</label>
-							</div>
-							<div>
-								<input type="radio" :id="`doesntcontain${index}`" :name="`type${index}`" value="doesntcontain" v-model="filters[index].option" @change="filter()">
-								<label :for="`doesntcontain${index}`">Doesn't contain</label>
-							</div>
-							<hr>
-							<div>
-								<input type="radio" :id="`notempty${index}`" :name="`empty${index}`" value="notempty" v-model="filters[index].empty" @change="filter()">
-								<label :for="`notempty${index}`">Not empty</label>
-							</div>
-							<div>
-								<input type="radio" :id="`empty${index}`" :name="`empty${index}`" value="empty" v-model="filters[index].empty" @change="filter()">
-								<label :for="`empty${index}`">Empty</label>
-							</div>
-							<div>
-								<input type="radio" :id="`anything${index}`" :name="`empty${index}`" value="anything" v-model="filters[index].empty" @change="filter()">
-								<label :for="`anything${index}`">Doesn't matter</label>
+
+							<div v-if="openFilter === index" class="filterPopout">
+								<div>
+									<input type="radio" :id="`contains${index}`" :name="`type${index}`" value="contains" v-model="filters[index].option" @change="filter()">
+									<label :for="`contains${index}`">Contains</label>
+								</div>
+								<div>
+									<input type="radio" :id="`exact${index}`" :name="`type${index}`" value="exact" v-model="filters[index].option" @change="filter()">
+									<label :for="`exact${index}`">Exact</label>
+								</div>
+								<div>
+									<input type="radio" :id="`begins${index}`" :name="`type${index}`" value="begins" v-model="filters[index].option" @change="filter()">
+									<label :for="`begins${index}`">Begins with</label>
+								</div>
+								<div>
+									<input type="radio" :id="`ends${index}`" :name="`type${index}`" value="ends" v-model="filters[index].option" @change="filter()">
+									<label :for="`ends${index}`">Ends with</label>
+								</div>
+								<div>
+									<input type="radio" :id="`doesntcontain${index}`" :name="`type${index}`" value="doesntcontain" v-model="filters[index].option" @change="filter()">
+									<label :for="`doesntcontain${index}`">Doesn't contain</label>
+								</div>
+								<hr>
+								<div>
+									<input type="radio" :id="`notempty${index}`" :name="`empty${index}`" value="notempty" v-model="filters[index].empty" @change="filter()">
+									<label :for="`notempty${index}`">Not empty</label>
+								</div>
+								<div>
+									<input type="radio" :id="`empty${index}`" :name="`empty${index}`" value="empty" v-model="filters[index].empty" @change="filter()">
+									<label :for="`empty${index}`">Empty</label>
+								</div>
+								<div>
+									<input type="radio" :id="`anything${index}`" :name="`empty${index}`" value="anything" v-model="filters[index].empty" @change="filter()">
+									<label :for="`anything${index}`">Doesn't matter</label>
+								</div>
 							</div>
 						</div>
-					</div>
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr v-for="(row, index) in rowsForDisplay" :key="index">
-				<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
-				<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
-			</tr>
-		</tbody>
-	</table>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(row, index) in rowsForDisplay" :key="index">
+					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
+					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </template>
 
 <script>
@@ -159,13 +167,6 @@ export default {
 		
 		this.applyDefaultSort();
 		this.fillSelectedRows();
-	},
-
-	watch: {
-		tableData() {
-			this.rows = this.tableData.rows;
-			this.rowsForDisplay = this.rows;
-		}
 	},
 
 	methods: {
@@ -279,6 +280,9 @@ export default {
 					if(this.filters[i].option == "isnt") {
 						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() !== this.filters[i].value.toLowerCase());
 					}
+					if(this.filters[i].option == "contains") {
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes(this.filters[i].value.toLowerCase()));
+					}
 				}
 
 				if(this.filters[i].type == "date" && this.filters[i].start && this.filters[i].end) {
@@ -328,6 +332,20 @@ export default {
 					}
 				}
 			}
+		},
+
+		getSum() {
+			let output = "Sum:";
+			this.$store.state.currencies.forEach(currency => {
+				output += " ";
+				let total = 0;
+				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn].replace(currency.symbol, "")) : null);
+				if(total !== 0) {
+					output += total.toFixed(2);
+					output += currency.symbol;
+				}
+			});
+			return output;
 		}
 	},
 	watch: {
@@ -337,6 +355,13 @@ export default {
 				if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
 			});
 			this.$emit("rowSelect", selectedRowContents);
+		},
+
+		tableData() {
+			this.rows = this.tableData.rows;
+			//this.rowsForDisplay = this.rows;
+			this.sort();
+			this.filter();
 		}
 	}
 }

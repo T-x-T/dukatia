@@ -26,6 +26,7 @@ const routes = [
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				const newTag: ITag = {
 					name: req.body.name,
+					userId: req.userId,
 					parentId: req.body.parentId ? req.body.parentId : undefined
 				}
 
@@ -63,6 +64,7 @@ const routes = [
 				const newTag: ITag = {
 					id: id,
 					name: req.body.name,
+					userId: req.userId,
 					parentId: req.body.parentId ? req.body.parentId : undefined
 				}
 				

@@ -34,7 +34,7 @@ export default {
 		await this.$store.dispatch("fetchTransactions");
 	},
 
-	mounted() {
+	async mounted() {
 		if(!document.cookie.includes("accessToken")) {
 			this.loggedIn = false;
 			this.$router.replace("/login");

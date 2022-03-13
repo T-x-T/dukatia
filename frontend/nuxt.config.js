@@ -6,6 +6,9 @@ export default {
   modules: [
     "@nuxtjs/axios"
   ],
+  plugins: [
+    "~/plugins/detailPageConfig.js"
+  ],
   css: ["assets/general", "assets/_vars"],
   components: true,
   head: {

@@ -54,18 +54,24 @@ button
   &:hover
     background: $heavy
     box-shadow: 6px 6px 0px black
-
-button.red
-  &:hover
-    background: $error
-
-button.green
-  &:hover
-    background: $success
-
-button.orange
-  &:hover
-    background: $warn
+  &.secondary
+    @extend .regular
+    color: $brightest
+    font-size: 14px
+    background: $dark
+    box-shadow: 2px 2px 0px black
+    &:hover
+      box-shadow: 3px 3px 0px black
+      background: $darkest
+  &.red
+    &:hover
+      background: $error
+  &.green
+    &:hover
+      background: $success
+  &.orange
+    &:hover
+      background: $warn
 
 select
   @extend .semibold

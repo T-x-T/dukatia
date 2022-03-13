@@ -92,7 +92,7 @@ CREATE TABLE public."Transactions" (
     currency integer NOT NULL,
     recipient integer NOT NULL,
     status integer NOT NULL,
-    "timestamp" timestamp without time zone NOT NULL,
+    "timestamp" timestamp with time zone NOT NULL,
     amount integer NOT NULL,
     comment text
 );

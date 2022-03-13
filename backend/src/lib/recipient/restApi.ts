@@ -26,6 +26,7 @@ const routes = [
 			executorFn: async (req: IParsedReq): Promise<IExecutorResponse> => {
 				const newRecipient: IRecipient = {
 					name: req.body.name,
+					userId: req.userId,
 					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
@@ -64,6 +65,7 @@ const routes = [
 				const newRecipient: IRecipient = {
 					id: id,
 					name: req.body.name,
+					userId: req.userId,
 					tagIds: Array.isArray(req.body.tagIds) && req.body.tagIds[0] !== null ? req.body.tagIds : undefined
 				}
 
