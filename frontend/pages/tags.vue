@@ -45,7 +45,7 @@ export default {
 				rows: this.$store.state.tags.map(x => ([
 					x.id,
 					x.name,
-					this.$store.state.tags.filter(y => y.id === x.parentId)[0]?.name
+					this.$store.state.tags.filter(y => y.id === x.parent_id)[0]?.name
 				]))
 			}
 		},

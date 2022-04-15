@@ -22,10 +22,13 @@ export default {
   },
   axios: {
     proxy: true,
-    baseURL: process.env.API_HOST ? process.env.API_HOST : "http://localhost:4000",
-    credentials: true
+    baseURL: process.env.API_HOST ? process.env.API_HOST : "http://127.0.0.1:4000",
+    credentials: true,
+    headers: {
+      "Content-Type": "application/json"
+    }
   },
   proxy: {
-    "/api": process.env.API_HOST ? process.env.API_HOST : "http://localhost:4000"
+    "/api": process.env.API_HOST ? process.env.API_HOST : "http://127.0.0.1:4000"
 	}
 }

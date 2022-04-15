@@ -11,14 +11,14 @@ export default {
 		symbol: ""
 	}),
 	props: {
-		currencyId: Number
+		currency_id: Number
 	},
 
 	mounted() {
-		const currency = this.$store.state.currencies.filter(x => x.id == this.currencyId)[0];
+		const currency = this.$store.state.currencies.filter(x => x.id == this.currency_id)[0];
 		this.symbol = currency.symbol;
-		this.$store.state.transactions.filter(x => x.currencyId === this.currencyId).forEach(x => this.amount += x.amount);
-		this.amount = this.amount / currency.minorinmayor;
+		this.$store.state.transactions.filter(x => x.currency_id === this.currency_id).forEach(x => this.amount += x.amount);
+		this.amount = this.amount / currency.minor_in_mayor;
 	}
 }
 </script>

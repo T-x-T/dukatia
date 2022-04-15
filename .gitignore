@@ -3,3 +3,5 @@ dist
 config.json
 .nuxt
 docker-compose-testing.yml
+target
+old_backend

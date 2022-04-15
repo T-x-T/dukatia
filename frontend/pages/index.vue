@@ -3,7 +3,7 @@
 		<h2>This is the Dashboard</h2>
 		<div id="grid">
 			<div class="gridItem" v-for="(c, i) in $store.state.currencies" :key="i">
-				<TotalBalance :currencyId="c.id"/>	
+				<TotalBalance :currency_id="c.id"/>	
 			</div>
 			<div class="gridItem large">
 				<ChartTotalBalanceOverTime />

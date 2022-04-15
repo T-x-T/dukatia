@@ -15,32 +15,32 @@ export default function(context, inject) {
 				},
 				{
 					label: "Currency",
-					property: "defaultCurrencyId",
+					property: "default_currency_id",
 					type: "currency"
 				},
 				{
 					label: "Tags",
-					property: "tagIds",
+					property: "tag_ids",
 					type: "tags"
 				}
 			],
 			data: {
 				id: "",
 				name: "",
-				defaultCurrency: context.store.state.currencies.filter(x => x.id == 0)[0],
-				tagIds: []
+				default_currency: context.store.state.currencies.filter(x => x.id == 0)[0],
+				tag_ids: []
 			},
 			apiEndpoint: "/api/v1/accounts",
 			prepareForApi: (x) => ({
 				name: x.name,
-				defaultCurrency: x.defaultCurrencyId,
-				tagIds: Array.isArray(x.tagIds) && typeof x.tagIds[0] == "number" ? x.tagIds : undefined
+				default_currency_id: x.default_currency_id,
+				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
 			}),
 			defaultData: {
 				id: "",
 				name: "",
-				defaultCurrency: context.store.state.currencies.filter(x => x.id == 0)[0],
-				tagIds: []
+				default_currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
+				tag_ids: []
 			},
 		},
 		recipient: {
@@ -58,25 +58,25 @@ export default function(context, inject) {
 				},
 				{
 					label: "Tags",
-					property: "tagIds",
+					property: "tag_ids",
 					type: "tags"
 				}
 			],
 			data: {
 				id: "",
 				name: "",
-				tagIds: []
+				tag_ids: []
 			},
 			apiEndpoint: "/api/v1/recipients",
 			prepareForApi: (x) => ({
 				id: x.id,
 				name: x.name,
-				tagIds: Array.isArray(x.tagIds) && typeof x.tagIds[0] == "number" ? x.tagIds : undefined
+				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
 			}),
 			defaultData: {
 				id: "",
 				name: "",
-				tagIds: []
+				tag_ids: []
 			}
 		},
 		tags: {
@@ -94,24 +94,24 @@ export default function(context, inject) {
 				},
 				{
 					label: "Parent",
-					property: "parentId",
+					property: "parent_id",
 					type: "singleTag"
 				}
 			],
 			data: {
 				id: "",
 				name: "",
-				parentId: null
+				parent_id: null
 			},
 			apiEndpoint: "/api/v1/tags",
 			prepareForApi: (x) => ({
 				name: x.name,
-				parentId: typeof x.parentId == "number" ? x.parentId : undefined
+				parent_id: typeof x.parent_id == "number" ? x.parent_id : undefined
 			}),
 			defaultData: {
 				id: "",
 				name: "",
-				parentId: null
+				parent_id: null
 			}
 		}
 	})

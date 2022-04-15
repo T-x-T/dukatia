@@ -18,12 +18,12 @@ export default {
 	},
 
 	created() {
-		this.recipient.tagIds = Array.isArray(this.recipient.tagIds) ? [...this.recipient.tagIds] : [null]
+		this.recipient.tag_ids = Array.isArray(this.recipient.tag_ids) ? [...this.recipient.tag_ids] : [null]
 
-		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.recipientId == this.recipient.id).map(x => {
-			x.account = this.$store.state.accounts.filter(a => a.id == x.accountId)[0];
-			x.currency = this.$store.state.currencies.filter(c => c.id == x.currencyId)[0];
-			x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipientId)[0];
+		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.recipient_id == this.recipient.id).map(x => {
+			x.account = this.$store.state.accounts.filter(a => a.id == x.account_id)[0];
+			x.currency = this.$store.state.currencies.filter(c => c.id == x.currency_id)[0];
+			x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipient_id)[0];
 			return x;
 		});
 
@@ -50,9 +50,9 @@ export default {
 					x.account.name,
 					x.recipient.name,
 					new Date(x.timestamp).toISOString().substring(0, 10),
-					`${x.amount / x.currency.minorinmayor}${x.currency.symbol}`,
+					`${x.amount / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					x.comment,
-					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
+					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		}

@@ -7,12 +7,12 @@
 			<div v-if="selectedRows.length > 0" id="batchEditContainer">
 				<div id="batchEdit">
 					<label for="account">Account:</label>
-					<select id="account" v-model="batchAccountId">
+					<select id="account" v-model="batchaccount_id">
 						<option v-for="(account, index) in $store.state.accounts" :key="index" :value="account.id">{{account.name}}</option>
 					</select>
 
 					<label for="recipient">Recipient:</label>
-					<select id="recipient" v-model="batchRecipientId">
+					<select id="recipient" v-model="batchrecipient_id">
 						<option v-for="(recipient, index) in $store.state.recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
 					</select>
 					<button class="green" @click="applyBatchEdit()">Edit selected rows</button>
@@ -43,8 +43,8 @@ export default {
 		tableOpen: true,
 		selectedRow: {},
 		selectedRows: [],
-		batchAccountId: null,
-		batchRecipientId: null
+		batchaccount_id: null,
+		batchrecipient_id: null
 	}),
 
 	async fetch() {
@@ -54,9 +54,9 @@ export default {
 	methods: {
 		async updateTransactions() {
 			const transactionsForDisplay = this.$store.state.transactions.map(x => {
-				x.account = this.$store.state.accounts.filter(a => a.id == x.accountId)[0];
-				x.currency = this.$store.state.currencies.filter(c => c.id == x.currencyId)[0];
-				x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipientId)[0];
+				x.account = this.$store.state.accounts.filter(a => a.id == x.account_id)[0];
+				x.currency = this.$store.state.currencies.filter(c => c.id == x.currency_id)[0];
+				x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipient_id)[0];
 				return x;
 			});
 
@@ -82,16 +82,16 @@ export default {
 					x.account.name,
 					x.recipient.name,
 					new Date(x.timestamp).toISOString().substring(0, 10),
-					`${x.amount / x.currency.minorinmayor}${x.currency.symbol}`,
+					`${x.amount / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					x.comment,
-					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
+					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		},
 
 		rowClick(row) {
 			const rowFromStore = this.$store.state.transactions.filter(x => x.id == row[0])[0]
-			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -8)};
+			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -1)};
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
@@ -104,9 +104,9 @@ export default {
 		async newTransaction() {
 			this.selectedRow = {
 				id: "",
-				accountId: 0,
-				currencyId: 0,
-				recipientId: 0,
+				account_id: 0,
+				currency_id: 0,
+				recipient_id: 0,
 				status: 1,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
@@ -121,13 +121,13 @@ export default {
 		async applyBatchEdit() {
 			await Promise.all(this.selectedRows.map(async row => {
 				let transaction = {...this.$store.state.transactions.filter(x => row && x.id === row[0])[0]};
-				transaction.accountId = Number.isInteger(this.batchAccountId) ? this.batchAccountId : transaction.accountId;
-				transaction.recipientId = Number.isInteger(this.batchRecipientId) ? this.batchRecipientId : transaction.recipientId;
+				transaction.account_id = Number.isInteger(this.batchaccount_id) ? this.batchaccount_id : transaction.account_id;
+				transaction.recipient_id = Number.isInteger(this.batchrecipient_id) ? this.batchrecipient_id : transaction.recipient_id;
 
 				await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transaction);
 			}));
-			this.batchAccountId = null;
-			this.batchRecipientId = null;
+			this.batchaccount_id = null;
+			this.batchrecipient_id = null;
 			setTimeout(() => this.updateAndLoadTable(), 100);
 		},
 

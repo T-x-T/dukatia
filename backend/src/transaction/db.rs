@@ -1,0 +1,149 @@
+use deadpool_postgres::Pool;
+use std::error::Error;
+use super::super::CustomError;
+use super::{Transaction, TransactionStatus};
+
+pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
+	let id: i32 = pool.get()
+		.await?
+		.query(
+			"INSERT INTO public.\"Transactions\" (id, \"user\", account, currency, recipient, status, timestamp, amount, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
+			&[
+				&(transaction.user_id as i32),
+				&(transaction.account_id as i32),
+				&(transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
+				&(transaction.recipient_id as i32),
+				&(transaction.status as i32),
+				&transaction.timestamp,
+				&transaction.amount,
+				&transaction.comment
+			])
+			.await?
+			[0].get(0);
+	
+	if transaction.tag_ids.is_some() {
+		for tag_id in transaction.tag_ids.clone().unwrap() {
+			pool.get()
+				.await?
+				.query(
+					"INSERT INTO public.\"TransactionTags\" (transaction, tag) VALUES ($1, $2);",
+					&[&id, &(tag_id as i32)]
+				).await?;
+		}
+	}
+	return Ok(());
+}
+
+pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
+	let rows = pool.get()
+		.await?
+		.query("SELECT tr.id, tr.account, tr.currency, tr.recipient, tr.status, tr.user, tr.timestamp, tr.amount, tr.comment, array_agg(t.tag) as tags FROM public.\"Transactions\" tr LEFT JOIN public.\"TransactionTags\" t ON tr.id = t.transaction GROUP BY tr.id;", &[])
+		.await?;
+	
+	if rows.is_empty() {
+		return Err(Box::new(CustomError::NoItemFound{item_type: String::from("transaction")}));
+	}
+
+	return Ok(rows.into_iter().map(|x| turn_row_into_transaction(&x)).collect());
+}
+
+pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
+	let rows = pool.get()
+		.await?
+		.query(
+			"SELECT tr.id, tr.account, tr.currency, tr.recipient, tr.status, tr.user, tr.timestamp, tr.amount, tr.comment, array_agg(t.tag) as tags FROM public.\"Transactions\" tr LEFT JOIN public.\"TransactionTags\" t ON tr.id = t.transaction WHERE tr.id=$1 GROUP BY tr.id;", 
+			&[&(transaction_id as i32)]
+		)
+		.await?;
+
+	if rows.is_empty() {
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("transaction"), filter: format!("id={}", transaction_id) }));
+	}
+
+	return Ok(turn_row_into_transaction(&rows[0]));
+}
+
+pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
+	if transaction.id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
+	}
+
+	get_by_id(&pool, transaction.id.unwrap()).await?;
+
+	let client = pool.get().await?;
+
+	client.query(
+		"UPDATE public.\"Transactions\" SET account=$1, currency=$2, recipient=$3, status=$4, timestamp=$5, amount=$6, comment=$7 WHERE id=$8;", 
+		&[&(transaction.account_id as i32),
+			&(transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
+			&(transaction.recipient_id as i32),
+			&(transaction.status as i32),
+			&transaction.timestamp,
+			&transaction.amount,
+			&transaction.comment,
+			&(transaction.id.unwrap() as i32)
+		]
+	)
+	.await?;
+	
+	client.query(
+		"DELETE FROM public.\"TransactionTags\" WHERE transaction=$1;",
+		&[&(transaction.id.unwrap() as i32)]
+	)
+	.await?;
+
+	if transaction.tag_ids.is_some() {
+		for tag_id in transaction.tag_ids.clone().unwrap() {
+			client.query(
+				"INSERT INTO public.\"TransactionTags\" (transaction, tag) VALUES ($1, $2);",
+				&[&(transaction.id.unwrap() as i32), &(tag_id as i32)]
+			)
+			.await?;
+		}
+	}
+
+	return Ok(());
+}
+
+pub async fn delete_by_id(pool: &Pool, transaction_id: u32) -> Result<(), Box<dyn Error>> {
+	pool.get()
+		.await?
+		.query(
+			"DELETE FROM public.\"Transactions\" WHERE id=$1;", 
+			&[&(transaction_id as i32)]
+		)
+		.await?;
+	
+	return Ok(());
+}
+
+fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
+	let id: i32 = row.get(0);
+	let account_id: i32 = row.get(1);
+	let currency_id: i32 = row.get(2);
+	let recipient_id: i32 = row.get(3);
+	let status: i32 = row.get(4);
+	let user_id: i32 = row.get(5);
+	let tag_ids: Vec<u32> = row.try_get(9)
+		.unwrap_or(Vec::new())
+		.into_iter()
+		.map(|x: i32| x as u32)
+		.collect();
+
+	return Transaction {
+		id: Some(id as u32),
+		user_id: user_id as u32,
+		account_id: account_id as u32,
+		currency_id: Some(currency_id as u32),
+		recipient_id: recipient_id as u32,
+		status: match status {
+			0 => TransactionStatus::Withheld,
+			1 => TransactionStatus::Completed,
+			_ => panic!("invalid transaction status found in row from database")
+		},
+		timestamp: row.get(6),
+		amount: row.get(7),
+		comment: row.get(8),
+		tag_ids: Some(tag_ids),
+	};
+}
