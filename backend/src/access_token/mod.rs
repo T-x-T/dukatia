@@ -112,7 +112,7 @@ mod tests {
 			let(config, pool) = setup().await;
 	
 			let res = get_user_of_token(&pool, &String::from("nonsense")).await;
-			assert_eq!(res.expect_err("this somehow didnt contain an error").to_string(), String::from("no user found for token"));
+			assert_eq!(res.expect_err("specified item of type user not found with filter access_token").to_string(), String::from("no user found for token"));
 			
 			teardown(&config).await;
 			return Ok(());
