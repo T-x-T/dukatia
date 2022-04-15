@@ -13,7 +13,7 @@ backend_test:
   - postgres:latest
   script:
   - cd backend/
-  - POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
+  - POSTGRES_PORT=5432 POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
 
 build_backend:
   image: docker:19.03.11
