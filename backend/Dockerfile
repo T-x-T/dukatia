@@ -1,0 +1,12 @@
+FROM rust:latest AS builder
+
+WORKDIR /app
+
+ADD . ./
+RUN cargo build --release
+
+FROM alpine:latest
+EXPOSE 4000
+
+COPY --from=builder /app/target/release/backend /app/backend
+CMD ["./backend"]
