@@ -5,8 +5,8 @@ WORKDIR /app
 ADD . ./
 RUN cargo build --release
 
-FROM alpine:latest
+FROM debian:bullseye-slim
 EXPOSE 4000
 
 COPY --from=builder /app/target/release/backend /app/backend
-CMD ["./backend"]
+CMD ["/app/backend"]
