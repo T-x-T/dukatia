@@ -1,4 +1,4 @@
-use actix_web::{post, web, HttpResponse, Responder, http::header::ContentType};
+use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
 use super::super::webserver::AppState;
 use super::super::user::{User, login};
@@ -19,7 +19,7 @@ async fn post_login(data: web::Data<AppState>, body: web::Json<LoginData>) -> im
 	};
 
 	match login(&data.config, &data.pool, user).await {
-		Ok(access_token) => return HttpResponse::Ok().content_type(ContentType::json()).body(format!("{{\"accessToken\":\"{}\"}}", access_token)),
-		Err(e) => return HttpResponse::BadRequest().content_type(ContentType::json()).body(format!("{{\"error\":\"{}\"}}", e)),
+		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{}\"}}", access_token)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	};
 }

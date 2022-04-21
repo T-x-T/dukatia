@@ -1,4 +1,5 @@
-use actix_web::{web, App, HttpServer};
+use actix_web::{dev::Service as _, web, App, HttpServer, middleware};
+use futures_util::future::FutureExt;
 use deadpool_postgres::Pool;
 use super::config::Config;
 use super::user;
@@ -22,6 +23,14 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 				config: config.clone(),
 				pool: pool.clone()
 			}))
+			.wrap(middleware::Compress::default())
+			.wrap(middleware::DefaultHeaders::new().add(("Content-Type", "application/json")))
+			.wrap_fn(|req, srv| {
+				println!("req: {} {}", req.method(), req.path());
+				srv.call(req).map(|res| {
+					return res;
+				})
+			})
 			.service(user::rest_api::post_login)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::post)
