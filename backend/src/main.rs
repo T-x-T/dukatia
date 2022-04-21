@@ -89,6 +89,7 @@ async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Er
 #[allow(dead_code)]
 async fn setup() -> (Config, Pool) {
   let config = initialize_config();
+  postgres::delete_database(&config).await;
   let pool = postgres::get_postgres_connection(&config).await;
   user::init(&config, &pool).await;
   return (config, pool);
@@ -96,5 +97,5 @@ async fn setup() -> (Config, Pool) {
 
 #[allow(dead_code)]
 async fn teardown(config: &Config) {
-  postgres::delete_testing_databases(&config).await;
+  postgres::delete_database(&config).await;
 }

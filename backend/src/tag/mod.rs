@@ -72,7 +72,7 @@ mod tests {
 	mod add {
 		use super::*;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_without_parent() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -82,7 +82,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_with_existing_parent() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -97,7 +97,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		#[should_panic]
 		async fn panic_with_non_existing_parent() {
 			let (config, pool) = setup().await;
@@ -113,7 +113,7 @@ mod tests {
 	mod get_all {
 		use super::*;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_with_default_db() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -123,7 +123,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -138,7 +138,7 @@ mod tests {
 			return Ok(());
 		}
 		
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_with_parent_id() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -155,7 +155,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -171,7 +171,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_correct_parent_id_with_some() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -196,7 +196,7 @@ mod tests {
 	mod update {
 		use super::*;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -210,7 +210,7 @@ mod tests {
 			return Ok(());
 		}
 		
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_error_without_id() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -226,7 +226,7 @@ mod tests {
 			};
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_error_when_specified_tag_doesnt_exist() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 

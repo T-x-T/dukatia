@@ -45,7 +45,7 @@ mod tests {
 		use super::*;
 		use super::super::super::tag;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -55,7 +55,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -76,7 +76,7 @@ mod tests {
 		use super::*;
 		use super::super::super::tag;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_on_default_db() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -86,7 +86,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -104,7 +104,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
@@ -121,7 +121,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 

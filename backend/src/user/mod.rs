@@ -48,7 +48,7 @@ mod tests {
 	use super::*;
 	use super::super::{setup, teardown};
 
-	#[tokio::test]
+	#[tokio::test(flavor = "multi_thread")]
 	async fn can_login_correct_admin_user() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
@@ -65,7 +65,7 @@ mod tests {
 		return Ok(());
 	}
 
-	#[tokio::test]
+	#[tokio::test(flavor = "multi_thread")]
 	async fn cant_login_admin_user_with_wrong_username() -> Result<(), String> {
 		let (config, pool) = setup().await;
 
@@ -85,7 +85,7 @@ mod tests {
 		return res;
 	}
 
-	#[tokio::test]
+	#[tokio::test(flavor = "multi_thread")]
 	async fn cant_login_admin_user_with_wrong_password() -> Result<(), String> {
 		let (config, pool) = setup().await;
 

@@ -44,7 +44,7 @@ mod tests {
 	mod add_access_token {
 		use super::*;
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
 			let(config, pool) = setup().await;
 		
@@ -54,7 +54,7 @@ mod tests {
 			return Ok(());
 		}
 	
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn return_access_token_of_correct_length() -> Result<(), Box<dyn Error>> {
 			let(config, pool) = setup().await;
 		
@@ -65,7 +65,7 @@ mod tests {
 			return Ok(());
 		}
 	
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		#[should_panic]
 		async fn using_user_with_no_id_should_panic() {
 			let(config, pool) = setup().await;
@@ -86,7 +86,7 @@ mod tests {
 			return add(&pool, &get_user(&config)).await;
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
 			let(config, pool) = setup().await;
 	
@@ -96,7 +96,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_id_of_only_user() -> Result<(), Box<dyn Error>> {
 			let(config, pool) = setup().await;
 	
@@ -107,7 +107,7 @@ mod tests {
 			return Ok(());
 		}
 
-		#[tokio::test]
+		#[tokio::test(flavor = "multi_thread")]
 		async fn returns_error_with_non_existent_token() -> Result<(), Box<dyn Error>> {
 			let(config, pool) = setup().await;
 	

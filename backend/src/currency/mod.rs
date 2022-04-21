@@ -22,7 +22,7 @@ mod tests {
 	use super::*;
 	use super::super::{setup, teardown};
 
-	#[tokio::test]
+	#[tokio::test(flavor = "multi_thread")]
 	async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
@@ -32,7 +32,7 @@ mod tests {
 		return Ok(());
 	}
 
-	#[tokio::test]
+	#[tokio::test(flavor = "multi_thread")]
 	async fn returns_two_rows() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
