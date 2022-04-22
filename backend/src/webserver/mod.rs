@@ -1,6 +1,9 @@
-use actix_web::{dev::Service as _, web, App, HttpServer, middleware};
+use actix_web::{dev::Service as _, web, App, HttpServer, HttpRequest, middleware};
+use std::error::Error;
 use futures_util::future::FutureExt;
 use deadpool_postgres::Pool;
+
+use super::CustomError;
 use super::config::Config;
 use super::user;
 use super::currency;
@@ -8,6 +11,7 @@ use super::account;
 use super::tag;
 use super::recipient;
 use super::transaction;
+use super::access_token::get_user_of_token;
 
 pub struct AppState {
 	pub config: Config,
@@ -50,4 +54,12 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 		.bind(("0.0.0.0", api_port))?
 		.run()
 		.await;
+}
+
+pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Error>> {
+	if req.cookie("accessToken").is_none() {
+    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("access_token")}));
+  }
+
+	return get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await;
 }

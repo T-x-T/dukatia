@@ -19,8 +19,6 @@ mod transaction;
 use std::fmt;
 use std::error::Error;
 use deadpool_postgres::Pool;
-use actix_web::HttpRequest;
-use access_token::get_user_of_token;
 
 use config::*;
 use postgres::get_postgres_connection;
@@ -78,18 +76,10 @@ impl Error for CustomError {
 
 }
 
-async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Error>> {
-	if req.cookie("accessToken").is_none() {
-    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("access_token")}));
-  }
-
-	return get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await;
-}
-
 #[allow(dead_code)]
 async fn setup() -> (Config, Pool) {
   let config = initialize_config();
-  postgres::delete_database(&config).await;
+  postgres::delete_testing_databases(&config).await;
   let pool = postgres::get_postgres_connection(&config).await;
   user::init(&config, &pool).await;
   return (config, pool);

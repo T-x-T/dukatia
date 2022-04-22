@@ -1,6 +1,5 @@
 use actix_web::{get, web, HttpResponse, HttpRequest, Responder};
-use super::super::is_authorized;
-use super::super::webserver::AppState;
+use super::super::webserver::{AppState, is_authorized};
 
 #[get("/api/v1/currencies/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {

@@ -1,7 +1,6 @@
 use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
-use super::super::is_authorized;
-use super::super::webserver::AppState;
+use super::super::webserver::{AppState, is_authorized};
 
 #[get("/api/v1/accounts/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
