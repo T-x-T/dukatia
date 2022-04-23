@@ -1,16 +1,12 @@
-FROM node:alpine
+FROM rust:latest AS builder
 
-# Set workdir
 WORKDIR /app
 
-# Bundle APP files
-COPY . .
+ADD . ./
+RUN cargo build --release
 
-# Install app dependencies
-ENV NPM_CONFIG_LOGLEVEL warn
-RUN npm install --production
-
-# expose port
+FROM debian:bullseye-slim
 EXPOSE 4000
 
-CMD [ "npm", "run", "prod" ]
+COPY --from=builder /app/target/release/backend /app/backend
+CMD ["/app/backend"]

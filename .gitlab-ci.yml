@@ -3,32 +3,17 @@ variables:
   POSTGRES_HOST: postgres
 
 stages:
-- compile
 - test
 - build
 
-compile_backend:
-  stage: compile
-  image: node:latest
-  script:
-    - cd backend
-    - npm i --dev
-    - npm run build
-  artifacts:
-    paths:
-      - backend/dist
-
 backend_test:
   stage: test
-  image: node:latest
+  image: rust:latest
   services:
   - postgres:latest
   script:
-  - cd backend/dist
-  - npm i
-  - NODE_ENV=testing POSTGRES_HOST=$POSTGRES_HOST ../node_modules/mocha/bin/mocha --exit -t 10000 test/index.js
-  dependencies:
-    - compile_backend
+  - cd backend/
+  - POSTGRES_PORT=5432 POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
 
 build_backend:
   image: docker:19.03.11
@@ -43,8 +28,6 @@ build_backend:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker build -t $IMAGE_TAG ./backend
   - docker push $IMAGE_TAG
-  dependencies:
-    - compile_backend
 build_frontend:
   image: docker:19.03.11
   stage: build
@@ -58,5 +41,3 @@ build_frontend:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker build -t $IMAGE_TAG ./frontend
   - docker push $IMAGE_TAG
-  dependencies:
-    - compile_backend

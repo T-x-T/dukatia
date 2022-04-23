@@ -34,7 +34,7 @@ export default {
 					x.id,
 					x.name,
 					x.symbol,
-					x.minorinmayor
+					x.minor_in_mayor
 				]))
 			}
 		}

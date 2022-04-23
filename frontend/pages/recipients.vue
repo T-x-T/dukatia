@@ -45,7 +45,7 @@ export default {
 				rows: this.$store.state.recipients.map(x => ([
 					x.id,
 					x.name,
-					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
+					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		},

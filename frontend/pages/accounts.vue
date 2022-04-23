@@ -47,16 +47,16 @@ export default {
 				rows: this.$store.state.accounts.map(x => ([
 					x.id,
 					x.name,
-					this.$store.state.currencies.filter(c => c.id == x.defaultCurrency)[0].name,
-					this.$store.state.tags.filter(y => x.tagIds?.includes(y.id)).map(y => y.name).join(", ")
+					this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].name,
+					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
 		},
 		
 		rowClick(row) {
 			const rowFromStore = this.$store.state.accounts.filter(x => x.id == row[0])[0];
-			const defaultCurrency = this.$store.state.currencies.filter(x => x.id == rowFromStore.defaultCurrency)[0]
-			this.selectedRow = {...rowFromStore, defaultCurrency: {...defaultCurrency}};
+			const default_currency = this.$store.state.currencies.filter(x => x.id == rowFromStore.default_currency)[0]
+			this.selectedRow = {...rowFromStore, default_currency: {...default_currency}};
 			this.mode = "details";
 		},
 
@@ -64,7 +64,7 @@ export default {
 			this.selectedRow = {
 				id: "",
 				name: "",
-				defaultCurrency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+				default_currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
 			}
 
 			this.mode = "details";

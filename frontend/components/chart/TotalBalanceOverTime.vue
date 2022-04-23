@@ -80,7 +80,7 @@ export default {
 			const dateSortedTransactions = transactions.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
 
 			this.$store.state.currencies.forEach(currency => {
-				const filteredTransactions = dateSortedTransactions.filter(x => x.currencyId == currency.id);
+				const filteredTransactions = dateSortedTransactions.filter(x => x.currency_id == currency.id);
 
 				let data = [];
 				let labels = [];

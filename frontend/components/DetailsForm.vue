@@ -6,7 +6,7 @@
 				<div v-if="field.type == 'number'">
 					<label>{{`${field.label}: `}}</label>
 					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled" :ref="'forminput' + index">
-					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{$store.state.currencies.filter(y => y.id == $store.state.accounts.filter(x => x.id == config.data.accountId)[0].defaultCurrency)[0].symbol}}</span>
+					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{$store.state.currencies.filter(y => y.id == $store.state.accounts.filter(x => x.id == config.data.account_id)[0].default_currency_id)[0].symbol}}</span>
 				</div>
 
 				<div v-else-if="field.type == 'string'">
@@ -102,18 +102,18 @@ export default {
 	},
 
 	created() {
-		this.config.data.tagIds = Array.isArray(this.config.data.tagIds) ? [...this.config.data.tagIds] : [null];
+		this.config.data.tag_ids = Array.isArray(this.config.data.tag_ids) ? [...this.config.data.tag_ids] : [null];
 		this.updateSelectData();
 	},
 
 	mounted() {
-		this.$nextTick(() => {this.$refs.forminput1[0].focus()});
+		this.$nextTick(() => {this.$refs.forminput1?.[0].focus()});
 	},
 
 	methods: {
 		tagUpdate(selected) {
 			this.tagsManuallyChanged = true;
-			this.config.data.tagIds = selected;
+			this.config.data.tag_ids = selected;
 		},
 
 		async send(goBack) {
@@ -130,7 +130,7 @@ export default {
 				this.tagsManuallyChanged = false;
 				this.config.data = {...this.config.defaultData};
 				this.$refs.forminput1[0].focus()
-				if(this.config.resetDefaultCurrencyId) this.config.data.defaultCurrencyId = this.config.data.defaultCurrency.id;
+				if(this.config.resetdefault_currency_id) this.config.data.default_currency_id = this.config.data.default_currency.id;
 				this.updateSelectData();
 			}
 		},
@@ -139,7 +139,7 @@ export default {
 			this.selectData = null;
 			this.selectData = {
 				options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
-				selected: this.config.data.tagIds ? [...this.config.data.tagIds] : undefined,
+				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : undefined,
 				label: "Tags:"
 			}
 		},
@@ -171,10 +171,10 @@ export default {
 	},
 
 	watch: {
-		"config.data.recipientId": function(oldVal, newVal) {
+		"config.data.recipient_id": function(oldVal, newVal) {
 			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged && typeof this.config.data.id != "number") {
-				const tagIdsOfRecipient = this.$store.state.recipients.filter(x => x.id === this.config.data.recipientId)[0].tagIds;
-				this.config.data.tagIds = tagIdsOfRecipient;
+				const tag_idsOfRecipient = this.$store.state.recipients.filter(x => x.id === this.config.data.recipient_id)[0].tag_ids;
+				this.config.data.tag_ids = tag_idsOfRecipient;
 				this.updateSelectData();
 			}
 		}
