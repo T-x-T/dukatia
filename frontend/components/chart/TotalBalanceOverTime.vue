@@ -74,7 +74,7 @@ export default {
 	methods: {
 		async update() {
 			this.loaded = false;
-			
+
 			this.chartData = {
 				datasets: []
 			}
@@ -88,7 +88,7 @@ export default {
 			this.$store.state.currencies.forEach(currency => {
 				this.chartData.datasets.push({
 					label: currency.symbol,
-					data: api_data[currency.id].map(x => ({x: x, y: x.y / currency.minor_in_mayor})),
+					data: api_data[currency.id].map(x => ({x: x.x, y: x.y / currency.minor_in_mayor})),
 					cubicInterpolationMode: "monotone",
 					fill: false,
 					borderColor: `#${this.colors[currency.id] ? this.colors[currency.id] : this.generateRandomColor(currency.id)}ff`
