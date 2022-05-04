@@ -7,10 +7,10 @@ use deadpool_postgres::Pool;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Currency {
-	id: Option<u32>,
-	name: String,
-	minor_in_mayor: u32,
-	symbol: String,
+	pub id: Option<u32>,
+	pub name: String,
+	pub minor_in_mayor: u32,
+	pub symbol: String,
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {

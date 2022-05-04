@@ -4,6 +4,7 @@
   clippy::or_fun_call,
   clippy::redundant_field_names,
 )]
+#![feature(btree_drain_filter)]
 
 mod webserver;
 mod access_token;
@@ -15,6 +16,7 @@ mod account;
 mod tag;
 mod recipient;
 mod transaction;
+mod reports;
 
 use std::fmt;
 use std::error::Error;
@@ -34,6 +36,7 @@ async fn main() -> std::io::Result<()> {
   user::init(&config, &pool).await;
   initialize_webserver(config, pool).await?;
   
+
   return Ok(());
 }
 

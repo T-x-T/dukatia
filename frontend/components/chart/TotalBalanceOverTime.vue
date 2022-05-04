@@ -3,7 +3,7 @@
 		<div id="title">
 			<p>Total balance over time</p>
 		</div>
-		<div id="chart">
+		<div v-if="loaded" id="chart">
 			<LineChart
 				:chartData="chartData"
 				:chartOptions="chartOptions"
@@ -22,6 +22,7 @@
 <script>
 export default {
 	data: () => ({
+		loaded: false,
 		fromDate: null,
 		toDate: null,
 		colors: {},
@@ -66,77 +67,35 @@ export default {
 		}
 	}),
 
-	fetch() {
-		this.update();
+	async fetch() {
+		await this.update();
 	},
 
 	methods: {
-		update() {
+		async update() {
+			this.loaded = false;
+			
 			this.chartData = {
 				datasets: []
 			}
 
-			const transactions = this.$store.state.transactions.map(x => ({...x}));
-			const dateSortedTransactions = transactions.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
+			let query = "";
+			if(this.fromDate && this.toDate) {
+				query = `?from_date=${this.fromDate}&to_date=${this.toDate}&`;
+			}
+			const api_data = await this.$axios.$get("/api/v1/reports/balance_over_time_per_currency" + query);
 
 			this.$store.state.currencies.forEach(currency => {
-				const filteredTransactions = dateSortedTransactions.filter(x => x.currency_id == currency.id);
-
-				let data = [];
-				let labels = [];
-	
-				filteredTransactions.forEach(x => {
-					data.push(x.amount);
-					labels.push(x.timestamp);
-				});
-	
-				for(let i = 0; i < labels.length; i++) {
-					if(labels[i] && labels[i + 1]) {
-						if(labels[i].slice(0, 10) === labels[i + 1].slice(0, 10)) {
-							data[i] += data[i + 1];
-							data[i + 1] = null;
-							labels[i + 1] = null;
-						}
-					}
-				}
-				data = data.filter(x => x);
-				labels = labels.filter(x => x);
-	
-				for(let i = 0; i < data.length; i++) {
-					if(i > 0) data[i] += data[i - 1];
-				}
-	
-				if(this.fromDate && this.toDate) {
-					let newData = [];
-					let newLabels = [];
-					for(let i = 0; i < labels.length; i++) {
-						if(Date.parse(labels[i]) >= Date.parse(this.fromDate) && Date.parse(labels[i]) <= Date.parse(this.toDate)) {
-							newData.push(data[i]);
-							newLabels.push(labels[i]);
-						}
-					}
-					data = newData;
-					labels = newLabels;
-				}
-	
-				data = data.map(x => x / 100);
-				labels = labels.map(x => x.slice(0, 10));
-	
-				for(let i = 0; i < labels.length; i++) {
-					data[i] = {
-						y: data[i],
-						x: labels[i]
-					}
-				}
-
 				this.chartData.datasets.push({
 					label: currency.symbol,
-					data: data,
+					data: api_data[currency.id].map(x => ({x: x, y: x.y / currency.minor_in_mayor})),
 					cubicInterpolationMode: "monotone",
 					fill: false,
 					borderColor: `#${this.colors[currency.id] ? this.colors[currency.id] : this.generateRandomColor(currency.id)}ff`
 				});
 			});
+
+			this.loaded = true;
 		},
 
 		generateRandomColor(key) {
