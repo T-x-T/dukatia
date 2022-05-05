@@ -7,6 +7,7 @@ use serde::Serialize;
 
 
 use super::transaction;
+use super::transaction::Transaction;
 use super::currency;
 use super::recipient;
 use super::account;
@@ -17,149 +18,116 @@ pub struct Output {
 	pub y: i32
 }
 
-pub async fn balance_over_time_per_currency(
-	pool: &Pool,
-	from_date: Option<chrono::NaiveDate>,
-	to_date: Option<chrono::NaiveDate>
-) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
-	let mut transactions = transaction::get_all(&pool).await?;
-	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
-
-	let currencies = currency::get_all(&pool).await?;
-
-	let mut output_map: BTreeMap<u32, Vec<Output>> = BTreeMap::new();
-	for currency in currencies {
-		let filtered_transactions = transactions.iter().filter(|x| x.currency_id.unwrap() == currency.id.unwrap());
-
-		let mut data: BTreeMap<chrono::NaiveDate, i32> = BTreeMap::new();
-
-		//Fill data while adding values from same date
-		for filtered_transaction in filtered_transactions {
-			if data.contains_key(&filtered_transaction.timestamp.date().naive_local()) {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), data.get(&filtered_transaction.timestamp.date().naive_local()).unwrap() + filtered_transaction.amount);
-			} else {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), filtered_transaction.amount);
-			}
-		}
-
-		//Create rolling sum of values
-		let mut prev: i32 = 0;
-		for i in 0..data.len() {
-			let cur_key = data.iter().nth(i).unwrap().0.clone();
-			let cur_val = data.iter().nth(i).unwrap().1.clone();
-			data.insert(cur_key, prev + cur_val);
-			prev = data.iter().nth(i).unwrap().1.clone();
-		}
-
-		//Optional date filtering
-		if from_date.is_some() && to_date.is_some() {
-			data = data.drain_filter(|k, _v| &from_date.unwrap().signed_duration_since(*k).num_seconds() <= &0 && &to_date.unwrap().signed_duration_since(*k).num_seconds() >= &0).collect();
-		}
-
-		let mut output: Vec<Output> = Vec::new();
+impl Output {
+	fn from_data(data: BTreeMap<chrono::NaiveDate, i32>) -> Vec<Self> {
+		let mut output: Vec<Self> = Vec::new();
 		for i in 0..data.len() {
 			output.push(Output { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
 		}
-		output_map.insert(currency.id.unwrap(), output);
-
+		return output;
 	}
-	return Ok(output_map);
+}
+
+struct Map {
+	data: BTreeMap<chrono::NaiveDate, i32>
+}
+
+impl Map {
+	fn build(transactions: Vec<&Transaction>) -> Self {
+		let mut data: BTreeMap<chrono::NaiveDate, i32> = BTreeMap::new();
+	
+		for transaction in transactions {
+			if data.contains_key(&transaction.timestamp.date().naive_local()) {
+				data.insert(transaction.timestamp.date().naive_local(), data.get(&transaction.timestamp.date().naive_local()).unwrap() + transaction.amount);
+			} else {
+				data.insert(transaction.timestamp.date().naive_local(), transaction.amount);
+			}
+		}
+	
+		return Self{data};
+	}
+	
+	fn create_rolling_sum(mut self) -> Self {
+		let mut prev: i32 = 0;
+		for i in 0..self.data.len() {
+			let cur_key = self.data.iter().nth(i).unwrap().0.clone();
+			let cur_val = self.data.iter().nth(i).unwrap().1.clone();
+			self.data.insert(cur_key, prev + cur_val);
+			prev = self.data.iter().nth(i).unwrap().1.clone();
+		}
+		return self;
+	}	
+}
+
+pub async fn balance_over_time_per_currency(
+	pool: &Pool, from_date: Option<chrono::NaiveDate>,	to_date: Option<chrono::NaiveDate>
+) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
+	let transactions = get_transactions_timestamp_sorted(&pool).await?;
+
+	return Ok(
+		currency::get_all(&pool).await?.iter().map(|currency| {
+			let data = Map::build(
+				transactions.iter()
+					.filter(|x| x.currency_id == currency.id)
+					.collect()
+			).create_rolling_sum();
+
+			if from_date.is_some() && to_date.is_some() {
+				return(currency.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+			} else {
+				return(currency.id.unwrap(), Output::from_data(data.data));
+			}
+	}).collect());
 }
 
 pub async fn balance_over_time_per_recipient(
-	pool: &Pool,
-	from_date: Option<chrono::NaiveDate>,
-	to_date: Option<chrono::NaiveDate>
+	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
 ) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
-	let mut transactions = transaction::get_all(&pool).await?;
-	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
-	let recipients = recipient::get_all(&pool).await?;
+	return Ok(
+		recipient::get_all(&pool).await?.iter().map(|recipient| {
+			let data = Map::build(
+				transactions.iter()
+					.filter(|x| x.recipient_id == recipient.id.unwrap())
+					.collect()
+			).create_rolling_sum();
 
-	let mut output_map: BTreeMap<u32, Vec<Output>> = BTreeMap::new();
-	for recipient in recipients {
-		let filtered_transactions = transactions.iter().filter(|x| x.recipient_id == recipient.id.unwrap());
-
-		let mut data: BTreeMap<chrono::NaiveDate, i32> = BTreeMap::new();
-
-		//Fill data while adding values from same date
-		for filtered_transaction in filtered_transactions {
-			if data.contains_key(&filtered_transaction.timestamp.date().naive_local()) {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), data.get(&filtered_transaction.timestamp.date().naive_local()).unwrap() + filtered_transaction.amount);
+			if from_date.is_some() && to_date.is_some() {
+				return(recipient.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
 			} else {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), filtered_transaction.amount);
+				return(recipient.id.unwrap(), Output::from_data(data.data));
 			}
-		}
-
-		//Create rolling sum of values
-		let mut prev: i32 = 0;
-		for i in 0..data.len() {
-			let cur_key = data.iter().nth(i).unwrap().0.clone();
-			let cur_val = data.iter().nth(i).unwrap().1.clone();
-			data.insert(cur_key, prev + cur_val);
-			prev = data.iter().nth(i).unwrap().1.clone();
-		}
-
-		//Optional date filtering
-		if from_date.is_some() && to_date.is_some() {
-			data = data.drain_filter(|k, _v| &from_date.unwrap().signed_duration_since(*k).num_seconds() <= &0 && &to_date.unwrap().signed_duration_since(*k).num_seconds() >= &0).collect();
-		}
-
-		let mut output: Vec<Output> = Vec::new();
-		for i in 0..data.len() {
-			output.push(Output { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
-		}
-		output_map.insert(recipient.id.unwrap(), output);
-
-	}
-	return Ok(output_map);
+	}).collect());
 }
 
 pub async fn balance_over_time_per_account(
-	pool: &Pool,
-	from_date: Option<chrono::NaiveDate>,
-	to_date: Option<chrono::NaiveDate>
+	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
 ) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
+	let transactions = get_transactions_timestamp_sorted(&pool).await?;
+
+	return Ok(
+		account::get_all(&pool).await?.iter().map(|account| {
+			let data = Map::build(
+				transactions.iter()
+					.filter(|x| x.account_id == account.id.unwrap())
+					.collect()
+			).create_rolling_sum();
+
+			if from_date.is_some() && to_date.is_some() {
+				return(account.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+			} else {
+				return(account.id.unwrap(), Output::from_data(data.data));
+			}
+	}).collect());
+}
+
+fn retain_date_range(mut data: BTreeMap<chrono::NaiveDate, i32>, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate) -> BTreeMap<chrono::NaiveDate, i32> {
+	return data.drain_filter(|k, _v| &from_date.signed_duration_since(*k).num_seconds() <= &0 && &to_date.signed_duration_since(*k).num_seconds() >= &0).collect();
+}
+
+async fn get_transactions_timestamp_sorted(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	let mut transactions = transaction::get_all(&pool).await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
-
-	let accounts = account::get_all(&pool).await?;
-
-	let mut output_map: BTreeMap<u32, Vec<Output>> = BTreeMap::new();
-	for account in accounts {
-		let filtered_transactions = transactions.iter().filter(|x| x.account_id == account.id.unwrap());
-
-		let mut data: BTreeMap<chrono::NaiveDate, i32> = BTreeMap::new();
-
-		//Fill data while adding values from same date
-		for filtered_transaction in filtered_transactions {
-			if data.contains_key(&filtered_transaction.timestamp.date().naive_local()) {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), data.get(&filtered_transaction.timestamp.date().naive_local()).unwrap() + filtered_transaction.amount);
-			} else {
-				data.insert(filtered_transaction.timestamp.date().naive_local(), filtered_transaction.amount);
-			}
-		}
-
-		//Create rolling sum of values
-		let mut prev: i32 = 0;
-		for i in 0..data.len() {
-			let cur_key = data.iter().nth(i).unwrap().0.clone();
-			let cur_val = data.iter().nth(i).unwrap().1.clone();
-			data.insert(cur_key, prev + cur_val);
-			prev = data.iter().nth(i).unwrap().1.clone();
-		}
-
-		//Optional date filtering
-		if from_date.is_some() && to_date.is_some() {
-			data = data.drain_filter(|k, _v| &from_date.unwrap().signed_duration_since(*k).num_seconds() <= &0 && &to_date.unwrap().signed_duration_since(*k).num_seconds() >= &0).collect();
-		}
-
-		let mut output: Vec<Output> = Vec::new();
-		for i in 0..data.len() {
-			output.push(Output { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
-		}
-		output_map.insert(account.id.unwrap(), output);
-
-	}
-	return Ok(output_map);
+	return Ok(transactions);
 }
