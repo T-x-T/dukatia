@@ -13,16 +13,16 @@ use super::recipient;
 use super::account;
 
 #[derive(Debug, Serialize)]
-pub struct Output {
+pub struct TimestampedOutput {
 	pub x: chrono::NaiveDate,
 	pub y: i32
 }
 
-impl Output {
+impl TimestampedOutput {
 	fn from_data(data: BTreeMap<chrono::NaiveDate, i32>) -> Vec<Self> {
 		let mut output: Vec<Self> = Vec::new();
 		for i in 0..data.len() {
-			output.push(Output { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
+			output.push(TimestampedOutput { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
 		}
 		return output;
 	}
@@ -61,7 +61,7 @@ impl Map {
 
 pub async fn balance_over_time_per_currency(
 	pool: &Pool, from_date: Option<chrono::NaiveDate>,	to_date: Option<chrono::NaiveDate>
-) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
+) -> Result<BTreeMap<u32, Vec<TimestampedOutput>>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
 	return Ok(
@@ -73,16 +73,16 @@ pub async fn balance_over_time_per_currency(
 			).create_rolling_sum();
 
 			if from_date.is_some() && to_date.is_some() {
-				return(currency.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+				return(currency.id.unwrap(), TimestampedOutput::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
 			} else {
-				return(currency.id.unwrap(), Output::from_data(data.data));
+				return(currency.id.unwrap(), TimestampedOutput::from_data(data.data));
 			}
 	}).collect());
 }
 
 pub async fn balance_over_time_per_recipient(
 	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
-) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
+) -> Result<BTreeMap<u32, Vec<TimestampedOutput>>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
 	return Ok(
@@ -94,16 +94,16 @@ pub async fn balance_over_time_per_recipient(
 			).create_rolling_sum();
 
 			if from_date.is_some() && to_date.is_some() {
-				return(recipient.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+				return(recipient.id.unwrap(), TimestampedOutput::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
 			} else {
-				return(recipient.id.unwrap(), Output::from_data(data.data));
+				return(recipient.id.unwrap(), TimestampedOutput::from_data(data.data));
 			}
 	}).collect());
 }
 
 pub async fn balance_over_time_per_account(
 	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
-) -> Result<BTreeMap<u32, Vec<Output>>, Box<dyn Error>> {
+) -> Result<BTreeMap<u32, Vec<TimestampedOutput>>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
 	return Ok(
@@ -115,9 +115,9 @@ pub async fn balance_over_time_per_account(
 			).create_rolling_sum();
 
 			if from_date.is_some() && to_date.is_some() {
-				return(account.id.unwrap(), Output::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+				return(account.id.unwrap(), TimestampedOutput::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
 			} else {
-				return(account.id.unwrap(), Output::from_data(data.data));
+				return(account.id.unwrap(), TimestampedOutput::from_data(data.data));
 			}
 	}).collect());
 }
@@ -130,4 +130,20 @@ async fn get_transactions_timestamp_sorted(pool: &Pool) -> Result<Vec<Transactio
 	let mut transactions = transaction::get_all(&pool).await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
 	return Ok(transactions);
+}
+
+async fn total_per_currency(pool: &Pool) -> Result<BTreeMap<u32, i32>, Box<dyn Error>> {
+	let mut output_map: BTreeMap<u32, i32> = BTreeMap::new();
+	let transactions = transaction::get_all(&pool).await?;
+
+	transactions.iter().for_each(|transaction| {
+		let currency_id = transaction.currency_id.unwrap();
+		if output_map.contains_key(&currency_id) {
+			output_map.insert(currency_id, output_map.get(&currency_id).unwrap() + transaction.amount);
+		} else {
+			output_map.insert(currency_id, transaction.amount);
+		}
+	});
+
+	return Ok(output_map);
 }

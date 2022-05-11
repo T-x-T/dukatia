@@ -2,8 +2,8 @@
 	<div>
 		<h2>This is the Dashboard</h2>
 		<div id="grid">
-			<div class="gridItem" v-for="(c, i) in $store.state.currencies" :key="i">
-				<TotalBalance :currency_id="c.id"/>	
+			<div class="gridItem" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
+				<TotalBalance :currency_id="parseInt(currency_id)" :amount="amount"/>	
 			</div>
 			<div class="gridItem large">
 				<ChartTotalBalanceOverTime />
@@ -21,12 +21,11 @@
 <script>
 export default {
 	data: () => ({
-		totalMoney: null
+		total_per_currency: {}
 	}),
 
 	async fetch() {
-		this.$store.state.transactions.forEach(x => this.totalMoney += x.amount);
-		this.totalMoney = (this.totalMoney / 100) + "€"
+		this.total_per_currency = await this.$axios.$get("/api/v1/reports/total_per_currency");
 	}
 }
 </script>
