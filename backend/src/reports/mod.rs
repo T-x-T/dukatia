@@ -147,3 +147,37 @@ async fn total_per_currency(pool: &Pool) -> Result<BTreeMap<u32, i32>, Box<dyn E
 
 	return Ok(output_map);
 }
+
+pub async fn spending_per_recipient_in_date_range(
+	pool: &Pool, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate
+) -> Result<BTreeMap<u32, BTreeMap<u32, i32>>, Box<dyn Error>> {
+	let mut output_map: BTreeMap<u32, BTreeMap<u32, i32>> = BTreeMap::new();
+	let transactions: Vec<Transaction> = transaction::get_all(&pool).await?.into_iter().filter(|x| {
+		return &from_date.signed_duration_since(x.timestamp.naive_local().date()).num_seconds() <= &0 && &to_date.signed_duration_since(x.timestamp.naive_local().date()).num_seconds() >= &0;
+	}).collect();
+	
+	let mut recipient_ids: Vec<u32> = transactions.iter().map(|x| x.recipient_id).collect();
+	recipient_ids.sort();
+	recipient_ids.dedup();
+	recipient_ids.iter().for_each(|recipient_id| {
+		let mut recipients_map: BTreeMap<u32, i32> = BTreeMap::new();
+		transactions.iter().filter(|x| &x.recipient_id == recipient_id).for_each(|transaction| {
+			let currency_id = transaction.currency_id.unwrap();
+			if recipients_map.contains_key(&currency_id) {
+				recipients_map.insert(currency_id, recipients_map.get(&currency_id).unwrap() + transaction.amount);
+			} else {
+				recipients_map.insert(currency_id, transaction.amount);
+			}
+		});
+		recipients_map.retain(|_, v| v < &mut 0);
+		recipients_map = recipients_map.iter().map(|(k, v)| (*k, v * -1)).collect();
+
+		if recipients_map.len() > 0 {
+			output_map.insert(*recipient_id, recipients_map);
+		}
+	});
+
+
+
+	return Ok(output_map);
+}

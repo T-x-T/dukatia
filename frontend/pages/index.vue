@@ -2,8 +2,11 @@
 	<div>
 		<h2>This is the Dashboard</h2>
 		<div id="grid">
-			<div class="gridItem" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
+			<div class="gridItem small" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
 				<TotalBalance :currency_id="parseInt(currency_id)" :amount="amount"/>	
+			</div>
+			<div class="gridItem medium">
+				<ChartSpendingPerRecipient />
 			</div>
 			<div class="gridItem large">
 				<ChartTotalBalanceOverTime />
@@ -46,6 +49,14 @@ div#grid
 div.gridItem
 	background: $darkest
 	padding: 10px
+
+div.small
+	grid-column: span 1
+	grid-row: span 1
+
+div.medium
+	grid-column: span 2
+	grid-row: span 4
 
 div.large
 	grid-column: span 4

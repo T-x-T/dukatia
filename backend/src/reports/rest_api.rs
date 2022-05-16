@@ -59,3 +59,20 @@ async fn total_per_currency(data: web::Data<AppState>, req: HttpRequest) -> impl
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}
 }
+
+#[get("/api/v1/reports/spending_per_recipient_in_date_range")]
+async fn spending_per_recipient_in_date_range(data: web::Data<AppState>, req: HttpRequest, date_control: web::Query<DateControl>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	if date_control.from_date.is_none() || date_control.to_date.is_none() {
+		return HttpResponse::BadRequest().body("{{\"error\":\"from_date and to_date are required\"}}");
+	}
+
+	match super::spending_per_recipient_in_date_range(&data.pool, date_control.from_date.unwrap(), date_control.to_date.unwrap()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
+}
