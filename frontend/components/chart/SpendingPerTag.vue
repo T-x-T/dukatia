@@ -1,7 +1,7 @@
 <template>
 	<div id="container">
 		<div id="title">
-			<p>Spending per recipient</p>
+			<p>Spending per tag</p>
 		</div>
 		<div v-if="loaded && !no_data" id="chart">
 			<PieChart
@@ -24,6 +24,8 @@
 				<option value="6">Last 365 days</option>
 				<option value="7">Total</option>
 			</select>
+			<label for="parent">Only Parents:</label>
+			<input type="checkbox" id="parent" v-model="only_parents">
 		</div>
 	</div>
 </template>
@@ -33,6 +35,7 @@ export default {
 	data: () => ({
 		loaded: false,
 		date_range: "0",
+		only_parents: false,
 		no_data: false,
 		fromDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 28).toISOString().slice(0, 10),
 		toDate: new Date().toISOString().slice(0, 10),
@@ -156,19 +159,19 @@ export default {
 				labels: []
 			}
 
-			let query = "";
+			let query = `?only_parents=${this.only_parents}`;
 			if(this.fromDate && this.toDate) {
-				query = `?from_date=${this.fromDate}&to_date=${this.toDate}&`;
+				query += `&from_date=${this.fromDate}&to_date=${this.toDate}`;
 			}
-			const api_data = await this.$axios.$get("/api/v1/reports/spending_per_recipient_in_date_range" + query);
+			const api_data = await this.$axios.$get("/api/v1/reports/spending_per_tag_in_date_range" + query);
 			this.no_data = Object.keys(api_data).length === 0;
-			
-			for(const recipient_id in api_data) {
+
+			for(const tag_id in api_data) {
 				let total_value = 0;
-				let label = `${this.$store.state.recipients.filter(r => r.id === Number(recipient_id))[0].name}: `;
-				for(const currency_id in api_data[recipient_id]) {
+				let label = `${this.$store.state.tags.filter(r => r.id === Number(tag_id))[0].name}: `;
+				for(const currency_id in api_data[tag_id]) {
 					const currency = this.$store.state.currencies.filter(c => c.id === Number(currency_id))[0];
-					const value = api_data[recipient_id][currency_id] / currency.minor_in_mayor;
+					const value = api_data[tag_id][currency_id] / currency.minor_in_mayor;
 					total_value += value;
 					label += `${value}${currency.symbol}, `;
 				}
@@ -186,6 +189,9 @@ export default {
 
 	watch: {
 		date_range() {
+			this.update();
+		},
+		only_parents() {
 			this.update();
 		}
 	}

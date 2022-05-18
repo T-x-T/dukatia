@@ -11,6 +11,8 @@ use super::transaction::Transaction;
 use super::currency;
 use super::recipient;
 use super::account;
+use super::tag;
+use super::tag::Tag;
 
 #[derive(Debug, Serialize)]
 pub struct TimestampedOutput {
@@ -176,8 +178,72 @@ pub async fn spending_per_recipient_in_date_range(
 			output_map.insert(*recipient_id, recipients_map);
 		}
 	});
+	
+	return Ok(output_map);
+}
 
+pub async fn spending_per_tag_in_date_range(
+	pool: &Pool, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate, only_parents: bool
+) -> Result<BTreeMap<u32, BTreeMap<u32, i32>>, Box<dyn Error>> {
+	let mut output_map: BTreeMap<u32, BTreeMap<u32, i32>> = BTreeMap::new();
+	let transactions: Vec<Transaction> = transaction::get_all(&pool).await?.into_iter().filter(|x| {
+		return &from_date.signed_duration_since(x.timestamp.naive_local().date()).num_seconds() <= &0 && &to_date.signed_duration_since(x.timestamp.naive_local().date()).num_seconds() >= &0;
+	}).collect();
+	
+	let mut tag_ids: Vec<u32> = transactions.clone().into_iter().map(|x| x.tag_ids.unwrap()).flatten().collect();
+	tag_ids.sort();
+	tag_ids.dedup();
+	tag_ids.iter().for_each(|tag_id| {
+		let mut tags_map: BTreeMap<u32, i32> = BTreeMap::new();
+		transactions.iter().filter(|x| x.tag_ids.as_ref().unwrap().contains(tag_id)).for_each(|transaction| {
+			let currency_id = transaction.currency_id.unwrap();
+			if tags_map.contains_key(&currency_id) {
+				tags_map.insert(currency_id, tags_map.get(&currency_id).unwrap() + transaction.amount);
+			} else {
+				tags_map.insert(currency_id, transaction.amount);
+			}
+		});
+		tags_map.retain(|_, v| v < &mut 0);
+		tags_map = tags_map.iter().map(|(k, v)| (*k, v * -1)).collect();
 
+		if tags_map.len() > 0 {
+			output_map.insert(*tag_id, tags_map);
+		}
+	});
+
+	if only_parents {
+		let mut temp_output_map = output_map;
+		output_map = BTreeMap::new();
+
+		for (tag_id, value) in temp_output_map.clone().iter() {
+			let highest_parent = get_highest_parent_of_tag(*tag_id, tag::get_all(&pool).await.unwrap());
+
+			if output_map.contains_key(&highest_parent) {
+				let mut new_value = temp_output_map.get(&highest_parent).unwrap().clone();
+				for (currency_id, amount) in value.iter() {
+					if new_value.contains_key(&currency_id) {
+						new_value.insert(*currency_id, new_value.get(&currency_id).unwrap() + amount);
+					} else {
+						new_value.insert(*currency_id, *amount);
+					}
+				}
+				output_map.insert(highest_parent, new_value.clone());
+				temp_output_map.insert(highest_parent, new_value);
+			} else {
+				output_map.insert(highest_parent, value.clone());
+				temp_output_map.insert(highest_parent, value.clone());
+			}
+		}
+	}
 
 	return Ok(output_map);
+}
+
+fn get_highest_parent_of_tag(tag_id: u32, tags: Vec<Tag>) -> u32 {
+	let tag = tags.iter().find(|&tag| tag.id.unwrap() == tag_id);
+	if tag.is_some() && tag.unwrap().parent_id.is_none() {
+		return tag_id;
+	} else {
+		return get_highest_parent_of_tag(tag.unwrap().parent_id.unwrap(), tags);
+	}
 }

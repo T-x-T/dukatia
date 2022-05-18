@@ -8,6 +8,9 @@
 			<div class="gridItem medium">
 				<ChartSpendingPerRecipient />
 			</div>
+			<div class="gridItem medium">
+				<ChartSpendingPerTag />
+			</div>
 			<div class="gridItem large">
 				<ChartTotalBalanceOverTime />
 			</div>
