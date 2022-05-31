@@ -43,7 +43,7 @@ async fn create_database(config: &Config) {
 		.await
 		.unwrap()
 		.simple_query(
-			&fs::read_to_string("./sql/init.sql")
+			&fs::read_to_string("sql/init.sql")
 			.expect("error trying to read init.sql")
 		)
 		.await
