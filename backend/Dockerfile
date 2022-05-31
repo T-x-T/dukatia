@@ -9,4 +9,4 @@ FROM debian:bullseye-slim
 EXPOSE 4000
 
 COPY --from=builder /app/target/release/backend /app/backend
-CMD ["/app/backend"]
+CMD ["cd /app && ./backend"]
