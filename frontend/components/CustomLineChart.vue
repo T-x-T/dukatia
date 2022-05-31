@@ -1,7 +1,7 @@
 <template>
 	<div id="container">
 		<div id="title">
-			<p>Balance per account over time</p>
+			<p>Balance per {{type}} over time</p>
 		</div>
 		<div v-if="loaded" id="chart">
 			<LineChart
@@ -10,11 +10,10 @@
 			/>
 		</div>
 		<div id="controls">
-			<label for="from">From:</label>
-			<input type="date" id="from" v-model="fromDate" @change="update">
-
-			<label for="to">To:</label>
-			<input type="date" id="to" v-model="toDate" @change="update">
+			<DateControl 
+				default_date_range="7"
+				v-on:update="updateDate"
+			/>
 		</div>
 	</div>
 </template>
@@ -23,8 +22,8 @@
 export default {
 	data: () => ({
 		loaded: false,
-		fromDate: null,
-		toDate: null,
+		from_date: null,
+		to_date: null,
 		colors: {},
 		chartData: {},
 		chartOptions: {
@@ -44,7 +43,7 @@ export default {
 						fontColor: "#ddd"
 					},
 					gridLines: {
-						color: "#fff5",
+						color: "#fff2",
 						drawBoder: false
 					}
 				}],
@@ -53,7 +52,7 @@ export default {
 						fontColor: "#ddd"
 					},
 					gridLines: {
-						color: "#fff5",
+						color: "#fff2",
 						drawBorder: false
 					}
 				}]
@@ -67,11 +66,24 @@ export default {
 		}
 	}),
 
-	async fetch() {
+	props: {
+		type: String,
+		api_path: String,
+		label_property: String
+	},
+
+	async mounted() {
 		await this.update();
 	},
 
 	methods: {
+		updateDate(dates) {
+			console.log("updateDate")
+			this.from_date = dates.from_date;
+			this.to_date = dates.to_date;
+			this.update();
+		},
+
 		async update() {
 			this.loaded = false;
 
@@ -80,34 +92,27 @@ export default {
 			}
 
 			let query = "";
-			if(this.fromDate && this.toDate) {
-				query = `?from_date=${this.fromDate}&to_date=${this.toDate}&`;
+			if(this.from_date && this.to_date) {
+				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
 			}
-			const api_data = await this.$axios.$get("/api/v1/reports/balance_over_time_per_account" + query);
+			const api_data = await this.$axios.$get(this.api_path + query);
 
-			this.$store.state.accounts.forEach(account => {
-				if(api_data[account.id].length > 0) {
+			this.$store.state[this.type].forEach((item, i) => {
+				if(api_data[item.id].length > 0) {
 					this.chartData.datasets.push({
-						label: account.name,
-						data: api_data[account.id]?.map(x => ({x: x.x, y: x.y / 100})),
+						label: item[this.label_property],
+						data: api_data[item.id]?.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
 						cubicInterpolationMode: "monotone",
 						fill: false,
-						borderColor: `#${this.colors[account.id] ? this.colors[account.id] : this.generateRandomColor(account.id)}ff`
+						borderColor: `rgba(0, 255, 255, ${(i + 1) / this.$store.state[this.type].length})`,
+						borderWidth: 4,
+						pointRadius: 2,
+						pointBorderWidth: 4
 					});
 				}
 			});
-
+			
 			this.loaded = true;
-		},
-
-		generateRandomColor(key) {
-			const chars = "0123456789abcdef";
-			let output = "";
-			for(let i = 0; i < 6; i++) {
-				output += chars.charAt(Math.floor(Math.random() * chars.length));
-			}
-			this.colors[key] = output;
-			return output;
 		}
 	}
 }
@@ -116,9 +121,13 @@ export default {
 <style lang="sass" scoped>
 div#container
 	height: 100%
-	display: grid
-	grid-template-columns: 100%
-	grid-template-rows: 30px 350px 30px
+	display: flex
+	flex-direction: column
+	justify-content: flex-start
+
+div#chart
+	flex-shrink: 4
+	min-height: 0
 
 div#title > p
 	text-align: center

@@ -6,19 +6,39 @@
 				<TotalBalance :currency_id="parseInt(currency_id)" :amount="amount"/>	
 			</div>
 			<div class="gridItem medium">
-				<ChartSpendingPerRecipient />
+				<CustomPieChart
+					type="recipients"
+					api_path="/api/v1/reports/spending_per_recipient_in_date_range"
+					label_property="name"
+				/>
 			</div>
 			<div class="gridItem medium">
-				<ChartSpendingPerTag />
+				<CustomPieChart
+					type="tags"
+					api_path="/api/v1/reports/spending_per_tag_in_date_range"
+					label_property="name"
+				/>
 			</div>
 			<div class="gridItem large">
-				<ChartTotalBalanceOverTime />
+				<CustomLineChart
+					type="currencies"
+					api_path="/api/v1/reports/balance_over_time_per_currency"
+					label_property="symbol"
+				/>
+			</div>
+ 			<div class="gridItem large">
+				<CustomLineChart
+					type="recipients"
+					api_path="/api/v1/reports/balance_over_time_per_recipient"
+					label_property="name"
+				/>
 			</div>
 			<div class="gridItem large">
-				<ChartBalancePerRecipientOverTime />
-			</div>
-			<div class="gridItem large">
-				<ChartBalancePerAccountOverTime />
+				<CustomLineChart
+					type="accounts"
+					api_path="/api/v1/reports/balance_over_time_per_account"
+					label_property="name"
+				/>
 			</div>
 		</div>
 	</div>
