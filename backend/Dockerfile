@@ -1,4 +1,4 @@
-FROM rust:latest AS builder
+FROM rustlang/rust:nightly AS builder
 
 WORKDIR /app
 
