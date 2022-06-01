@@ -9,5 +9,6 @@ FROM debian:bullseye-slim
 EXPOSE 4000
 
 COPY --from=builder /app/target/release/backend /app/backend
-WORKDIR /app
+COPY --from=builder /app/sql /app/sql
+
 CMD ["/app/backend"]
