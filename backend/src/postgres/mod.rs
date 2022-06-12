@@ -44,7 +44,10 @@ async fn create_database(config: &Config) {
 		.unwrap()
 		.simple_query(
 			&fs::read_to_string("./sql/init.sql")
-			.expect("error trying to read init.sql")
+			.unwrap_or_else(|_| 
+				fs::read_to_string("/app/sql/init.sql")
+				.expect("error trying to read init.sql")
+			)
 		)
 		.await
 		.expect("error trying to load init.sql into newly created database");

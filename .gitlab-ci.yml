@@ -8,7 +8,7 @@ stages:
 
 backend_test:
   stage: test
-  image: rust:latest
+  image: rustlang/rust:nightly
   services:
   - postgres:latest
   script:

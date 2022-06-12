@@ -11,6 +11,7 @@ use super::account;
 use super::tag;
 use super::recipient;
 use super::transaction;
+use super::reports;
 use super::access_token::get_user_of_token;
 
 pub struct AppState {
@@ -35,6 +36,12 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 					return res;
 				})
 			})
+			.service(reports::rest_api::balance_over_time_per_currency)
+			.service(reports::rest_api::balance_over_time_per_recipient)
+			.service(reports::rest_api::balance_over_time_per_account)
+			.service(reports::rest_api::total_per_currency)
+			.service(reports::rest_api::spending_per_recipient_in_date_range)
+			.service(reports::rest_api::spending_per_tag_in_date_range)
 			.service(user::rest_api::post_login)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::post)
