@@ -16,6 +16,10 @@
 			<DateControl 
 				v-on:update="updateDate"
 			/>
+			<div v-if="showOnlyParentsToggle">
+				<label for="parent">Only Parents:</label>
+				<input type="checkbox" id="parent" v-model="only_parents">
+			</div>
 		</div>
 	</div>
 </template>
@@ -29,6 +33,7 @@ export default {
 		to_date: new Date().toISOString().slice(0, 10),
 		colors: {},
 		chartData: {},
+		only_parents: false,
 		chartOptions: {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -54,7 +59,8 @@ export default {
 	props: {
 		type: String,
 		api_path: String,
-		label_property: String
+		label_property: String,
+		showOnlyParentsToggle: Boolean
 	},
 
 	async mounted() {
@@ -80,7 +86,10 @@ export default {
 
 			let query = "";
 			if(this.from_date && this.to_date) {
-				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
+				query = `?from_date=${this.from_date}&to_date=${this.to_date}`;
+			}
+			if(this.showOnlyParentsToggle) {
+				query += `&only_parents=${this.only_parents}`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
 			this.no_data = Object.keys(api_data).length === 0;
@@ -103,6 +112,12 @@ export default {
 			this.chartData.datasets[0].borderColor = "rgba(167, 176, 194, 1)";
 
 			this.loaded = true;
+		}
+	},
+
+	watch: {
+		only_parents() {
+			this.update();
 		}
 	}
 }

@@ -17,6 +17,7 @@
 					type="tags"
 					api_path="/api/v1/reports/spending_per_tag_in_date_range"
 					label_property="name"
+					showOnlyParentsToggle=true
 				/>
 			</div>
 			<div class="gridItem large">
