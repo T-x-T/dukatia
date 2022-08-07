@@ -96,12 +96,11 @@ export default {
 				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
-
 			this.$store.state[this.type].forEach((item, i) => {
-				if(api_data[item.id].length > 0) {
+				if(api_data[item.id]?.data.length > 0) {
 					this.chartData.datasets.push({
 						label: item[this.label_property],
-						data: api_data[item.id]?.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
+						data: api_data[item.id].data.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
 						cubicInterpolationMode: "monotone",
 						fill: false,
 						borderColor: `rgba(0, 255, 255, ${(i + 1) / this.$store.state[this.type].length})`,

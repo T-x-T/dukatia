@@ -93,19 +93,18 @@ export default {
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
 			this.no_data = Object.keys(api_data).length === 0;
-			
 			for(const id in api_data) {
 				let total_value = 0;
 				let label = `${this.$store.state[this.type].filter(x => x.id === Number(id))[0][this.label_property]}: `;
-				for(const currency_id in api_data[id]) {
+				for(const currency_id in api_data[id].data) {
 					const currency = this.$store.state.currencies.filter(c => c.id === Number(currency_id))[0];
-					const value = api_data[id][currency_id] / currency.minor_in_mayor;
+					const value = api_data[id].data[currency_id] / currency.minor_in_mayor;
 					total_value += value;
 					label += `${value}${currency.symbol}, `;
 				}
 				label = label.slice(0, -2);
-				this.chartData.datasets[0].data.push(total_value);
-				this.chartData.labels.push(label);
+				this.chartData.datasets[0].data[api_data[id].rank] = total_value;
+				this.chartData.labels[api_data[id].rank] = label;
 			}
 			this.chartData.datasets[0].backgroundColor = this.chartData.labels.map((_, i, a) => `rgba(167, 176, 194, ${(i + 1) / a.length})`);
 			this.chartData.datasets[0].borderWidth = 2;
