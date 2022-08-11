@@ -20,13 +20,13 @@ type AccountId = u32;
 type TagId = u32;
 
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct RankedData {
 	data: BTreeMap<u32, i32>,
 	rank: u32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct TimeseriesRankedData {
 	data: Vec<TimestampedOutput>,
 	rank: u32,
@@ -44,10 +44,12 @@ impl TimestampedOutput {
 		for i in 0..data.len() {
 			output.push(TimestampedOutput { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
 		}
+
 		return output;
 	}
 }
 
+#[derive(Debug, Serialize, Clone)]
 struct Timeseries {
 	data: BTreeMap<chrono::NaiveDate, i32>
 }
@@ -89,7 +91,7 @@ async fn get_transactions_timestamp_sorted(pool: &Pool) -> Result<Vec<Transactio
 	return Ok(transactions);
 }
 
-fn add_ranks_timeseries(input: BTreeMap<u32, Vec<TimestampedOutput>>)  -> BTreeMap<u32, TimeseriesRankedData> {
+fn add_ranks_timeseries(input: BTreeMap<u32, Vec<TimestampedOutput>>) -> BTreeMap<u32, TimeseriesRankedData> {
 	let mut last_values: Vec<(u32, i32)> = input.iter().map(|(i, v)| (*i, v.last().unwrap().y)).collect();
 	last_values.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
 	
@@ -102,6 +104,12 @@ fn add_ranks_timeseries(input: BTreeMap<u32, Vec<TimestampedOutput>>)  -> BTreeM
 	}
 
 	return output_map;
+}
+
+fn limit_results_timeseries(input: BTreeMap<u32, TimeseriesRankedData>, top_entries: u32, bottom_entries: u32) -> BTreeMap<u32, TimeseriesRankedData> {
+	return input.clone().drain_filter(|_, v| {
+		v.rank < top_entries || v.rank >= input.len() as u32 - bottom_entries
+	}).collect();
 }
 
 fn get_highest_parent_of_tag(tag_id: u32, tags: &Vec<Tag>) -> u32 {
@@ -125,6 +133,31 @@ fn add_ranks(input: BTreeMap<u32, BTreeMap<u32, i32>>) -> BTreeMap<u32, RankedDa
 	};
 
 	return output_map;
+}
+
+fn limit_results(input: BTreeMap<u32, RankedData>, max_entries: u32) -> BTreeMap<u32, RankedData> {
+	let mut output: BTreeMap<u32, RankedData> = BTreeMap::new();
+
+	for (k, v) in input.into_iter() {
+		if v.rank < max_entries {
+			output.insert(k, v);
+		} else {
+			if output.contains_key(&u32::MAX) {
+				
+				let mut new_data: BTreeMap<CurrencyId, i32> = output.get(&u32::MAX).unwrap().data.clone();
+				
+				for (k2, v2) in v.data.into_iter() {
+					*new_data.entry(k2).or_insert(0) += v2;
+				}
+
+				output.insert(u32::MAX, RankedData{data: new_data, rank: max_entries});
+			} else {
+				output.insert(u32::MAX, RankedData{data: v.data, rank: max_entries});
+			}
+		}
+	}
+
+	return output;
 }
 
 fn flatten_map(map: &BTreeMap<u32, BTreeMap<u32, i32>>) -> Vec<(&u32, i32)> {
@@ -168,7 +201,7 @@ pub async fn balance_over_time_per_currency(
 	}).collect();
 	timeseries_output.drain_filter(|_, v| v.len() == 0);
 
-	return Ok(add_ranks_timeseries(timeseries_output));
+	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
 }
 
 pub async fn balance_over_time_per_recipient(
@@ -191,7 +224,7 @@ pub async fn balance_over_time_per_recipient(
 	}).collect();
 	timeseries_output.drain_filter(|_, v| v.len() == 0);
 
-	return Ok(add_ranks_timeseries(timeseries_output));
+	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
 }
 
 pub async fn balance_over_time_per_account(
@@ -214,7 +247,7 @@ pub async fn balance_over_time_per_account(
 	}).collect();
 	timeseries_output.drain_filter(|_, v| v.len() == 0);
 
-	return Ok(add_ranks_timeseries(timeseries_output));
+	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
 }
 
 
@@ -267,7 +300,7 @@ pub async fn spending_per_recipient_in_date_range(
 		}
 	});
 
-	return Ok(add_ranks(output));
+	return Ok(limit_results(add_ranks(output), 5));
 }
 
 pub async fn spending_per_tag_in_date_range(
@@ -321,5 +354,5 @@ pub async fn spending_per_tag_in_date_range(
 		});
 	}
 
-	return Ok(add_ranks(output));
+	return Ok(limit_results(add_ranks(output), 5));
 }

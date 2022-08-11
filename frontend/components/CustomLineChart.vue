@@ -78,7 +78,6 @@ export default {
 
 	methods: {
 		updateDate(dates) {
-			console.log("updateDate")
 			this.from_date = dates.from_date;
 			this.to_date = dates.to_date;
 			this.update();

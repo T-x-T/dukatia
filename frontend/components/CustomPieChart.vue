@@ -95,7 +95,7 @@ export default {
 			this.no_data = Object.keys(api_data).length === 0;
 			for(const id in api_data) {
 				let total_value = 0;
-				let label = `${this.$store.state[this.type].filter(x => x.id === Number(id))[0][this.label_property]}: `;
+				let label = id == 4294967295 ? "other: " : `${this.$store.state[this.type].filter(x => x.id === Number(id))[0][this.label_property]}: `;
 				for(const currency_id in api_data[id].data) {
 					const currency = this.$store.state.currencies.filter(c => c.id === Number(currency_id))[0];
 					const value = api_data[id].data[currency_id] / currency.minor_in_mayor;
