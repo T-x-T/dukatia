@@ -10,6 +10,7 @@
 				<li ref="tags" @click="currentRoute = 'tags'"><NuxtLink to="/tags">Tags</NuxtLink></li>
 				<li ref="currencies" @click="currentRoute = 'currencies'"><NuxtLink to="/currencies">Currencies</NuxtLink></li>
 				<br><br>
+				<li ref="settings" @click="currentRoute = 'settings'"><NuxtLink to="/settings">Settings</NuxtLink></li>
 				<li @click="logout"><a>Logout</a></li>
 			</ul>
 		</nav>

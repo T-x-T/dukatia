@@ -13,7 +13,7 @@ pub async fn add(pool: &Pool, user: &User) -> Result<String, Box<dyn Error>> {
 		format!(
 			"{}{}{}", 
 			user.name, 
-			user.secret, 
+			user.secret.clone().unwrap(), 
 			Utc::now().timestamp_millis() * rand::thread_rng().gen_range(2..8192)
 		)
 	);
@@ -36,7 +36,7 @@ mod tests {
 		return User {
 			id: Some(0),
 			name: config.admin_username.clone(),
-			secret: config.admin_password.clone(),
+			secret: Some(config.admin_password.clone()),
 			superuser: true,
 		};
 	}
