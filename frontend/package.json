@@ -16,5 +16,8 @@
     "sass-loader": "^8.0.2",
     "vue-chartjs": "^3.5.1",
     "webpack": "^4.45.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/color-mode": "^2.1.1"
   }
 }

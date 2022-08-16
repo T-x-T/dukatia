@@ -118,12 +118,10 @@ export default {
 #input
 	svg
 		display: inline
-		color: white
 		height: 32px
 		position: absolute
 		margin-left: -35px
 		&:hover
-			color: $heavy
 			cursor: pointer
 
 #dropdown

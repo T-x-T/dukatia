@@ -73,6 +73,13 @@ export default {
 	},
 
 	async mounted() {
+		if(this.$colorMode.preference == "light") {
+			this.chartOptions.scales.xAxes[0].ticks.fontColor = "#111";
+			this.chartOptions.scales.xAxes[0].gridLines.color = "#0002";
+			this.chartOptions.scales.yAxes[0].ticks.fontColor = "111";
+			this.chartOptions.scales.yAxes[0].gridLines.color = "0002";
+			this.chartOptions.legend.labels.fontColor = "#000";
+		}
 		await this.update();
 	},
 

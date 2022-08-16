@@ -6,6 +6,9 @@ export default {
   modules: [
     "@nuxtjs/axios"
   ],
+  buildModules: [
+    "@nuxtjs/color-mode"
+  ],
   plugins: [
     "~/plugins/detailPageConfig.js"
   ],

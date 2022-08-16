@@ -58,7 +58,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
 
 div#grid
 	display: grid
@@ -71,7 +70,6 @@ div#grid
 	grid-gap: 10px
 
 div.gridItem
-	background: $darkest
 	padding: 10px
 
 div.small

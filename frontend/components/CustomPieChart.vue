@@ -64,6 +64,9 @@ export default {
 	},
 
 	async mounted() {
+		if(this.$colorMode.preference == "light") {
+			this.chartOptions.legend.labels.fontColor = "#000";
+		}
 		await this.update();
 	},
 

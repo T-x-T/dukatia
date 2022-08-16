@@ -69,11 +69,9 @@ main
 	width: 100vw
 
 nav
-	background: $darkest
 	width: fit-content
 	min-height: 100vh
 	flex-shrink: 0
-	border-right: 2px solid $heavy
 	h1
 		margin: 25px
 		cursor: pointer
@@ -81,20 +79,13 @@ nav
 		text-shadow: 4px 4px 8px black
 		&:hover
 			transform: scale(1.1) rotate(5deg)
-
-a
-	@extend .semibold
-	font-size: 24px
-	color: $bright
-	margin: 10px
-	margin-left: 20px
-	transition-duration: 0.2s
-	cursor: pointer
-	&:hover
-		color: $heavy
-
-.active
-	color: $heavy
+	a
+		@extend .semibold
+		font-size: 24px
+		margin: 10px
+		margin-left: 20px
+		transition-duration: 0.2s
+		cursor: pointer
 
 li
 	width: fit-content

@@ -25,7 +25,7 @@
 			/>
 		</div>
 
-		<div v-if="detailsOpen" id="details">
+		<div v-if="detailsOpen" id="detailBar">
 			<TransactionDetails 
 				:transaction="selectedRow"
 				v-on:back="updateAndLoadTable"
@@ -146,8 +146,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
-
 div#main
 	display: flex
 	justify-content: space-between
@@ -155,7 +153,6 @@ div#main
 div#table
 	flex-grow: 1
 
-div#details
-	border-left: 2px solid $heavydark
+div#detailBar
 	padding-left: 8px
 </style>

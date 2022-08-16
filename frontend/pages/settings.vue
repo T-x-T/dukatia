@@ -1,6 +1,6 @@
 <template>
 	<main>
-		<div class="settingGroup">
+		<div class="gridItem">
 			<p>Update Password:</p>
 			<input type="password" v-model="oldPassword" placeholder="Old Password">
 			<br>
@@ -12,13 +12,14 @@
 			<p v-if="passwordUpdateMessage">{{passwordUpdateMessage}}</p>
 		</div>
 
-		<div class="settingGroup">
+		<div class="gridItem">
 			<p>Select Theme</p>
-			<select>
+			<select v-model="$colorMode.preference">
 				<option value="dark">Dark</option>
 				<option value="light">Light</option>
 				<option value="monochrome">Monochrome</option>
 				<option value="black">Black</option>
+				<option>None</option>
 			</select>
 		</div>
 	</main>
@@ -56,10 +57,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
-
-div.settingGroup
-	background: $darkest
+div.gridItem
 	padding: 5px
 	margin: 10px
 	box-shadow: 4px 4px 0px black
