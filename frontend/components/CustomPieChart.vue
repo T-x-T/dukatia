@@ -16,6 +16,10 @@
 			<DateControl 
 				v-on:update="updateDate"
 			/>
+			<div v-if="showOnlyParentsToggle">
+				<label for="parent">Only Parents:</label>
+				<input type="checkbox" id="parent" v-model="only_parents">
+			</div>
 		</div>
 	</div>
 </template>
@@ -29,6 +33,7 @@ export default {
 		to_date: new Date().toISOString().slice(0, 10),
 		colors: {},
 		chartData: {},
+		only_parents: false,
 		chartOptions: {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -54,10 +59,14 @@ export default {
 	props: {
 		type: String,
 		api_path: String,
-		label_property: String
+		label_property: String,
+		showOnlyParentsToggle: Boolean
 	},
 
 	async mounted() {
+		if(this.$colorMode.preference == "light") {
+			this.chartOptions.legend.labels.fontColor = "#000";
+		}
 		await this.update();
 	},
 
@@ -80,29 +89,37 @@ export default {
 
 			let query = "";
 			if(this.from_date && this.to_date) {
-				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
+				query = `?from_date=${this.from_date}&to_date=${this.to_date}`;
+			}
+			if(this.showOnlyParentsToggle) {
+				query += `&only_parents=${this.only_parents}`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
 			this.no_data = Object.keys(api_data).length === 0;
-			
 			for(const id in api_data) {
 				let total_value = 0;
-				let label = `${this.$store.state[this.type].filter(x => x.id === Number(id))[0][this.label_property]}: `;
-				for(const currency_id in api_data[id]) {
+				let label = id == 4294967295 ? "other: " : `${this.$store.state[this.type].filter(x => x.id === Number(id))[0][this.label_property]}: `;
+				for(const currency_id in api_data[id].data) {
 					const currency = this.$store.state.currencies.filter(c => c.id === Number(currency_id))[0];
-					const value = api_data[id][currency_id] / currency.minor_in_mayor;
+					const value = api_data[id].data[currency_id] / currency.minor_in_mayor;
 					total_value += value;
 					label += `${value}${currency.symbol}, `;
 				}
 				label = label.slice(0, -2);
-				this.chartData.datasets[0].data.push(total_value);
-				this.chartData.labels.push(label);
+				this.chartData.datasets[0].data[api_data[id].rank] = total_value;
+				this.chartData.labels[api_data[id].rank] = label;
 			}
 			this.chartData.datasets[0].backgroundColor = this.chartData.labels.map((_, i, a) => `rgba(167, 176, 194, ${(i + 1) / a.length})`);
 			this.chartData.datasets[0].borderWidth = 2;
 			this.chartData.datasets[0].borderColor = "rgba(167, 176, 194, 1)";
 
 			this.loaded = true;
+		}
+	},
+
+	watch: {
+		only_parents() {
+			this.update();
 		}
 	}
 }

@@ -17,6 +17,7 @@
 					type="tags"
 					api_path="/api/v1/reports/spending_per_tag_in_date_range"
 					label_property="name"
+					:showOnlyParentsToggle="true"
 				/>
 			</div>
 			<div class="gridItem large">
@@ -57,7 +58,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
 
 div#grid
 	display: grid
@@ -70,7 +70,6 @@ div#grid
 	grid-gap: 10px
 
 div.gridItem
-	background: $darkest
 	padding: 10px
 
 div.small

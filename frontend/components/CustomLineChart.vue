@@ -73,12 +73,18 @@ export default {
 	},
 
 	async mounted() {
+		if(this.$colorMode.preference == "light") {
+			this.chartOptions.scales.xAxes[0].ticks.fontColor = "#111";
+			this.chartOptions.scales.xAxes[0].gridLines.color = "#0002";
+			this.chartOptions.scales.yAxes[0].ticks.fontColor = "111";
+			this.chartOptions.scales.yAxes[0].gridLines.color = "0002";
+			this.chartOptions.legend.labels.fontColor = "#000";
+		}
 		await this.update();
 	},
 
 	methods: {
 		updateDate(dates) {
-			console.log("updateDate")
 			this.from_date = dates.from_date;
 			this.to_date = dates.to_date;
 			this.update();
@@ -96,12 +102,11 @@ export default {
 				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
-
 			this.$store.state[this.type].forEach((item, i) => {
-				if(api_data[item.id].length > 0) {
+				if(api_data[item.id]?.data.length > 0) {
 					this.chartData.datasets.push({
 						label: item[this.label_property],
-						data: api_data[item.id]?.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
+						data: api_data[item.id].data.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
 						cubicInterpolationMode: "monotone",
 						fill: false,
 						borderColor: `rgba(0, 255, 255, ${(i + 1) / this.$store.state[this.type].length})`,

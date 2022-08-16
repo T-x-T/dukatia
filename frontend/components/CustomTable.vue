@@ -368,8 +368,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
-
 td
 	white-space: break-spaces
 
@@ -377,7 +375,6 @@ tr
 	cursor: pointer
 	&:hover td
 		transition-duration: 0s
-		background: $dark
 
 th
 	padding-bottom: 4px
@@ -392,8 +389,6 @@ div.columnHeaderWrapper
 svg
 	margin-bottom: -6px
 	height: 24px
-	&:hover
-		color: $heavy
 
 div.filterPopout
 	position: absolute

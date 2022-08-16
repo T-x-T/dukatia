@@ -43,6 +43,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(reports::rest_api::spending_per_recipient_in_date_range)
 			.service(reports::rest_api::spending_per_tag_in_date_range)
 			.service(user::rest_api::post_login)
+			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::post)
 			.service(account::rest_api::put)

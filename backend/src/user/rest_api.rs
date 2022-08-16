@@ -1,25 +1,33 @@
-use actix_web::{post, web, HttpResponse, Responder};
+use actix_web::{post, web, HttpResponse, HttpRequest, Responder, put};
 use serde::Deserialize;
-use super::super::webserver::AppState;
-use super::super::user::{User, login};
+use super::super::webserver::{AppState, is_authorized};
+use super::super::user::LoginCredentials;
 
-#[derive(Deserialize)]
-struct LoginData {
-	name: String,
-	secret: String,
-}
 
 #[post("/api/v1/login")]
-async fn post_login(data: web::Data<AppState>, body: web::Json<LoginData>) -> impl Responder {
-	let user = User {
-		id: None,
-		name: body.name.clone(),
-		secret: body.secret.to_string(),
-		superuser: false,
-	};
-
-	match login(&data.config, &data.pool, user).await {
+async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
+	match super::login(&data.config, &data.pool, body.into_inner()).await {
 		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{}\"}}", access_token)),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	};
+}
+
+
+#[derive(Deserialize)]
+struct PutSecretBody {
+	old_secret: String,
+	new_secret: String,
+}
+
+#[put("/api/v1/users/me/secret")]
+async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, req: HttpRequest, ) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::update_secret(&data.config, &data.pool, body.old_secret.clone(), body.new_secret.clone(), user_id).await {
+		Ok(()) => return HttpResponse::Ok().body(""),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
 }
