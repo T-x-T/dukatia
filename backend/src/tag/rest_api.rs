@@ -1,4 +1,4 @@
-use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
 
@@ -61,3 +61,15 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 	}
 }
 
+#[delete("/api/v1/tags/{tag_id}")]
+async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
+	let _ = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+	};
+
+	match super::delete(&data.pool, tag_id.into_inner()).await {
+		Ok(_) => return HttpResponse::Ok().body(""),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+	}
+}
