@@ -1,18 +1,20 @@
 <template>
 	<main>
 		<nav>
-			<h1>TxTs Treasury</h1>
-			<ul v-if="loggedIn">
-				<li ref="dashboard" @click="currentRoute = 'dashboard'"><NuxtLink to="/">Dashboard</NuxtLink></li>
-				<li ref="transactions" @click="currentRoute = 'transactions'"><NuxtLink to="/transactions">Transactions</NuxtLink></li>
-				<li ref="accounts" @click="currentRoute = 'accounts'"><NuxtLink to="/accounts">Accounts</NuxtLink></li>
-				<li ref="recipients" @click="currentRoute = 'recipients'"><NuxtLink to="/recipients">Recipients</NuxtLink></li>
-				<li ref="tags" @click="currentRoute = 'tags'"><NuxtLink to="/tags">Tags</NuxtLink></li>
-				<li ref="currencies" @click="currentRoute = 'currencies'"><NuxtLink to="/currencies">Currencies</NuxtLink></li>
-				<br><br>
-				<li ref="settings" @click="currentRoute = 'settings'"><NuxtLink to="/settings">Settings</NuxtLink></li>
-				<li @click="logout"><a>Logout</a></li>
-			</ul>
+			<div id="navcontainer">
+				<h1>TxTs Treasury</h1>
+				<ul v-if="loggedIn">
+					<li ref="dashboard" @click="currentRoute = 'dashboard'"><NuxtLink to="/">Dashboard</NuxtLink></li>
+					<li ref="transactions" @click="currentRoute = 'transactions'"><NuxtLink to="/transactions">Transactions</NuxtLink></li>
+					<li ref="accounts" @click="currentRoute = 'accounts'"><NuxtLink to="/accounts">Accounts</NuxtLink></li>
+					<li ref="recipients" @click="currentRoute = 'recipients'"><NuxtLink to="/recipients">Recipients</NuxtLink></li>
+					<li ref="tags" @click="currentRoute = 'tags'"><NuxtLink to="/tags">Tags</NuxtLink></li>
+					<li ref="currencies" @click="currentRoute = 'currencies'"><NuxtLink to="/currencies">Currencies</NuxtLink></li>
+					<br><br>
+					<li ref="settings" @click="currentRoute = 'settings'"><NuxtLink to="/settings">Settings</NuxtLink></li>
+					<li @click="logout"><a>Logout</a></li>
+				</ul>
+			</div>
 		</nav>
 		<div id="content">
 			<Nuxt />
@@ -69,9 +71,8 @@ main
 	width: 100vw
 
 nav
-	width: fit-content
+	width: 21em
 	min-height: 100vh
-	flex-shrink: 0
 	h1
 		margin: 25px
 		cursor: pointer
@@ -87,6 +88,10 @@ nav
 		transition-duration: 0.2s
 		cursor: pointer
 
+#navcontainer
+	position: fixed
+	top: 0
+
 li
 	width: fit-content
 	&:hover
@@ -95,4 +100,5 @@ li
 #content
 	flex-grow: 1
 	padding: 1%
+	width: 1rem
 </style>
