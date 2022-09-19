@@ -29,7 +29,6 @@ use webserver::initialize_webserver;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
   let config = initialize_config();
-  println!("Started with config: {:?}", config);
 
   let pool = get_postgres_connection(&config).await;
 

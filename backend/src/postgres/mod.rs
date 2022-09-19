@@ -62,6 +62,8 @@ async fn get_pool(config: &Config) -> Pool {
 	cfg.dbname = Some(config.db_database.clone());
 	cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
 
+	println!("Connecting to database {} on host {}", config.db_database, config.db_host);
+
 	return cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
 }
 
