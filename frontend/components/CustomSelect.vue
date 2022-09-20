@@ -8,7 +8,7 @@
 		<div id="clickTarget" v-if="dropdown" @click="toggleDropdown()"></div>
 		<div id="dropdown" v-if="dropdown">
 			<ul>
-				<li v-for="(item, index) in selectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
+				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
 					<input type="checkbox" v-model="optionStates[item.id]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
@@ -22,6 +22,7 @@ export default {
 	data: () => ({
 		displayText: "",
 		dropdown: false,
+		sortedSelectData: {},
 		optionStates: []
 	}),
 
@@ -35,6 +36,9 @@ export default {
 
 	methods: {
 		updateSelectData() {
+			this.sortedSelectData = this.selectData;
+			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
+
 			this.optionStates = [];
 			if(this.selectData.selected) {
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
@@ -84,19 +88,25 @@ export default {
 			optionStates[id] = !optionStates[id];
 			this.optionStates = null;
 			this.optionStates = optionStates;
-			this.$emit("update", this.optionStates.map(x => this.selectData.options.filter(y => x && y.id === id)[0]?.id).filter(x => typeof x == "number"));
+			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();
 		},
 
 		updateDisplayText() {
 			this.displayText = "";
 			this.selectData.options.forEach((x, i) => {
-				if(this.optionStates[i]) {
+				if(this.optionStates[x.id]) {
 					this.displayText += x.name;
 					this.displayText += ", ";	
 				}
 			});
 			if(this.displayText) this.displayText = this.displayText.slice(0, this.displayText.length - 2);
+		},
+
+		sortStrings(a, b) {
+			if(a.toLowerCase() > b.toLowerCase()) return 1;
+			if(a.toLowerCase() < b.toLowerCase()) return -1;
+			return 0;
 		}
 	},
 
