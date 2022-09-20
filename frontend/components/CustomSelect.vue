@@ -9,7 +9,7 @@
 		<div id="dropdown" v-if="dropdown">
 			<ul>
 				<li v-for="(item, index) in selectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
-					<input type="checkbox" v-model="optionStates[index]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
+					<input type="checkbox" v-model="optionStates[item.id]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -84,7 +84,7 @@ export default {
 			optionStates[id] = !optionStates[id];
 			this.optionStates = null;
 			this.optionStates = optionStates;
-			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
+			this.$emit("update", this.optionStates.map(x => this.selectData.options.filter(y => x && y.id === id)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();
 		},
 
