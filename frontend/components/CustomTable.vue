@@ -3,6 +3,10 @@
 		<p>Count: {{rowsForDisplay.length}}</p>
 		<p v-if="tableData.displaySum">{{getSum()}}</p>
 		<table>
+			<colgroup>
+					<col v-if="tableData.multiSelect" class="multiselect">
+					<col v-for="(header, index) in tableData.columns" :key="index" :class="header.type">
+			</colgroup>
 			<thead>
 				<tr>
 					<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
@@ -368,8 +372,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+table
+	table-layout: fixed
+
 td
 	white-space: break-spaces
+	overflow: hidden
+	text-overflow: ellipsis
 
 tr
 	cursor: pointer
@@ -414,4 +423,13 @@ div.clickTarget
 	z-index: 4
 	width: 100vw
 	height: 100vh
+
+col.multiselect
+	width: 5em
+col.number
+	width: 8em
+col.choice
+	width: 10em
+col.date
+	width: 20em
 </style>

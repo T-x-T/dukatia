@@ -112,7 +112,8 @@ export default function(context, inject) {
 				id: "",
 				name: "",
 				parent_id: null
-			}
+			},
+			deletable: true
 		}
 	})
 }

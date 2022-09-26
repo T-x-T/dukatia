@@ -29,6 +29,10 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	return db::update(&pool, &tag).await;
 }
 
+pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
+	return db::delete(&pool, tag_id).await;
+}
+
 //If tag_id is supplied check if parent_id can be parent of tag (checks cyclic dependency)
 async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bool {
 	if db::get_by_id(&pool, parent_id).await.is_err() {

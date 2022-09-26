@@ -50,6 +50,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(tag::rest_api::get_all)
 			.service(tag::rest_api::post)
 			.service(tag::rest_api::put)
+			.service(tag::rest_api::delete)
 			.service(recipient::rest_api::get_all)
 			.service(recipient::rest_api::post)
 			.service(recipient::rest_api::put)

@@ -155,4 +155,5 @@ div#table
 
 div#detailBar
 	padding-left: 8px
+	flex-shrink: 0
 </style>

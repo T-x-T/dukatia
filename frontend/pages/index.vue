@@ -62,7 +62,6 @@ export default {
 div#grid
 	display: grid
 	width: 100%
-	height: 100vh
 	grid-template-columns: repeat(auto-fit, minmax(10%, 1fr))
 	grid-auto-rows: 100px
 	align-items: stretch

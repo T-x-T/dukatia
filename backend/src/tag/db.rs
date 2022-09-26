@@ -55,6 +55,17 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	return Ok(());
 }
 
+pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
+	pool.get()
+		.await?
+		.query("DELETE FROM public.\"Tags\" WHERE id=$1;", &[&(tag_id as i32)]).await?;
+
+	pool.get().await?
+		.query("UPDATE public.\"Tags\" SET parent=null WHERE parent=$1", &[&(tag_id as i32)]).await?;
+
+	return Ok(());
+}
+
 fn turn_row_into_tag(row: &tokio_postgres::Row) -> Tag {
 	let id: i32 = row.get(0);
 	let user_id: Option<i32> = row.get(3);

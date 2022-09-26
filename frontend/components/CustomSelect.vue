@@ -7,9 +7,10 @@
 		</div>
 		<div id="clickTarget" v-if="dropdown" @click="toggleDropdown()"></div>
 		<div id="dropdown" v-if="dropdown">
+			<input type="text" id="dropdownSearch" placeholder="filter" ref="dropdownSearch" v-model="searchTerm" @keydown="keypressDropdownInput">
 			<ul>
-				<li v-for="(item, index) in selectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
-					<input type="checkbox" v-model="optionStates[index]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
+				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
+					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -22,7 +23,10 @@ export default {
 	data: () => ({
 		displayText: "",
 		dropdown: false,
-		optionStates: []
+		sortedSelectData: {},
+		filteredSelectData: null,
+		optionStates: [],
+		searchTerm: ""
 	}),
 
 	props: {
@@ -35,6 +39,9 @@ export default {
 
 	methods: {
 		updateSelectData() {
+			this.sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
+			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
+
 			this.optionStates = [];
 			if(this.selectData.selected) {
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
@@ -44,7 +51,7 @@ export default {
 
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
-			this.$nextTick(() => this.$refs.dropdown0?.[0]?.focus());
+			this.$nextTick(() => this.$refs["dropdownSearch"]?.focus());
 			this.updateDisplayText();
 		},
 
@@ -64,7 +71,7 @@ export default {
 		keypressDropdownInput(e) {
 			if(e.keyCode == 40) { //Down
 				e.preventDefault();
-				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1) {
+				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1 || e.target.id == "dropdownSearch") {
 					this.$refs["dropdown0"]?.[0]?.focus();
 				} else {
 					this.$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
@@ -91,18 +98,35 @@ export default {
 		updateDisplayText() {
 			this.displayText = "";
 			this.selectData.options.forEach((x, i) => {
-				if(this.optionStates[i]) {
+				if(this.optionStates[x.id]) {
 					this.displayText += x.name;
 					this.displayText += ", ";	
 				}
 			});
 			if(this.displayText) this.displayText = this.displayText.slice(0, this.displayText.length - 2);
+		},
+
+		sortStrings(a, b) {
+			if(a.toLowerCase() > b.toLowerCase()) return 1;
+			if(a.toLowerCase() < b.toLowerCase()) return -1;
+			return 0;
+		},
+
+		applyFilter() {
+			this.filteredSelectData = {...this.selectData};
+			this.filteredSelectData.options = this.selectData.options.filter(x => 
+				x.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+			);
+			this.updateSelectData();
 		}
 	},
 
 	watch: {
 		selectData() {
 			this.updateSelectData();
+		},
+		searchTerm() {
+			this.applyFilter();
 		}
 	}
 }
@@ -136,7 +160,7 @@ export default {
 	li
 		cursor: pointer
 		user-select: none
-	input
+	input.checkbox
 		cursor: pointer
 	p
 		padding: 1px 2px 1px 2px
