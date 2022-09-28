@@ -427,7 +427,7 @@ div.clickTarget
 col.multiselect
 	width: 5em
 col.number
-	width: 8em
+	width: 10em
 col.choice
 	width: 10em
 col.date
