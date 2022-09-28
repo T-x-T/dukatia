@@ -10,7 +10,7 @@
 			<input type="text" id="dropdownSearch" placeholder="filter" ref="dropdownSearch" v-model="searchTerm" @keydown="keypressDropdownInput">
 			<ul>
 				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
-					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" tabindex="-1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
+					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" :tabindex="index === 0 ? 0 : -1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -82,6 +82,10 @@ export default {
 					this.$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
 				} else {
 					this.$refs["dropdown" + (Number(e.target.id) - 1)]?.[0]?.focus();
+				}
+			} else if(e.keyCode == 9) { //Tab
+				if(Object.keys(this.sortedSelectData.options).length === 0) {
+					this.toggleDropdown();
 				}
 			}
 		},
