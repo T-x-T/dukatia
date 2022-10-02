@@ -31,7 +31,7 @@ export default {
 		no_data: false,
 		from_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 28).toISOString().slice(0, 10),
 		to_date: new Date().toISOString().slice(0, 10),
-		colors: {},
+		colors: ["#EC8A83", "#FFAD85", "#F9F176", "#8BE59D", "#6AB4F1", "#A983D8"],
 		chartData: {},
 		only_parents: false,
 		chartOptions: {
@@ -109,9 +109,7 @@ export default {
 				this.chartData.datasets[0].data[api_data[id].rank] = total_value;
 				this.chartData.labels[api_data[id].rank] = label;
 			}
-			this.chartData.datasets[0].backgroundColor = this.chartData.labels.map((_, i, a) => `rgba(167, 176, 194, ${(i + 1) / a.length})`);
-			this.chartData.datasets[0].borderWidth = 2;
-			this.chartData.datasets[0].borderColor = "rgba(167, 176, 194, 1)";
+			this.chartData.datasets[0].backgroundColor = this.chartData.labels.map((_, i, a) => this.colors[i]);
 
 			this.loaded = true;
 		}

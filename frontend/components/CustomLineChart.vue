@@ -24,7 +24,7 @@ export default {
 		loaded: false,
 		from_date: null,
 		to_date: null,
-		colors: {},
+		colors: ["#EC8A83", "#FFAD85", "#F9F176", "#8BE59D", "#6AB4F1", "#A983D8"],
 		chartData: {},
 		chartOptions: {
 			responsive: true,
@@ -102,18 +102,21 @@ export default {
 				query = `?from_date=${this.from_date}&to_date=${this.to_date}&`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
-			this.$store.state[this.type].forEach((item, i) => {
+			let j = 0;
+			this.$store.state[this.type].forEach((item) => {
 				if(api_data[item.id]?.data.length > 0) {
 					this.chartData.datasets.push({
 						label: item[this.label_property],
 						data: api_data[item.id].data.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
 						cubicInterpolationMode: "monotone",
 						fill: false,
-						borderColor: `rgba(0, 255, 255, ${(i + 1) / this.$store.state[this.type].length})`,
+						borderColor: this.colors[j],
+						backgroundColor: this.colors[j],
 						borderWidth: 4,
 						pointRadius: 2,
 						pointBorderWidth: 4
 					});
+					j++;
 				}
 			});
 			
