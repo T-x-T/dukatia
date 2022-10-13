@@ -22,9 +22,18 @@
 			</div>
 			<div class="gridItem large">
 				<CustomLineChart
+					api_path="/api/v1/reports/balance_over_time"
+					label_property="symbol"
+					:aggregated="true"
+					title="Earning and spending per period"
+				/>
+			</div>
+			<div class="gridItem large">
+				<CustomLineChart
 					type="currencies"
 					api_path="/api/v1/reports/balance_over_time_per_currency"
 					label_property="symbol"
+					title="Balance per Currency over Time"
 				/>
 			</div>
  			<div class="gridItem large">
@@ -32,6 +41,7 @@
 					type="recipients"
 					api_path="/api/v1/reports/balance_over_time_per_recipient"
 					label_property="name"
+					title="Balance per Recipient over Time"
 				/>
 			</div>
 			<div class="gridItem large">
@@ -39,6 +49,7 @@
 					type="accounts"
 					api_path="/api/v1/reports/balance_over_time_per_account"
 					label_property="name"
+					title="Balance per Recipient over Time"
 				/>
 			</div>
 		</div>

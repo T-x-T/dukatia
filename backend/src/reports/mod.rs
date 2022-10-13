@@ -1,11 +1,12 @@
 pub mod rest_api;
+mod timeseries;
 
 use std::collections::BTreeMap;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use serde::Serialize;
 
-
+use timeseries::*;
 use super::transaction;
 use super::transaction::Transaction;
 use super::currency;
@@ -19,6 +20,13 @@ type RecipientId = u32;
 type AccountId = u32;
 type TagId = u32;
 
+
+#[derive(serde::Deserialize, Copy, Clone)]
+pub enum Period {
+	Monthly,
+	Quarterly,
+	Yearly,
+}
 
 #[derive(Debug, Serialize, Clone)]
 pub struct RankedData {
@@ -49,38 +57,6 @@ impl TimestampedOutput {
 	}
 }
 
-#[derive(Debug, Serialize, Clone)]
-struct Timeseries {
-	data: BTreeMap<chrono::NaiveDate, i32>
-}
-
-impl Timeseries {
-	fn build(transactions: Vec<&Transaction>) -> Self {
-		let mut data: BTreeMap<chrono::NaiveDate, i32> = BTreeMap::new();
-	
-		for transaction in transactions {
-			if data.contains_key(&transaction.timestamp.date().naive_local()) {
-				data.insert(transaction.timestamp.date().naive_local(), data.get(&transaction.timestamp.date().naive_local()).unwrap() + transaction.amount);
-			} else {
-				data.insert(transaction.timestamp.date().naive_local(), transaction.amount);
-			}
-		}
-	
-		return Self{data};
-	}
-	
-	fn create_rolling_sum(mut self) -> Self {
-		let mut prev: i32 = 0;
-		for i in 0..self.data.len() {
-			let cur_key = self.data.iter().nth(i).unwrap().0.clone();
-			let cur_val = self.data.iter().nth(i).unwrap().1.clone();
-			self.data.insert(cur_key, prev + cur_val);
-			prev = self.data.iter().nth(i).unwrap().1.clone();
-		}
-		return self;
-	}	
-}
-
 fn retain_date_range(mut data: BTreeMap<chrono::NaiveDate, i32>, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate) -> BTreeMap<chrono::NaiveDate, i32> {
 	return data.drain_filter(|k, _v| &from_date.signed_duration_since(*k).num_seconds() <= &0 && &to_date.signed_duration_since(*k).num_seconds() >= &0).collect();
 }
@@ -99,7 +75,7 @@ fn add_ranks_timeseries(input: BTreeMap<u32, Vec<TimestampedOutput>>) -> BTreeMa
 
 	let mut counter = 0;
 	for(i, _) in last_values.into_iter() {
-		output_map.insert(i, TimeseriesRankedData{data: input.get(&i).expect("This should never happen").clone(), rank: counter});
+		output_map.insert(i, TimeseriesRankedData{data: input.get(&i).expect("This should never happen (maybe get some ECC memory)").clone(), rank: counter});
 		counter += 1;
 	}
 
@@ -250,7 +226,40 @@ pub async fn balance_over_time_per_account(
 	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
 }
 
+pub async fn balance_over_time(
+	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>, period: Period
+) -> Result<BTreeMap<u32, TimeseriesRankedData>, Box<dyn Error>> {
+	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
+	let mut timeseries_output: BTreeMap<u32, Vec<TimestampedOutput>> = vec![0, 1, 2].into_iter().map(|i| { //0 = Earning, 1 = Spending, 2 = Net
+		let timeseries = Timeseries::build(
+			transactions.iter()
+				.filter(|&x| {
+					match i {
+						0 => x.amount > 0,
+						1 => x.amount < 0,
+						_ => x.amount != 0,
+					}
+				})
+				.collect()
+		);
+
+		let data = match period {
+			Period::Monthly => timeseries.create_sum_aggregate_monthly(),
+			Period::Quarterly => timeseries.create_sum_aggregate_quarterly(),
+			Period::Yearly => timeseries.create_sum_aggregate_yearly(),
+		};
+
+		if from_date.is_some() && to_date.is_some() {
+			return(i, TimestampedOutput::from_data(retain_date_range(data.data, from_date.unwrap(), to_date.unwrap())));
+		} else {
+			return(i, TimestampedOutput::from_data(data.data));
+		}
+	}).collect();
+	timeseries_output.drain_filter(|_, v| v.len() == 0);
+	
+	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
+}
 
 
 async fn total_per_currency(pool: &Pool) -> Result<BTreeMap<u32, i32>, Box<dyn Error>> {
