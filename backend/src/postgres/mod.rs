@@ -91,10 +91,10 @@ async fn get_newest_schema_version() -> u32 {
 
 async fn upgrade_schema(current_version: u32, newest_version: u32, config: &Config) {
 	let mut next_version = current_version + 1;
-	println!("Update to version {}", next_version);
 	let pool = get_pool(&config).await.get().await.unwrap();
-
+	
 	while next_version <= newest_version {
+		println!("Update to version {}", next_version);
 		pool.simple_query(
 			&fs::read_to_string(format!("./sql/upgrade_{}.sql", next_version))
 			.unwrap_or_else(|_| 
