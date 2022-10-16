@@ -4,7 +4,7 @@
   clippy::or_fun_call,
   clippy::redundant_field_names,
 )]
-#![feature(btree_drain_filter)]
+#![feature(btree_drain_filter, backtrace)]
 
 mod webserver;
 mod access_token;
@@ -17,6 +17,7 @@ mod tag;
 mod recipient;
 mod transaction;
 mod reports;
+mod asset;
 
 use std::fmt;
 use std::error::Error;

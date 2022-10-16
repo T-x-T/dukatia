@@ -74,7 +74,7 @@ export default {
 				currency_id: x.currency_id,
 				status: x.status,
 				timestamp: new Date(x.timestamp),
-				amount: Math.round(x.amount * 100),
+				amount: Math.round(x.amount * 100), //TODO: doesnt use minorInMayor
 				comment: x.comment,
 				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
 			}),
