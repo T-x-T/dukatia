@@ -62,6 +62,8 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(transaction::rest_api::delete)
 			.service(asset::rest_api::get_all)
 			.service(asset::rest_api::post)
+			.service(asset::rest_api::put)
+			.service(asset::rest_api::delete_by_id)
 			.service(currency::rest_api::get_all);
 	})
 		.bind(("0.0.0.0", api_port))?

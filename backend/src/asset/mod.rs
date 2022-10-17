@@ -24,3 +24,11 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
+
+pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
+	return db::update(&pool, &asset).await;
+}
+
+pub async fn delete_by_id(pool: &Pool, asset_id: u32) -> Result<(), Box<dyn Error>> {
+	return db::delete_by_id(&pool, asset_id).await;
+}

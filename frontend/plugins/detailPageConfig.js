@@ -181,7 +181,8 @@ export default function(context, inject) {
 				value_per_unit: 0,
 				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
 				tag_ids: []
-			}
+			},
+			deletable: true
 		},
 	})
 }
