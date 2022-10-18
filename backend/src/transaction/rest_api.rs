@@ -2,6 +2,7 @@ use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responde
 use serde::Deserialize;
 use chrono::prelude::*;
 use super::super::webserver::{AppState, is_authorized};
+use super::Asset;
 
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
@@ -25,6 +26,7 @@ struct TransactionPost {
 	amount: i32,
 	comment: Option<String>,
 	tag_ids: Option<Vec<u32>>,
+	asset_id: Option<u32>,
 }
 
 #[post("/api/v1/transactions")]
@@ -33,6 +35,20 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
 	};
+
+	let mut asset: Option<Asset> = None;
+	if body.asset_id.is_some() {
+		asset = Some(Asset {
+			id: body.asset_id,
+			name: String::from(""),
+			currency_id: 0,
+			user_id,
+			amount: None,
+			value_per_unit: None,
+			description: None,
+			tag_ids: None,
+		})
+	}
 
 	let transaction = super::Transaction {
 		id: None,
@@ -49,6 +65,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		amount: body.amount,
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
+		asset,
 	};
 
 	match super::add(&data.pool, &transaction).await {
@@ -63,6 +80,20 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
 	};
+
+	let mut asset: Option<Asset> = None;
+	if body.asset_id.is_some() {
+		asset = Some(Asset {
+			id: body.asset_id,
+			name: String::from(""),
+			currency_id: 0,
+			user_id,
+			amount: None,
+			value_per_unit: None,
+			description: None,
+			tag_ids: None,
+		})
+	}
 
 	let transaction = super::Transaction {
 		id: Some(transaction_id.into_inner()),
@@ -79,6 +110,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		amount: body.amount,
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
+		asset,
 	};
 
 	match super::update(&data.pool, &transaction).await {

@@ -65,13 +65,14 @@ export default {
 				displaySum: true,
 				sumColumn: 4,
 				defaultSort: {
-					column: 3,
+					column: 4,
 					sort: "desc"
 				},
 				columns: [
 					{name: "ID", type: "number"},
 					{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
 					{name: "Recipient", type: "choice", options: [...new Set(this.$store.state.recipients.map(x => x.name))]},
+					{name: "Asset", type: "choice", options: [...new Set(this.$store.state.assets.map(x => x.name))]},
 					{name: "Timestamp", type: "date"},
 					{name: "Amount", type: "number"},
 					{name: "Comment", type: "string"},
@@ -81,6 +82,7 @@ export default {
 					x.id,
 					x.account.name,
 					x.recipient.name,
+					x.asset ? x.asset.name : "",
 					new Date(x.timestamp).toISOString().substring(0, 10),
 					`${x.amount / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					x.comment,

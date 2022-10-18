@@ -425,7 +425,7 @@ div.clickTarget
 	height: 100vh
 
 col.multiselect
-	width: 5em
+	width: 1.5em
 col.number
 	width: 10em
 col.choice

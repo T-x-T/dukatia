@@ -42,6 +42,13 @@
 					<button v-if="field.addNew" class="secondary" @click="subForm = 'recipient'" tabindex="-1">New</button>	
 				</div>
 
+				<div v-else-if="field.type == 'asset'">
+					<label>{{`${field.label}: `}}</label>
+					<select v-model="config.data[field.property]" :ref="'forminput' + index">
+						<option v-for="(asset, aindex) in $store.state.assets" :key="aindex" :value="asset.id">{{asset.name}}</option>
+					</select>	
+				</div>
+
 				<div v-else-if="field.type == 'tags'">
 					<CustomSelect
 						:selectData="selectData"

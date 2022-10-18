@@ -20,6 +20,7 @@ export default {
 
 	created() {
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [null]
+		this.transaction.asset_id = this.transaction.asset?.id;
 
 		this.config = {
 			fields: [
@@ -40,6 +41,11 @@ export default {
 					property: "recipient_id",
 					type: "recipient",
 					addNew: true
+				},
+				{
+					label: "Asset",
+					property: "asset_id",
+					type: "asset"
 				},
 				{
 					label: "Timestamp",
@@ -71,6 +77,7 @@ export default {
 			prepareForApi: (x) => ({
 				account_id: x.account_id,
 				recipient_id: x.recipient_id,
+				asset_id: x.asset_id,
 				currency_id: x.currency_id,
 				status: x.status,
 				timestamp: new Date(x.timestamp),
@@ -83,6 +90,7 @@ export default {
 				account_id: 0,
 				currency_id: 0,
 				recipient_id: 0,
+				asset_id: 0,
 				status: 1,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,

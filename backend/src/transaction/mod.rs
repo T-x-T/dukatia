@@ -7,6 +7,7 @@ use chrono::prelude::*;
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::account;
+use super::asset::Asset;
 
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
@@ -27,6 +28,7 @@ pub struct Transaction {
 	pub amount: i32,
 	pub comment: Option<String>,
 	pub tag_ids: Option<Vec<u32>>,
+	pub asset: Option<Asset>
 }
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
@@ -84,6 +86,7 @@ mod tests {
 			amount: 12345,
 			comment: Some(String::from("this is a comment")),
 			tag_ids: None,
+			asset: None
 		};
 	}
 

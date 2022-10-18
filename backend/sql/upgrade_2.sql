@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public."AssetTransactions"
     "assetId" integer NOT NULL,
     "transactionId" integer NOT NULL,
     CONSTRAINT "AssetTransactions_pkey" PRIMARY KEY ("assetId", "transactionId"),
+    CONSTRAINT "transactionIdUnique" UNIQUE ("transactionId"),
     CONSTRAINT "assetId" FOREIGN KEY ("assetId")
         REFERENCES public."Assets" (id) MATCH SIMPLE
         ON UPDATE CASCADE
@@ -122,4 +123,30 @@ SELECT a.id, a.name, a.description, a."userId", a."currencyId", array_agg(t."tag
 	ORDER BY a.id;
 
 ALTER TABLE public."AssetData"
+    OWNER TO postgres;
+
+
+CREATE OR REPLACE VIEW public."TransactionData"
+ AS
+ SELECT tr.id,
+    tr.account,
+    tr.currency,
+    tr.recipient,
+    tr.status,
+    tr."user",
+    tr."timestamp",
+    tr.amount,
+    tr.comment,
+    array_agg(t.tag) AS tags,
+    a.id AS "assetId",
+    a.name AS "assetName",
+	a.description AS "assetDescription"
+   FROM "Transactions" tr
+     LEFT JOIN "TransactionTags" t ON tr.id = t.transaction
+     LEFT JOIN "AssetTransactions" at ON at."transactionId" = tr.id
+     LEFT JOIN "Assets" a ON a.id = at."assetId"
+  GROUP BY tr.id, a.id
+  ORDER BY tr.id;
+
+ALTER TABLE public."TransactionData"
     OWNER TO postgres;

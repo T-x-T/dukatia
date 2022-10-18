@@ -122,7 +122,6 @@ export default {
 				query += `period=${this.period}&`;
 			}
 			const api_data = await this.$axios.$get(this.api_path + query);
-			console.log(api_data)
 			let j = 0;
 
 			const common = {
