@@ -1,4 +1,6 @@
 use deadpool_postgres::Pool;
+use std::collections::BTreeMap;
+use chrono::Utc;
 use std::error::Error;
 use super::super::CustomError;
 use super::Asset;
@@ -28,14 +30,20 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 		}
 	}
 
+	let timestamp = if asset.timestamp.is_some() {
+		asset.timestamp.unwrap()
+	} else {
+		Utc::now()
+	};
+
 	client.query(
 		"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
-		&[&(id as i32), &chrono::Local::now(), &asset.amount]
+		&[&(id as i32), &timestamp, &asset.amount]
 	).await?;
 
 	client.query(
 		"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
-		&[&(id as i32), &chrono::Local::now(), &(asset.value_per_unit.unwrap() as i32)]
+		&[&(id as i32), &timestamp, &(asset.value_per_unit.unwrap() as i32)]
 	).await?;
 
 	return Ok(());
@@ -68,6 +76,44 @@ pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Erro
 	return Ok(turn_row_into_asset(&rows[0]));
 }
 
+pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
+	let rows = pool.get()
+		.await?
+		.query(
+			"SELECT \"timestamp\", \"valuePerUnit\"	FROM public.\"AssetValuations\" WHERE \"assetId\"=$1;",
+			&[&(asset_id as i32)]
+		).await?;
+
+		let mut output: BTreeMap<chrono::DateTime<chrono::Utc>, u32> = BTreeMap::new();
+
+		rows.into_iter().for_each(|x| {
+			let timestamp: chrono::DateTime<chrono::Utc> = x.get(0);
+			let value_per_unit: i32 = x.get(1);
+			output.insert(timestamp, value_per_unit as u32);
+		});
+
+		return Ok(output);
+}
+
+pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
+	let rows = pool.get()
+		.await?
+		.query(
+			"SELECT \"timestamp\", \"amount\"	FROM public.\"AssetAmounts\" WHERE \"assetId\"=$1;",
+			&[&(asset_id as i32)]
+		).await?;
+
+		let mut output: BTreeMap<chrono::DateTime<chrono::Utc>, f64> = BTreeMap::new();
+
+		rows.into_iter().for_each(|x| {
+			let timestamp: chrono::DateTime<chrono::Utc> = x.get(0);
+			let value_per_unit: f64 = x.get(1);
+			output.insert(timestamp, value_per_unit);
+		});
+
+		return Ok(output);
+}
+
 pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	if asset.id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
@@ -96,17 +142,23 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 		}
 	}
 
+	let timestamp = if asset.timestamp.is_some() {
+		asset.timestamp.unwrap()
+	} else {
+		Utc::now()
+	};
+
 	if asset.amount.is_some() {
 		client.query(
 			"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
-			&[&(asset.id.unwrap() as i32), &chrono::Local::now(), &asset.amount]
+			&[&(asset.id.unwrap() as i32), &timestamp, &asset.amount]
 		).await?;
 	}
 	
 	if asset.value_per_unit.is_some() {
 		client.query(
 			"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
-			&[&(asset.id.unwrap() as i32), &chrono::Local::now(), &(asset.value_per_unit.unwrap() as i32)]
+			&[&(asset.id.unwrap() as i32), &timestamp, &(asset.value_per_unit.unwrap() as i32)]
 		).await?;
 	}
 
@@ -147,5 +199,6 @@ fn turn_row_into_asset(row: &tokio_postgres::Row) -> Asset {
 		tag_ids: Some(tag_ids),
 		value_per_unit: Some(value_per_unit as u32),
 		amount: Some(amount),
+		timestamp: None
 	}
 }

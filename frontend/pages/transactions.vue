@@ -63,7 +63,7 @@ export default {
 			this.tableData = {
 				multiSelect: true,
 				displaySum: true,
-				sumColumn: 4,
+				sumColumn: 5,
 				defaultSort: {
 					column: 4,
 					sort: "desc"

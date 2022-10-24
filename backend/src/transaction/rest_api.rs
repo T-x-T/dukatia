@@ -47,6 +47,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 			value_per_unit: None,
 			description: None,
 			tag_ids: None,
+			timestamp: Some(body.timestamp)
 		})
 	}
 
@@ -92,6 +93,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 			value_per_unit: None,
 			description: None,
 			tag_ids: None,
+			timestamp: Some(body.timestamp)
 		})
 	}
 

@@ -14,11 +14,13 @@ use super::recipient;
 use super::account;
 use super::tag;
 use super::tag::Tag;
+use super::asset;
 
 type CurrencyId = u32;
 type RecipientId = u32;
 type AccountId = u32;
 type TagId = u32;
+type AssetId = u32;
 
 
 #[derive(serde::Deserialize, Copy, Clone)]
@@ -364,4 +366,16 @@ pub async fn spending_per_tag_in_date_range(
 	}
 
 	return Ok(limit_results(add_ranks(output), 5));
+}
+
+
+
+pub async fn value_per_unit_over_time_for_asset(pool: &Pool, asset_id: AssetId)
+-> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
+	return Ok(asset::get_value_per_unit_history(&pool, asset_id).await?);
+}
+
+pub async fn amount_over_time_for_asset(pool: &Pool, asset_id: AssetId)
+-> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
+	return Ok(asset::get_amount_history(&pool, asset_id).await?);
 }

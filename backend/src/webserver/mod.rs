@@ -44,6 +44,8 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(reports::rest_api::total_per_currency)
 			.service(reports::rest_api::spending_per_recipient_in_date_range)
 			.service(reports::rest_api::spending_per_tag_in_date_range)
+			.service(reports::rest_api::value_per_unit_over_time_for_asset)
+			.service(reports::rest_api::amount_over_time_for_asset)
 			.service(user::rest_api::post_login)
 			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
@@ -73,7 +75,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 
 pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Error>> {
 	if req.cookie("accessToken").is_none() {
-    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("access_token")}));
+    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }
 
 	return get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await;

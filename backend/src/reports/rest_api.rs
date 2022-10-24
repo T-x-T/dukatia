@@ -115,3 +115,29 @@ async fn spending_per_tag_in_date_range(data: web::Data<AppState>, req: HttpRequ
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}
 }
+
+#[get("/api/v1/reports/value_per_unit_over_time_for_asset/{asset_id}")]
+async fn value_per_unit_over_time_for_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::value_per_unit_over_time_for_asset(&data.pool, asset_id.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
+}
+
+#[get("/api/v1/reports/amount_over_time_for_asset/{asset_id}")]
+async fn amount_over_time_for_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::amount_over_time_for_asset(&data.pool, asset_id.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
+}

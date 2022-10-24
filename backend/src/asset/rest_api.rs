@@ -1,12 +1,13 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
+use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
 
 #[get("/api/v1/assets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => {println!("{:?}", e); return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))}
 	};
 
 	match super::get_all(&data.pool).await {
@@ -22,7 +23,8 @@ struct AssetPost {
 	currency_id: u32,
 	value_per_unit: u32,
 	amount: f64,
-	tag_ids: Option<Vec<u32>>
+	tag_ids: Option<Vec<u32>>,
+	timestamp: DateTime<Utc>
 }
 
 #[post("/api/v1/assets")]
@@ -41,6 +43,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		amount: Some(body.amount),
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		timestamp: Some(body.timestamp),
 	};
 
 	match super::add(&data.pool, &asset).await {
@@ -65,6 +68,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		amount: Some(body.amount),
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		timestamp: Some(body.timestamp),
 	};
 
 	match super::update(&data.pool, &asset).await {

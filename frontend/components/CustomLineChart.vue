@@ -9,7 +9,7 @@
 				:chartOptions="chartOptions"
 			/>
 		</div>
-		<div id="controls">
+		<div id="controls" v-if="!no_controls">
 			<DateControl 
 				default_date_range="7"
 				v-on:update="updateDate"
@@ -81,6 +81,7 @@ export default {
 		label_property: String,
 		aggregated: Boolean,
 		title: String,
+		no_controls: Boolean,
 	},
 
 	async mounted() {
@@ -132,7 +133,23 @@ export default {
 				pointBorderWidth: 4
 			}
 
-			if(this.type) {
+			if(this.type == "simple_monetary") {
+				this.chartData.datasets.push({
+					...common,
+					label: "",
+					data: Object.keys(api_data).map(item => ({x: item, y: api_data[item] / 100})), //TODO: not using minor_in_mayor 
+					borderColor: this.colors[0],
+					backgroundColor: this.colors[0],
+				});
+			}else if(this.type == "simple") {
+				this.chartData.datasets.push({
+					...common,
+					label: "",
+					data: Object.keys(api_data).map(item => ({x: item, y: api_data[item]})),
+					borderColor: this.colors[0],
+					backgroundColor: this.colors[0],
+				});				
+			} else if(this.type) {
 				this.$store.state[this.type].forEach((item) => {
 					if(api_data[item.id]?.data.length > 0) {
 						this.chartData.datasets.push({
