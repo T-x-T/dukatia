@@ -17,6 +17,10 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dyn Error>> {
+	return db::get_by_id(&pool, currency_id).await;
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;

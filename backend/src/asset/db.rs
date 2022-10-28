@@ -5,7 +5,7 @@ use std::error::Error;
 use super::super::CustomError;
 use super::Asset;
 
-pub async fn add(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	if asset.amount.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("amount"), item_type: String::from("asset") }))
 	}
@@ -46,7 +46,7 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 		&[&(id as i32), &timestamp, &(asset.value_per_unit.unwrap() as i32)]
 	).await?;
 
-	return Ok(());
+	return Ok(id as u32);
 }
 
 

@@ -152,7 +152,17 @@ export default function(context, inject) {
 					label: "Tags",
 					property: "tag_ids",
 					type: "tags"
-				}
+				},
+				{
+					label: "Timestamp",
+					property: "timestamp",
+					type: "timestamp",
+				},
+				{ //TODO: Only show accounts that fit currency somehow
+					label: "Account",
+					property: "account",
+					type: "account",
+				},
 			],
 			data: {
 				id: "",
@@ -161,7 +171,9 @@ export default function(context, inject) {
 				amount: 0,
 				value_per_unit: 0,
 				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
-				tag_ids: []
+				tag_ids: [],
+				timestamp: new Date(),
+				account: 0,
 			},
 			apiEndpoint: "/api/v1/assets",
 			prepareForApi: (x) => ({
@@ -171,7 +183,9 @@ export default function(context, inject) {
 				amount: Number(x.amount),
 				value_per_unit: Math.round(x.value_per_unit * 100), //TODO: doesnt use minorInMayor
 				currency_id: x.currency_id, 
-				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
+				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
+				timestamp: new Date(x.timestamp),
+				account_id: x.account,
 			}),
 			defaultData: {
 				id: "",
@@ -180,7 +194,9 @@ export default function(context, inject) {
 				amount: 1,
 				value_per_unit: 0,
 				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
-				tag_ids: []
+				tag_ids: [],
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
+				account: 0
 			},
 			deletable: true
 		},

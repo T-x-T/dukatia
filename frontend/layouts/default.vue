@@ -30,13 +30,17 @@ export default {
 		loggedIn: true
 	}),
 
-	async fetch() {
-		await this.$store.dispatch("fetchAccounts");
-		await this.$store.dispatch("fetchCurrencies");
-		await this.$store.dispatch("fetchRecipients");
-		await this.$store.dispatch("fetchTags");
-		await this.$store.dispatch("fetchTransactions");
-		await this.$store.dispatch("fetchAssets");
+	async created() {
+		try {
+			await this.$store.dispatch("fetchAccounts");
+			await this.$store.dispatch("fetchCurrencies");
+			await this.$store.dispatch("fetchRecipients");
+			await this.$store.dispatch("fetchTags");
+			await this.$store.dispatch("fetchTransactions");
+			await this.$store.dispatch("fetchAssets");
+		} catch(e) {
+			console.error(e);
+		}
 	},
 
 	async mounted() {

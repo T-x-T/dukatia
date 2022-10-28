@@ -19,12 +19,16 @@ pub struct Asset {
 	pub timestamp: Option<DateTime<Utc>>
 }
 
-pub async fn add(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	return db::add(&pool, &asset).await;
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
+}
+
+pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
+	return db::get_by_id(&pool, asset_id).await;
 }
 
 pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {

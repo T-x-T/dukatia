@@ -1,12 +1,15 @@
 <template>
 	<div id="grid">
-		<DetailsPage
-			class="gridItem medium"
-			id="detailPage"
-			:config="config"
-			v-on:back="$emit('back')"
-		/>
-		<div class=" gridItem large">
+		<div id="wrapper" class="gridItem medium">
+			<div id="inner">
+				<DetailsPage
+					id="detailPage"
+					:config="config"
+					v-on:back="$emit('back')"
+				/>
+			</div>
+		</div>
+		<div v-if="asset.id" class=" gridItem large">
 			<CustomLineChart
 				:api_path="`/api/v1/reports/value_per_unit_over_time_for_asset/${asset.id}`"
 				title="Value over time per single unit"
@@ -14,7 +17,7 @@
 				:no_controls="true"
 			/>
 		</div>
-		<div class=" gridItem large">
+		<div v-if="asset.id" class=" gridItem large">
 			<CustomLineChart
 				:api_path="`/api/v1/reports/amount_over_time_for_asset/${asset.id}`"
 				title="Amount over time"
@@ -57,17 +60,22 @@ export default {
 div#grid
 	display: grid
 	width: 100%
-	grid-template-columns: repeat(auto-fit, minmax(10%, 1fr))
+	grid-template-columns: repeat(11, 1fr)
 	grid-auto-rows: 100px
 	align-items: stretch
 	justify-items: stretch
 	grid-gap: 10px
 
+div#wrapper
+	display: flex
+	align-items: center
+	justify-content: center
+
 div.gridItem
 	padding: 10px
 
 div.small
-	grid-column: span 1
+	grid-column: span 2
 	grid-row: span 1
 
 div.medium
@@ -75,6 +83,6 @@ div.medium
 	grid-row: span 4
 
 div.large
-	grid-column: span 4
+	grid-column: span 5
 	grid-row: span 4
 </style>

@@ -64,21 +64,21 @@ export default {
 		},
 
 		rowClick(row) {
-			this.selectedRow = {...this.$store.state.assets.filter(x => x.id == row[0])[0]};
+			this.selectedRow = {
+				...this.$store.state.assets.filter(x => x.id == row[0])[0],
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
+			};
 			this.mode = "details";
 		},
 
 		async newAsset() {
-			this.selectedRow = {
-				id: "",
-				name: "",
-				description: ""
-			};
+			this.selectedRow = this.$detailPageConfig.asset.defaultData;
 			this.mode = "details";
 		},
 
 		async updateAndLoadTable() {
 			await this.$store.dispatch("fetchAssets");
+			await this.$store.dispatch("fetchTransactions");
 			await this.updateAssets();
 			this.mode = "table";
 		}
