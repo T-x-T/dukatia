@@ -126,7 +126,13 @@ export default {
 				transaction.account_id = Number.isInteger(this.batchaccount_id) ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = Number.isInteger(this.batchrecipient_id) ? this.batchrecipient_id : transaction.recipient_id;
 
-				await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transaction);
+				try {
+					await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transaction);
+				} catch(e) {
+					console.error(e.response);
+					window.alert(e.response.data);
+					return;
+				}
 			}));
 			this.batchaccount_id = null;
 			this.batchrecipient_id = null;

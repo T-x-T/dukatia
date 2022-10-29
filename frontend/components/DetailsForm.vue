@@ -124,10 +124,16 @@ export default {
 		},
 
 		async send(goBack) {
-			if(typeof this.config.data.id == "number") {
-				await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
-			} else {
-				await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+			try {
+				if(typeof this.config.data.id == "number") {
+					await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
+				} else {
+					await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+				}
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
 			}
 
 			if(goBack) {
@@ -152,7 +158,13 @@ export default {
 		},
 
 		async deleteThis() {
-			await this.$axios.$delete(`${this.config.apiEndpoint}/${this.config.data.id}`);
+			try {
+				await this.$axios.$delete(`${this.config.apiEndpoint}/${this.config.data.id}`);
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
+			}
 			this.$emit("back");
 		},
 
