@@ -16,10 +16,10 @@ backend_test:
   - POSTGRES_PORT=5432 POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
 
 build_backend:
-  image: docker:19.03.11
+  image: docker:20.10.17
   stage: build
   services:
-  - docker:19.03.11-dind
+  - docker:20.10.17-dind
   variables:
     IMAGE_TAG: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG-$IMAGE_VERSION"
     DOCKER_HOST: tcp://docker:2375
@@ -29,10 +29,10 @@ build_backend:
   - docker build -t $IMAGE_TAG ./backend
   - docker push $IMAGE_TAG
 build_frontend:
-  image: docker:19.03.11
+  image: docker:20.10.17
   stage: build
   services:
-  - docker:19.03.11-dind
+  - docker:20.10.17-dind
   variables:
     IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG-$IMAGE_VERSION"
     DOCKER_HOST: tcp://docker:2375
