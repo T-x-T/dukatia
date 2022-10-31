@@ -1,35 +1,71 @@
 <template>
-	<div id="grid">
-		<div id="wrapper" class="gridItem medium">
-			<div id="inner">
-				<DetailsPage
-					id="detailPage"
-					:config="config"
-					v-on:back="$emit('back')"
+	<div>
+		<button @click="$emit('back')">Back</button>
+		<div id="grid">
+			<div id="wrapper" class="gridItem">
+				<div id="inner">
+					<h3>Asset data</h3>
+					<DetailsForm
+						:config="config"
+						v-on:back="$emit('back')"
+					/>
+				</div>
+			</div>
+			<div id="wrapper" class="gridItem">
+				<div id="inner">
+					<h3>Buy/Sell with transaction</h3>
+					<div id="transactionForm">
+						<label for="transactionAmount">Amount change:</label>
+						<input type="number" id="transactionAmount" v-model="transactionData.amount">
+						<br>
+						<label for="transactionValue">Value per unit:</label>
+						<input type="number" id="transactionValue" v-model="transactionData.value_per_unit">
+						<br>
+						<label for="transactionTimestamp">Timestamp:</label>
+						<input type="datetime-local" id="transactionTimestamp" v-model="transactionData.timestamp">
+						<br>
+						<label for="transactionAccount">Account:</label>
+						<select id="transactionAccount" v-model="transactionData.account_id">
+							<option v-for="(account, index) in $store.state.accounts.filter(x => x.default_currency_id === asset.currency_id)" :key="index" :value="account.id">{{account.name}}</option>
+						</select>
+						<br>
+						<button class="green" @click="saveTransaction">Save</button>
+					</div>
+				</div>
+			</div>
+			<div id="wrapper" class="gridItem">
+				<div id="inner">
+					<h3>Update amount without transaction</h3>
+					<div id="updateForm">
+						<label for="updateAmount">New amount:</label>
+						<input type="number" id="updateAmount" v-model="updateData.amount">
+						<br>
+						<label for="updateValue">Value per unit:</label>
+						<input type="number" id="updateValue" v-model="updateData.value_per_unit">
+						<br>
+						<label for="updateTimestamp">Timestamp:</label>
+						<input type="datetime-local" id="updateTimestamp" v-model="updateData.timestamp">
+						<br>
+						<button class="green" @click="saveUpdate">Save</button>
+					</div>
+				</div>
+			</div>
+			<div v-if="asset.id && renderCharts" class="gridItem chart">
+				<CustomLineChart
+					:api_path="`/api/v1/reports/value_per_unit_over_time_for_asset/${asset.id}`"
+					title="Value over time per single unit"
+					type="simple_monetary"
+					:no_controls="true"
 				/>
 			</div>
-		</div>
-		<div v-if="asset.id" class=" gridItem large">
-			<CustomLineChart
-				:api_path="`/api/v1/reports/value_per_unit_over_time_for_asset/${asset.id}`"
-				title="Value over time per single unit"
-				type="simple_monetary"
-				:no_controls="true"
-			/>
-		</div>
-		<div v-if="asset.id" class=" gridItem large">
-			<CustomLineChart
-				:api_path="`/api/v1/reports/amount_over_time_for_asset/${asset.id}`"
-				title="Amount over time"
-				type="simple"
-				:no_controls="true"
-			/>
-		</div>
-		<div class="gridItem medium">
-
-		</div>
-		<div class="gridItem small">
-
+			<div v-if="asset.id && renderCharts" class="gridItem chart">
+				<CustomLineChart
+					:api_path="`/api/v1/reports/amount_over_time_for_asset/${asset.id}`"
+					title="Amount over time"
+					type="simple"
+					:no_controls="true"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -37,34 +73,103 @@
 <script>
 export default {
 	data: () => ({
-		config: {}
+		asset: null,
+		config: {},
+		transactionData: {},
+		updateData: {},
+		renderCharts: true
 	}),
 
 	props: {
-		asset: Object
+		propAsset: Object
 	},
 
 	created() {
-		this.config = {
-			...this.$detailPageConfig.asset,
-			data: {
-				...this.asset,
+		this.update();
+	},
+
+	methods: {
+		update() {
+			this.asset = this.asset ? this.asset : this.propAsset;
+
+			this.config = {
+				...this.$detailPageConfig.asset,
+				data: {
+					...this.asset,
+					value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor
+				},
+			};
+			this.transactionData = {
+				amount: 0,
 				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor
-			},
-		};
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
+				account_id: 0
+			};
+
+			this.updateData = {
+				amount: this.asset.amount,
+				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor,
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
+			};
+		},
+
+		async saveTransaction() {
+			try {
+				await this.$axios.$put(`/api/v1/assets/${this.asset.id}`, {
+					...this.asset,
+					amount: Number(this.asset.amount) + Number(this.transactionData.amount),
+					value_per_unit: Math.round(this.transactionData.value_per_unit * 100), //TODO: use minor_in_mayor
+					timestamp: new Date(this.transactionData.timestamp),
+					account_id: this.transactionData.account_id
+				})
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
+			}
+
+			await this.$store.dispatch("fetchAssets");
+			await this.$store.dispatch("fetchTransactions");
+			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
+			this.update();
+			this.renderCharts = false;
+			this.$nextTick(() => this.renderCharts = true);
+		},
+
+		async saveUpdate() {
+			try {
+				await this.$axios.$put(`/api/v1/assets/${this.asset.id}`, {
+					...this.asset,
+					amount: Number(this.updateData.amount),
+					value_per_unit: Math.round(this.updateData.value_per_unit * 100), //TODO: use minor_in_mayor
+					timestamp: new Date(this.updateData.timestamp)
+				})
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
+			}
+
+			await this.$store.dispatch("fetchAssets");
+			await this.$store.dispatch("fetchTransactions");
+			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
+			this.update();			
+			this.renderCharts = false;
+			this.$nextTick(() => this.renderCharts = true);
+		}
 	}
 }
 </script>
 
 <style lang="sass" scoped>
 div#grid
-	display: grid
+	display: flex
 	width: 100%
-	grid-template-columns: repeat(11, 1fr)
-	grid-auto-rows: 100px
-	align-items: stretch
-	justify-items: stretch
-	grid-gap: 10px
+	justify-content: flex-start
+	align-items: flex-start
+	align-content: flex-start
+	gap: 10px
+	flex-wrap: wrap
 
 div#wrapper
 	display: flex
@@ -74,15 +179,7 @@ div#wrapper
 div.gridItem
 	padding: 10px
 
-div.small
-	grid-column: span 2
-	grid-row: span 1
-
-div.medium
-	grid-column: span 2
-	grid-row: span 4
-
-div.large
-	grid-column: span 5
-	grid-row: span 4
+div.chart
+	width: 50vw
+	height: 40vh
 </style>

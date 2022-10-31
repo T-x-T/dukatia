@@ -137,11 +137,13 @@ export default function(context, inject) {
 					label: "Amount",
 					property: "amount",
 					type: "number",
+					disabled: true
 				},
 				{
 					label: "Value per unit",
 					property: "value_per_unit",
 					type: "number",
+					disabled: true
 				},
 				{
 					label: "Currency",
@@ -152,16 +154,6 @@ export default function(context, inject) {
 					label: "Tags",
 					property: "tag_ids",
 					type: "tags"
-				},
-				{
-					label: "Timestamp",
-					property: "timestamp",
-					type: "timestamp",
-				},
-				{ //TODO: Only show accounts that fit currency somehow
-					label: "Account",
-					property: "account",
-					type: "account",
 				},
 			],
 			data: {
@@ -177,7 +169,6 @@ export default function(context, inject) {
 			},
 			apiEndpoint: "/api/v1/assets",
 			prepareForApi: (x) => ({
-				id: x.id,
 				name: x.name,
 				description: x.description,
 				amount: Number(x.amount),
@@ -198,7 +189,8 @@ export default function(context, inject) {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				account: 0
 			},
-			deletable: true
+			deletable: true,
+			noSaveAndNew: true
 		},
 	})
 }

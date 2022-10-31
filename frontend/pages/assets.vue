@@ -10,7 +10,7 @@
 
 		<div id="details" v-if="mode == 'details'">
 			<AssetDetails
-				:asset="selectedRow"
+				:propAsset="selectedRow"
 				v-on:back="updateAndLoadTable"
 			/>
 		</div>
