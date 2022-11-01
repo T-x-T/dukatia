@@ -30,16 +30,16 @@ export default {
 		loggedIn: true
 	}),
 
-	async created() {
+	async fetch() {
 		try {
-			await this.$store.dispatch("fetchAccounts");
-			await this.$store.dispatch("fetchCurrencies");
-			await this.$store.dispatch("fetchRecipients");
-			await this.$store.dispatch("fetchTags");
-			await this.$store.dispatch("fetchTransactions");
-			await this.$store.dispatch("fetchAssets");
+			await this.$store.dispatch("fetchAll");
 		} catch(e) {
-			console.error(e);
+			if(e.response.data.error == "cookie accessToken not set") {
+				console.info("not logged in, redirecting to login page");
+				redirect(302, '/login');
+			} else {
+				console.error(e.response);
+			}
 		}
 	},
 

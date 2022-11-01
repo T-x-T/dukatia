@@ -34,6 +34,15 @@ export const mutations = {
 }
 
 export const actions = {
+	async fetchAll(context) {
+		context.commit("accounts", (await this.$axios.$get("/api/v1/accounts/all")).sort((a, b) => a.id - b.id));
+		context.commit("currencies", (await this.$axios.$get("/api/v1/currencies/all")).sort((a, b) => a.id - b.id));
+		context.commit("recipients", (await this.$axios.$get("/api/v1/recipients/all")).sort((a, b) => a.id - b.id));
+		context.commit("transactions", (await this.$axios.$get("/api/v1/transactions/all")).sort((a, b) => a.id - b.id));
+		context.commit("tags", (await this.$axios.$get("/api/v1/tags/all")).sort((a, b) => a.id - b.id));
+		context.commit("assets", (await this.$axios.$get("/api/v1/assets/all")).sort((a, b) => a.id - b.id));
+	},
+
 	async fetchAccounts(context) {
 		try {
 			context.commit("accounts", (await this.$axios.$get("/api/v1/accounts/all")).sort((a, b) => a.id - b.id));
