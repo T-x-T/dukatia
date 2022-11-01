@@ -136,14 +136,12 @@ export default function(context, inject) {
 				{
 					label: "Amount",
 					property: "amount",
-					type: "number",
-					disabled: true
+					type: "number"
 				},
 				{
 					label: "Value per unit",
 					property: "value_per_unit",
-					type: "number",
-					disabled: true
+					type: "number"
 				},
 				{
 					label: "Currency",

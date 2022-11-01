@@ -21,6 +21,9 @@
 						<label for="transactionValue">Value per unit:</label>
 						<input type="number" id="transactionValue" v-model="transactionData.value_per_unit">
 						<br>
+						<label for="transactionCost">Additional cost:</label>
+						<input type="number" id="transactionCost" v-model="transactionData.cost">
+						<br>
 						<label for="transactionTimestamp">Timestamp:</label>
 						<input type="datetime-local" id="transactionTimestamp" v-model="transactionData.timestamp">
 						<br>
@@ -120,7 +123,8 @@ export default {
 					amount: Number(this.asset.amount) + Number(this.transactionData.amount),
 					value_per_unit: Math.round(this.transactionData.value_per_unit * 100), //TODO: use minor_in_mayor
 					timestamp: new Date(this.transactionData.timestamp),
-					account_id: this.transactionData.account_id
+					account_id: this.transactionData.account_id,
+					cost: Math.round(this.transactionData.cost * 100), //TODO: use minor_in_mayor
 				})
 			} catch(e) {
 				console.error(e.response);

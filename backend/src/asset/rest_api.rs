@@ -30,6 +30,7 @@ struct AssetPost {
 	tag_ids: Option<Vec<u32>>,
 	timestamp: DateTime<Utc>,
 	account_id: Option<u32>,
+	cost: Option<u32>,
 }
 
 #[post("/api/v1/assets")]
@@ -125,11 +126,16 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 	let currency = crate::currency::get_by_id(&pool, body.currency_id).await.unwrap();
 	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
 
-	let comment: String = if amount_difference < 0.0 {
+	let mut comment: String = if amount_difference < 0.0 {
 		format!("Sold {} units at {} each", amount_difference * -1.0, formatted_value_per_unit)
 	} else {
 		format!("Bought {} units at {} each", amount_difference, formatted_value_per_unit)
 	};
+
+	if body.cost.is_some() {
+		let formatted_cost = format!("{}{}", body.cost.unwrap() as f64 / currency.minor_in_mayor as f64, currency.symbol);
+		comment = format!("{} with additional cost of {}", comment, formatted_cost);
+	}
 
 	let transaction = transaction::Transaction {
 		id: None,
@@ -138,7 +144,7 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 		recipient_id: 0,
 		status: transaction::TransactionStatus::Completed,
 		timestamp: body.timestamp,
-		amount: (body.value_per_unit as f64 * amount_difference) as i32 * -1,
+		amount: ((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32,
 		comment: Some(comment),
 		asset: Some(asset),
 		user_id,
