@@ -90,7 +90,6 @@ export default {
 				account_id: 0,
 				currency_id: 0,
 				recipient_id: 0,
-				asset_id: 0,
 				status: 1,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
