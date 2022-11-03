@@ -75,7 +75,9 @@ async fn get_schema_version(config: &Config) -> u32 {
 async fn get_newest_schema_version() -> u32 {
 	let mut version = 0;
 	
-	fs::read_dir("./sql").unwrap().for_each(|entry| {
+	let files = fs::read_dir("./sql").unwrap_or_else(|_| fs::read_dir("/app/sql").expect("error trying to read the sql directory"));
+	
+	files.for_each(|entry| {
 		let file_name = entry.unwrap().file_name().into_string().unwrap();
 
 		if file_name.starts_with("upgrade_") {
