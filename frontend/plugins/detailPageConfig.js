@@ -136,7 +136,8 @@ export default function(context, inject) {
 				{
 					label: "Amount",
 					property: "amount",
-					type: "number"
+					type: "number",
+					initial: true
 				},
 				{
 					label: "Value per unit",
@@ -153,9 +154,21 @@ export default function(context, inject) {
 					property: "tag_ids",
 					type: "tags"
 				},
+				{
+					label: "Additional Cost",
+					property: "cost",
+					type: "number",
+					initial: true
+				},
+				{
+					label: "Account",
+					property: "account",
+					type: "account",
+					initial: true
+				},
 			],
 			data: {
-				id: "",
+				id: null,
 				name: "",
 				description: "",
 				amount: 0,
@@ -164,6 +177,7 @@ export default function(context, inject) {
 				tag_ids: [],
 				timestamp: new Date(),
 				account: 0,
+				cost: 0
 			},
 			apiEndpoint: "/api/v1/assets",
 			prepareForApi: (x) => ({
@@ -171,6 +185,7 @@ export default function(context, inject) {
 				description: x.description,
 				amount: Number(x.amount),
 				value_per_unit: Math.round(x.value_per_unit * 100), //TODO: doesnt use minorInMayor
+				cost: Math.round(x.cost * 100), //TODO: doesnt use minorInMayor
 				currency_id: x.currency_id, 
 				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
 				timestamp: new Date(x.timestamp),
@@ -185,7 +200,8 @@ export default function(context, inject) {
 				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
 				tag_ids: [],
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				account: 0
+				account: 0,
+				cost: 0
 			},
 			deletable: true,
 			noSaveAndNew: true
