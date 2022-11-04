@@ -166,6 +166,12 @@ export default function(context, inject) {
 					type: "account",
 					initial: true
 				},
+				{
+					label: "Timestamp",
+					property: "timestamp",
+					type: "timestamp",
+					initial: true
+				},
 			],
 			data: {
 				id: null,
