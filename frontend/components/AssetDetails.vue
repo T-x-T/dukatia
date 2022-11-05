@@ -16,21 +16,24 @@
 					<h3>Buy/Sell with transaction</h3>
 					<div id="transactionForm">
 						<label for="transactionAmount">Amount change:</label>
-						<input type="number" id="transactionAmount" v-model="transactionData.amount">
+						<input type="number" id="transactionAmount" v-model="transactionData.amount" @input="updateTransactionTotal">
 						<br>
 						<label for="transactionValue">Value per unit:</label>
-						<input type="number" id="transactionValue" v-model="transactionData.value_per_unit">
+						<input type="number" id="transactionValue" v-model="transactionData.value_per_unit" @input="updateTransactionTotal">
 						<br>
 						<label for="transactionCost">Additional cost:</label>
-						<input type="number" id="transactionCost" v-model="transactionData.cost">
-						<br>
-						<label for="transactionTimestamp">Timestamp:</label>
-						<input type="datetime-local" id="transactionTimestamp" v-model="transactionData.timestamp">
+						<input type="number" id="transactionCost" v-model="transactionData.cost" @input="updateTransactionTotal">
 						<br>
 						<label for="transactionAccount">Account:</label>
 						<select id="transactionAccount" v-model="transactionData.account_id">
 							<option v-for="(account, index) in $store.state.accounts.filter(x => x.default_currency_id === asset.currency_id)" :key="index" :value="account.id">{{account.name}}</option>
 						</select>
+						<br>
+						<label for="transactionTimestamp">Timestamp:</label>
+						<input type="datetime-local" id="transactionTimestamp" v-model="transactionData.timestamp">
+						<br>
+						<label for="transactionTotal">Total:</label>
+						<input type="number" id="transactionTotal" v-model="transactionData.total" @change="transactionData.total_manually_changed = true">
 						<br>
 						<button class="green" @click="saveTransaction">Save</button>
 					</div>
@@ -53,7 +56,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="asset.id && renderCharts" class="gridItem chart">
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
 				<CustomLineChart
 					:api_path="`/api/v1/reports/value_per_unit_over_time_for_asset/${asset.id}`"
 					title="Value over time per single unit"
@@ -61,7 +64,7 @@
 					:no_controls="true"
 				/>
 			</div>
-			<div v-if="asset.id && renderCharts" class="gridItem chart">
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
 				<CustomLineChart
 					:api_path="`/api/v1/reports/amount_over_time_for_asset/${asset.id}`"
 					title="Amount over time"
@@ -106,7 +109,8 @@ export default {
 				amount: 0,
 				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				account_id: 0
+				account_id: 0,
+				cost: 0
 			};
 
 			this.updateData = {
@@ -117,6 +121,7 @@ export default {
 		},
 
 		async saveTransaction() {
+			console.log(this.transactionData.total_manually_changed)
 			try {
 				await this.$axios.$put(`/api/v1/assets/${this.asset.id}`, {
 					...this.asset,
@@ -125,6 +130,7 @@ export default {
 					timestamp: new Date(this.transactionData.timestamp),
 					account_id: this.transactionData.account_id,
 					cost: Math.round(this.transactionData.cost * 100), //TODO: use minor_in_mayor
+					total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * 100) : null //TODO: use minor_in_mayor
 				})
 			} catch(e) {
 				console.error(e.response);
@@ -138,6 +144,11 @@ export default {
 			this.update();
 			this.renderCharts = false;
 			this.$nextTick(() => this.renderCharts = true);
+		},
+
+		updateTransactionTotal() {
+			this.transactionData.total_manually_changed = false;
+			this.transactionData.total = Math.round(((Number(this.transactionData.amount) * Number(this.transactionData.value_per_unit)) + Number(this.transactionData.cost)) * -100 + Number.EPSILON) / 100;
 		},
 
 		async saveUpdate() {

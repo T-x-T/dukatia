@@ -31,6 +31,7 @@ struct AssetPost {
 	timestamp: DateTime<Utc>,
 	account_id: Option<u32>,
 	cost: Option<u32>,
+	total_value: Option<i32>,
 }
 
 #[post("/api/v1/assets")]
@@ -137,6 +138,12 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 		comment = format!("{} with additional cost of {}", comment, formatted_cost);
 	}
 
+	let amount = if body.total_value.is_some() {
+		body.total_value.unwrap()
+	} else {
+		((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32
+	};
+
 	let transaction = transaction::Transaction {
 		id: None,
 		currency_id: None,
@@ -144,7 +151,7 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 		recipient_id: 0,
 		status: transaction::TransactionStatus::Completed,
 		timestamp: body.timestamp,
-		amount: ((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32,
+		amount,
 		comment: Some(comment),
 		asset: Some(asset),
 		user_id,
