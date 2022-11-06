@@ -113,6 +113,8 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 }
 
 async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: u32, user_id: u32) -> Result<(), Box<dyn Error>> {
+	let asset = super::get_by_id(&pool, asset_id).await?;
+
 	let asset_valuation = super::AssetValuation {
 		value_per_unit: body.value_per_unit,
 		amount: body.amount,
@@ -124,9 +126,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		return Ok(());
 	}
 	
-	let asset = super::get_by_id(&pool, asset_id).await?;
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
-
 	let amount_difference = body.amount - last_amount;
 	let currency = crate::currency::get_by_id(&pool, asset.currency_id).await.unwrap();
 	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
