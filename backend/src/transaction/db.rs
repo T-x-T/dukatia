@@ -163,7 +163,6 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 			value_per_unit: None,
 			amount: None,
 			tag_ids: None,
-			timestamp: None
 		});
 	}
 

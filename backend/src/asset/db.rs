@@ -1,18 +1,10 @@
 use deadpool_postgres::Pool;
 use std::collections::BTreeMap;
-use chrono::Utc;
 use std::error::Error;
 use super::super::CustomError;
-use super::Asset;
+use super::{Asset, AssetValuation};
 
 pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
-	if asset.amount.is_none() {
-		return Err(Box::new(CustomError::MissingProperty { property: String::from("amount"), item_type: String::from("asset") }))
-	}
-	if asset.value_per_unit.is_none() {
-		return Err(Box::new(CustomError::MissingProperty { property: String::from("value_per_unit"), item_type: String::from("asset") }))
-	}
-
 	let client = pool.get().await?;
 
 	let id: i32 = client.query(
@@ -29,22 +21,6 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 				).await?;
 		}
 	}
-
-	let timestamp = if asset.timestamp.is_some() {
-		asset.timestamp.unwrap()
-	} else {
-		Utc::now()
-	};
-
-	client.query(
-		"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
-		&[&(id as i32), &timestamp, &asset.amount]
-	).await?;
-
-	client.query(
-		"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
-		&[&(id as i32), &timestamp, &(asset.value_per_unit.unwrap() as i32)]
-	).await?;
 
 	return Ok(id as u32);
 }
@@ -142,25 +118,23 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 		}
 	}
 
-	let timestamp = if asset.timestamp.is_some() {
-		asset.timestamp.unwrap()
-	} else {
-		Utc::now()
-	};
+	return Ok(());
+}
 
-	if asset.amount.is_some() {
-		client.query(
-			"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
-			&[&(asset.id.unwrap() as i32), &timestamp, &asset.amount]
-		).await?;
-	}
+pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
+	get_by_id(&pool, asset_id).await?;
 	
-	if asset.value_per_unit.is_some() {
-		client.query(
-			"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
-			&[&(asset.id.unwrap() as i32), &timestamp, &(asset.value_per_unit.unwrap() as i32)]
-		).await?;
-	}
+	let client = pool.get().await?;
+	
+	client.query(
+		"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
+		&[&(asset_id as i32), &asset_valuation.timestamp, &asset_valuation.amount]
+	).await?;
+	
+	client.query(
+		"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
+		&[&(asset_id as i32), &asset_valuation.timestamp, &(asset_valuation.value_per_unit as i32)]
+	).await?;
 
 	return Ok(());
 }
@@ -187,8 +161,8 @@ fn turn_row_into_asset(row: &tokio_postgres::Row) -> Asset {
 		.into_iter()
 		.map(|x: i32| x as u32)
 		.collect();
-	let amount: f64 = row.get(6);
-	let value_per_unit: i32 = row.get(7);
+	let amount: f64 = row.try_get(6).unwrap_or(0.0);
+	let value_per_unit: i32 = row.try_get(7).unwrap_or(0);
 
 	return Asset {
 		id: Some(id as u32),
@@ -199,6 +173,5 @@ fn turn_row_into_asset(row: &tokio_postgres::Row) -> Asset {
 		tag_ids: Some(tag_ids),
 		value_per_unit: Some(value_per_unit as u32),
 		amount: Some(amount),
-		timestamp: None
 	}
 }

@@ -25,13 +25,17 @@ struct AssetPost {
 	name: String,
 	description: Option<String>,
 	currency_id: u32,
+	tag_ids: Option<Vec<u32>>,
+}
+
+#[derive(Deserialize, Clone)]
+struct AssetValuationPost {
 	value_per_unit: u32,
 	amount: f64,
-	tag_ids: Option<Vec<u32>>,
 	timestamp: DateTime<Utc>,
-	account_id: Option<u32>,
 	cost: Option<u32>,
 	total_value: Option<i32>,
+	account_id: Option<u32>,
 }
 
 #[post("/api/v1/assets")]
@@ -46,26 +50,13 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		name: body.name.clone(),
 		description: body.description.clone(),
 		currency_id: body.currency_id,
-		value_per_unit: Some(body.value_per_unit),
-		amount: Some(body.amount),
+		value_per_unit: None,
+		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
-		timestamp: Some(body.timestamp),
 	};
 
-	let asset_result = super::add(&data.pool, &asset).await;
-
-	if body.account_id.is_some() && asset_result.is_ok() {
-		let mut asset = asset;
-		asset.id = Some(asset_result.as_ref().unwrap().clone());
-
-		match add_transaction(&data.pool, &body, asset.clone(), user_id, true).await {
-			Ok(_) => (),
-			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
-		}
-	}
-
-	match asset_result {
+	match super::add(&data.pool, &asset).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	}
@@ -83,19 +74,11 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		name: body.name.clone(),
 		description: body.description.clone(),
 		currency_id: body.currency_id,
-		value_per_unit: Some(body.value_per_unit),
-		amount: Some(body.amount),
+		value_per_unit: None,
+		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
-		timestamp: Some(body.timestamp),
 	};
-
-	if body.account_id.is_some() {
-		match add_transaction(&data.pool, &body, asset.clone(), user_id, false).await {
-			Ok(_) => (),
-			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
-		}
-	}
 
 	match super::update(&data.pool, &asset).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
@@ -116,15 +99,36 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 	};
 }
 
-async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super::Asset, user_id: u32, new: bool) -> Result<(), Box<dyn Error>> {
-	let last_amount: f64 = if !new {
-		super::get_by_id(&pool, asset.id.unwrap()).await.unwrap().amount.unwrap_or_default()
-	} else {
-		0.0
+#[post("/api/v1/assets/{asset_id}/valuations")]
+async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetValuationPost>, asset_id: web::Path<u32>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
 	};
 
+	return match add_valuation(&data.pool, &body, asset_id.into_inner(), user_id).await {
+		Ok(_) => HttpResponse::Ok().body(""),
+		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+	};
+}
+
+async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: u32, user_id: u32) -> Result<(), Box<dyn Error>> {
+	let asset_valuation = super::AssetValuation {
+		value_per_unit: body.value_per_unit,
+		amount: body.amount,
+		timestamp: body.timestamp,
+	};
+	super::add_valuation(&pool, asset_id, &asset_valuation).await?;
+
+	if body.account_id.is_none() {
+		return Ok(());
+	}
+	
+	let asset = super::get_by_id(&pool, asset_id).await?;
+	let last_amount: f64 = asset.amount.unwrap_or(0.0);
+
 	let amount_difference = body.amount - last_amount;
-	let currency = crate::currency::get_by_id(&pool, body.currency_id).await.unwrap();
+	let currency = crate::currency::get_by_id(&pool, asset.currency_id).await.unwrap();
 	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {
@@ -144,6 +148,7 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 		((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32
 	};
 
+
 	let transaction = transaction::Transaction {
 		id: None,
 		currency_id: None,
@@ -157,5 +162,7 @@ async fn add_transaction(pool: &Pool, body: &web::Json<AssetPost>, asset: super:
 		user_id,
 		tag_ids: None,
 	};
-	return transaction::add(&pool, &transaction).await;
+	transaction::add(&pool, &transaction).await?;
+
+	return Ok(());
 }

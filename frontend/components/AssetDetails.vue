@@ -11,7 +11,7 @@
 					/>
 				</div>
 			</div>
-			<div id="wrapper" class="gridItem">
+			<div v-if="asset.id !== '' && renderCharts" id="wrapper" class="gridItem">
 				<div id="inner">
 					<h3>Buy/Sell with transaction</h3>
 					<div id="transactionForm">
@@ -39,9 +39,9 @@
 					</div>
 				</div>
 			</div>
-			<div id="wrapper" class="gridItem">
+			<div v-if="asset.id !== '' && renderCharts" id="wrapper" class="gridItem">
 				<div id="inner">
-					<h3>Update amount without transaction</h3>
+					<h3>Update without transaction</h3>
 					<div id="updateForm">
 						<label for="updateAmount">New amount:</label>
 						<input type="number" id="updateAmount" v-model="updateData.amount">
@@ -121,10 +121,8 @@ export default {
 		},
 
 		async saveTransaction() {
-			console.log(this.transactionData.total_manually_changed)
 			try {
-				await this.$axios.$put(`/api/v1/assets/${this.asset.id}`, {
-					...this.asset,
+				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
 					amount: Number(this.asset.amount) + Number(this.transactionData.amount),
 					value_per_unit: Math.round(this.transactionData.value_per_unit * 100), //TODO: use minor_in_mayor
 					timestamp: new Date(this.transactionData.timestamp),
@@ -153,8 +151,7 @@ export default {
 
 		async saveUpdate() {
 			try {
-				await this.$axios.$put(`/api/v1/assets/${this.asset.id}`, {
-					...this.asset,
+				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
 					amount: Number(this.updateData.amount),
 					value_per_unit: Math.round(this.updateData.value_per_unit * 100), //TODO: use minor_in_mayor
 					timestamp: new Date(this.updateData.timestamp)

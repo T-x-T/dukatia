@@ -15,12 +15,22 @@ pub struct Asset {
 	pub currency_id: u32,
 	pub value_per_unit: Option<u32>,
 	pub amount: Option<f64>,
-	pub tag_ids: Option<Vec<u32>>,
-	pub timestamp: Option<DateTime<Utc>>
+	pub tag_ids: Option<Vec<u32>>
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct AssetValuation {
+	value_per_unit: u32,
+	amount: f64,
+	timestamp: DateTime<Utc>,
 }
 
 pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	return db::add(&pool, &asset).await;
+}
+
+pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
+	return db::add_valuation(&pool, asset_id, &asset_valuation).await;
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
