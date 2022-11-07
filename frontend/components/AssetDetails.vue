@@ -8,6 +8,7 @@
 					<DetailsForm
 						:config="config"
 						v-on:back="$emit('back')"
+						v-on:updateData="reload"
 					/>
 				</div>
 			</div>
@@ -96,7 +97,7 @@ export default {
 
 	methods: {
 		update() {
-			this.asset = this.asset ? this.asset : this.propAsset;
+			this.asset = this.asset ? this.asset : {...this.propAsset, id: ""};
 
 			this.config = {
 				...this.$detailPageConfig.asset,
@@ -120,6 +121,17 @@ export default {
 			};
 		},
 
+		async reload(res) {
+			await this.$store.dispatch("fetchAssets");
+			await this.$store.dispatch("fetchTransactions");
+			if (res?.id) this.asset.id = res.id;
+			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
+			
+			this.update();
+			this.renderCharts = false;
+			this.$nextTick(() => this.renderCharts = true);
+		},
+
 		async saveTransaction() {
 			try {
 				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
@@ -136,12 +148,7 @@ export default {
 				return;
 			}
 
-			await this.$store.dispatch("fetchAssets");
-			await this.$store.dispatch("fetchTransactions");
-			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
-			this.update();
-			this.renderCharts = false;
-			this.$nextTick(() => this.renderCharts = true);
+			this.reload();
 		},
 
 		updateTransactionTotal() {
@@ -162,12 +169,7 @@ export default {
 				return;
 			}
 
-			await this.$store.dispatch("fetchAssets");
-			await this.$store.dispatch("fetchTransactions");
-			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
-			this.update();			
-			this.renderCharts = false;
-			this.$nextTick(() => this.renderCharts = true);
+			this.reload();
 		}
 	}
 }

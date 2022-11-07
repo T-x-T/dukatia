@@ -72,6 +72,7 @@ export default {
 		},
 
 		async newAsset() {
+			this.selectedRow = null;
 			this.selectedRow = this.$detailPageConfig.asset.defaultData;
 			this.mode = "details";
 		},

@@ -57,7 +57,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 	};
 
 	match super::add(&data.pool, &asset).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{}\"}}", id)),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	}
 }

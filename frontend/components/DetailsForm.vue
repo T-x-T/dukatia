@@ -124,11 +124,12 @@ export default {
 		},
 
 		async send(goBack) {
+			let res = null;
 			try {
 				if(typeof this.config.data.id == "number") {
-					await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
+					res = await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
 				} else {
-					await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+					res = await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
 				}
 			} catch(e) {
 				console.error(e.response);
@@ -136,10 +137,13 @@ export default {
 				return;
 			}
 
-			if(goBack) {
+			if(!this.config.noGoBackOnSave && goBack) {
 				this.$emit("back");
 			} else {
-				this.$emit("updateData");
+				this.$emit("updateData", res);
+				
+				if(this.config.noGoBackOnSave) return;
+
 				this.tagsManuallyChanged = false;
 				this.config.data = {...this.config.defaultData};
 				this.$refs.forminput1[0].focus()

@@ -189,7 +189,8 @@ export default function(context, inject) {
 				cost: 0
 			},
 			deletable: true,
-			noSaveAndNew: true
+			noSaveAndNew: true,
+			noGoBackOnSave: true
 		},
 	})
 }
