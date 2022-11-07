@@ -55,9 +55,9 @@ export default {
 					x.id,
 					x.name,
 					x.description,
-					x.amount,
+					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
 					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.amount * x.value_per_unit) / x.currency.minor_in_mayor}${x.currency.symbol}`,
+					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
 					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
 				]))
 			}
