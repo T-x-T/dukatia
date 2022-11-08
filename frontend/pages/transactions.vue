@@ -72,7 +72,7 @@ export default {
 					{name: "ID", type: "number"},
 					{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
 					{name: "Recipient", type: "choice", options: [...new Set(this.$store.state.recipients.map(x => x.name))]},
-					{name: "Asset", type: "choice", options: [...new Set(this.$store.state.assets.map(x => x.name))]},
+					{name: "Asset", type: "choice", options: [...new Set(this.$store.state.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
 					{name: "Timestamp", type: "date"},
 					{name: "Amount", type: "number"},
 					{name: "Comment", type: "string"},

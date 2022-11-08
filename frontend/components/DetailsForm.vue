@@ -45,7 +45,7 @@
 				<div v-else-if="field.type == 'asset'">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
-						<option v-for="(asset, aindex) in $store.state.assets" :key="aindex" :value="asset.id">{{asset.name}}</option>
+						<option v-for="(asset, aindex) in [...$store.state.assets].sort((a, b) => a.name > b.name ? 1 : -1)" :key="aindex" :value="asset.id">{{asset.name}}</option>
 					</select>	
 				</div>
 

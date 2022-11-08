@@ -39,8 +39,8 @@ export default {
 			this.tableData = {
 				multiSelect: false,
 				defaultSort: {
-					column: 0,
-					sort: "asc"
+					column: 5,
+					sort: "desc"
 				},
 				columns: [
 					{name: "ID", type: "number"},
