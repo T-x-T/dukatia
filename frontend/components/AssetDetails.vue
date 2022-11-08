@@ -97,7 +97,7 @@ export default {
 
 	methods: {
 		update() {
-			this.asset = this.asset ? this.asset : {...this.propAsset, id: ""};
+			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: ""} : this.propAsset;
 
 			this.config = {
 				...this.$detailPageConfig.asset,

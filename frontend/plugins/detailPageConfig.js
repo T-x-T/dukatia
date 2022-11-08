@@ -178,7 +178,7 @@ export default function(context, inject) {
 			}),
 			defaultData: {
 				id: "",
-				name: "",
+				name: null,
 				description: "",
 				amount: 0,
 				value_per_unit: 0,
