@@ -148,7 +148,7 @@ export default {
 		async saveTransaction() {
 			try {
 				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
-					amount: Number(this.asset.amount) + Number(this.transactionData.amount),
+					amount_change: Number(this.transactionData.amount),
 					value_per_unit: Math.round(this.transactionData.value_per_unit * 100), //TODO: use minor_in_mayor
 					timestamp: new Date(this.transactionData.timestamp),
 					account_id: this.transactionData.account_id,

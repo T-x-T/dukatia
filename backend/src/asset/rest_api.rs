@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
 use crate::transaction;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct AssetPost {
 	name: String,
 	description: Option<String>,
@@ -15,10 +15,11 @@ struct AssetPost {
 	tag_ids: Option<Vec<u32>>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct AssetValuationPost {
 	value_per_unit: u32,
-	amount: f64,
+	amount: Option<f64>,
+	amount_change: Option<f64>,
 	timestamp: DateTime<Utc>,
 	cost: Option<u32>,
 	total_value: Option<i32>,
@@ -108,9 +109,12 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 
 	let mut asset_valuations: Vec<super::AssetValuation> = Vec::new();
 	for x in body.clone().into_iter() {
+		if x.amount.is_none() {
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"field amount needs to be set\"}}"));
+		}
 		asset_valuations.push(super::AssetValuation {
 			timestamp: x.timestamp,
-			amount: x.amount,
+			amount: x.amount.unwrap(),
 			value_per_unit: x.value_per_unit,
 		});
 	}	
@@ -136,12 +140,30 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 
 #[post("/api/v1/assets/{asset_id}/valuations")]
 async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetValuationPost>, asset_id: web::Path<u32>) -> impl Responder {
+	let asset_id = asset_id.into_inner();
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
 	};
 
-	return match add_valuation(&data.pool, &body, asset_id.into_inner(), user_id).await {
+	if body.amount.is_none() && body.amount_change.is_none() {
+		return HttpResponse::BadRequest().body(format!("{{\"error\":\"field amount or amount_change needs to be set\"}}"));
+	}
+
+	let mut asset_valuation = body;
+
+	if asset_valuation.amount_change.is_some() {
+		let amount_history = super::get_valuation_history_by_asset_id(&data.pool, asset_id).await.expect("couldnt get amount history");
+		let mut last_asset_valuation_amount: f64 = 0.0;
+		for x in amount_history {
+			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
+				last_asset_valuation_amount = x.amount;
+			}
+		}
+		asset_valuation.amount = Some(last_asset_valuation_amount + asset_valuation.amount_change.unwrap());
+	}
+
+	return match add_valuation(&data.pool, &asset_valuation, asset_id, user_id).await {
 		Ok(_) => HttpResponse::Ok().body(""),
 		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	};
@@ -152,7 +174,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 
 	let asset_valuation = super::AssetValuation {
 		value_per_unit: body.value_per_unit,
-		amount: body.amount,
+		amount: body.amount.unwrap(),
 		timestamp: body.timestamp,
 	};
 	super::add_valuation(&pool, asset_id, &asset_valuation).await?;
@@ -162,7 +184,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	}
 	
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
-	let amount_difference = body.amount - last_amount;
+	let amount_difference = body.amount.unwrap() - last_amount;
 	let currency = crate::currency::get_by_id(&pool, asset.currency_id).await.unwrap();
 	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
 
