@@ -38,6 +38,8 @@ export default {
 
 			this.tableData = {
 				multiSelect: false,
+				displaySum: true,
+				sumColumn: 5,
 				defaultSort: {
 					column: 5,
 					sort: "desc"
