@@ -45,6 +45,14 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	return db::update(&pool, &asset).await;
 }
 
+pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
+	return db::get_valuation_history_by_asset_id(&pool, asset_id).await;
+}
+
+pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
+	return db::replace_valuation_history_of_asset(&pool, asset_id, asset_valuations).await;
+}
+
 pub async fn delete_by_id(pool: &Pool, asset_id: u32) -> Result<(), Box<dyn Error>> {
 	return db::delete_by_id(&pool, asset_id).await;
 }

@@ -7,19 +7,6 @@ use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
 use crate::transaction;
 
-#[get("/api/v1/assets/all")]
-async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
-		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
-	};
-
-	match super::get_all(&data.pool).await {
-		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
-	}
-}
-
 #[derive(Deserialize, Clone)]
 struct AssetPost {
 	name: String,
@@ -36,6 +23,19 @@ struct AssetValuationPost {
 	cost: Option<u32>,
 	total_value: Option<i32>,
 	account_id: Option<u32>,
+}
+
+#[get("/api/v1/assets/all")]
+async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::get_all(&data.pool).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
 }
 
 #[post("/api/v1/assets")]
@@ -81,6 +81,41 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 	};
 
 	match super::update(&data.pool, &asset).await {
+		Ok(_) => return HttpResponse::Ok().body(""),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+	}
+}
+
+#[get("/api/v1/assets/{asset_id}/valuation_history")]
+async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+	};
+
+	match super::get_valuation_history_by_asset_id(&data.pool, asset_id.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+	}
+}
+
+#[post("/api/v1/assets/{asset_id}/valuation_history")]
+async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>, body: web::Json<Vec<AssetValuationPost>>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+	};
+
+	let mut asset_valuations: Vec<super::AssetValuation> = Vec::new();
+	for x in body.clone().into_iter() {
+		asset_valuations.push(super::AssetValuation {
+			timestamp: x.timestamp,
+			amount: x.amount,
+			value_per_unit: x.value_per_unit,
+		});
+	}	
+
+	match super::replace_valuation_history_of_asset(&data.pool, asset_id.into_inner(), asset_valuations).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	}

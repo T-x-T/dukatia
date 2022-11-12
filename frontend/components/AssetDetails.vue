@@ -2,7 +2,7 @@
 	<div>
 		<button @click="$emit('back')">Back</button>
 		<div id="grid">
-			<div id="wrapper" class="gridItem">
+			<div class="gridItem form">
 				<div id="inner">
 					<h3>Asset data</h3>
 					<DetailsForm
@@ -12,7 +12,19 @@
 					/>
 				</div>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" id="wrapper" class="gridItem">
+
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
+				<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
+				<div v-if="showAssetValuationEditor">
+					<Popup v-on:close="closeAssetValuationEditor">
+						<AssetValuationsEditor 
+							:assetId="asset.id"
+						/>
+					</Popup>
+				</div>
+			</div>
+
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
 				<div id="inner">
 					<h3>Buy/Sell with transaction</h3>
 					<div id="transactionForm">
@@ -40,7 +52,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" id="wrapper" class="gridItem">
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
 				<div id="inner">
 					<h3>Update without transaction</h3>
 					<div id="updateForm">
@@ -84,7 +96,8 @@ export default {
 		config: {},
 		transactionData: {},
 		updateData: {},
-		renderCharts: true
+		renderCharts: true,
+		showAssetValuationEditor: false,
 	}),
 
 	props: {
@@ -170,6 +183,11 @@ export default {
 			}
 
 			this.reload();
+		},
+
+		closeAssetValuationEditor() {
+			this.showAssetValuationEditor = false;
+			this.reload();
 		}
 	}
 }
@@ -185,7 +203,7 @@ div#grid
 	gap: 10px
 	flex-wrap: wrap
 
-div#wrapper
+div.form
 	display: flex
 	align-items: center
 	justify-content: center

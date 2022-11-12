@@ -121,6 +121,40 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	return Ok(());
 }
 
+pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
+	get_by_id(&pool, asset_id).await?;
+
+	let rows = pool.get()
+		.await?
+		.query("SELECT * FROM public.\"AssetValuationHistory\" WHERE assetId=$1",
+		&[&(asset_id as i32)]
+	).await?;
+
+	return Ok(rows.into_iter().map(|x| turn_row_into_asset_valuation(&x)).collect());
+}
+
+pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
+	get_by_id(&pool, asset_id).await?;
+	
+	let client = pool.get().await?;
+
+	client.query(
+		"DELETE FROM public.\"AssetAmounts\" WHERE \"assetId\"=$1",
+		&[&(asset_id as i32)]
+	).await?;
+
+	client.query(
+		"DELETE FROM public.\"AssetValuations\" WHERE \"assetId\"=$1",
+		&[&(asset_id as i32)]
+	).await?;
+
+	for asset_valuation in asset_valuations {
+		add_valuation(&pool, asset_id, &asset_valuation).await?;
+	}
+
+	return Ok(());
+}
+
 pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
 	get_by_id(&pool, asset_id).await?;
 	
@@ -173,5 +207,17 @@ fn turn_row_into_asset(row: &tokio_postgres::Row) -> Asset {
 		tag_ids: Some(tag_ids),
 		value_per_unit: Some(value_per_unit as u32),
 		amount: Some(amount),
+	}
+}
+
+fn turn_row_into_asset_valuation(row: &tokio_postgres::Row) -> AssetValuation {
+	let timestamp: chrono::DateTime<chrono::Utc> = row.get(1);
+	let amount: f64 = row.try_get(2).unwrap_or(0.0);
+	let value_per_unit: i32 = row.try_get(3).unwrap_or(0);
+
+	return AssetValuation { 
+		value_per_unit: value_per_unit as u32,
+		amount,
+		timestamp
 	}
 }
