@@ -67,7 +67,7 @@ export default {
 
 		async save() {
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.assetId}/valuation_history`, this.assetValuations.filter(x => !x.deleted).map(x => ({amount: Number(x.amount), value_per_unit: Number(x.value_per_unit) * 100, timestamp: x.timestamp}))); //TODO: use minor in mayor
+				await this.$axios.$post(`/api/v1/assets/${this.assetId}/valuation_history`, this.assetValuations.filter(x => !x.deleted).map(x => ({amount: Number(x.amount), value_per_unit: Math.round(Number(x.value_per_unit) * 100), timestamp: x.timestamp}))); //TODO: use minor in mayor
 			} catch(e) {
 				console.error(e.response);
 				window.alert(e.response.data);
