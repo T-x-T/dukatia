@@ -153,9 +153,9 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	let mut asset_valuation = body;
 
 	if asset_valuation.amount_change.is_some() {
-		let amount_history = super::get_valuation_history_by_asset_id(&data.pool, asset_id).await.expect("couldnt get amount history");
+		let valuation_history = super::get_valuation_history_by_asset_id(&data.pool, asset_id).await.expect("couldnt get amount history");
 		let mut last_asset_valuation_amount: f64 = 0.0;
-		for x in amount_history {
+		for x in valuation_history {
 			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
 				last_asset_valuation_amount = x.amount;
 			}

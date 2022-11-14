@@ -30,7 +30,42 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 }
 
 pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
-	return db::add_valuation(&pool, asset_id, &asset_valuation).await;
+	let valuation_history = get_valuation_history_by_asset_id(&pool, asset_id).await?;
+	let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
+		.filter(
+			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() > 0
+		).collect();
+	
+	if newer_than_input.len() > 0 {
+		let mut last_asset_valuation_amount: f64 = 0.0;
+		for x in &valuation_history {
+			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
+				last_asset_valuation_amount = x.amount;
+			}
+		}
+		
+		let difference: f64 = asset_valuation.amount - last_asset_valuation_amount;
+
+		let older_than_input: Vec<&AssetValuation> = valuation_history.iter()
+		.filter(
+			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0
+		).collect();
+
+		let newer_than_input: Vec<AssetValuation> = newer_than_input.into_iter().map(|x| {
+			let mut y = x.clone();
+			y.amount += difference;
+			return y;
+		}).collect();
+
+		let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().map(|x| x.clone()).collect();
+		new_asset_valuations.push(asset_valuation.clone());
+		newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
+
+		return db::replace_valuation_history_of_asset(&pool, asset_id, new_asset_valuations).await;
+	} else {
+		return db::add_valuation(&pool, asset_id, &asset_valuation).await;
+	}
+
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
