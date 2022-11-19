@@ -143,7 +143,7 @@ export default {
 				this.chartData.datasets.push({
 					...common,
 					label: "",
-					data: Object.keys(api_data).map(item => ({x: item, y: api_data[item] / 100})), //TODO: not using minor_in_mayor 
+					data: Object.keys(api_data).map(item => ({x: item, y: ((api_data[item] / 100) * 100 + Number.EPSILON) / 100})), //TODO: not using minor_in_mayor 
 					borderColor: this.colors[0],
 					backgroundColor: this.colors[0],
 				});
