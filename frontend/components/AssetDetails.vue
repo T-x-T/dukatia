@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<button @click="$emit('back')">Back</button>
+		<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
 		<div id="grid">
 			<div class="gridItem form">
 				<div id="inner">
@@ -13,18 +14,7 @@
 					/>
 				</div>
 			</div>
-
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
-				<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
-				<div v-if="showAssetValuationEditor">
-					<Popup v-on:close="closeAssetValuationEditor">
-						<AssetValuationsEditor 
-							:assetId="asset.id"
-						/>
-					</Popup>
-				</div>
-			</div>
-
+				
 			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
 				<div id="inner">
 					<h3>Buy/Sell with transaction</h3>
@@ -94,6 +84,14 @@
 					:no_controls="true"
 				/>
 			</div>
+		</div>
+
+		<div v-if="showAssetValuationEditor">
+			<Popup v-on:close="closeAssetValuationEditor">
+				<AssetValuationsEditor 
+					:assetId="asset.id"
+				/>
+			</Popup>
 		</div>
 	</div>
 </template>
