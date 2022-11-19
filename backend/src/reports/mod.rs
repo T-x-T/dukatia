@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use serde::Serialize;
+use chrono::{Utc, DateTime, NaiveDate, Duration};
 
 use timeseries::*;
 use super::transaction;
@@ -44,12 +45,12 @@ pub struct TimeseriesRankedData {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct TimestampedOutput {
-	pub x: chrono::NaiveDate,
+	pub x: NaiveDate,
 	pub y: i32
 }
 
 impl TimestampedOutput {
-	fn from_data(data: BTreeMap<chrono::NaiveDate, i32>) -> Vec<Self> {
+	fn from_data(data: BTreeMap<NaiveDate, i32>) -> Vec<Self> {
 		let mut output: Vec<Self> = Vec::new();
 		for i in 0..data.len() {
 			output.push(TimestampedOutput { x: data.iter().nth(i).unwrap().0.clone(), y: data.iter().nth(i).unwrap().1.clone() });
@@ -59,7 +60,7 @@ impl TimestampedOutput {
 	}
 }
 
-fn retain_date_range(mut data: BTreeMap<chrono::NaiveDate, i32>, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate) -> BTreeMap<chrono::NaiveDate, i32> {
+fn retain_date_range(mut data: BTreeMap<NaiveDate, i32>, from_date: NaiveDate, to_date: NaiveDate) -> BTreeMap<NaiveDate, i32> {
 	return data.drain_filter(|k, _v| &from_date.signed_duration_since(*k).num_seconds() <= &0 && &to_date.signed_duration_since(*k).num_seconds() >= &0).collect();
 }
 
@@ -145,7 +146,7 @@ fn flatten_map(map: &BTreeMap<u32, BTreeMap<u32, i32>>) -> Vec<(&u32, i32)> {
 }
 
 async fn get_transactions_between_dates(
-	pool: &Pool, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate
+	pool: &Pool, from_date: NaiveDate, to_date: NaiveDate
 ) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	return Ok(
 		transaction::get_all(&pool).await?.into_iter().filter(|x| {
@@ -160,7 +161,7 @@ async fn get_transactions_between_dates(
 
 
 pub async fn balance_over_time_per_currency(
-	pool: &Pool, from_date: Option<chrono::NaiveDate>,	to_date: Option<chrono::NaiveDate>
+	pool: &Pool, from_date: Option<NaiveDate>,	to_date: Option<NaiveDate>
 ) -> Result<BTreeMap<CurrencyId, TimeseriesRankedData>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
@@ -183,7 +184,7 @@ pub async fn balance_over_time_per_currency(
 }
 
 pub async fn balance_over_time_per_recipient(
-	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
+	pool: &Pool, from_date: Option<NaiveDate>, to_date: Option<NaiveDate>
 ) -> Result<BTreeMap<RecipientId, TimeseriesRankedData>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
@@ -206,7 +207,7 @@ pub async fn balance_over_time_per_recipient(
 }
 
 pub async fn balance_over_time_per_account(
-	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>
+	pool: &Pool, from_date: Option<NaiveDate>, to_date: Option<NaiveDate>
 ) -> Result<BTreeMap<AccountId, TimeseriesRankedData>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
@@ -229,7 +230,7 @@ pub async fn balance_over_time_per_account(
 }
 
 pub async fn balance_over_time(
-	pool: &Pool, from_date: Option<chrono::NaiveDate>, to_date: Option<chrono::NaiveDate>, period: Period
+	pool: &Pool, from_date: Option<NaiveDate>, to_date: Option<NaiveDate>, period: Period
 ) -> Result<BTreeMap<u32, TimeseriesRankedData>, Box<dyn Error>> {
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 
@@ -285,7 +286,7 @@ async fn total_per_currency(pool: &Pool) -> Result<BTreeMap<u32, i32>, Box<dyn E
 
 
 pub async fn spending_per_recipient_in_date_range(
-	pool: &Pool, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate
+	pool: &Pool, from_date: NaiveDate, to_date: NaiveDate
 ) -> Result<BTreeMap<RecipientId, RankedData>, Box<dyn Error>> {
 	let mut output: BTreeMap<RecipientId, BTreeMap<CurrencyId, i32>> = BTreeMap::new();
 	let transactions = get_transactions_between_dates(pool, from_date, to_date).await?;
@@ -315,7 +316,7 @@ pub async fn spending_per_recipient_in_date_range(
 }
 
 pub async fn spending_per_tag_in_date_range(
-	pool: &Pool, from_date: chrono::NaiveDate, to_date: chrono::NaiveDate, only_parents: bool
+	pool: &Pool, from_date: NaiveDate, to_date: NaiveDate, only_parents: bool
 ) -> Result<BTreeMap<TagId, RankedData>, Box<dyn Error>> {
 	let mut output: BTreeMap<TagId, BTreeMap<CurrencyId, i32>> = BTreeMap::new();
 	let transactions = get_transactions_between_dates(pool, from_date, to_date).await?;
@@ -368,14 +369,35 @@ pub async fn spending_per_tag_in_date_range(
 	return Ok(limit_results(add_ranks(output), 5));
 }
 
+pub async fn daily_valuation_of_asset(pool: &Pool, asset_id: AssetId) 
+-> Result<BTreeMap<NaiveDate, (u32, f64)>, Box<dyn Error>> {
+	let mut output: BTreeMap<NaiveDate, (u32, f64)> = BTreeMap::new();
 
+	let value_history = asset::get_value_per_unit_history(&pool, asset_id).await?;
+	let amount_history = asset::get_amount_history(&pool, asset_id).await?;
 
-pub async fn value_per_unit_over_time_for_asset(pool: &Pool, asset_id: AssetId)
--> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
-	return Ok(asset::get_value_per_unit_history(&pool, asset_id).await?);
-}
+	if value_history.len() == 0 || amount_history.len() == 0 {
+		return Ok(output);
+	}
 
-pub async fn amount_over_time_for_asset(pool: &Pool, asset_id: AssetId)
--> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
-	return Ok(asset::get_amount_history(&pool, asset_id).await?);
+	let mut first_day: NaiveDate = Utc::now().date().naive_utc();
+	if value_history.first_key_value().unwrap().0.date().naive_utc().signed_duration_since(first_day).num_seconds() < 0 {
+		first_day = value_history.first_key_value().unwrap().0.date().naive_utc();	
+	}
+	if amount_history.first_key_value().unwrap().0.date().naive_utc().signed_duration_since(first_day).num_seconds() < 0 {
+		first_day = amount_history.first_key_value().unwrap().0.date().naive_utc();	
+	}
+
+	let today: NaiveDate = Utc::now().date().naive_utc();
+
+	let mut current_day = first_day;
+	while today.signed_duration_since(current_day).num_seconds() > 0 {
+		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().naive_utc().signed_duration_since(current_day).num_seconds() <= 0).collect();
+		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().naive_utc().signed_duration_since(current_day).num_seconds() <= 0).collect();
+
+		output.insert(current_day, (no_future_values.last_key_value().unwrap().1.clone().clone(), no_future_amounts.last_key_value().unwrap().1.clone().clone()));
+		current_day = current_day + Duration::days(1);
+	}
+
+	return Ok(output);
 }

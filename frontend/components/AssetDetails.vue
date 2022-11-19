@@ -6,6 +6,7 @@
 				<div id="inner">
 					<h3>Asset data</h3>
 					<DetailsForm
+						v-if="config"
 						:config="config"
 						v-on:back="$emit('back')"
 						v-on:updateData="reload"
@@ -71,7 +72,15 @@
 			</div>
 			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
 				<CustomLineChart
-					:api_path="`/api/v1/reports/value_per_unit_over_time_for_asset/${asset.id}`"
+					:api_data="api_data_total_value"
+					title="Total value over time"
+					type="simple_monetary"
+					:no_controls="true"
+				/>
+			</div>
+			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
+				<CustomLineChart
+					:api_data="api_data_value"
 					title="Value over time per single unit"
 					type="simple_monetary"
 					:no_controls="true"
@@ -79,7 +88,7 @@
 			</div>
 			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
 				<CustomLineChart
-					:api_path="`/api/v1/reports/amount_over_time_for_asset/${asset.id}`"
+					:api_data="api_data_amount"
 					title="Amount over time"
 					type="simple"
 					:no_controls="true"
@@ -93,11 +102,15 @@
 export default {
 	data: () => ({
 		asset: null,
-		config: {},
+		config: null,
 		transactionData: {},
 		updateData: {},
-		renderCharts: true,
+		renderCharts: false,
 		showAssetValuationEditor: false,
+		api_data: null,
+		api_data_value: null,
+		api_data_amount: null,
+		api_data_total_value: null,
 	}),
 
 	props: {
@@ -109,8 +122,17 @@ export default {
 	},
 
 	methods: {
-		update() {
+		async update() {
 			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: ""} : this.propAsset;
+			this.api_data = await this.$axios.$get(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
+			this.api_data_value = {};
+			this.api_data_amount = {};
+			this.api_data_total_value = {};
+			for (let k in this.api_data) {
+				this.api_data_value[k] = this.api_data[k][0];
+				this.api_data_amount[k] = this.api_data[k][1];
+				this.api_data_total_value[k] = this.api_data[k][1] * this.api_data[k][0];
+			}
 
 			this.config = {
 				...this.$detailPageConfig.asset,
@@ -132,6 +154,8 @@ export default {
 				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
 			};
+
+			this.renderCharts = true;
 		},
 
 		async reload(res) {

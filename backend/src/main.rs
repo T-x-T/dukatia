@@ -4,7 +4,7 @@
   clippy::or_fun_call,
   clippy::redundant_field_names,
 )]
-#![feature(btree_drain_filter, backtrace)]
+#![feature(btree_drain_filter)]
 
 mod webserver;
 mod access_token;

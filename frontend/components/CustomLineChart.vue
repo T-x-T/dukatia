@@ -78,6 +78,7 @@ export default {
 	props: {
 		type: String,
 		api_path: String,
+		api_data: Object,
 		label_property: String,
 		aggregated: Boolean,
 		title: String,
@@ -122,7 +123,12 @@ export default {
 			if(this.aggregated) {
 				query += `period=${this.period}&`;
 			}
-			const api_data = await this.$axios.$get(this.api_path + query);
+			const api_data = this.api_path ? await this.$axios.$get(this.api_path + query) : this.api_data;
+
+			if (!api_data) {
+				return;
+			}
+
 			let j = 0;
 
 			const common = {
