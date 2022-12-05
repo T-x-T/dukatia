@@ -122,14 +122,17 @@ export default {
 	methods: {
 		async update() {
 			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: ""} : this.propAsset;
-			this.api_data = await this.$axios.$get(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
-			this.api_data_value = {};
-			this.api_data_amount = {};
-			this.api_data_total_value = {};
-			for (let k in this.api_data) {
-				this.api_data_value[k] = this.api_data[k][0];
-				this.api_data_amount[k] = this.api_data[k][1];
-				this.api_data_total_value[k] = this.api_data[k][1] * this.api_data[k][0];
+			
+			if(this.asset.id !== '') {
+				this.api_data = await this.$axios.$get(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
+				this.api_data_value = {};
+				this.api_data_amount = {};
+				this.api_data_total_value = {};
+				for (let k in this.api_data) {
+					this.api_data_value[k] = this.api_data[k][0];
+					this.api_data_amount[k] = this.api_data[k][1];
+					this.api_data_total_value[k] = this.api_data[k][1] * this.api_data[k][0];
+				}
 			}
 
 			this.config = {
