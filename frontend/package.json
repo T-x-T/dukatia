@@ -4,9 +4,9 @@
   "description": "front end written in nuxt.js for TxTs Treasury",
   "main": "index.js",
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start"
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider nuxt",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider nuxt build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider nuxt start"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
