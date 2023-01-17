@@ -165,7 +165,7 @@ export default {
 			if (res?.id) this.asset.id = res.id;
 			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
 			
-			this.update();
+			await this.update();
 			this.renderCharts = false;
 			this.$nextTick(() => this.renderCharts = true);
 		},

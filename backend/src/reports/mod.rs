@@ -388,10 +388,10 @@ pub async fn daily_valuation_of_asset(pool: &Pool, asset_id: AssetId)
 		first_day = amount_history.first_key_value().unwrap().0.date().naive_utc();	
 	}
 
-	let today: NaiveDate = Utc::now().date().naive_utc();
+	let tomorrow: NaiveDate = Utc::now().date().naive_utc().checked_add_signed(chrono::Duration::days(1)).unwrap();
 
 	let mut current_day = first_day;
-	while today.signed_duration_since(current_day).num_seconds() > 0 {
+	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
 		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().naive_utc().signed_duration_since(current_day).num_seconds() <= 0).collect();
 		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().naive_utc().signed_duration_since(current_day).num_seconds() <= 0).collect();
 
