@@ -4,7 +4,7 @@ pub mod rest_api;
 use deadpool_postgres::Pool;
 use serde::Serialize;
 use std::{error::Error, collections::BTreeMap};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, Date};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Asset {
@@ -72,12 +72,22 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
+	return db::get_all_from_user(pool, user_id).await;
+}
+
 pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
 	return db::get_by_id(&pool, asset_id).await;
 }
 
 pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	return db::update(&pool, &asset).await;
+}
+
+pub async fn get_total_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
+	let amount = db::get_amount_at_day(pool, asset_id, date).await?;
+	let value = db::get_value_at_day(pool, asset_id, date).await? as f64;
+	return Ok(amount * value);
 }
 
 pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {

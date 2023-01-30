@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use serde::Serialize;
-use chrono::{Utc, DateTime, NaiveDate, Duration};
+use chrono::{Utc, DateTime, NaiveDate, Duration, Date};
 
 use timeseries::*;
 use super::transaction;
@@ -156,31 +156,64 @@ async fn get_transactions_between_dates(
 	);
 }
 
-
-
-
-
 pub async fn balance_over_time_per_currency(
-	pool: &Pool, from_date: Option<NaiveDate>,	to_date: Option<NaiveDate>
+	pool: &Pool, from_date: Option<NaiveDate>, to_date: Option<NaiveDate>
 ) -> Result<BTreeMap<CurrencyId, TimeseriesRankedData>, Box<dyn Error>> {
+	let mut output: BTreeMap<CurrencyId, Vec<TimestampedOutput>> = BTreeMap::new();
+
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
+	let assets = asset::get_all_from_user(pool, 0).await.unwrap(); //TODO: get only data from correct user
 
-	let mut timeseries_output: BTreeMap<CurrencyId, Vec<TimestampedOutput>> = currency::get_all(&pool).await?.iter().map(|currency| {
-		let timeseries = Timeseries::build(
-			transactions.iter()
-				.filter(|x| x.currency_id == currency.id)
-				.collect()
-		).create_rolling_sum();
+	let first_day: Date<Utc> = match from_date {
+		Some(x) => Date::from_utc(x, Utc),
+		None => transactions.get(0).unwrap().timestamp.date(), //TODO: This will panic when no transaction are found
+	};
+	let tomorrow: Date<Utc> = match to_date {
+		Some(x) => Date::from_utc(x.checked_add_signed(Duration::days(1)).unwrap(), Utc),
+		None => Utc::now().date().checked_add_signed(Duration::days(1)).unwrap(),
+	};
 
-		if from_date.is_some() && to_date.is_some() {
-			return(currency.id.unwrap(), TimestampedOutput::from_data(retain_date_range(timeseries.data, from_date.unwrap(), to_date.unwrap())));
-		} else {
-			return(currency.id.unwrap(), TimestampedOutput::from_data(timeseries.data));
+	let mut current_day = first_day;
+
+	let mut todays_output: BTreeMap<CurrencyId, i32> = BTreeMap::new();
+
+	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
+		for asset in assets.iter() {
+			let current_days_value_of_asset: i32 = asset::get_total_value_at_day(pool, asset.id.unwrap(), current_day.checked_add_signed(Duration::days(1)).unwrap()).await.unwrap_or(0.0).round() as i32;
+			if !todays_output.contains_key(&asset.currency_id) {
+				todays_output.insert(asset.currency_id, current_days_value_of_asset);
+			} else {
+				todays_output.insert(asset.currency_id, todays_output.get(&asset.currency_id).unwrap() + current_days_value_of_asset);
+			}
 		}
-	}).collect();
-	timeseries_output.drain_filter(|_, v| v.len() == 0);
 
-	return Ok(limit_results_timeseries(add_ranks_timeseries(timeseries_output), 3, 3));
+		for transaction in transactions.iter() {
+			if transaction.timestamp.date() > current_day {
+				continue;
+			}
+
+			if !todays_output.contains_key(&transaction.currency_id.unwrap()) {
+				todays_output.insert(transaction.currency_id.unwrap(), transaction.amount);
+			} else {
+				todays_output.insert(transaction.currency_id.unwrap(), todays_output.get(&transaction.currency_id.unwrap()).unwrap() + transaction.amount);
+			}
+		}
+
+		todays_output.into_iter().for_each(|(currency_id, value)| {
+			if !output.contains_key(&currency_id) {
+				output.insert(currency_id, vec![TimestampedOutput {x: current_day.naive_utc(), y: value}]);
+			} else {
+				let mut new_timestamped_output = output.get(&currency_id).unwrap().clone();
+				new_timestamped_output.push(TimestampedOutput {x: current_day.naive_utc(), y: value});
+				output.insert(currency_id, new_timestamped_output);
+			}
+		});
+
+		todays_output = BTreeMap::new();
+		current_day = current_day + Duration::days(1);
+	}
+
+	return Ok(limit_results_timeseries(add_ranks_timeseries(output), 3, 3));
 }
 
 pub async fn balance_over_time_per_recipient(

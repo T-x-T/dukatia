@@ -1,4 +1,5 @@
 use deadpool_postgres::Pool;
+use chrono::{offset::TimeZone, Utc, Date};
 use std::collections::BTreeMap;
 use std::error::Error;
 use super::super::CustomError;
@@ -39,6 +40,19 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
 }
 
+pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
+	let rows = pool.get()
+		.await?
+		.query("SELECT * FROM public.\"AssetData\" WHERE \"userId\"=$1;", &[&(user_id as i32)])
+		.await?;
+	
+	if rows.is_empty() {
+		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
+	}
+
+	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
+}
+
 pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
@@ -50,6 +64,36 @@ pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Erro
 	}
 
 	return Ok(turn_row_into_asset(&rows[0]));
+}
+
+pub async fn get_amount_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
+	let res = pool.get()
+		.await?
+		.query(
+			"SELECT * FROM public.\"AssetAmounts\" WHERE \"assetId\" = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
+			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
+		).await?;
+
+	if res.len() == 0 {
+		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
+	}
+
+	return Ok(res[0].try_get(2).unwrap_or(0.0));
+}
+
+pub async fn get_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<i32, Box<dyn Error>> {
+	let res = pool.get()
+		.await?
+		.query(
+			"SELECT * FROM public.\"AssetValuations\" WHERE \"assetId\" = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
+			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
+		).await?;
+
+	if res.len() == 0 {
+		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
+	}
+
+	return Ok(res[0].try_get(2).unwrap_or(0));
 }
 
 pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
