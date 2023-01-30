@@ -10,7 +10,6 @@ use chrono::{Utc, DateTime, NaiveDate, Duration, Date};
 use timeseries::*;
 use super::transaction;
 use super::transaction::Transaction;
-use super::currency;
 use super::recipient;
 use super::account;
 use super::tag;

@@ -1,5 +1,5 @@
 use deadpool_postgres::Pool;
-use chrono::{offset::TimeZone, Utc, Date};
+use chrono::{Utc, Date};
 use std::collections::BTreeMap;
 use std::error::Error;
 use super::super::CustomError;
