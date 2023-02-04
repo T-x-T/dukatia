@@ -5,6 +5,7 @@
   clippy::redundant_field_names,
 )]
 #![feature(btree_drain_filter)]
+#![feature(drain_filter)]
 
 mod webserver;
 mod access_token;

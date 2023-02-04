@@ -20,9 +20,9 @@ pub struct Asset {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct AssetValuation {
-	value_per_unit: u32,
-	amount: f64,
-	timestamp: DateTime<Utc>,
+	pub value_per_unit: u32,
+	pub amount: f64,
+	pub timestamp: DateTime<Utc>,
 }
 
 pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {

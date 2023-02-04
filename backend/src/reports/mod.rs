@@ -163,6 +163,14 @@ pub async fn balance_over_time_per_currency(
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
 	let assets = asset::get_all_from_user(pool, 0).await.unwrap(); //TODO: get only data from correct user
 
+	let mut asset_valuations: BTreeMap<u32, Vec<asset::AssetValuation>> = BTreeMap::new();
+
+	for asset in assets.iter() {
+		let mut asset_valuation = asset::get_valuation_history_by_asset_id(pool, asset.id.unwrap()).await?;
+		asset_valuation.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+		asset_valuations.insert(asset.id.unwrap(), asset_valuation);
+	}
+
 	let first_day: Date<Utc> = match from_date {
 		Some(x) => Date::from_utc(x, Utc),
 		None => transactions.get(0).unwrap().timestamp.date(), //TODO: This will panic when no transaction are found
@@ -178,7 +186,12 @@ pub async fn balance_over_time_per_currency(
 
 	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
 		for asset in assets.iter() {
-			let current_days_value_of_asset: i32 = asset::get_total_value_at_day(pool, asset.id.unwrap(), current_day.checked_add_signed(Duration::days(1)).unwrap()).await.unwrap_or(0.0).round() as i32;
+			let current_days_asset_valuation = asset_valuations.get(&asset.id.unwrap()).unwrap().clone().drain_filter(|x| x.timestamp.date() <= current_day).last();
+			let current_days_value_of_asset: i32 = match current_days_asset_valuation {
+				Some(x) => (x.amount * x.value_per_unit as f64).round() as i32,
+				None => 0,
+			};
+			
 			if !todays_output.contains_key(&asset.currency_id) {
 				todays_output.insert(asset.currency_id, current_days_value_of_asset);
 			} else {
