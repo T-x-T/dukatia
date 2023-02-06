@@ -21,6 +21,13 @@
 					</div>
 
 					<div>
+						<label for="asset">Asset:</label>
+						<select id="asset" v-model="batchasset_id">
+							<option v-for="(asset, index) in $store.state.assets" :key="index" :value="asset.id">{{asset.name}}</option>
+						</select>
+					</div>
+
+					<div>
 						<CustomSelect
 							:selectData="selectData"
 							v-on:update="tagUpdate"
@@ -57,6 +64,7 @@ export default {
 		selectedRows: [],
 		batchaccount_id: null,
 		batchrecipient_id: null,
+		batchasset_id: null,
 		batchtag_ids: [],
 		selectData: null,
 	}),
@@ -150,6 +158,7 @@ export default {
 				let transaction = {...this.$store.state.transactions.filter(x => row && x.id === row[0])[0]};
 				transaction.account_id = Number.isInteger(this.batchaccount_id) ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = Number.isInteger(this.batchrecipient_id) ? this.batchrecipient_id : transaction.recipient_id;
+				transaction.asset_id = Number.isInteger(this.batchasset_id) ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {
