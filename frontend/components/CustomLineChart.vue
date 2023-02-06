@@ -135,7 +135,7 @@ export default {
 				cubicInterpolationMode: "monotone",
 				fill: false,
 				borderWidth: 4,
-				pointRadius: 2,
+				pointRadius: 0.5,
 				pointBorderWidth: 4
 			}
 
