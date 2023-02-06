@@ -172,19 +172,33 @@ pub async fn balance_over_time_per_currency(
 	}
 
 	let first_day: Date<Utc> = match from_date {
-		Some(x) => Date::from_utc(x, Utc),
+		Some(x) => {
+			if x >= transactions.get(0).unwrap().timestamp.date().naive_utc() { //TODO: This will panic when no transaction are found
+				Date::from_utc(x, Utc)
+			} else {
+				transactions.get(0).unwrap().timestamp.date() //TODO: This will panic when no transaction are found
+			}
+		},
 		None => transactions.get(0).unwrap().timestamp.date(), //TODO: This will panic when no transaction are found
 	};
-	let tomorrow: Date<Utc> = match to_date {
-		Some(x) => Date::from_utc(x.checked_add_signed(Duration::days(1)).unwrap(), Utc),
-		None => Utc::now().date().checked_add_signed(Duration::days(1)).unwrap(),
+
+	let tomorrow = Utc::now().date().checked_add_signed(Duration::days(1)).unwrap();
+	let last_day: Date<Utc> = match to_date {
+		Some(x) => {
+			if x <= tomorrow.naive_utc() {
+				Date::from_utc(x.checked_add_signed(Duration::days(1)).unwrap(), Utc)
+			} else {
+				tomorrow
+			}
+		},
+		None => tomorrow,
 	};
 
 	let mut current_day = first_day;
 
 	let mut todays_output: BTreeMap<CurrencyId, i32> = BTreeMap::new();
 
-	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
+	while last_day.signed_duration_since(current_day).num_seconds() > 0 {
 		for asset in assets.iter() {
 			let current_days_asset_valuation = asset_valuations.get(&asset.id.unwrap()).unwrap().clone().drain_filter(|x| x.timestamp.date() <= current_day).last();
 			let current_days_value_of_asset: i32 = match current_days_asset_valuation {
