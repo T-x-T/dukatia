@@ -41,7 +41,7 @@ jobs:
       - name: Build and push backend image
         working-directory: backend
         env:
-          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/TxTs-Treasury/backend:${{ github.ref_slug }}-${{ github.run_number }}
+          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/txts-treasury/backend:${{ github.ref_slug }}-${{ github.run_number }}
         run: |
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
@@ -60,7 +60,7 @@ jobs:
       - name: Build and push frontend image
         working-directory: frontend
         env:
-          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/TxTs-Treasury/frontend:${{ github.ref_slug }}-${{ github.run_number }}
+          IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/txts-treasury/frontend:${{ github.ref_slug }}-${{ github.run_number }}
         run: |
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
