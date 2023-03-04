@@ -27,7 +27,7 @@ jobs:
         working-directory: backend
         run: |
           rustup default nightly
-          POSTGRES_PORT=5432 POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
+          POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
 
   build_backend:
     runs-on: ubuntu-latest
