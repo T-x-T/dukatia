@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    needs: backend_test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
