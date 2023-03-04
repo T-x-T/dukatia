@@ -25,6 +25,7 @@ jobs:
       - name: Test backend
         working-directory: backend
         run: |
+          rustup default nightly
           POSTGRES_PORT=5432 POSTGRES_HOST=$POSTGRES_HOST cargo test -j 1
 
   build_backend:
