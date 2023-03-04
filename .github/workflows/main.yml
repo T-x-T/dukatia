@@ -31,6 +31,8 @@ jobs:
 
   build_backend:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -50,6 +52,8 @@ jobs:
 
   build_frontend:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
