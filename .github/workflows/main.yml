@@ -45,7 +45,6 @@ jobs:
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref }}
         run: |
-          cd backend
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
 
@@ -65,6 +64,5 @@ jobs:
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref }}
         run: |
-          cd frontend
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
