@@ -12,9 +12,6 @@ on:
 jobs:
   backend_test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -22,6 +19,10 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+      - name: Setup PostgreSQL
+        uses: Harmon758/postgresql-action@v1.0.0
+        with:
+          postgresql password: $POSTGRES_PASSWORD
       - name: Test backend
         working-directory: backend
         run: |
