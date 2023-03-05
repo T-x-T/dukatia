@@ -84,6 +84,7 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	return db::update(&pool, &asset).await;
 }
 
+#[allow(unused)]
 pub async fn get_total_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
 	let amount = db::get_amount_at_day(pool, asset_id, date).await?;
 	let value = db::get_value_at_day(pool, asset_id, date).await? as f64;
