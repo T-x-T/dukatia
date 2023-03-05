@@ -36,7 +36,6 @@ async fn main() -> std::io::Result<()> {
   user::init(&config, &pool).await;
   initialize_webserver(config, pool).await?;
   
-
   return Ok(());
 }
 
