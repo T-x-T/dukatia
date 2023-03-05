@@ -60,4 +60,3 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Recipi
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	}
 }
-

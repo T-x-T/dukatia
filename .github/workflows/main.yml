@@ -5,9 +5,7 @@ env:
   POSTGRES_HOST: postgres
 
 on:
-  push:
-    branches:
-      - main
+  push
 
 jobs:
   backend_test:
