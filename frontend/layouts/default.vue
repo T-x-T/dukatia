@@ -6,6 +6,7 @@
 				<ul v-if="loggedIn">
 					<li ref="dashboard" @click="currentRoute = 'dashboard'"><NuxtLink to="/">Dashboard</NuxtLink></li>
 					<li ref="transactions" @click="currentRoute = 'transactions'"><NuxtLink to="/transactions">Transactions</NuxtLink></li>
+					<li ref="assets" @click="currentRoute = 'assets'"><NuxtLink to="/assets">Assets</NuxtLink></li>
 					<li ref="accounts" @click="currentRoute = 'accounts'"><NuxtLink to="/accounts">Accounts</NuxtLink></li>
 					<li ref="recipients" @click="currentRoute = 'recipients'"><NuxtLink to="/recipients">Recipients</NuxtLink></li>
 					<li ref="tags" @click="currentRoute = 'tags'"><NuxtLink to="/tags">Tags</NuxtLink></li>
@@ -30,11 +31,16 @@ export default {
 	}),
 
 	async fetch() {
-		await this.$store.dispatch("fetchAccounts");
-		await this.$store.dispatch("fetchCurrencies");
-		await this.$store.dispatch("fetchRecipients");
-		await this.$store.dispatch("fetchTags");
-		await this.$store.dispatch("fetchTransactions");
+		try {
+			await this.$store.dispatch("fetchAll");
+		} catch(e) {
+			if(e.response.data.error == "cookie accessToken not set") {
+				console.info("not logged in, redirecting to login page");
+				redirect(302, '/login');
+			} else {
+				console.error(e.response);
+			}
+		}
 	},
 
 	async mounted() {

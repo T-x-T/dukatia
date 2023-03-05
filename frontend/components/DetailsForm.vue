@@ -5,30 +5,30 @@
 			
 				<div v-if="field.type == 'number'">
 					<label>{{`${field.label}: `}}</label>
-					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled" :ref="'forminput' + index">
+					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{$store.state.currencies.filter(y => y.id == $store.state.accounts.filter(x => x.id == config.data.account_id)[0].default_currency_id)[0].symbol}}</span>
 				</div>
 
 				<div v-else-if="field.type == 'string'">
 					<label>{{`${field.label}: `}}</label>
-					<input type="text" v-model="config.data[field.property]" :disabled="field.disabled" :ref="'forminput' + index">
+					<input type="text" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 				</div>
 
 				<div v-else-if="field.type == 'timestamp'">
 					<label>{{`${field.label}: `}}</label>
-					<input type="datetime-local" v-model="config.data[field.property]" :disabled="field.disabled" :ref="'forminput' + index">
+					<input type="datetime-local" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 				</div>
 
 				<div v-else-if="field.type == 'currency'">
 					<label>{{`${field.label}: `}}</label>
-					<select v-model="config.data[field.property]" :ref="'forminput' + index">
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 						<option v-for="(currency, cindex) in $store.state.currencies" :key="cindex" :value="currency.id">{{currency.name}}</option>
 					</select>
 				</div>
 
 				<div v-else-if="field.type == 'account'">
 					<label>{{`${field.label}: `}}</label>
-					<select v-model="config.data[field.property]" :ref="'forminput' + index">
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 						<option v-for="(account, aindex) in $store.state.accounts" :key="aindex" :value="account.id">{{account.name}}</option>
 					</select>
 					<button v-if="field.addNew" class="secondary" @click="subForm = 'account'" tabindex="-1">New</button>	
@@ -36,10 +36,17 @@
 
 				<div v-else-if="field.type == 'recipient'">
 					<label>{{`${field.label}: `}}</label>
-					<select v-model="config.data[field.property]" :ref="'forminput' + index">
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 						<option v-for="(recipient, rindex) in $store.state.recipients" :key="rindex" :value="recipient.id">{{recipient.name}}</option>
 					</select>	
 					<button v-if="field.addNew" class="secondary" @click="subForm = 'recipient'" tabindex="-1">New</button>	
+				</div>
+
+				<div v-else-if="field.type == 'asset'">
+					<label>{{`${field.label}: `}}</label>
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
+						<option v-for="(asset, aindex) in [...$store.state.assets].sort((a, b) => a.name > b.name ? 1 : -1)" :key="aindex" :value="asset.id">{{asset.name}}</option>
+					</select>	
 				</div>
 
 				<div v-else-if="field.type == 'tags'">
@@ -52,7 +59,7 @@
 
 				<div v-else-if="field.type == 'singleTag'">
 					<label>{{`${field.label}: `}}</label>
-					<select v-model="config.data[field.property]" :ref="'forminput' + index">
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== '')" :ref="'forminput' + index">
 						<option value=""></option>
 						<option v-for="(item, tindex) in $store.state.tags" :key="tindex" :value="item.id">{{item.name}}</option>
 					</select>
@@ -117,16 +124,26 @@ export default {
 		},
 
 		async send(goBack) {
-			if(typeof this.config.data.id == "number") {
-				await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
-			} else {
-				await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+			let res = null;
+			try {
+				if(typeof this.config.data.id == "number") {
+					res = await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
+				} else {
+					res = await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+				}
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
 			}
 
-			if(goBack) {
+			if(!this.config.noGoBackOnSave && goBack) {
 				this.$emit("back");
 			} else {
-				this.$emit("updateData");
+				this.$emit("updateData", res);
+				
+				if(this.config.noGoBackOnSave) return;
+
 				this.tagsManuallyChanged = false;
 				this.config.data = {...this.config.defaultData};
 				this.$refs.forminput1[0].focus()
@@ -145,7 +162,13 @@ export default {
 		},
 
 		async deleteThis() {
-			await this.$axios.$delete(`${this.config.apiEndpoint}/${this.config.data.id}`);
+			try {
+				await this.$axios.$delete(`${this.config.apiEndpoint}/${this.config.data.id}`);
+			} catch(e) {
+				console.error(e.response);
+				window.alert(e.response.data);
+				return;
+			}
 			this.$emit("back");
 		},
 

@@ -6,7 +6,7 @@
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
 		</div>
 		<div id="clickTarget" v-if="dropdown" @click="toggleDropdown()"></div>
-		<div id="dropdown" v-if="dropdown">
+		<div id="dropdown" v-if="dropdown" :class="selectData.openTop ? 'opentop' : ''">
 			<input type="text" id="dropdownSearch" placeholder="filter" ref="dropdownSearch" v-model="searchTerm" @keydown="keypressDropdownInput">
 			<ul>
 				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
@@ -156,20 +156,27 @@ export default {
 	background: rgba(0, 0, 0, 0.5)
 	backdrop-filter: blur(5px) saturate(20%)
 	box-shadow: 0px 0px 15px black
-	min-width: 200px
+	min-width: 250px
 	position: absolute
 	z-index: 10
-	padding: 4px 40px 4px 4px
+	padding: 4px 4px 4px 4px
 	margin: 0px 0px 0px 4px
+	ul
+		max-height: 33vh
+		overflow: scroll
 	li
 		cursor: pointer
 		user-select: none
 	input.checkbox
 		cursor: pointer
+	#dropdownSearch
+		width: 95%
 	p
 		padding: 1px 2px 1px 2px
 	span
 		@extend .semibold
+	&.opentop
+		margin-top: -507px
 
 #clickTarget
 	position: fixed

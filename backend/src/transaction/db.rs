@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::{Transaction, TransactionStatus};
+use super::{Transaction, TransactionStatus, Asset};
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let id: i32 = pool.get()
@@ -31,13 +31,23 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 				).await?;
 		}
 	}
+
+	if transaction.asset.is_some() && transaction.asset.clone().unwrap().id.is_some() {
+		pool.get()
+			.await?
+			.query(
+				"INSERT INTO public.\"AssetTransactions\" (\"transactionId\", \"assetId\") VALUES ($1, $2);", 
+			&[&(id as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
+		).await?;
+	}
+
 	return Ok(());
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT tr.id, tr.account, tr.currency, tr.recipient, tr.status, tr.user, tr.timestamp, tr.amount, tr.comment, array_agg(t.tag) as tags FROM public.\"Transactions\" tr LEFT JOIN public.\"TransactionTags\" t ON tr.id = t.transaction GROUP BY tr.id;", &[])
+		.query("SELECT * from public.\"TransactionData\"", &[])
 		.await?;
 	
 	if rows.is_empty() {
@@ -51,7 +61,7 @@ pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, 
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT tr.id, tr.account, tr.currency, tr.recipient, tr.status, tr.user, tr.timestamp, tr.amount, tr.comment, array_agg(t.tag) as tags FROM public.\"Transactions\" tr LEFT JOIN public.\"TransactionTags\" t ON tr.id = t.transaction WHERE tr.id=$1 GROUP BY tr.id;", 
+			"SELECT * FROM public.\"TransactionData\" WHERE id=$1;", 
 			&[&(transaction_id as i32)]
 		)
 		.await?;
@@ -102,6 +112,18 @@ pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dy
 		}
 	}
 
+	client.query(
+		"DELETE FROM public.\"AssetTransactions\" WHERE \"transactionId\"=$1",
+		&[&(transaction.id.unwrap() as i32)]
+	).await?;
+
+	if transaction.asset.is_some() && transaction.asset.clone().unwrap().id.is_some() {
+		client.query(
+				"INSERT INTO public.\"AssetTransactions\" (\"transactionId\", \"assetId\") VALUES ($1, $2);", 
+			&[&(transaction.id.unwrap() as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
+		).await?;
+	}
+
 	return Ok(());
 }
 
@@ -129,6 +151,20 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 		.into_iter()
 		.map(|x: i32| x as u32)
 		.collect();
+	let asset_id: Option<i32> = row.get(10);
+	let mut asset: Option<Asset> = None;
+	if asset_id.is_some() {
+		asset = Some(Asset {
+			id: Some(asset_id.unwrap() as u32),
+			name: row.get(11),
+			description: row.get(12),
+			user_id: user_id as u32,
+			currency_id: currency_id as u32,
+			value_per_unit: None,
+			amount: None,
+			tag_ids: None,
+		});
+	}
 
 	return Transaction {
 		id: Some(id as u32),
@@ -145,5 +181,6 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 		amount: row.get(7),
 		comment: row.get(8),
 		tag_ids: Some(tag_ids),
+		asset,
 	};
 }

@@ -114,6 +114,83 @@ export default function(context, inject) {
 				parent_id: null
 			},
 			deletable: true
-		}
+		},
+		asset: {
+			fields: [
+				{
+					label: "ID",
+					property: "id",
+					type: "number",
+					disabled: true
+				},
+				{
+					label: "Name",
+					property: "name",
+					type: "string",
+				},
+				{
+					label: "Description",
+					property: "description",
+					type: "string",
+				},
+				{
+					label: "Amount",
+					property: "amount",
+					type: "number",
+					disabled: true
+				},
+				{
+					label: "Value per unit",
+					property: "value_per_unit",
+					type: "number",
+					disabled: true
+				},
+				{
+					label: "Currency",
+					property: "currency_id",
+					type: "currency"
+				},
+				{
+					label: "Tags",
+					property: "tag_ids",
+					type: "tags"
+				},
+			],
+			data: {
+				id: null,
+				name: "",
+				description: "",
+				amount: 0,
+				value_per_unit: 0,
+				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
+				tag_ids: [],
+				timestamp: new Date(),
+				account: 0,
+				cost: 0
+			},
+			apiEndpoint: "/api/v1/assets",
+			prepareForApi: (x) => ({
+				name: x.name,
+				description: x.description,
+				currency_id: x.currency_id, 
+				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
+				timestamp: new Date(x.timestamp),
+			}),
+			defaultData: {
+				id: "",
+				name: null,
+				description: "",
+				amount: 0,
+				value_per_unit: 0,
+				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
+				tag_ids: [],
+				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
+				account: 0,
+				cost: 0
+			},
+			deletable: true,
+			noSaveAndNew: true,
+			noGoBackOnSave: true
+		},
 	})
 }

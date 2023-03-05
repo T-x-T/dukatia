@@ -5,6 +5,7 @@
   clippy::redundant_field_names,
 )]
 #![feature(btree_drain_filter)]
+#![feature(drain_filter)]
 
 mod webserver;
 mod access_token;
@@ -17,25 +18,24 @@ mod tag;
 mod recipient;
 mod transaction;
 mod reports;
+mod asset;
 
 use std::fmt;
 use std::error::Error;
 use deadpool_postgres::Pool;
 
 use config::*;
-use postgres::get_postgres_connection;
 use webserver::initialize_webserver;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
   let config = initialize_config();
 
-  let pool = get_postgres_connection(&config).await;
+  let pool = postgres::get_connection(&config).await;
 
   user::init(&config, &pool).await;
   initialize_webserver(config, pool).await?;
   
-
   return Ok(());
 }
 
@@ -82,7 +82,7 @@ impl Error for CustomError {
 async fn setup() -> (Config, Pool) {
   let config = initialize_config();
   postgres::delete_testing_databases(&config).await;
-  let pool = postgres::get_postgres_connection(&config).await;
+  let pool = postgres::get_connection(&config).await;
   user::init(&config, &pool).await;
   return (config, pool);
 }
