@@ -21,7 +21,7 @@
 			"method": "POST",
 			"body": {
 				"name": "admin",
-				"secret": "password"
+				"secret": "changeme"
 			}
 		}
 	},
