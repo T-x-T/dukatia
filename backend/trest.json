@@ -1,0 +1,134 @@
+{
+	"configs": [
+		{
+			"name": "backend",
+			"description": "tests for the rest api of the backend",
+			"setup": {
+				"cmd": "docker-compose up -d",
+				"finished_condition": {
+					"endpoint_reachable": "/api/v1"
+				}
+			},
+			"cleanup": {
+				"cmd": "docker-compose down"
+			},
+			"api_hostname": "http://localhost:4000"
+		}
+	],
+	"tasks": {
+		"login_as_admin": {
+			"endpoint": "/api/v1/login",
+			"method": "POST",
+			"body": {
+				"name": "admin",
+				"secret": "changeme"
+			}
+		}
+	},
+	"tests": [
+		{
+			"name": "currency",
+			"tests": [
+				{
+					"name": "retrieval of all currencies works",
+					"endpoint": "/api/v1/currencies/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}]
+					} 
+				}
+			]
+		},
+		{
+			"name": "recipients",
+			"tests": [
+				{
+					"name": "retrieval of all recipients works",
+					"endpoint": "/api/v1/recipients/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new recipient created correctly",
+					"endpoint": "/api/v1/recipients/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}, {"id":1,"name":"test","user_id":0,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "updating name of recipient returns 200",
+					"endpoint": "/api/v1/recipients/1",
+					"method": "PUT",
+					"body": {
+						"name":"edited test"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated recipient name saved correctly",
+					"endpoint": "/api/v1/recipients/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}, {"id":1,"name":"edited test","user_id":0,"tag_ids":[]}]
+					}
+				}
+			]
+		}
+	]
+}
