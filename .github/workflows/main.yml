@@ -49,6 +49,27 @@ jobs:
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
 
+  backend_api_test_trest:
+    runs-on: ubuntu-latest
+    needs: build_backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+      - name: Setup PostgreSQL
+        uses: Harmon758/postgresql-action@v1.0.0
+        with:
+          postgresql password: $POSTGRES_PASSWORD
+      - name: Run trest on backend
+        working-directory: backend
+        run: |
+          rustup default nightly
+          sed -i 's/##backend_image##/ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}/g' file.txt
+          wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
+
   build_frontend:
     runs-on: ubuntu-latest
     permissions:

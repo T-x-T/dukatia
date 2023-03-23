@@ -1,0 +1,21 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: changeme
+  backend:
+    image: ##backend_image##
+    restart: always
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: changeme
+      DATABASE_NAME: txts_treasury
+      ADMIN_PASSWORD: changeme
+      PEPPER: changeme
+    links:
+      - postgres
+    ports:
+      - "127.0.0.1:4000:4000"
