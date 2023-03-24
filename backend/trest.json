@@ -4,7 +4,7 @@
 			"name": "backend",
 			"description": "tests for the rest api of the backend",
 			"setup": {
-				"cmd": "docker-compose up -d",
+				"cmd": "docker-compose pull && docker-compose up -d",
 				"finished_condition": {
 					"endpoint_reachable": "/api/v1"
 				}
