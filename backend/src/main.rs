@@ -66,7 +66,7 @@ impl fmt::Display for CustomError {
     return match self {
       CustomError::NoItemFound {item_type} => write!(f, "no item of type {} found", item_type),
       CustomError::SpecifiedItemNotFound {item_type, filter} => write!(f, "specified item of type {} not found with filter {}", item_type, filter),
-      CustomError::InvalidItem {reason} => write!(f, "the given item is invalid, becaus>e {}", reason),
+      CustomError::InvalidItem {reason} => write!(f, "the given item is invalid, because {}", reason),
       CustomError::InvalidCredentials => write!(f, "the given credentials are invalid"),
       CustomError::MissingCookie {cookie} => write!(f, "cookie {} not set", cookie),
       CustomError::MissingProperty {property, item_type} => write!(f, "Missing property {} on type {}", property, item_type),

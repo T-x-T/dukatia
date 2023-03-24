@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: changeme
   backend:
-    image: ##backend_image##
+    build: .
     restart: always
     environment:
       POSTGRES_HOST: postgres
