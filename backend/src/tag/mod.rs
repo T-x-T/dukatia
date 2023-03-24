@@ -16,7 +16,7 @@ pub struct Tag {
 
 pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
-		return Err(Box::new(CustomError::InvalidItem{reason: String::from("it doesn't exist or because it would create a cyclic relationship")}));
+		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
 	return db::add(&pool, &tag).await;
 }
@@ -26,6 +26,9 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 }
 
 pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
+	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
+		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
+	}
 	return db::update(&pool, &tag).await;
 }
 
