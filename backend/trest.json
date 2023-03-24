@@ -427,6 +427,146 @@
 						"status_code_equals": 400,
 						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
 					}
+				},
+				{
+					"name": "deleting tag thats used as a parent returns 200",
+					"endpoint": "/api/v1/tags/2",
+					"method": "DELETE",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "tag whose parent got deleted now has null as parent_id",
+					"endpoint": "/api/v1/tags/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":1,"name":"edited test","user_id":0,"parent_id":null}]
+					}
+				},
+				{
+					"name": "creating tag with non existant parent fails",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name":"edited test",
+						"parent_id": 420
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
+					}
+				},
+				{
+					"name": "updating tag with non existant parent fails",
+					"endpoint": "/api/v1/tags/2",
+					"method": "PUT",
+					"body": {
+						"name":"edited test",
+						"parent_id": 420
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
+					}
+				}
+			]
+		},
+		{
+			"name": "users",
+			"tests": [
+				{
+					"name": "login with wrong secret doesnt work",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "admin",
+						"secret": "wrong_password"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the given credentials are invalid"}
+					} 
+				},
+				{
+					"name": "login with correct secret works",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "admin",
+						"secret": "changeme"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "changing password returns 200",
+					"endpoint": "/api/v1/users/me/secret",
+					"method": "PUT",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"old_secret": "changeme",
+						"new_secret": "new_password"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "login with new secret works",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "admin",
+						"secret": "new_password"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "login with old secret doesnt work",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "admin",
+						"secret": "changeme"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the given credentials are invalid"}
+					} 
 				}
 			]
 		}
