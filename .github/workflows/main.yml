@@ -47,7 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    needs: backend_test
+    needs: 
+      - backend_test
+      - backend_api_test_trest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
