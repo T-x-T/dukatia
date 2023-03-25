@@ -569,6 +569,196 @@
 					} 
 				}
 			]
+		},
+		{
+			"name": "transactions",
+			"tests": [
+				{
+					"name": "retrieval of all transactions works with none in the database",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": []
+					}
+				},
+				{
+					"name": "post of new transaction returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new transaction created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}]
+					}
+				},
+				{
+					"name": "updating details of transaction returns 200",
+					"endpoint": "/api/v1/transactions/0",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"amount": -12345,
+						"comment": "this is an edited comment"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated transaction details saved correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","amount":-12345,"comment":"this is an edited comment","tag_ids":[],"asset":null}]
+					}
+				},
+				{
+					"name": "post of second transaction returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "deleting transaction returns 200",
+					"endpoint": "/api/v1/transactions/0",
+					"method": "DELETE",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "correct transaction got deleted",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}]
+					}
+				},
+				{
+					"name": "post of transaction with non existant account_id returns 400",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 10,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"specified item of type Account not found with filter account_id=10"}
+					}
+				},
+				{
+					"name": "post of transaction with non existant recipient_id returns 400",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 10,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 400
+					}
+				}
+			]
 		}
 	]
 }
