@@ -33,10 +33,6 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 		.query("SELECT * FROM public.\"AssetData\";", &[])
 		.await?;
 	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
-	}
-
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
 }
 
