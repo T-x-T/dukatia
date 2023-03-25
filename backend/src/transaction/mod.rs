@@ -130,17 +130,13 @@ mod tests {
 		use super::super::super::tag;
 
 		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_error_on_default_db() {
+		async fn returns_no_results_on_empty_db() {
 			let (config, pool) = setup().await;
 
-			let res = get_all(&pool).await;
-			
-			teardown(&config).await;
+			let res = get_all(&pool).await.unwrap();
+			assert_eq!(res.len(), 0);
 
-			match res {
-				Ok(_) => panic!("this should return an error"),
-				Err(_) => return (),
-			};
+			teardown(&config).await;
 		}
 
 		#[tokio::test(flavor = "multi_thread")]
