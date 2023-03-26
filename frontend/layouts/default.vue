@@ -73,8 +73,9 @@ export default {
 
 main
 	display: flex
-	height: fit-content
+	height: 100vh
 	width: 100vw
+	overflow: hidden
 
 nav
 	width: 21em
@@ -94,10 +95,6 @@ nav
 		transition-duration: 0.2s
 		cursor: pointer
 
-#navcontainer
-	position: fixed
-	top: 0
-
 li
 	width: fit-content
 	&:hover
@@ -107,4 +104,5 @@ li
 	flex-grow: 1
 	padding: 1%
 	width: 1rem
+	height: 100vh
 </style>

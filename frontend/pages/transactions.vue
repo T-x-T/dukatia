@@ -192,9 +192,12 @@ export default {
 div#main
 	display: flex
 	justify-content: space-between
+	overflow: hidden
+	height: 100vh
 
 div#table
 	flex-grow: 1
+	overflow: scroll
 
 div#detailBar
 	padding-left: 8px

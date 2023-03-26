@@ -1,5 +1,5 @@
 <template>
-	<main>
+	<div id="main">
 		<div class="gridItem">
 			<p>Update Password:</p>
 			<input type="password" v-model="oldPassword" placeholder="Old Password">
@@ -22,7 +22,7 @@
 				<option>None</option>
 			</select>
 		</div>
-	</main>
+	</div>
 </template>
 
 <script>
@@ -57,7 +57,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+div#main
+	height: 100vh
+	display: flex
+
 div.gridItem
+	width: max-content
+	height: max-content
 	padding: 5px
 	margin: 10px
 	box-shadow: 4px 4px 0px black

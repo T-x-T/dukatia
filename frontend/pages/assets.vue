@@ -88,3 +88,9 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+div#table
+	height: 100vh
+	overflow: scroll
+</style>
