@@ -16,7 +16,7 @@ pub struct Tag {
 
 pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
-		return Err(Box::new(CustomError::InvalidItem{reason: String::from("it doesn't exist or because it would create a cyclic relationship")}));
+		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
 	return db::add(&pool, &tag).await;
 }
@@ -26,6 +26,9 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 }
 
 pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
+	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), tag.id).await {
+		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
+	}
 	return db::update(&pool, &tag).await;
 }
 
@@ -35,6 +38,7 @@ pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
 
 //If tag_id is supplied check if parent_id can be parent of tag (checks cyclic dependency)
 async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bool {
+	println!("parent_id: {}, tag_id: {:?}", parent_id, tag_id);
 	if db::get_by_id(&pool, parent_id).await.is_err() {
 		return false;
 	}
@@ -46,6 +50,7 @@ async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bo
 	//Check cyclic dependency
 	let mut next_parent_id_to_check = parent_id;
 	loop {
+		println!("next_parent_id_to_check: {}, tag_id: {:?}", next_parent_id_to_check, tag_id);
 		if next_parent_id_to_check == tag_id.unwrap() {
 			return false;
 		}
@@ -53,7 +58,12 @@ async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bo
 		if next_tag.is_err() {
 			break;
 		}
-		next_parent_id_to_check = next_tag.unwrap().id.unwrap();
+		let next_tag_parent = next_tag.unwrap().parent_id;
+		if next_tag_parent.is_none() {
+			break;
+		} else {
+			next_parent_id_to_check = next_tag_parent.unwrap();
+		}
 	}
 
 	return true;
@@ -238,6 +248,29 @@ mod tests {
 			add(&pool, &tag).await?;
 
 			tag.id = Some(1);
+			let res = update(&pool, &tag).await;
+			
+			teardown(&config).await;
+			match res {
+				Ok(_) => panic!("this should have returned an error, but didnt"),
+				Err(_) => return Ok(())
+			};
+		}
+
+		#[tokio::test(flavor = "multi_thread")]
+		async fn returns_error_when_trying_to_create_cyclic_relationship() -> Result<(), Box<dyn Error>> {
+			let (config, pool) = setup().await;
+
+			let mut tag = get_tag();
+			add(&pool, &tag).await?;
+			add(&pool, &tag).await?;
+
+			tag.id = Some(0);
+			tag.parent_id = Some(1);
+			update(&pool, &tag).await?;
+
+			tag.id = Some(1);
+			tag.parent_id = Some(0);
 			let res = update(&pool, &tag).await;
 			
 			teardown(&config).await;

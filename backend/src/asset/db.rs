@@ -33,10 +33,6 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 		.query("SELECT * FROM public.\"AssetData\";", &[])
 		.await?;
 	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
-	}
-
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
 }
 
@@ -66,6 +62,7 @@ pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Erro
 	return Ok(turn_row_into_asset(&rows[0]));
 }
 
+#[allow(unused)]
 pub async fn get_amount_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
 	let res = pool.get()
 		.await?
@@ -81,6 +78,7 @@ pub async fn get_amount_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> R
 	return Ok(res[0].try_get(2).unwrap_or(0.0));
 }
 
+#[allow(unused)]
 pub async fn get_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<i32, Box<dyn Error>> {
 	let res = pool.get()
 		.await?

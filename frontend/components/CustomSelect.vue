@@ -42,7 +42,6 @@ export default {
 			this.sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
 			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
 
-			this.optionStates = [];
 			if(this.selectData.selected) {
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
 			}
@@ -51,6 +50,7 @@ export default {
 
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
+			this.searchTerm = "";
 			this.$nextTick(() => this.$refs["dropdownSearch"]?.focus());
 			this.updateDisplayText();
 		},

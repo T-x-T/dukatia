@@ -49,7 +49,7 @@
 					type="accounts"
 					api_path="/api/v1/reports/balance_over_time_per_account"
 					label_property="name"
-					title="Balance per Recipient over Time"
+					title="Balance per Account over Time"
 				/>
 			</div>
 		</div>

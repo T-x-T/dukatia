@@ -161,6 +161,10 @@ pub async fn balance_over_time_per_currency(
 	let mut output: BTreeMap<CurrencyId, Vec<TimestampedOutput>> = BTreeMap::new();
 
 	let transactions = get_transactions_timestamp_sorted(&pool).await?;
+	if transactions.len() == 0 {
+		return Ok(limit_results_timeseries(add_ranks_timeseries(output), 3, 3));
+	}
+
 	let assets = asset::get_all_from_user(pool, 0).await.unwrap(); //TODO: get only data from correct user
 
 	let mut asset_valuations: BTreeMap<u32, Vec<asset::AssetValuation>> = BTreeMap::new();
@@ -173,13 +177,13 @@ pub async fn balance_over_time_per_currency(
 
 	let first_day: Date<Utc> = match from_date {
 		Some(x) => {
-			if x >= transactions.get(0).unwrap().timestamp.date().naive_utc() { //TODO: This will panic when no transaction are found
+			if x >= transactions.get(0).unwrap().timestamp.date().naive_utc() {
 				Date::from_utc(x, Utc)
 			} else {
-				transactions.get(0).unwrap().timestamp.date() //TODO: This will panic when no transaction are found
+				transactions.get(0).unwrap().timestamp.date()
 			}
 		},
-		None => transactions.get(0).unwrap().timestamp.date(), //TODO: This will panic when no transaction are found
+		None => transactions.get(0).unwrap().timestamp.date(),
 	};
 
 	let tomorrow = Utc::now().date().checked_add_signed(Duration::days(1)).unwrap();

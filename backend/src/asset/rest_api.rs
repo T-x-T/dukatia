@@ -205,7 +205,6 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32
 	};
 
-
 	let transaction = transaction::Transaction {
 		id: None,
 		currency_id: None,

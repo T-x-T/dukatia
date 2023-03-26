@@ -8,6 +8,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use super::account;
 use super::asset::Asset;
+use crate::CustomError;
 
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
@@ -34,14 +35,18 @@ pub struct Transaction {
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let mut transaction = transaction.clone();
 
-	transaction.currency_id = Some(
-		account::get_all(&pool)
-			.await?
-			.into_iter()
-			.filter(|x| x.id.unwrap() == transaction.account_id)
-			.collect::<Vec<account::Account>>()[0]
-			.default_currency_id
-		);
+	let account = account::get_all(&pool)
+		.await?
+		.into_iter()
+		.filter(|x| x.id.unwrap() == transaction.account_id)
+		.collect::<Vec<account::Account>>();
+
+	if account.len() != 1 {
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("Account"), filter: format!("account_id={}", transaction.account_id) }));
+	} else {
+		transaction.currency_id = Some(account[0].default_currency_id);
+	}
+
 
 	return db::add(&pool, &transaction).await;
 }
@@ -125,17 +130,13 @@ mod tests {
 		use super::super::super::tag;
 
 		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_error_on_default_db() {
+		async fn returns_no_results_on_empty_db() {
 			let (config, pool) = setup().await;
 
-			let res = get_all(&pool).await;
-			
-			teardown(&config).await;
+			let res = get_all(&pool).await.unwrap();
+			assert_eq!(res.len(), 0);
 
-			match res {
-				Ok(_) => panic!("this should return an error"),
-				Err(_) => return (),
-			};
+			teardown(&config).await;
 		}
 
 		#[tokio::test(flavor = "multi_thread")]

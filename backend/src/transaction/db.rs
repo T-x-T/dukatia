@@ -50,10 +50,6 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		.query("SELECT * from public.\"TransactionData\"", &[])
 		.await?;
 	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound{item_type: String::from("transaction")}));
-	}
-
 	return Ok(rows.into_iter().map(|x| turn_row_into_transaction(&x)).collect());
 }
 
