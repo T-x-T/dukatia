@@ -1048,6 +1048,190 @@
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}]
 					}
+				},
+				{
+					"name": "post of valuation with account_id, cost and lower amount returns 200",
+					"endpoint": "/api/v1/assets/1/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 123,
+						"amount": 10,
+						"timestamp": "2023-03-22T11:22:00Z",
+						"account_id": 0,
+						"cost": 100
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction gets correctly created",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}
+						]
+					}
+				},
+				{
+					"name": "post of valuation with account_id, cost and amount_change returns 200",
+					"endpoint": "/api/v1/assets/1/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 123,
+						"amount_change": 10,
+						"timestamp": "2023-03-23T11:22:00Z",
+						"account_id": 0,
+						"cost": 100
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction gets correctly created",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}
+						]
+					}
+				},
+				{
+					"name": "post of valuation with account_id, cost and negative amount_change returns 200",
+					"endpoint": "/api/v1/assets/1/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 123,
+						"amount_change": -10,
+						"timestamp": "2023-03-24T11:22:00Z",
+						"account_id": 0,
+						"cost": 100
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction gets correctly created",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},
+							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-24T11:22:00Z","amount":1130,"comment":"Sold 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}
+						]
+					}
+				},
+				{
+					"name": "valuation got correctly saved",
+					"endpoint": "/api/v1/assets/1/valuation_history",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z"},
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T11:22:00Z"},
+							{"value_per_unit":123,"amount":30.0,"timestamp":"2023-03-21T11:22:00Z"},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T11:22:00Z"},
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-23T11:22:00Z"},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-24T11:22:00Z"}
+						]
+					}
+				},
+				{
+					"name": "replacing asset valuation history returns 200",
+					"endpoint": "/api/v1/assets/1/valuation_history",
+					"method": "POST",
+					"body": [
+						{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T12:22:00Z"},
+						{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
+						{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
+					],
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "valuation got correctly overwritten",
+					"endpoint": "/api/v1/assets/1/valuation_history",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T12:22:00Z"},
+							{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
+						]
+					}
 				}
 			]
 		}
