@@ -147,8 +147,9 @@ export default {
 	svg
 		display: inline
 		height: 32px
-		position: absolute
-		margin-left: -35px
+		position: relative
+		margin-bottom: -10px
+		margin-left: -36px
 		&:hover
 			cursor: pointer
 

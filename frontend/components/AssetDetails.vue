@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="main">
 		<button @click="$emit('back')">Back</button>
 		<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
 		<div id="grid">
@@ -66,6 +66,7 @@
 					title="Total value over time"
 					type="simple_monetary"
 					:no_controls="true"
+					:currency_id="asset.currency_id"
 				/>
 			</div>
 			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
@@ -74,6 +75,7 @@
 					title="Value over time per single unit"
 					type="simple_monetary"
 					:no_controls="true"
+					:currency_id="asset.currency_id"
 				/>
 			</div>
 			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
@@ -84,6 +86,7 @@
 					:no_controls="true"
 				/>
 			</div>
+			<div id="spacer"></div>
 		</div>
 
 		<div v-if="showAssetValuationEditor">
@@ -135,16 +138,18 @@ export default {
 				}
 			}
 
+			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+
 			this.config = {
 				...this.$detailPageConfig.asset,
 				data: {
 					...this.asset,
-					value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor
+					value_per_unit: this.asset.value_per_unit / minor_in_mayor,
 				},
 			};
 			this.transactionData = {
 				amount: 0,
-				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor
+				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				account_id: 0,
 				cost: 0
@@ -152,7 +157,7 @@ export default {
 
 			this.updateData = {
 				amount: this.asset.amount,
-				value_per_unit: this.asset.value_per_unit / 100, //TODO: use minor_in_mayor,
+				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
 			};
 
@@ -171,14 +176,16 @@ export default {
 		},
 
 		async saveTransaction() {
+			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+
 			try {
 				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
 					amount_change: Number(this.transactionData.amount),
-					value_per_unit: Math.round(this.transactionData.value_per_unit * 100), //TODO: use minor_in_mayor
+					value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
 					timestamp: new Date(this.transactionData.timestamp),
 					account_id: this.transactionData.account_id,
-					cost: Math.round(this.transactionData.cost * 100), //TODO: use minor_in_mayor
-					total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * 100) : null //TODO: use minor_in_mayor
+					cost: Math.round(this.transactionData.cost * minor_in_mayor),
+					total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
 				})
 			} catch(e) {
 				console.error(e.response);
@@ -195,10 +202,12 @@ export default {
 		},
 
 		async saveUpdate() {
+			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+
 			try {
 				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
 					amount: Number(this.updateData.amount),
-					value_per_unit: Math.round(this.updateData.value_per_unit * 100), //TODO: use minor_in_mayor
+					value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
 					timestamp: new Date(this.updateData.timestamp)
 				})
 			} catch(e) {
@@ -219,6 +228,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+div#main
+	overflow: scroll
+	height: 100vh
+
 div#grid
 	display: flex
 	width: 100%
@@ -232,11 +245,19 @@ div.form
 	display: flex
 	align-items: center
 	justify-content: center
+	height: max-content
 
 div.gridItem
 	padding: 10px
 
 div.chart
+	flex-grow: 1
+
+div.chart
 	width: 50vw
 	height: 40vh
+
+div#spacer
+	height: 100px
+	width: 100%
 </style>

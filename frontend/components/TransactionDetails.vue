@@ -21,6 +21,7 @@ export default {
 	created() {
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [null]
 		this.transaction.asset_id = this.transaction.asset?.id;
+		const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.transaction.currency_id)[0].minor_in_mayor;
 
 		this.config = {
 			fields: [
@@ -81,7 +82,7 @@ export default {
 				currency_id: x.currency_id,
 				status: x.status,
 				timestamp: new Date(x.timestamp),
-				amount: Math.round(x.amount * 100), //TODO: doesnt use minorInMayor
+				amount: Math.round(x.amount * minor_in_mayor),
 				comment: x.comment,
 				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
 			}),
