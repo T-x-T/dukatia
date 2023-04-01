@@ -1,28 +1,18 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="mode=='table'">
-			<button class="green" @click="newRecipient">Add</button>
-			<CustomTable
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-			/>
-		</div>
-
-		<div id="details" v-if="mode=='details'">
-			<RecipientDetails 
-				:recipient="selectedRow"
-				v-on:back="updateAndLoadTable"
-			/>
-		</div>
+		<button class="green" @click="newRecipient">Add</button>
+		<CustomTable
+			v-if="tableData"
+			:tableData="tableData"
+			v-on:rowClick="rowClick"
+		/>
 	</div>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		tableData: {},
-		selectedRow: {},
-		mode: "table"
+		tableData: null,
 	}),
 
 	async fetch() {
@@ -31,6 +21,7 @@ export default {
 
 	methods: {
 		async updateRecipients() {
+			await this.$store.dispatch("fetchRecipients");
 			this.tableData = {
 				multiSelect: false,
 				defaultSort: {
@@ -51,23 +42,11 @@ export default {
 		},
 		
 		rowClick(row) {
-			this.selectedRow = {...this.$store.state.recipients.filter(x => x.id == row[0])[0]};
-			this.mode = "details";
+			this.$router.push(`/recipients/${row[0]}`);
 		},
 
 		async newRecipient() {
-			this.selectedRow = {
-				id: "",
-				name: ""
-			}
-
-			this.mode = "details";
-		},
-
-		async updateAndLoadTable() {
-			await this.$store.dispatch("fetchRecipients");
-			await this.updateRecipients();
-			this.mode = "table";
+			this.$router.push("/recipients/new");
 		}
 	}
 }

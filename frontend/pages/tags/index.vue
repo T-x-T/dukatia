@@ -1,28 +1,18 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="mode=='table'">
-			<button class="green" @click="newTag()">Add</button>
-			<CustomTable
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-			/>
-		</div>
-
-		<div id="details" v-if="mode=='details'">
-			<TagDetails
-				:tag="selectedRow"
-				v-on:back="updateAndLoadTable"
-			/>
-		</div>
+		<button class="green" @click="newTag()">Add</button>
+		<CustomTable
+			v-if="tableData"
+			:tableData="tableData"
+			v-on:rowClick="rowClick"
+		/>
 	</div>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		tableData: {},
-		selectedRow: {},
-		mode: "table"
+		tableData: null
 	}),
 
 	async fetch() {
@@ -31,6 +21,7 @@ export default {
 
 	methods: {
 		async updateTags() {
+			await this.$store.dispatch("fetchTags");
 			this.tableData = {
 				multiSelect: false,
 				defaultSort: {
@@ -51,23 +42,11 @@ export default {
 		},
 
 		rowClick(row) {
-			this.selectedRow = {...this.$store.state.tags.filter(x => x.id == row[0])[0]};
-			this.mode = "details";
+			this.$router.push(`/tags/${row[0]}`);
 		},
 
 		async newTag() {
-			this.selectedRow = {
-				id: "",
-				name: ""
-			}
-
-			this.mode = "details";
-		},
-
-		async updateAndLoadTable() {
-			await this.$store.dispatch("fetchTags");
-			await this.updateTags();
-			this.mode = "table";
+			this.$router.push("/tags/new");
 		}
 	}
 }

@@ -38,6 +38,7 @@
 				</div>		
 			</div>
 			<CustomTable
+				ref="table"
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
 				v-on:rowSelect="rowSelect"
@@ -77,6 +78,13 @@ export default {
 			selected: undefined,
 			label: "Tags:",
 			openTop: true
+		}
+	},
+
+	mounted() {
+		const id = Number(this.$route.path.split("/")[2]);
+		if(Number.isInteger(id)) {
+			this.openDetailPage(id);
 		}
 	},
 
@@ -121,8 +129,14 @@ export default {
 		},
 
 		rowClick(row) {
-			const rowFromStore = this.$store.state.transactions.filter(x => x.id == row[0])[0]
-			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -1)};
+			if(this.selectedRow.id === row[0]) return;
+			history.pushState({}, "", `/transactions/${row[0]}`);
+			this.openDetailPage(row[0]);
+		},
+
+		openDetailPage(transaction_id) {
+			const rowFromStore = this.$store.state.transactions.filter(x => x.id == transaction_id)[0];
+			this.selectedRow = {...rowFromStore, amount: rowFromStore.amount / 100, timestamp: rowFromStore.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},

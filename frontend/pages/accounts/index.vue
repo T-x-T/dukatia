@@ -1,29 +1,18 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="mode=='table'">
-			<button class="green" @click="newAccount">Add</button>
-
-			<CustomTable
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-			/>
-		</div>
-
-		<div id="details" v-if="mode=='details'">
-			<AccountDetails
-				:account="selectedRow"
-				v-on:back="updateAndLoadTable"
-			/>
-		</div>
+		<button class="green" @click="newAccount">Add</button>
+		<CustomTable
+			v-if="tableData"
+			:tableData="tableData"
+			v-on:rowClick="rowClick"
+		/>
 	</div>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		tableData: {},
-		selectedRow: {},
-		mode: "table"
+		tableData: null
 	}),
 
 	async fetch() {
@@ -32,6 +21,7 @@ export default {
 
 	methods: {
 		async updateAccounts() {
+			await this.$store.dispatch("fetchAccounts");
 			this.tableData = {
 				multiSelect: false,
 				defaultSort: {
@@ -54,26 +44,11 @@ export default {
 		},
 		
 		rowClick(row) {
-			const rowFromStore = this.$store.state.accounts.filter(x => x.id == row[0])[0];
-			const default_currency = this.$store.state.currencies.filter(x => x.id == rowFromStore.default_currency)[0]
-			this.selectedRow = {...rowFromStore, default_currency: {...default_currency}};
-			this.mode = "details";
+			this.$router.push(`/accounts/${row[0]}`);
 		},
 
 		async newAccount() {
-			this.selectedRow = {
-				id: "",
-				name: "",
-				default_currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
-			}
-
-			this.mode = "details";
-		},
-
-		async updateAndLoadTable() {
-			await this.$store.dispatch("fetchAccounts");
-			await this.updateAccounts();
-			this.mode = "table";
+			this.$router.push("/accounts/new");
 		}
 	}
 }

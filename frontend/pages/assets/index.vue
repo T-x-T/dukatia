@@ -1,28 +1,18 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="mode == 'table'">
-			<button class="green" @click="newAsset">Add</button>
-			<CustomTable
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-			/>
-		</div>
-
-		<div id="details" v-if="mode == 'details'">
-			<AssetDetails
-				:propAsset="selectedRow"
-				v-on:back="updateAndLoadTable"
-			/>
-		</div>
+		<button class="green" @click="newAsset">Add</button>
+		<CustomTable
+			v-if="tableData"
+			:tableData="tableData"
+			v-on:rowClick="rowClick"
+		/>
 	</div>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		tableData: {},
-		selectedRow: {},
-		mode: "table"
+		tableData: null
 	}),
 
 	async fetch() {
@@ -31,6 +21,7 @@ export default {
 
 	methods: {
 		async updateAssets() {
+			await this.$store.dispatch("fetchAssets");
 			const assetsForDisplay = this.$store.state.assets.map(x => {
 				x.currency = this.$store.state.currencies.filter(c => c.id == x.currency_id)[0];
 				return x;
@@ -66,24 +57,11 @@ export default {
 		},
 
 		rowClick(row) {
-			this.selectedRow = {
-				...this.$store.state.assets.filter(x => x.id == row[0])[0],
-				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
-			};
-			this.mode = "details";
+			this.$router.push(`/assets/${row[0]}`);
 		},
 
 		async newAsset() {
-			this.selectedRow = null;
-			this.selectedRow = this.$detailPageConfig.asset.defaultData;
-			this.mode = "details";
-		},
-
-		async updateAndLoadTable() {
-			await this.$store.dispatch("fetchAssets");
-			await this.$store.dispatch("fetchTransactions");
-			await this.updateAssets();
-			this.mode = "table";
+			this.$router.push("/assets/new");
 		}
 	}
 }
