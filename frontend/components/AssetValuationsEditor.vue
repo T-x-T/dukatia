@@ -42,8 +42,11 @@ export default {
 	},
 
 	async fetch() {
+		const asset = this.$store.state.assets.filter(x => x.id == this.assetId)[0];
+		const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+
 		this.assetValuations = (await this.$axios.$get(`/api/v1/assets/${this.assetId}/valuation_history`)).map(x => {
-			x.value_per_unit /= 100;  //TODO: use minor in mayor
+			x.value_per_unit /= minor_in_mayor;
 			x.deleted = false;
 			return x;
 		});
@@ -66,8 +69,20 @@ export default {
 		},
 
 		async save() {
+			const asset = this.$store.state.assets.filter(x => x.id == this.assetId)[0];
+			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.assetId}/valuation_history`, this.assetValuations.filter(x => !x.deleted).map(x => ({amount: Number(x.amount), value_per_unit: Math.round(Number(x.value_per_unit) * 100), timestamp: x.timestamp}))); //TODO: use minor in mayor
+				await this.$axios.$post(
+					`/api/v1/assets/${this.assetId}/valuation_history`, 
+					this.assetValuations
+						.filter(x => !x.deleted)
+						.map(x => ({
+							amount: Number(x.amount),
+							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_mayor),
+							timestamp: x.timestamp
+						}))
+				);
 			} catch(e) {
 				console.error(e.response);
 				window.alert(e.response.data);

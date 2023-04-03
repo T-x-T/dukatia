@@ -162,7 +162,7 @@ export default function(context, inject) {
 				description: "",
 				amount: 0,
 				value_per_unit: 0,
-				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
+				currency_id: 0,
 				tag_ids: [],
 				timestamp: new Date(),
 				account: 0,
@@ -182,7 +182,7 @@ export default function(context, inject) {
 				description: "",
 				amount: 0,
 				value_per_unit: 0,
-				currency_id: context.store.state.currencies.filter(x => x.id == 0)[0],
+				currency_id: 0,
 				tag_ids: [],
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				account: 0,
@@ -191,6 +191,50 @@ export default function(context, inject) {
 			deletable: true,
 			noSaveAndNew: true,
 			noGoBackOnSave: true
+		},
+		currency: {
+			fields: [
+				{
+					label: "ID",
+					property: "id",
+					type: "number",
+					disabled: true
+				},
+				{
+					label: "Name",
+					property: "name",
+					type: "string",
+				},
+				{
+					label: "Minor in Mayor",
+					property: "minor_in_mayor",
+					type: "number"
+				},
+				{
+					label: "Symbol",
+					property: "symbol",
+					type: "string"
+				}
+			],
+			data: {
+				id: "",
+				name: "",
+				minor_in_mayor: 100,
+				symbol: ""
+			},
+			apiEndpoint: "/api/v1/currencies",
+			prepareForApi: (x) => ({
+				id: x.id,
+				name: x.name,
+				minor_in_mayor: Number(x.minor_in_mayor),
+				symbol: x.symbol
+			}),
+			defaultData: {
+				id: "",
+				name: "",
+				minor_in_mayor: 100,
+				symbol: ""
+			}
 		},
 	})
 }

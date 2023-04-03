@@ -68,7 +68,9 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(asset::rest_api::post_valuation)
 			.service(asset::rest_api::get_valuation_history_by_asset_id)
 			.service(asset::rest_api::replace_valuation_history_of_asset)
-			.service(currency::rest_api::get_all);
+			.service(currency::rest_api::get_all)
+			.service(currency::rest_api::post)
+			.service(currency::rest_api::put);
 	})
 		.bind(("0.0.0.0", api_port))?
 		.run()

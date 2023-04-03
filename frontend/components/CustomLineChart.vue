@@ -83,6 +83,7 @@ export default {
 		aggregated: Boolean,
 		title: String,
 		no_controls: Boolean,
+		currency_id: Number
 	},
 
 	async mounted() {
@@ -140,10 +141,11 @@ export default {
 			}
 
 			if(this.type == "simple_monetary") {
+				const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.currency_id)[0].minor_in_mayor;
 				this.chartData.datasets.push({
 					...common,
 					label: "",
-					data: Object.keys(api_data).map(item => ({x: item, y: ((api_data[item] / 100) * 100 + Number.EPSILON) / 100})), //TODO: not using minor_in_mayor 
+					data: Object.keys(api_data).map(item => ({x: item, y: ((api_data[item] / minor_in_mayor) * 100 + Number.EPSILON) / 100})),
 					borderColor: this.colors[0],
 					backgroundColor: this.colors[0],
 				});
@@ -157,6 +159,11 @@ export default {
 				});				
 			} else if(this.type) {
 				this.$store.state[this.type].forEach((item) => {
+					let minor_in_mayor = 100;
+					if(this.type == "currencies") {
+						minor_in_mayor = item.minor_in_mayor;
+					}
+
 					if(api_data[item.id]?.data.length > 0) {
 						this.chartData.datasets.push({
 							...common,

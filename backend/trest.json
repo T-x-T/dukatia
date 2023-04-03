@@ -43,6 +43,74 @@
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}]
 					} 
+				},
+				{
+					"name": "post of new currency returns 200",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"minor_in_mayor": 100,
+						"symbol": "*"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new currency created correctly",
+					"endpoint": "/api/v1/currencies/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"test","minor_in_mayor":100,"symbol":"*"}]
+					}
+				},
+				{
+					"name": "updating details of currency returns 200",
+					"endpoint": "/api/v1/currencies/2",
+					"method": "PUT",
+					"body": {
+						"name":"edited test",
+						"minor_in_mayor": 12,
+						"symbol": "/"
+					},
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated currency details saved correctly",
+					"endpoint": "/api/v1/currencies/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"}]
+					}
 				}
 			]
 		},

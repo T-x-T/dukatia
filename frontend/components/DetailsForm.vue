@@ -1,5 +1,5 @@
 <template>
-	<div id="main">
+	<div>
 		<div id="formWrapper">
 			<div class="formInput" v-for="(field, index) in config.fields" :key="index">
 			

@@ -132,7 +132,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index">
+				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>

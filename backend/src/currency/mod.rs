@@ -21,6 +21,14 @@ pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dy
 	return db::get_by_id(&pool, currency_id).await;
 }
 
+pub async fn add(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
+	return db::add(pool, currency).await;
+}
+
+pub async fn update(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
+	return db::update(pool, currency).await;
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;
