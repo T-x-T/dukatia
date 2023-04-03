@@ -1,9 +1,9 @@
 <template>
-	<div id="main">
-			<RecipientDetails 
-				:recipient="recipientData"
-				v-on:back="$router.push('/recipients')"
-			/>		
+	<div>
+		<RecipientDetails 
+			:recipient="recipientData"
+			v-on:back="$router.push('/recipients')"
+		/>		
 	</div>
 </template>
 

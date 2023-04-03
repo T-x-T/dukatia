@@ -21,8 +21,7 @@ export default {
 	created() {
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [null]
 		this.transaction.asset_id = this.transaction.asset?.id;
-		const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.transaction.currency_id)[0].minor_in_mayor;
-
+		
 		this.config = {
 			fields: [
 				{
@@ -75,17 +74,23 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: (x) => ({
-				account_id: x.account_id,
-				recipient_id: x.recipient_id,
-				asset_id: x.asset_id,
-				currency_id: x.currency_id,
-				status: x.status,
-				timestamp: new Date(x.timestamp),
-				amount: Math.round(x.amount * minor_in_mayor),
-				comment: x.comment,
-				tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
-			}),
+			prepareForApi: (x) => {
+				console.log(x)
+				const account = this.$store.state.accounts.filter(y => y.id == x.account_id)[0];
+				const minor_in_mayor = this.$store.state.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
+				console.log(minor_in_mayor)
+				return {
+					account_id: x.account_id,
+					recipient_id: x.recipient_id,
+					asset_id: x.asset_id,
+					currency_id: x.currency_id,
+					status: x.status,
+					timestamp: new Date(x.timestamp),
+					amount: Math.round(x.amount * minor_in_mayor),
+					comment: x.comment,
+					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
+				};
+			},
 			defaultData: {
 				id: "",
 				account_id: 0,

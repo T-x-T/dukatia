@@ -192,5 +192,49 @@ export default function(context, inject) {
 			noSaveAndNew: true,
 			noGoBackOnSave: true
 		},
+		currency: {
+			fields: [
+				{
+					label: "ID",
+					property: "id",
+					type: "number",
+					disabled: true
+				},
+				{
+					label: "Name",
+					property: "name",
+					type: "string",
+				},
+				{
+					label: "Minor in Mayor",
+					property: "minor_in_mayor",
+					type: "number"
+				},
+				{
+					label: "Symbol",
+					property: "symbol",
+					type: "string"
+				}
+			],
+			data: {
+				id: "",
+				name: "",
+				minor_in_mayor: 100,
+				symbol: ""
+			},
+			apiEndpoint: "/api/v1/currencies",
+			prepareForApi: (x) => ({
+				id: x.id,
+				name: x.name,
+				minor_in_mayor: Number(x.minor_in_mayor),
+				symbol: x.symbol
+			}),
+			defaultData: {
+				id: "",
+				name: "",
+				minor_in_mayor: 100,
+				symbol: ""
+			}
+		},
 	})
 }
