@@ -1,0 +1,398 @@
+@import "assets/_vars.sass"
+
+@font-face
+  font-family: "bold"
+  font-display: swap
+  src: url("./TitilliumWeb-Bold.ttf")
+
+@font-face
+  font-family: "semibold"
+  font-display: swap
+  src: url("./TitilliumWeb-SemiBold.ttf")
+
+@font-face
+  font-family: "regular"
+  font-display: swap
+  src: url("./TitilliumWeb-Regular.ttf")
+
+html.dark-mode
+  scrollbar-color: $dark-dark $dark-bright
+  background: $dark-bgdarkest
+  color: $dark-brightest
+  ::selection
+    color: $dark-heavy
+  a
+    color: $dark-heavy
+    &.active
+      color: $dark-heavydark
+    &:hover
+      color: $dark-heavydark
+  nav
+    background: $dark-darkest
+    border-bottom: 2px solid $dark-heavy
+  button
+    background: $dark-heavydark
+    &.red
+      &:hover
+        background: $error
+    &.green
+      &:hover
+        background: $success
+    &.orange
+      &:hover
+        background: $warn
+    &:hover
+      background: $dark-heavy
+    &.secondary
+      color: $dark-brightest
+      background: $dark-dark
+      &:hover
+        background: $dark-darkest
+  select
+    background: $dark-heavydark
+  input
+    background: $dark-heavydark
+    &:disabled
+      background: $dark-dark
+  h1
+    color: $dark-heavy
+  thead
+    svg
+      &:hover
+        color: $dark-heavy
+  th
+    background: $dark-darkest
+    border-bottom: 2px solid $dark-heavydark
+  tr
+    &:nth-child(even) td
+      background: $dark-darkest
+    &:nth-child(odd) td
+      background: $dark-darker
+    &:hover td
+      background: $dark-dark
+  div.gridItem
+    background: $dark-darkest
+  div#detailBar
+    border-left: 2px solid $dark-heavydark
+  div#input
+    svg
+      color: $dark-brightest
+      &:hover
+        color: $dark-heavy
+
+html.light-mode
+  scrollbar-color: $light-dark $light-bright
+  background: $light-bgdarkest
+  color: black
+  ::selection
+    color: $light-heavy
+  a
+    color: $light-heavy
+    &.active
+      color: $light-heavydark
+    &:hover
+      color: $light-heavydark
+  nav
+    background: $light-darkest
+    border-bottom: 2px solid $light-heavy
+  button
+    background: $light-heavydark
+    &.red
+      &:hover
+        background: $error
+    &.green
+      &:hover
+        background: $success
+    &.orange
+      &:hover
+        background: $warn
+    &:hover
+      background: $light-heavy
+    &.secondary
+      color: $light-brightest
+      background: $light-dark
+      &:hover
+        background: $light-darkest
+  select
+    background: $light-heavydark
+  input
+    background: $light-heavydark
+    &:disabled
+      background: $light-dark
+  h1
+    color: $light-heavy
+  thead
+    svg
+      &:hover
+        color: $light-heavy
+  th
+    background: $light-darkest
+    border-bottom: 2px solid $light-heavydark
+  tr
+    &:nth-child(even) td
+      background: $light-darkest
+    &:nth-child(odd) td
+      background: $light-darker
+    &:hover td
+      background: $light-dark
+  div.gridItem
+    background: $light-darkest
+  div#detailBar
+    border-left: 2px solid $light-heavydark
+  div#input
+    svg
+      color: $light-brightest
+      &:hover
+        color: $light-heavy
+
+html.monochrome-mode
+  scrollbar-color: $monochrome-dark $monochrome-bright
+  background: $monochrome-bgdarkest
+  color: $monochrome-brightest
+  ::selection
+    color: $monochrome-heavy
+  a
+    color: $monochrome-heavy
+    &.active
+      color: $monochrome-heavydark
+    &:hover
+      color: $monochrome-heavydark
+  nav
+    background: $monochrome-darkest
+    border-bottom: 2px solid $monochrome-heavy
+  button
+    color: $monochrome-brightest
+    background: $monochrome-heavydark
+    &.red
+      &:hover
+        background: $error
+    &.green
+      &:hover
+        background: $success
+    &.orange
+      &:hover
+        background: $warn
+    &:hover
+      color: $monochrome-dark
+      background: $monochrome-heavy
+    &.secondary
+      color: $monochrome-brightest
+      background: $monochrome-dark
+      &:hover
+        background: $monochrome-darkest
+  select
+    color: $monochrome-brightest
+    background: $monochrome-heavydark
+  input
+    background: $monochrome-heavydark
+    color: $monochrome-brightest
+    &:disabled
+      background: $monochrome-dark
+  h1
+    color: $monochrome-heavy
+  thead
+    svg
+      &:hover
+        color: $monochrome-heavy
+  th
+    background: $monochrome-darkest
+    border-bottom: 2px solid $monochrome-heavydark
+  tr
+    &:nth-child(even) td
+      background: $monochrome-darkest
+    &:nth-child(odd) td
+      background: $monochrome-darker
+    &:hover td
+      background: $monochrome-dark
+  div.gridItem
+    background: $monochrome-darkest
+  div#detailBar
+    border-left: 2px solid $monochrome-heavydark
+  div#input
+    svg
+      color: $monochrome-brightest
+      &:hover
+        color: $monochrome-heavy
+
+html.black-mode
+  scrollbar-color: $black-dark $black-bright
+  background: $black-bgdarkest
+  color: $black-brightest
+  ::selection
+    color: $black-heavy
+  a
+    color: $black-bright
+    &.active
+      color: $black-brighter
+    &:hover
+      color: $black-brighter
+  nav
+    background: $black-bgdarkest
+    border-bottom: 2px solid $black-heavy
+  button
+    color: $black-brightest
+    background: $black-darkest
+    &.red
+      &:hover
+        background: $error
+    &.green
+      &:hover
+        background: $success
+    &.orange
+      &:hover
+        background: $warn
+    &:hover
+      color: $black-dark
+      background: $black-heavy
+    &.secondary
+      color: $black-brightest
+      background: $black-dark
+      &:hover
+        background: $black-darkest
+  select
+    color: $black-brightest
+    background: $black-heavydark
+  input
+    background: $black-heavydark
+    color: $black-brightest
+    &:disabled
+      background: $black-dark
+  h1
+    color: $black-bright
+  thead
+    svg
+      &:hover
+        color: $black-heavy
+  th
+    background: $black-darkest
+    border-bottom: 2px solid $black-heavydark
+  tr
+    &:nth-child(even) td
+      background: $black-darkest
+    &:nth-child(odd) td
+      background: $black-darker
+    &:hover td
+      background: $black-dark
+  div.gridItem
+    background: $black-darkest
+  div#detailBar
+    border-left: 2px solid $black-heavydark
+  div#input
+    svg
+      color: $black-brightest
+      &:hover
+        color: $black-heavy
+
+
+::selection
+  background: rgba(0,0,0,.5)
+  
+*
+  margin: 0
+  padding: 0
+  text-decoration: none
+  transition-duration: .1s
+
+html
+  scroll-behavior: smooth
+  overflow-x: hidden !important
+  scrollbar-width: thin
+  position: relative
+
+p, span, li
+  @extend .regular
+
+a
+  font-weight: bold
+
+li
+  list-style-type: none
+
+button
+  @extend .semibold
+  padding: 1px 4px 1px 4px
+  border-radius: 0px
+  border: none
+  box-shadow: 4px 4px 0px black
+  margin: 0px 6px 6px 0px
+  color: black
+  cursor: pointer
+  font-size: 16px
+  &:hover
+    box-shadow: 6px 6px 0px black
+  &.secondary
+    @extend .regular
+    font-size: 14px
+    box-shadow: 2px 2px 0px black
+    &:hover
+      box-shadow: 3px 3px 0px black
+
+select
+  @extend .semibold
+  margin: 4px
+  border-radius: 0px
+  border: none
+  color: black
+  font-size: 14px
+
+option
+  font-size: 12px
+
+input
+  border: none
+  padding: 2px 4px 2px 4px
+  margin: 4px
+  font-size: 14px
+  &:disabled
+    color: black
+
+h1
+  @extend .bold
+  font-size: 45px
+
+h2, h3, h4
+  @extend .semibold
+
+h2
+  font-size: 40px
+
+h3
+  font-size: 36px
+
+h4
+  font-size: 32px
+
+table
+  width: 100%
+  border-collapse: separate
+  border-spacing: 0px
+  white-space: nowrap
+  text-align: center
+  select
+    height: 100%
+    right: 0
+    margin: 0
+    width: 100%
+  
+th
+  @extend .semibold
+  font-size: 20px
+
+tbody
+  @extend .regular
+    
+label
+  @extend .semibold
+
+div#batchEditContainer
+  position: fixed
+  display: flex
+  justify-content: center
+  align-items: center
+  bottom: 0px
+  left: 0px
+  width: 100vw
+  padding: 10px
+  background: rgba(0, 0, 0, 0.5)
+  backdrop-filter: blur(5px) saturate(20%)
+  box-shadow: 0px 0px 15px black
