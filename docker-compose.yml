@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: changeme
   frontend:
-    image: ghcr.io/t-x-t/txts-treasury/frontend:0.11.0
+    image: ghcr.io/t-x-t/txts-treasury/frontend:0.11.1
     restart: always
     environment:
       API_HOST: http://backend:4000
@@ -15,7 +15,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
   backend:
-    image: ghcr.io/t-x-t/txts-treasury/backend:0.11.0
+    image: ghcr.io/t-x-t/txts-treasury/backend:0.11.1
     restart: always
     environment:
       POSTGRES_HOST: postgres
