@@ -75,10 +75,8 @@ export default {
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
 			prepareForApi: (x) => {
-				console.log(x)
 				const account = this.$store.state.accounts.filter(y => y.id == x.account_id)[0];
 				const minor_in_mayor = this.$store.state.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
-				console.log(minor_in_mayor)
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -100,7 +98,8 @@ export default {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
-				currency: this.$store.state.currencies.filter(x => x.id == 0)[0]
+				currency: this.$store.state.currencies.filter(x => x.id == 0)[0],
+				tag_ids: []
 			},
 			deletable: true
 		}

@@ -51,6 +51,7 @@
 
 				<div v-else-if="field.type == 'tags'">
 					<CustomSelect
+						v-if="selectData"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
 					/>
@@ -154,11 +155,13 @@ export default {
 
 		updateSelectData() {
 			this.selectData = null;
-			this.selectData = {
-				options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
-				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : undefined,
-				label: "Tags:"
-			}
+			this.$nextTick(() => {
+				this.selectData = {
+					options: [...this.$store.state.tags.map(x => ({id: x.id, name: x.name}))],
+					selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : [],
+					label: "Tags:"
+				}
+			});
 		},
 
 		async deleteThis() {
