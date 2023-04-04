@@ -192,6 +192,7 @@ export default {
 			await this.$store.dispatch("fetchTransactions");
 			setTimeout(() => this.updateTransactions(), 100);
 			this.detailsOpen = false;
+			history.pushState({}, "", "/transactions");
 		},
 
 		async updateTable() {
