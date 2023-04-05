@@ -1,5 +1,5 @@
 <template>
-	<div id="main">
+	<div>
 		<button @click="$emit('back')">Back</button>
 		<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
 		<div id="grid">
@@ -86,7 +86,6 @@
 					:no_controls="true"
 				/>
 			</div>
-			<div id="spacer"></div>
 		</div>
 
 		<div v-if="showAssetValuationEditor">
@@ -228,9 +227,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-div#main
-	overflow: scroll
-	height: 100vh
 
 div#grid
 	display: flex
@@ -256,8 +252,4 @@ div.chart
 div.chart
 	width: 50vw
 	height: 40vh
-
-div#spacer
-	height: 100px
-	width: 100%
 </style>

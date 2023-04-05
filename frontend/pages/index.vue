@@ -52,7 +52,6 @@
 					title="Balance per Account over Time"
 				/>
 			</div>
-			<div id="spacer"></div>
 		</div>
 	</div>
 </template>
@@ -74,8 +73,6 @@ export default {
 <style lang="sass" scoped>
 
 div#grid
-	height: 100vh
-	overflow: scroll
 	display: grid
 	width: 100%
 	grid-template-columns: repeat(auto-fit, minmax(10%, 1fr))
@@ -83,10 +80,6 @@ div#grid
 	align-items: stretch
 	justify-items: stretch
 	grid-gap: 10px
-
-div#spacer
-	grid-column: span 4
-	grid-row: span 1
 
 div.gridItem
 	padding: 10px

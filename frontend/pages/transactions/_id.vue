@@ -192,6 +192,7 @@ export default {
 			await this.$store.dispatch("fetchTransactions");
 			setTimeout(() => this.updateTransactions(), 100);
 			this.detailsOpen = false;
+			history.pushState({}, "", "/transactions");
 		},
 
 		async updateTable() {
@@ -211,7 +212,8 @@ div#main
 
 div#table
 	flex-grow: 1
-	overflow: scroll
+	overflow: auto
+	padding-bottom: 20px
 
 div#detailBar
 	padding-left: 8px
