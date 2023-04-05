@@ -1,5 +1,5 @@
 <template>
-	<div id="main">
+	<div>
 		<button class="green" @click="newAsset">Add</button>
 		<CustomTable
 			v-if="tableData"
@@ -66,9 +66,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="sass" scoped>
-div#table
-	height: 100vh
-	overflow: scroll
-</style>

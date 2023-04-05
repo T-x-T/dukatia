@@ -18,7 +18,9 @@
 			</div>
 		</nav>
 		<div id="content">
-			<Nuxt />
+			<div id="innerContent">
+				<Nuxt />
+			</div>
 		</div>
 	</main>
 </template>
@@ -102,7 +104,10 @@ li
 
 #content
 	flex-grow: 1
-	padding: 1%
 	width: 1rem
 	height: 100vh
+	overflow: auto
+
+#innerContent
+	margin: 10px 10px 10px 10px
 </style>

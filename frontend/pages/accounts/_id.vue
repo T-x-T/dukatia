@@ -1,5 +1,5 @@
 <template>
-	<div id="main">
+	<div>
 		<AccountDetails
 			:account="accountData"
 			v-on:back="$router.push('/accounts')"
@@ -29,9 +29,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="sass" scoped>
-div#main
-	height: 100vh
-	overflow: scroll
-</style>

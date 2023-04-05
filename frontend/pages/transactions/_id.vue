@@ -212,7 +212,8 @@ div#main
 
 div#table
 	flex-grow: 1
-	overflow: scroll
+	overflow: auto
+	padding-bottom: 20px
 
 div#detailBar
 	padding-left: 8px
