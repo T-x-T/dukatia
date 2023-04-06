@@ -62,7 +62,7 @@ This endpoint is used to modify existing accounts.
 You need to specify the id of the account you want to modify in the request path.
 
 Request:  
-`POST /api/v1/accounts/{account_id}`
+`PUT /api/v1/accounts/{account_id}`
 ```json
 {
 	"name": "bank xy",

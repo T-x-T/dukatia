@@ -32,3 +32,45 @@ Response:
 | name | name of the currency |
 | minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
 | symbol | symbol of the currency |
+
+### create currency
+
+This endpoint is used to create new currencies. 
+
+Request:  
+`POST /api/v1/currency`
+```json
+{
+		"name": "euro",
+		"minor_in_mayor": 100,
+		"symbol": "€"
+}
+```
+
+| Property | Description |
+| ----------- | ----------- |
+| name | name of the currency |
+| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| symbol | symbol of the currency |
+
+### modify currency
+
+This endpoint is used to modify existing currencies.  
+You need to specify the id of the currency you want to modify in the request path.
+
+Request:  
+`PUT /api/v1/currency/{currency_id}`
+```json
+{
+		"name": "euro",
+		"minor_in_mayor": 100,
+		"symbol": "€"
+}
+```
+
+| Property | Description |
+| ----------- | ----------- |
+| name | name of the currency |
+| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| symbol | symbol of the currency |
+
