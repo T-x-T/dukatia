@@ -31,7 +31,7 @@ export default {
 				});
 				this.error = "";
 				document.cookie =`accessToken=${res.accessToken};SameSite=Strict`;
-				await this.$router.replace("/");
+				await useRouter().replace("/");
 				location.reload();
 			} catch(e) {
 				this.error = e.response.data.error

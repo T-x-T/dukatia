@@ -1,6 +1,7 @@
 <template>
 	<div id="main">
 		<TagDetails
+			v-if="tagData"
 			:tag="tagData"
 			v-on:back="$router.push('/tags')"
 		/>
@@ -10,10 +11,11 @@
 <script>
 export default {
 	data: () => ({
-		tagData: {}
+		tagData: null
 	}),
 
-	async fetch() {
+	async created() {
+		const tags = (await useFetch("/api/v1/tags/all")).data.value;
 		if(this.$route.path.split("/")[2] == "new") {
 			this.tagData = {
 				id: "",
@@ -21,8 +23,8 @@ export default {
 			};
 		} else {
 			const id = Number(this.$route.path.split("/")[2]);
-			const tagFromStore = this.$store.state.tags.filter(x => x.id == id)[0];
-			this.tagData = {...tagFromStore};
+			const tag = tags.filter(x => x.id == id)[0];
+			this.tagData = {...tag};
 		}
 	}
 }

@@ -41,12 +41,12 @@ export default {
 			}
 		},
 		
-		rowClick(row) {
-			this.$router.push(`/recipients/${row[0]}`);
+		async rowClick(row) {
+			await useRouter().push(`/recipients/${row[0]}`);
 		},
 
 		async newRecipient() {
-			this.$router.push("/recipients/new");
+			await useRouter().push("/recipients/new");
 		}
 	}
 }

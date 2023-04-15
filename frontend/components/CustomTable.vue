@@ -132,7 +132,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="row[0]">
+				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
@@ -156,8 +156,8 @@ export default {
 	props: {
 		tableData: Object,
 	},
-
-	fetch() {
+	
+	created() {
 		this.rows = this.tableData.rows;
 		this.rowsForDisplay = this.rows;
 
@@ -168,7 +168,6 @@ export default {
 				empty: c.type == "string" ? "anything" : undefined
 			});
 		});
-		
 		this.applyDefaultSort();
 		this.fillSelectedRows();
 	},

@@ -9,45 +9,33 @@
 	</div>
 </template>
 
-<script>
-export default {
-	data: () => ({
-		tableData: null
-	}),
+<script lang="ts" setup>
+const tags = (await useFetch("/api/v1/tags/all")).data.value;
 
-	async fetch() {
-		await this.updateTags();
+const tableData = {
+	multiSelect: false,
+	defaultSort: {
+		column: 0,
+		sort: "asc"
 	},
+	columns: [
+		{name: "ID", type: "number"},
+		{name: "Name", type: "string"},
+		{name: "Parent", type: "string"}
+	],
+	rows: (tags as any).map((x: any) => ([
+		x.id,
+		x.name,
+		((tags as any).filter((y: any) => y.id === x.parent_id)[0] as any)?.name
+	]))
 
-	methods: {
-		async updateTags() {
-			await this.$store.dispatch("fetchTags");
-			this.tableData = {
-				multiSelect: false,
-				defaultSort: {
-					column: 0,
-					sort: "asc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Name", type: "string"},
-					{name: "Parent", type: "string"}
-				],
-				rows: this.$store.state.tags.map(x => ([
-					x.id,
-					x.name,
-					this.$store.state.tags.filter(y => y.id === x.parent_id)[0]?.name
-				]))
-			}
-		},
+};
 
-		rowClick(row) {
-			this.$router.push(`/tags/${row[0]}`);
-		},
+async function rowClick(row: any) {
+	await useRouter().push(`/tags/${row[0]}`);
+};
 
-		async newTag() {
-			this.$router.push("/tags/new");
-		}
-	}
-}
+async function newTag() {
+	await useRouter().push("/tags/new");
+};
 </script>

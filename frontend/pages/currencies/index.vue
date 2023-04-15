@@ -43,12 +43,12 @@ export default {
 			}
 		},
 		
-		rowClick(row) {
-			this.$router.push(`/currencies/${row[0]}`);
+		async rowClick(row) {
+			await useRouter().push(`/currencies/${row[0]}`);
 		},
 
 		async newCurrency() {
-			this.$router.push("/currencies/new");
+			await useRouter().push("/currencies/new");
 		}
 	}
 }

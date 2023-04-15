@@ -45,12 +45,12 @@ export default {
 			}
 		},
 		
-		rowClick(row) {
-			this.$router.push(`/accounts/${row[0]}`);
+		async rowClick(row) {
+			await useRouter().push(`/accounts/${row[0]}`);
 		},
 
 		async newAccount() {
-			this.$router.push("/accounts/new");
+			await useRouter().push("/accounts/new");
 		}
 	}
 }

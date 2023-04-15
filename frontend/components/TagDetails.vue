@@ -19,7 +19,7 @@ export default {
 
 	created() {
 		this.config = {
-			...this.$detailPageConfig.tags,
+			...this.$detailPageConfig().tags,
 			data: this.tag
 		}
 	}

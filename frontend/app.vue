@@ -19,52 +19,50 @@
 		</nav>
 		<div id="content">
 			<div id="innerContent">
-				<Nuxt />
+				<NuxtPage />
 			</div>
 		</div>
 	</main>
 </template>
 
-<script>
+<script lang="ts" setup>
+
+let currentRoute = "dashboard";
+let loggedIn = true;
+
+try {
+	//await useMainStore().fetchAll();
+} catch(e: any) {
+	if(e.response?.data?.error == "cookie accessToken not set") {
+		console.info("not logged in, redirecting to login page");
+		useRouter().replace("/login");
+	} else {
+		console.error(e.response);
+	}
+}
+
+function logout() {
+	document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+	location.reload();
+}
+</script>
+
+<script lang="ts">
 export default {
-	data: () => ({
-		currentRoute: "dashboard",
-		loggedIn: true
-	}),
-
-	async fetch() {
-		try {
-			await this.$store.dispatch("fetchAll");
-		} catch(e) {
-			if(e.response.data.error == "cookie accessToken not set") {
-				console.info("not logged in, redirecting to login page");
-				redirect(302, '/login');
-			} else {
-				console.error(e.response);
-			}
-		}
-	},
-
 	async mounted() {
 		if(!document.cookie.includes("accessToken")) {
-			this.loggedIn = false;
-			this.$router.replace("/login");
+			loggedIn = false;
+			await useRouter().replace("/login");
 		}
-		this.currentRoute = this.$route.path.replace("/", "");
-		this.$refs[this.currentRoute]?.firstChild.classList.add("active");
+
+		//currentRoute = this.$route.path.replace("/", "");
+		(this as any).$refs[(this as any).currentRoute]?.firstChild.classList.add("active");
 	},
 
 	watch: {
 		currentRoute(newRoute, oldRoute) {
-			this.$refs[newRoute]?.firstChild.classList.add("active");
-			this.$refs[oldRoute]?.firstChild.classList.remove("active");
-		}
-	},
-
-	methods: {
-		logout() {
-			document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-			location.reload();
+			(this.$refs[newRoute] as any)?.firstChild.classList.add("active");
+			(this.$refs[oldRoute] as any)?.firstChild.classList.remove("active");
 		}
 	}
 }

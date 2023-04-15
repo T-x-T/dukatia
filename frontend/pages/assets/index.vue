@@ -56,12 +56,12 @@ export default {
 			}
 		},
 
-		rowClick(row) {
-			this.$router.push(`/assets/${row[0]}`);
+		async rowClick(row) {
+			await useRouter().push(`/assets/${row[0]}`);
 		},
 
 		async newAsset() {
-			this.$router.push("/assets/new");
+			await useRouter().push("/assets/new");
 		}
 	}
 }
