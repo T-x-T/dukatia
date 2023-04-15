@@ -9,49 +9,43 @@
 	</div>
 </template>
 
-<script>
-export default {
-	data: () => ({
-		tableData: null
-	}),
+<script lang="ts" setup>
+const accounts: any = (await useFetch("/api/v1/accounts/all")).data.value;
+const currencies: any = (await useFetch("/api/v1/currencies/all")).data.value;
+const tags: any = (await useFetch("/api/v1/tags/all")).data.value;
+const transactions: any = (await useFetch("/api/v1/transactions/all")).data.value;
 
-	async fetch() {
-		await this.updateAccounts();
+const tableData = {
+	multiSelect: false,
+	defaultSort: {
+		column: 0,
+		sort: "asc"
 	},
+	columns: [
+		{name: "ID", type: "number"},
+		{name: "Name", type: "string"},
+		{name: "Currency", type: "choice", options: currencies.map((x: any) => x.name)},
+		{name: "Tags", type: "choice", options: [...new Set(tags.map((x: any) => x.name))]},
+		{name: "Balance", type: "number"}
+	],
+	rows: accounts.map((x: any) => ([
+		x.id,
+		x.name,
+		currencies.filter((c: any) => c.id == x.default_currency_id)[0].name,
+		tags.filter((t: any) => x.tag_ids?.includes(t.id)).map((t: any) => t.name).join(", "),
+		transactions
+			.filter((t: any) => t.account_id == x.id)
+			.reduce((a: any, b: any) => a + b.amount, 0) 
+			/ currencies.filter((c: any) => c.id == x.default_currency_id)[0].minor_in_mayor 
+			+ currencies.filter((c: any) => c.id == x.default_currency_id)[0].symbol
+	]))
+};
 
-	methods: {
-		async updateAccounts() {
-			await this.$store.dispatch("fetchAccounts");
-			this.tableData = {
-				multiSelect: false,
-				defaultSort: {
-					column: 0,
-					sort: "asc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Name", type: "string"},
-					{name: "Currency", type: "choice", options: this.$store.state.currencies.map(x => x.name)},
-					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]},
-					{name: "Balance", type: "number"}
-				],
-				rows: this.$store.state.accounts.map(x => ([
-					x.id,
-					x.name,
-					this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].name,
-					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", "),
-					this.$store.state.transactions.filter(t => t.account_id == x.id).reduce((a, b) => a + b.amount, 0) / this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor + this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].symbol
-				]))
-			}
-		},
-		
-		async rowClick(row) {
-			await useRouter().push(`/accounts/${row[0]}`);
-		},
+async function rowClick(row: any) {
+await useRouter().push(`/accounts/${row[0]}`);
+};
 
-		async newAccount() {
-			await useRouter().push("/accounts/new");
-		}
-	}
-}
+async function newAccount() {
+await useRouter().push("/accounts/new");
+};
 </script>

@@ -25,18 +25,18 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		oldPassword: null,
 		newPassword: null,
 		newPasswordConfirmation: null,
-		passwordUpdateMessage: null
+		passwordUpdateMessage: ""
 	}),
 
 	methods: {
 		async updatePassword() {
-			this.passwordUpdateMessage = null;
+			this.passwordUpdateMessage = "";
 
 			if(this.newPassword !== this.newPasswordConfirmation) {
 				this.passwordUpdateMessage = "The entered new passwords don't match";
@@ -51,8 +51,8 @@ export default {
 						new_secret: this.newPassword 
 					}
 				});
-			} catch(e) {
-				this.passwordUpdateMessage = e.response.data;
+			} catch(e: any) {
+				this.passwordUpdateMessage = e?.data?.data?.error;
 			}
 		}
 	}

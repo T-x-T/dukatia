@@ -9,45 +9,33 @@
 	</div>
 </template>
 
-<script>
-export default {
-	data: () => ({
-		tableData: null,
-	}),
+<script lang="ts" setup>
+const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
+const tags: any = (await useFetch("/api/v1/tags/all")).data.value;
 
-	async fetch() {
-		await this.updateRecipients();
+const tableData = {
+	multiSelect: false,
+	defaultSort: {
+		column: 0,
+		sort: "asc"
 	},
+	columns: [
+		{name: "ID", type: "number"},
+		{name: "Name", type: "string"},
+		{name: "Tags", type: "choice", options: [...new Set(tags.map((x: any) => x.name))]}
+	],
+	rows: recipients.map((x: any) => ([
+		x.id,
+		x.name,
+		tags.filter((y: any) => x.tag_ids?.includes(y.id)).map((y: any) => y.name).join(", ")
+	]))
+};
 
-	methods: {
-		async updateRecipients() {
-			await this.$store.dispatch("fetchRecipients");
-			this.tableData = {
-				multiSelect: false,
-				defaultSort: {
-					column: 0,
-					sort: "asc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Name", type: "string"},
-					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
-				],
-				rows: this.$store.state.recipients.map(x => ([
-					x.id,
-					x.name,
-					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
-				]))
-			}
-		},
-		
-		async rowClick(row) {
-			await useRouter().push(`/recipients/${row[0]}`);
-		},
+async function rowClick(row: any) {
+	await useRouter().push(`/recipients/${row[0]}`);
+};
 
-		async newRecipient() {
-			await useRouter().push("/recipients/new");
-		}
-	}
-}
+async function newRecipient() {
+	await useRouter().push("/recipients/new");
+};
 </script>

@@ -14,7 +14,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		username: "",
@@ -25,7 +25,7 @@ export default {
 	methods: {
 		async login() {
 			try {
-				const res = await $fetch("/api/v1/login", {
+				const res: any = await $fetch("/api/v1/login", {
 					method: "POST",
 					body: {
 						name: this.username,
@@ -36,8 +36,8 @@ export default {
 				document.cookie =`accessToken=${res.accessToken};SameSite=Strict`;
 				await useRouter().replace("/");
 				location.reload();
-			} catch(e) {
-				this.error = e.response.data.error
+			} catch(e: any) {
+				this.error = e?.data?.data?.error
 			}
 		}
 	}

@@ -2,12 +2,12 @@
 	<div>
 		<CurrencyDetails
 			:currency="currencyData"
-			v-on:back="$router.push('/currencies')"
+			v-on:back="useRouter().push('/currencies')"
 		/>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		currencyData: {}
@@ -15,10 +15,11 @@ export default {
 
 	async fetch() {
 		if(this.$route.path.split("/")[2] == "new") {
-			this.currencyData = this.$detailPageConfig.currency.defaultData;
+			this.currencyData = this.$detailPageConfig().currency.defaultData;
 		} else {
+			const currencies: any = await $fetch("/api/v1/currencies/all");
 			const id = Number(this.$route.path.split("/")[2]);
-			const currencyFromStore = this.$store.state.currencies.filter(x => x.id == id)[0];
+			const currencyFromStore = currencies.filter((x: any) => x.id == id)[0];
 			this.currencyData = {...currencyFromStore};
 		}
 	}

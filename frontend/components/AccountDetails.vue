@@ -7,7 +7,8 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
+
 export default {
 	data: () => ({
 		config: {}
@@ -17,18 +18,24 @@ export default {
 		account: Object
 	},
 
-	created() {
-		this.account.tag_ids = Array.isArray(this.account.tag_ids) ? [...this.account.tag_ids] : [null];
+	async created() {
+		const transactions: any = (await useFetch("/api/v1/transactions/all")).data.value;
+		const accounts: any = (await useFetch("/api/v1/accounts/all")).data.value;
+		const currencies: any = (await useFetch("/api/v1/currencies/all")).data.value;
+		const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
+		const tags: any = (await useFetch("/api/v1/tags/all")).data.value;
 
-		const transactionsForDisplay = this.$store.state.transactions.filter(x => x.account_id == this.account.id).map(x => {
-			x.account = this.$store.state.accounts.filter(a => a.id == x.account_id)[0];
-			x.currency = this.$store.state.currencies.filter(c => c.id == x.currency_id)[0];
-			x.recipient = this.$store.state.recipients.filter(r => r.id == x.recipient_id)[0];
+		(this as any).account.tag_ids = Array.isArray((this as any).account.tag_ids) ? [...(this as any).account.tag_ids] : [null];
+
+		const transactionsForDisplay = transactions.filter((x: any) => x.account_id == (this as any).account.id).map((x: any) => {
+			x.account = accounts.filter((a: any) => a.id == x.account_id)[0];
+			x.currency = currencies.filter((c: any) => c.id == x.currency_id)[0];
+			x.recipient = recipients.filter((r: any) => r.id == x.recipient_id)[0];
 			return x;
 		});
 
 		this.config = {
-			...this.$detailPageConfig.account,
+			...this.$detailPageConfig().account,
 			data: this.account,
 			resetdefault_currency_id: true,
 			tableData : {
@@ -39,21 +46,21 @@ export default {
 				},
 				columns: [
 					{name: "ID", type: "number"},
-					{name: "Account", type: "choice", options: [...new Set(this.$store.state.accounts.map(x => x.name))]},
-					{name: "Recipient", type: "choice", options: [...new Set(this.$store.state.recipients.map(x => x.name))]},
+					{name: "Account", type: "choice", options: [...new Set(accounts.map((x: any) => x.name))]},
+					{name: "Recipient", type: "choice", options: [...new Set(recipients.map((x: any) => x.name))]},
 					{name: "Timestamp", type: "date"},
 					{name: "Amount", type: "number"},
 					{name: "Comment", type: "string"},
-					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]}
+					{name: "Tags", type: "choice", options: [...new Set(tags.map((x: any) => x.name))]}
 				],
-				rows: transactionsForDisplay.map(x => ([
+				rows: transactionsForDisplay.map((x: any) => ([
 					x.id,
 					x.account.name,
 					x.recipient.name,
 					new Date(x.timestamp).toISOString().substring(0, 10),
 					`${x.amount / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					x.comment,
-					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", ")
+					tags.filter((y: any) => x.tag_ids?.includes(y.id)).map((y: any) => y.name).join(", ")
 				]))
 			}
 		}

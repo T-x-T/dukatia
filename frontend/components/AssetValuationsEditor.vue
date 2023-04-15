@@ -84,8 +84,8 @@ export default {
 						}))
 				});
 			} catch(e) {
-				console.error(e.response);
-				window.alert(e.response.data);
+				console.error(e?.data?.data);
+				window.alert(e?.data?.data?.error);
 				return;
 			}
 		}

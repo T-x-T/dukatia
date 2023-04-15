@@ -33,11 +33,11 @@ let loggedIn = true;
 try {
 	//await useMainStore().fetchAll();
 } catch(e: any) {
-	if(e.response?.data?.error == "cookie accessToken not set") {
+	if(e?.data?.data?.error == "cookie accessToken not set") {
 		console.info("not logged in, redirecting to login page");
 		useRouter().replace("/login");
 	} else {
-		console.error(e.response);
+		console.error(e?.data?.data);
 	}
 }
 

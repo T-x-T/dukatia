@@ -2,26 +2,27 @@
 	<div>
 		<RecipientDetails 
 			:recipient="recipientData"
-			v-on:back="$router.push('/recipients')"
+			v-on:back="useRouter().push('/recipients')"
 		/>		
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		recipientData: {}
 	}),
 
 	async fetch() {
-		if(this.$route.path.split("/")[2] == "new") {
+		if(useRoute().path.split("/")[2] == "new") {
 			this.recipientData = {
 				id: "",
 				name: ""
 			};
 		} else {
+			const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
 			const id = Number(this.$route.path.split("/")[2]);
-			const recipientFromStore = this.$store.state.recipients.filter(x => x.id == id)[0];
+			const recipientFromStore = recipients.filter((x: any) => x.id == id)[0];
 			this.recipientData = {...recipientFromStore};
 		}
 	}

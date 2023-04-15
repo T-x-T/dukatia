@@ -9,47 +9,34 @@
 	</div>
 </template>
 
-<script>
-export default {
-	data: () => ({
-		tableData: null
-	}),
+<script lang="ts" setup>
+const currencies: any = (await useFetch("/api/v1/currencies/all")).data.value;
 
-	async fetch() {
-		await this.updateCurrencies();
+const tableData = {
+	multiSelect: false,
+	defaultSort: {
+		column: 0,
+		sort: "asc"
 	},
+	columns: [
+		{name: "ID", type: "number"},
+		{name: "Name", type: "string"},
+		{name: "Symbol", type: "string"},
+		{name: "Minor in Mayor", type: "number"},
+	],
+	rows: currencies.map((x: any) => ([
+		x.id,
+		x.name,
+		x.symbol,
+		x.minor_in_mayor
+	]))
+};
 
-	methods: {
-		async updateCurrencies() {
-			await this.$store.dispatch("fetchCurrencies");
-			this.tableData = {
-				multiSelect: false,
-				defaultSort: {
-					column: 0,
-					sort: "asc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Name", type: "string"},
-					{name: "Symbol", type: "string"},
-					{name: "Minor in Mayor", type: "number"},
-				],
-				rows: this.$store.state.currencies.map(x => ([
-					x.id,
-					x.name,
-					x.symbol,
-					x.minor_in_mayor
-				]))
-			}
-		},
-		
-		async rowClick(row) {
-			await useRouter().push(`/currencies/${row[0]}`);
-		},
+async function rowClick(row: any) {
+	await useRouter().push(`/currencies/${row[0]}`);
+};
 
-		async newCurrency() {
-			await useRouter().push("/currencies/new");
-		}
-	}
-}
+async function newCurrency() {
+	await useRouter().push("/currencies/new");
+};
 </script>
