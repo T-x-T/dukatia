@@ -64,7 +64,7 @@ export default {
 	}),
 
 	async fetch() {
-		this.total_per_currency = await this.$axios.$get("/api/v1/reports/total_per_currency");
+		this.total_per_currency = await $fetch("/api/v1/reports/total_per_currency");
 		this.$nextTick(() => this.show = true); //Important to not error when user without accessToken cookie set visits the index page
 	},
 }

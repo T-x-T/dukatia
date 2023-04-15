@@ -124,7 +124,7 @@ export default {
 			if(this.aggregated) {
 				query += `period=${this.period}&`;
 			}
-			const api_data = this.api_path ? await this.$axios.$get(this.api_path + query) : this.api_data;
+			const api_data = this.api_path ? await $fetch(this.api_path + query) : this.api_data;
 
 			if (!api_data) {
 				return;

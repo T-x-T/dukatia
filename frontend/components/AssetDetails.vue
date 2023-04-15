@@ -126,7 +126,7 @@ export default {
 			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: ""} : this.propAsset;
 			
 			if(this.asset.id !== '') {
-				this.api_data = await this.$axios.$get(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
+				this.api_data = await $fetch(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
 				this.api_data_value = {};
 				this.api_data_amount = {};
 				this.api_data_total_value = {};
@@ -178,13 +178,16 @@ export default {
 			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
 
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
-					amount_change: Number(this.transactionData.amount),
-					value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
-					timestamp: new Date(this.transactionData.timestamp),
-					account_id: this.transactionData.account_id,
-					cost: Math.round(this.transactionData.cost * minor_in_mayor),
-					total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
+				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
+					method: "POST",
+					body: {
+						amount_change: Number(this.transactionData.amount),
+						value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
+						timestamp: new Date(this.transactionData.timestamp),
+						account_id: this.transactionData.account_id,
+						cost: Math.round(this.transactionData.cost * minor_in_mayor),
+						total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
+					}
 				})
 			} catch(e) {
 				console.error(e.response);
@@ -204,10 +207,13 @@ export default {
 			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
 
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
-					amount: Number(this.updateData.amount),
-					value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
-					timestamp: new Date(this.updateData.timestamp)
+				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
+					method: "POST",
+					body: {
+						amount: Number(this.updateData.amount),
+						value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
+						timestamp: new Date(this.updateData.timestamp)
+					}
 				})
 			} catch(e) {
 				console.error(e.response);

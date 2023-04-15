@@ -44,9 +44,12 @@ export default {
 			}
 
 			try {
-				await this.$axios.$put("/api/v1/users/me/secret", {
-					old_secret: this.oldPassword,
-					new_secret: this.newPassword 
+				await $fetch("/api/v1/users/me/secret", {
+					method: "PUT",
+					body: {
+						old_secret: this.oldPassword,
+						new_secret: this.newPassword 
+					}
 				});
 			} catch(e) {
 				this.passwordUpdateMessage = e.response.data;

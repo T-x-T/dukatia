@@ -94,7 +94,7 @@ export default {
 			if(this.showOnlyParentsToggle) {
 				query += `&only_parents=${this.only_parents}`;
 			}
-			const api_data = await this.$axios.$get(this.api_path + query);
+			const api_data = await $fetch(this.api_path + query);
 			this.no_data = Object.keys(api_data).length === 0;
 			for(const id in api_data) {
 				let total_value = 0;

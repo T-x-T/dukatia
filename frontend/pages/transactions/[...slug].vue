@@ -176,7 +176,10 @@ export default {
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {
-					await this.$axios.$put(`/api/v1/transactions/${transaction.id}`, transaction);
+					await $fetch(`/api/v1/transactions/${transaction.id}`, {
+						method: "PUT",
+						body: transaction
+					});
 				} catch(e) {
 					console.error(e.response);
 					window.alert(e.response.data);

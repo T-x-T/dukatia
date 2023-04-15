@@ -25,9 +25,12 @@ export default {
 	methods: {
 		async login() {
 			try {
-				const res = await this.$axios.$post("/api/v1/login", {
-					name: this.username,
-					secret: this.password
+				const res = await $fetch("/api/v1/login", {
+					method: "POST",
+					body: {
+						name: this.username,
+						secret: this.password
+					}
 				});
 				this.error = "";
 				document.cookie =`accessToken=${res.accessToken};SameSite=Strict`;

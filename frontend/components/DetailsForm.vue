@@ -138,9 +138,15 @@ export default {
 			let res = null;
 			try {
 				if(typeof this.config.data.id == "number") {
-					res = await this.$axios.$put(`${this.config.apiEndpoint}/${this.config.data.id}`, this.config.prepareForApi(this.config.data));
+					res = await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, {
+						method: "PUT",
+						body: this.config.prepareForApi(this.config.data)
+					});
 				} else {
-					res = await this.$axios.$post(this.config.apiEndpoint, this.config.prepareForApi(this.config.data));
+					res = await $fetch(this.config.apiEndpoint, {
+						method: "POST",
+						body: this.config.prepareForApi(this.config.data)
+					});
 				}
 			} catch(e) {
 				console.error(e.response);
@@ -176,7 +182,7 @@ export default {
 
 		async deleteThis() {
 			try {
-				await this.$axios.$delete(`${this.config.apiEndpoint}/${this.config.data.id}`);
+				await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
 			} catch(e) {
 				console.error(e.response);
 				window.alert(e.response.data);
