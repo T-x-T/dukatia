@@ -13,7 +13,7 @@ export default {
 		recipientData: {}
 	}),
 
-	async fetch() {
+	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
 			this.recipientData = {
 				id: "",
@@ -21,7 +21,7 @@ export default {
 			};
 		} else {
 			const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
-			const id = Number(this.$route.path.split("/")[2]);
+			const id = Number(useRoute().path.split("/")[2]);
 			const recipientFromStore = recipients.filter((x: any) => x.id == id)[0];
 			this.recipientData = {...recipientFromStore};
 		}

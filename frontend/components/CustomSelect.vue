@@ -1,16 +1,16 @@
 <template>
 	<div id="wrapper">
 		<div id="input" @click="toggleDropdown()" @keypress="(e) => {if(e.keyCode == 32) toggleDropdown()}">
-			<label for="thething">{{this.selectData.label}}</label>
+			<label for="thething">{{(selectData as any).label}}</label>
 			<input id="thething" type="text" v-model="displayText" readonly>
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
 		</div>
 		<div id="clickTarget" v-if="dropdown" @click="toggleDropdown()"></div>
-		<div id="dropdown" v-if="dropdown" :class="selectData.openTop ? 'opentop' : ''">
+		<div id="dropdown" v-if="dropdown" :class="(selectData as any).openTop ? 'opentop' : ''">
 			<input type="text" id="dropdownSearch" placeholder="filter" ref="dropdownSearch" v-model="searchTerm" @keydown="keypressDropdownInput">
 			<ul>
-				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
-					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" :tabindex="index === 0 ? 0 : -1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
+				<li v-for="(item, index) in (sortedSelectData as any)?.options" :key="index" class="listItem" @click="toggleOption(item.id)">
+					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" :tabindex="index === 0 ? 0 : -1" :ref="'dropdown' + index" :id="(index as unknown as string)" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -18,7 +18,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		displayText: "",
@@ -33,17 +33,17 @@ export default {
 		selectData: Object
 	},
 
-	mounted() {
-		this.updateSelectData();
+	async mounted() {
+		await this.updateSelectData();
 	},
 
 	methods: {
-		updateSelectData() {
-			this.sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
-			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
+		async updateSelectData() {
+			(this as any).sortedSeletData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
+			(this as any).sortedSelectData.options.sort((a: any, b: any) => this.sortStrings(a.name, b.name));
 
-			if(this.selectData.selected) {
-				this.selectData.selected.forEach(x => this.optionStates[x] = true);
+			if((this as any).selectData.selected) {
+				(this as any).selectData.selected.forEach((x: any) => (this as any).optionStates[x] = true);
 			}
 			this.updateDisplayText();
 		},
@@ -51,7 +51,7 @@ export default {
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
 			this.searchTerm = "";
-			this.$nextTick(() => this.$refs["dropdownSearch"]?.focus());
+			this.$nextTick(() => (this as any).$refs["dropdownSearch"]?.focus());
 			this.updateDisplayText();
 		},
 
@@ -63,45 +63,45 @@ export default {
 			this.dropdown = true;
 		},
 
-		focusOutDropdown(e) {
+		focusOutDropdown(e: any) {
 			if(e.relatedTarget?.parentNode?.className != "listItem" && e.relatedTarget !== null) return this.closeDropdown();
-			if(e.relatedTarget === null) this.$nextTick(() => focus(e.target));
+			if(e.relatedTarget === null) this.$nextTick(() => e.target.focus());
 		},
 
-		keypressDropdownInput(e) {
+		keypressDropdownInput(e: any) {
 			if(e.keyCode == 40) { //Down
 				e.preventDefault();
 				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1 || e.target.id == "dropdownSearch") {
-					this.$refs["dropdown0"]?.[0]?.focus();
+					(this as any).$refs["dropdown0"]?.[0]?.focus();
 				} else {
-					this.$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
+					(this as any).$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
 				}
 			} else if(e.keyCode == 38) { //Up
 				e.preventDefault();
 				if(Number(e.target.id) - 1 < 0) {
-					this.$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
+					(this as any).$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
 				} else {
-					this.$refs["dropdown" + (Number(e.target.id) - 1)]?.[0]?.focus();
+					(this as any).$refs["dropdown" + (Number(e.target.id) - 1)]?.[0]?.focus();
 				}
 			} else if(e.keyCode == 9) { //Tab
-				if(Object.keys(this.sortedSelectData.options).length === 0) {
+				if(Object.keys((this as any).sortedSelectData.options).length === 0) {
 					this.toggleDropdown();
 				}
 			}
 		},
 
-		toggleOption(id) {
-			let optionStates = this.optionStates;
+		toggleOption(id: any) {
+			let optionStates: any = this.optionStates;
 			optionStates[id] = !optionStates[id];
-			this.optionStates = null;
+			(this as any).optionStates = null;
 			this.optionStates = optionStates;
-			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
+			this.$emit("update", this.optionStates.map((x, i) => (this as any).selectData.options.filter((y: any) => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();
 		},
 
 		updateDisplayText() {
 			this.displayText = "";
-			this.selectData.options.forEach((x, i) => {
+			(this as any).selectData.options.forEach((x: any, i: any) => {
 				if(this.optionStates[x.id]) {
 					this.displayText += x.name;
 					this.displayText += ", ";	
@@ -110,15 +110,15 @@ export default {
 			if(this.displayText) this.displayText = this.displayText.slice(0, this.displayText.length - 2);
 		},
 
-		sortStrings(a, b) {
+		sortStrings(a: string, b: string) {
 			if(a.toLowerCase() > b.toLowerCase()) return 1;
 			if(a.toLowerCase() < b.toLowerCase()) return -1;
 			return 0;
 		},
 
 		applyFilter() {
-			this.filteredSelectData = {...this.selectData};
-			this.filteredSelectData.options = this.selectData.options.filter(x => 
+			(this as any).filteredSelectData = {...this.selectData};
+			(this as any).filteredSelectData.options = (this as any).selectData.options.filter((x: any) => 
 				x.name.toLowerCase().includes(this.searchTerm.toLowerCase())
 			);
 			this.updateSelectData();

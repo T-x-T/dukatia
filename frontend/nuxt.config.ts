@@ -4,8 +4,7 @@ export default defineNuxtConfig ({
     port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000
   },
   modules: [
-    "@nuxtjs/color-mode",
-    "@pinia/nuxt"
+    "@nuxtjs/color-mode"
   ],
   css: ["assets/general.sass", "assets/_vars.sass"],
   telemetry: false,

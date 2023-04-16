@@ -4,21 +4,24 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		amount_for_display: 0,
-		symbol: ""
+		symbol: "",
+		currencies: [],
 	}),
+
 	props: {
 		currency_id: Number,
 		amount: Number
 	},
 
-	mounted() {
-		const currency = this.$store.state.currencies.filter(x => x.id == this.currency_id)[0];
+	async created() {
+		this.currencies = await $fetch("/api/v1/currencies/all");
+		const currency: any = this.currencies.filter((x: any) => x.id == this.currency_id)[0];
 		this.symbol = currency.symbol;
-		this.amount_for_display = this.amount / currency.minor_in_mayor;
+		this.amount_for_display = (this as any).amount / currency.minor_in_mayor;
 	}
 }
 </script>

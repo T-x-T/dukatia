@@ -23,7 +23,7 @@ export default {
 				name: ""
 			};
 		} else {
-			const id = Number(this.$route.path.split("/")[2]);
+			const id = Number(useRoute().path.split("/")[2]);
 			const tag = tags.filter((x: any) => x.id == id)[0];
 			this.tagData = {...tag};
 		}

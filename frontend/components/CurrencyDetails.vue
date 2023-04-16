@@ -7,7 +7,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		config: {}
@@ -18,8 +18,9 @@ export default {
 	},
 
 	created() {
+		console.log(this.currency)
 		this.config = {
-			...this.$detailPageConfig.currency,
+			...this.$detailPageConfig().currency,
 			data: this.currency
 		}
 	}

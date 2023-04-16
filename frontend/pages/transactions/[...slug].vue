@@ -95,7 +95,7 @@ export default {
 	},
 
 	mounted() {
-		const id = Number(this.$route.path.split("/")[2]);
+		const id = Number(useRoute().path.split("/")[2]);
 		if(Number.isInteger(id)) {
 			this.openDetailPage(id);
 		}

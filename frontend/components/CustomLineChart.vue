@@ -5,6 +5,7 @@
 		</div>
 		<div v-if="loaded" id="chart">
 			<LineChart
+				v-if="chartData"
 				:chartData="chartData"
 				:chartOptions="chartOptions"
 			/>
@@ -26,7 +27,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		loaded: false,
@@ -34,7 +35,7 @@ export default {
 		to_date: null,
 		period: "Monthly",
 		colors: ["#EC8A83", "#FFAD85", "#F9F176", "#8BE59D", "#6AB4F1", "#A983D8"],
-		chartData: {},
+		chartData: null,
 		chartOptions: {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -42,8 +43,7 @@ export default {
 				display: false,
 			},
 			scales: {
-				xAxes: [{
-					id: "x",
+				xAxes: {
 					type: "time",
 					time: {
 						unit: "day"
@@ -55,8 +55,8 @@ export default {
 						color: "#fff2",
 						drawBoder: false
 					}
-				}],
-				yAxes: [{
+				},
+				yAxes: {
 					ticks: {
 						fontColor: "#ddd"
 					},
@@ -64,7 +64,7 @@ export default {
 						color: "#fff2",
 						drawBorder: false
 					}
-				}]
+				}
 			},
 			legend: {
 				position: "bottom",
@@ -72,7 +72,12 @@ export default {
 					fontColor: "#fff"
 				}
 			}
-		}
+		},
+		accounts: [],
+		currencies: [],
+		recipients: [],
+		assets: [],
+		transactions: []
 	}),
 
 	props: {
@@ -87,11 +92,17 @@ export default {
 	},
 
 	async mounted() {
+		this.accounts = await $fetch("/api/v1/accounts/all");
+		this.currencies = await $fetch("/api/v1/currencies/all");
+		this.recipients = await $fetch("/api/v1/recipients/all");
+		this.assets = await $fetch("/api/v1/assets/all");
+		this.transactions = await $fetch("/api/v1/transactions/all");
+
 		if(this.$colorMode.preference == "light") {
-			this.chartOptions.scales.xAxes[0].ticks.fontColor = "#111";
-			this.chartOptions.scales.xAxes[0].gridLines.color = "#0002";
-			this.chartOptions.scales.yAxes[0].ticks.fontColor = "111";
-			this.chartOptions.scales.yAxes[0].gridLines.color = "0002";
+			this.chartOptions.scales.xAxes.ticks.fontColor = "#111";
+			this.chartOptions.scales.xAxes.gridLines.color = "#0002";
+			this.chartOptions.scales.yAxes.ticks.fontColor = "111";
+			this.chartOptions.scales.yAxes.gridLines.color = "0002";
 			this.chartOptions.legend.labels.fontColor = "#000";
 		}
 		await this.update();
@@ -104,7 +115,7 @@ export default {
 	},
 
 	methods: {
-		updateDate(dates) {
+		updateDate(dates: any) {
 			this.from_date = dates.from_date;
 			this.to_date = dates.to_date;
 			this.update();
@@ -113,7 +124,7 @@ export default {
 		async update() {
 			this.loaded = false;
 
-			this.chartData = {
+			(this as any).chartData = {
 				datasets: []
 			}
 
@@ -124,7 +135,7 @@ export default {
 			if(this.aggregated) {
 				query += `period=${this.period}&`;
 			}
-			const api_data = this.api_path ? await $fetch(this.api_path + query) : this.api_data;
+			const api_data: any = this.api_path ? await $fetch(this.api_path + query) : this.api_data;
 
 			if (!api_data) {
 				return;
@@ -141,8 +152,8 @@ export default {
 			}
 
 			if(this.type == "simple_monetary") {
-				const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.currency_id)[0].minor_in_mayor;
-				this.chartData.datasets.push({
+				const minor_in_mayor = (this as any).currencies.filter((x: any) => x.id == this.currency_id)[0].minor_in_mayor;
+				(this as any).chartData.datasets.push({
 					...common,
 					label: "",
 					data: Object.keys(api_data).map(item => ({x: item, y: ((api_data[item] / minor_in_mayor) * 100 + Number.EPSILON) / 100})),
@@ -150,7 +161,7 @@ export default {
 					backgroundColor: this.colors[0],
 				});
 			}else if(this.type == "simple") {
-				this.chartData.datasets.push({
+				(this as any).chartData.datasets.push({
 					...common,
 					label: "",
 					data: Object.keys(api_data).map(item => ({x: item, y: api_data[item]})),
@@ -158,17 +169,17 @@ export default {
 					backgroundColor: this.colors[0],
 				});				
 			} else if(this.type) {
-				this.$store.state[this.type].forEach((item) => {
+				(this as any)[this.type].forEach((item: any) => {
 					let minor_in_mayor = 100;
 					if(this.type == "currencies") {
 						minor_in_mayor = item.minor_in_mayor;
 					}
 
 					if(api_data[item.id]?.data.length > 0) {
-						this.chartData.datasets.push({
+						(this as any).chartData.datasets.push({
 							...common,
-							label: item[this.label_property],
-							data: api_data[item.id].data.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
+							label: item[(this as any).label_property],
+							data: api_data[item.id].data.map((x: any) => ({x: x.x, y: x.y / minor_in_mayor})),
 							borderColor: this.colors[j],
 							backgroundColor: this.colors[j],
 						});
@@ -178,10 +189,10 @@ export default {
 			} else {
 				Object.keys(api_data).forEach((item) => {
 					if(api_data[item]?.data.length > 0) {
-						this.chartData.datasets.push({
+						(this as any).chartData.datasets.push({
 							...common,
 							label: item === "0" ? "Earning" : item === "1" ? "Spending" : "Net",
-							data: api_data[item].data.map(x => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
+							data: api_data[item].data.map((x: any) => ({x: x.x, y: x.y / 100})), //TODO: not using minor_in_mayor 
 							borderColor: this.colors[j],
 							backgroundColor: this.colors[j],
 						});

@@ -8,19 +8,23 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
-		config: {}
+		config: {},
+		accounts: [],
+		currencies: []
 	}),
 
 	props: {
 		transaction: Object
 	},
 
-	created() {
-		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [null]
-		this.transaction.asset_id = this.transaction.asset?.id;
+	async created() {
+		this.accounts = await $fetch("/api/v1/accounts/all");
+		this.currencies = await $fetch("/api/v1/currencies/all");
+		(this as any).transaction.tag_ids = Array.isArray((this as any).transaction.tag_ids) ? [...(this as any).transaction.tag_ids] : [null];
+		(this as any).transaction.asset_id = (this as any).transaction.asset?.id;
 		
 		this.config = {
 			fields: [
@@ -74,9 +78,9 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: (x) => {
-				const account = this.$store.state.accounts.filter(y => y.id == x.account_id)[0];
-				const minor_in_mayor = this.$store.state.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
+			prepareForApi: (x: any) => {
+				const account: any = this.accounts.filter((y: any) => y.id == x.account_id)[0];
+				const minor_in_mayor = (this as any).currencies.filter((y: any) => y.id == account.default_currency_id)[0].minor_in_mayor;
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -98,7 +102,7 @@ export default {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
-				currency: this.$store.state.currencies.filter(x => x.id == 0)[0],
+				currency: this.currencies.filter((x: any) => x.id == 0)[0],
 				tag_ids: []
 			},
 			deletable: true

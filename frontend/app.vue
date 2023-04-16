@@ -30,7 +30,7 @@
 let currentRoute = "dashboard";
 let loggedIn = true;
 
-try {
+try { //TODO: fix logic to check if were logged in
 	//await useMainStore().fetchAll();
 } catch(e: any) {
 	if(e?.data?.data?.error == "cookie accessToken not set") {
@@ -55,7 +55,6 @@ export default {
 			await useRouter().replace("/login");
 		}
 
-		//currentRoute = this.$route.path.replace("/", "");
 		(this as any).$refs[(this as any).currentRoute]?.firstChild.classList.add("active");
 	},
 

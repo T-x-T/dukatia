@@ -11,15 +11,15 @@
 			/>
 		</div>
 
-		<div v-if="config.tableData" id="table">
+		<div v-if="(config as any).tableData" id="table">
 			<CustomTable
-				:tableData="config.tableData"
+				:tableData="(config as any).tableData"
 			/>
 		</div>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		selectData: {}
