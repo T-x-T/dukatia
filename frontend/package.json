@@ -8,12 +8,10 @@
     "build": "npx nuxi build",
     "start": "npx nuxi start"
   },
-  "devDependencies": {
+  "dependencies": {
     "@nuxtjs/color-mode": "^3.2.0",
     "consola": "^3.0.2",
-    "nuxt": "^3.4.1"
-  },
-  "dependencies": {
+    "nuxt": "^3.4.1",
     "chart.js": "^4.2.1",
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^2.29.3",
