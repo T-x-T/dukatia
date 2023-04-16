@@ -1,6 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
+			v-if="config"
 			:config="config"
 			v-on:back="$emit('back')"
 		/>
@@ -11,7 +12,7 @@
 
 export default {
 	data: () => ({
-		config: {}
+		config: null
 	}),
 
 	props: {
@@ -19,11 +20,11 @@ export default {
 	},
 
 	async created() {
-		const transactions: any = (await useFetch("/api/v1/transactions/all")).data.value;
-		const accounts: any = (await useFetch("/api/v1/accounts/all")).data.value;
-		const currencies: any = (await useFetch("/api/v1/currencies/all")).data.value;
-		const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
-		const tags: any = (await useFetch("/api/v1/tags/all")).data.value;
+		const transactions: any = await $fetch("/api/v1/transactions/all");
+		const accounts: any = await $fetch("/api/v1/accounts/all");
+		const currencies: any = await $fetch("/api/v1/currencies/all");
+		const recipients: any = await $fetch("/api/v1/recipients/all");
+		const tags: any = await $fetch("/api/v1/tags/all");
 
 		(this as any).account.tag_ids = Array.isArray((this as any).account.tag_ids) ? [...(this as any).account.tag_ids] : [null];
 
@@ -34,7 +35,7 @@ export default {
 			return x;
 		});
 
-		this.config = {
+		(this as any).config = {
 			...this.$detailPageConfig().account,
 			data: this.account,
 			resetdefault_currency_id: true,

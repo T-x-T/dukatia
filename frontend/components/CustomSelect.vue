@@ -33,13 +33,14 @@ export default {
 		selectData: Object
 	},
 
-	async mounted() {
+	async created() {
+		if(!(this as any).selectData?.options) return;
 		await this.updateSelectData();
 	},
 
 	methods: {
 		async updateSelectData() {
-			(this as any).sortedSeletData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
+			(this as any).sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
 			(this as any).sortedSelectData.options.sort((a: any, b: any) => this.sortStrings(a.name, b.name));
 
 			if((this as any).selectData.selected) {
@@ -116,18 +117,18 @@ export default {
 			return 0;
 		},
 
-		applyFilter() {
+		async applyFilter() {
 			(this as any).filteredSelectData = {...this.selectData};
 			(this as any).filteredSelectData.options = (this as any).selectData.options.filter((x: any) => 
 				x.name.toLowerCase().includes(this.searchTerm.toLowerCase())
 			);
-			this.updateSelectData();
+			await this.updateSelectData();
 		}
 	},
 
 	watch: {
-		selectData() {
-			this.updateSelectData();
+		async selectData() {
+			await this.updateSelectData();
 		},
 		searchTerm() {
 			this.applyFilter();

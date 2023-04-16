@@ -1,6 +1,6 @@
 <template>
 	<div id="main">
-		<div id="table" v-if="tableOpen">
+		<div id="table">
 			<div>
 				<button class="green" @click="newTransaction">Add</button>
 			</div>
@@ -61,7 +61,6 @@ export default {
 	data: () => ({
 		tableData: null,
 		detailsOpen: false,
-		tableOpen: true,
 		selectedRow: {},
 		selectedRows: [],
 		batchaccount_id: null,
@@ -76,25 +75,23 @@ export default {
 		assets: [],
 		transactions: []
 	}),
-
-	async created() {
+	
+	async mounted() {
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.assets = await $fetch("/api/v1/assets/all");
 		this.transactions = await $fetch("/api/v1/transactions/all");
-		await this.updateTransactions();
-
+		this.updateTransactions();
+	
 		(this as any).selectData = {
 			options: [...this.tags.map((x: any) => ({id: x.id, name: x.name}))],
 			selected: undefined,
 			label: "Tags:",
 			openTop: true
 		}
-	},
 
-	mounted() {
 		const id = Number(useRoute().path.split("/")[2]);
 		if(Number.isInteger(id)) {
 			this.openDetailPage(id);
@@ -201,19 +198,20 @@ export default {
 			}));
 			this.batchaccount_id = null;
 			this.batchrecipient_id = null;
-			setTimeout(() => this.updateAndLoadTable(), 100);
+			this.updateAndLoadTable();
 		},
 
 		async updateAndLoadTable() {
 			this.transactions = await $fetch("/api/v1/transactions/all");
-			setTimeout(() => this.updateTransactions(), 100);
+			this.updateTransactions();
 			this.detailsOpen = false;
+			this.selectedRow = {};
 			history.pushState({}, "", "/transactions");
 		},
 
 		async updateTable() {
 			this.transactions = await $fetch("/api/v1/transactions/all");
-			setTimeout(() => this.updateTransactions(), 100);
+			this.updateTransactions();
 		}
 	}
 }

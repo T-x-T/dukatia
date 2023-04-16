@@ -6,7 +6,7 @@
 				<div v-if="field.type == 'number'">
 					<label>{{`${field.label}: `}}</label>
 					<input type="number" v-model="(config as any).data[field.property]" :step="field.step" :disabled="field.disabled || (field.initial && (config as any).data.id !== '')" :ref="'forminput' + index">
-					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{(currencies as any).filter((y: any) => y.id == (accounts as any).filter((x: any) => x.id == (config as any).data.account_id)[0].default_currency_id)[0].symbol}}</span>
+					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{(currencies as any).filter((y: any) => y.id == (accounts as any).filter((x: any) => x.id == (config as any).data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 				</div>
 
 				<div v-else-if="field.type == 'string'">
@@ -51,7 +51,6 @@
 
 				<div v-else-if="field.type == 'tags'">
 					<CustomSelect
-						v-if="selectData"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
 					/>
@@ -113,17 +112,16 @@ export default {
 		config: Object
 	},
 
-	async created() {
+	async mounted() {
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.assets = await $fetch("/api/v1/assets/all");
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
+		
 		(this as any).config.data.tag_ids = Array.isArray((this as any).config.data.tag_ids) ? [...(this as any).config.data.tag_ids] : [null];
 		await this.updateSelectData();
-	},
 
-	mounted() {
 		this.$nextTick(() => {(this as any).$refs.forminput1?.[0].focus()});
 	},
 
@@ -169,14 +167,11 @@ export default {
 		},
 
 		async updateSelectData() {
-			(this as any).selectData = null;
-			this.$nextTick(() => {
-				this.selectData = {
-					options: [...this.tags.map((x: any) => ({id: x.id, name: x.name}))],
-					selected: (this as any).config.data.tag_ids ? [...(this as any).config.data.tag_ids] : [],
-					label: "Tags:"
-				}
-			});
+			this.selectData = {
+				options: [...this.tags.map((x: any) => ({id: x.id, name: x.name}))],
+				selected: (this as any).config.data.tag_ids ? [...(this as any).config.data.tag_ids] : [],
+				label: "Tags:"
+			};
 		},
 
 		async deleteThis() {
@@ -201,7 +196,7 @@ export default {
 					this.$detailPageConfig().recipient.data = {...this.$detailPageConfig().recipient.defaultData};
 				};
 				case 'tags': {
-					this.tags = (await $fetch("/api/v1/tags/all"));
+					this.tags = await $fetch("/api/v1/tags/all");
 					await this.updateSelectData();
 					this.$detailPageConfig().tags.data = {...this.$detailPageConfig().tags.defaultData};
 				};

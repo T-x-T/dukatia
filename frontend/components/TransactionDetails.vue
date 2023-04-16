@@ -1,6 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
+			v-if="config"
 			:config="config"
 			v-on:back="$emit('back')"
 			v-on:updateData="$emit('updateData')"
@@ -11,7 +12,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {},
+		config: null,
 		accounts: [],
 		currencies: []
 	}),
@@ -26,7 +27,7 @@ export default {
 		(this as any).transaction.tag_ids = Array.isArray((this as any).transaction.tag_ids) ? [...(this as any).transaction.tag_ids] : [null];
 		(this as any).transaction.asset_id = (this as any).transaction.asset?.id;
 		
-		this.config = {
+		(this as any).config = {
 			fields: [
 				{
 					label: "ID",

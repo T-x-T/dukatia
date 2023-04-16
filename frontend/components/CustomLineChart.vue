@@ -43,7 +43,7 @@ export default {
 				display: false,
 			},
 			scales: {
-				xAxes: {
+				x: {
 					type: "time",
 					time: {
 						unit: "day"
@@ -56,7 +56,7 @@ export default {
 						drawBoder: false
 					}
 				},
-				yAxes: {
+				y: {
 					ticks: {
 						fontColor: "#ddd"
 					},
@@ -99,10 +99,10 @@ export default {
 		this.transactions = await $fetch("/api/v1/transactions/all");
 
 		if(this.$colorMode.preference == "light") {
-			this.chartOptions.scales.xAxes.ticks.fontColor = "#111";
-			this.chartOptions.scales.xAxes.gridLines.color = "#0002";
-			this.chartOptions.scales.yAxes.ticks.fontColor = "111";
-			this.chartOptions.scales.yAxes.gridLines.color = "0002";
+			this.chartOptions.scales.x.ticks.fontColor = "#111";
+			this.chartOptions.scales.x.gridLines.color = "#0002";
+			this.chartOptions.scales.y.ticks.fontColor = "111";
+			this.chartOptions.scales.y.gridLines.color = "0002";
 			this.chartOptions.legend.labels.fontColor = "#000";
 		}
 		await this.update();

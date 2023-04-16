@@ -1,6 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
+			v-if="config"
 			:config="config"
 			v-on:back="$emit('back')"
 		/>
@@ -10,7 +11,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {}
+		config: null
 	}),
 
 	props: {
@@ -18,7 +19,7 @@ export default {
 	},
 
 	created() {
-		this.config = {
+		(this as any).config = {
 			...this.$detailPageConfig().tags,
 			data: this.tag
 		}

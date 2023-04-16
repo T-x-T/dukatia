@@ -1,6 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
+			v-if="config"
 			:config="config"
 			v-on:back="$emit('back')"
 		/>
@@ -10,7 +11,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {},
+		config: null,
 		tags: [],
 		recipients: [],
 		accounts: [],
@@ -37,7 +38,7 @@ export default {
 			return x;
 		});
 
-		this.config = {
+		(this as any).config = {
 			...this.$detailPageConfig().recipient,
 			data: this.recipient,
 			tableData: {
