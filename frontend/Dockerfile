@@ -1,11 +1,11 @@
 FROM node:16-alpine
 
 WORKDIR /frontend
-ENV NODE_ENV=prod
+ENV NODE_ENV=production
 
 COPY . .
 
-RUN npm install --production
+RUN npm install
 RUN npm run build
 
 EXPOSE 3000
