@@ -30,7 +30,10 @@ export default {
 	}),
 
 	props: {
-		selectData: Object
+		selectData: {
+			type: Object as PropType<SelectData>,
+			required: true,
+		}
 	},
 
 	async created() {
