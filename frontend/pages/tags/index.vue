@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-const tags = (await useFetch("/api/v1/tags/all")).data.value;
+const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
 
 const tableData = {
 	multiSelect: false,
@@ -23,15 +23,15 @@ const tableData = {
 		{name: "Name", type: "string"},
 		{name: "Parent", type: "string"}
 	],
-	rows: (tags as any).map((x: any) => ([
+	rows: tags.map(x => ([
 		x.id,
 		x.name,
-		((tags as any).filter((y: any) => y.id === x.parent_id)[0] as any)?.name
+		tags.filter(y => y.id === x.parent_id)[0]?.name
 	]))
 
 };
 
-async function rowClick(row: any) {
+async function rowClick(row: Row) {
 	await useRouter().push(`/tags/${row[0]}`);
 };
 

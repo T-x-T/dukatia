@@ -40,7 +40,7 @@
 			</div>
 			<CustomTable
 				ref="table"
-				v-if="tableData"
+				v-if="Object.keys(tableData).length > 0"
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
 				v-on:rowSelect="rowSelect"
@@ -61,7 +61,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		tableData: null,
+		tableData: {},
 		detailsOpen: false,
 		selectedRow: {} as Transaction | null,
 		selectedRows: [] as Transaction[] | null,
@@ -109,7 +109,7 @@ export default {
 				return x;
 			});
 
-			(this as any).tableData = {
+			this.tableData = {
 				multiSelect: true,
 				displaySum: true,
 				sumColumn: 5,
@@ -141,7 +141,7 @@ export default {
 		},
 
 		rowClick(row: Row) {
-			if((this.selectedRow as any).id === row[0]) return;
+			if(this.selectedRow?.id === row[0]) return;
 			history.pushState({}, "", `/transactions/${row[0]}`);
 			this.openDetailPage(row[0]);
 		},
@@ -153,7 +153,7 @@ export default {
 			this.$nextTick(() => this.detailsOpen = true);
 		},
 
-		rowSelect(rows: any) {
+		rowSelect(rows: Row) {
 			this.selectedRows = null;
 			this.selectedRows = rows;
 		},

@@ -18,9 +18,9 @@ export default {
 		if(useRoute().path.split("/")[2] == "new") {
 			this.currencyData = this.$detailPageConfig().currency.defaultData;
 		} else {
-			const currencies: any = await $fetch("/api/v1/currencies/all");
+			const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 			const id = Number(useRoute().path.split("/")[2]);
-			const currencyFromStore = currencies.filter((x: any) => x.id == id)[0];
+			const currencyFromStore = currencies.filter(x => x.id == id)[0];
 			console.log(currencyFromStore)
 			this.currencyData = {...currencyFromStore};
 		}

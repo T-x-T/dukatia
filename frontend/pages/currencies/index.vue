@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-const currencies: any = (await useFetch("/api/v1/currencies/all")).data.value;
+const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
 
 const tableData = {
 	multiSelect: false,
@@ -24,7 +24,7 @@ const tableData = {
 		{name: "Symbol", type: "string"},
 		{name: "Minor in Mayor", type: "number"},
 	],
-	rows: currencies.map((x: any) => ([
+	rows: currencies.map(x => ([
 		x.id,
 		x.name,
 		x.symbol,
@@ -32,7 +32,7 @@ const tableData = {
 	]))
 };
 
-async function rowClick(row: any) {
+async function rowClick(row: Row) {
 	await useRouter().push(`/currencies/${row[0]}`);
 };
 

@@ -4,9 +4,10 @@ declare global {
 	type Account = {
 		id?: number,
 		name: string,
-		default_currency_id: number,
-		user_id: number,
+		default_currency_id?: number,
+		user_id?: number,
 		tag_ids?: number[],
+		default_currency?: Currency,
 	}
 
 	type Asset = {
@@ -18,6 +19,7 @@ declare global {
 		value_per_unit?: number,
 		amount?: number,
 		tag_ids?: number[],
+		currency?: Currency,
 	}
 
 	type Currency = {
@@ -37,7 +39,7 @@ declare global {
 	type Tag = {
 		id?: number,
 		name: string,
-		user_id: number,
+		user_id?: number,
 		parent_id?: number,
 	}
 

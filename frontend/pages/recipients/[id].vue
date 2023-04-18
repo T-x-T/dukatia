@@ -20,9 +20,9 @@ export default {
 				name: ""
 			};
 		} else {
-			const recipients: any = await $fetch("/api/v1/recipients/all");
+			const recipients = await $fetch("/api/v1/recipients/all") as Recipient[];
 			const id = Number(useRoute().path.split("/")[2]);
-			const recipientFromStore = recipients.filter((x: any) => x.id == id)[0];
+			const recipientFromStore = recipients.filter(x => x.id == id)[0];
 			this.recipientData = {...recipientFromStore};
 		}
 	}

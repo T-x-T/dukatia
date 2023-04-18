@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-const recipients: any = (await useFetch("/api/v1/recipients/all")).data.value;
-const tags: any = (await useFetch("/api/v1/tags/all")).data.value;
+const recipients = (await useFetch("/api/v1/recipients/all")).data.value as Recipient[];
+const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
 
 const tableData = {
 	multiSelect: false,
@@ -22,16 +22,16 @@ const tableData = {
 	columns: [
 		{name: "ID", type: "number"},
 		{name: "Name", type: "string"},
-		{name: "Tags", type: "choice", options: [...new Set(tags.map((x: any) => x.name))]}
+		{name: "Tags", type: "choice", options: [...new Set(tags.map(x => x.name))]}
 	],
-	rows: recipients.map((x: any) => ([
+	rows: recipients.map(x => ([
 		x.id,
 		x.name,
-		tags.filter((y: any) => x.tag_ids?.includes(y.id)).map((y: any) => y.name).join(", ")
+		tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
 	]))
 };
 
-async function rowClick(row: any) {
+async function rowClick(row: Row) {
 	await useRouter().push(`/recipients/${row[0]}`);
 };
 

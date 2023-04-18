@@ -11,9 +11,9 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		currencies: [],
-		accounts: [],
-		accountData: null,
+		currencies: [] as Currency[],
+		accounts: [] as Account[],
+		accountData: null as Account | null,
 	}),
 
 	async created() {
@@ -22,16 +22,15 @@ export default {
 
 		const isNew = useRoute().path.split("/")[2] == "new";
 		if(isNew) {
-			(this as any).accountData = {
-				id: "",
+			this.accountData = {
 				name: "",
-				default_currency: this.currencies.filter((x: any) => x.id == 0)[0],
-				tagIds: []
+				default_currency: this.currencies.filter(x => x.id == 0)[0],
+				tag_ids: []
 			};
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
-			const accountFromStore: any = this.accounts.filter((x: any) => x.id == id)[0];
-			const default_currency: any = this.currencies.filter((x: any) => x.id == accountFromStore.default_currency)[0];
+			const accountFromStore = this.accounts.filter(x => x.id == id)[0];
+			const default_currency = this.currencies.filter(x => x.id == accountFromStore.default_currency)[0];
 			this.accountData = {...accountFromStore, default_currency: {...default_currency}};
 		}
 	}
