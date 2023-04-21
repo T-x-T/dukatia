@@ -72,5 +72,63 @@ declare global {
 		openTop?: boolean
 	}
 
+	type AssetValuation = {
+		value_per_unit: number,
+		amount: number,
+		timestamp: string,
+		deleted?: boolean,
+	}
+
 	type Row = any[]
+
+	type TableSort = {
+		column: number,
+		sort: "asc" | "desc",
+	}
+
+	type ColumnType =
+		"number" |
+		"string" |
+		"choice" |
+		"date"
+
+	type Column = {
+		name: string,
+		type: ColumnType,
+		options?: string[],
+	}
+
+	type TableData = {
+		multiSelect: boolean,
+		defaultSort: TableSort,
+		columns: Column[],
+		rows: Row[],
+		displaySum?: boolean,
+		sumColumn?: number,
+	}
+
+	type TableFilterOption = 
+		"is" |
+		"isnt" |
+		"contains" |
+		"between" |
+		"outside" |
+		"exact" |
+		"less" |
+		"more" |
+		"begins" |
+		"ends" |
+		"doesntcontain" |
+		"notempty" |
+		"empty" |
+		"anything"
+
+	type TableFilter = {
+		type: ColumnType,
+		option: TableFilterOption,
+		empty: string,
+		value?: string | number,
+		start?: string,
+		end?: string,
+	}
 }
