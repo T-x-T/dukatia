@@ -14,11 +14,13 @@ export default {
 	}),
 
 	props: {
-		currency: Object
+		currency: {
+			type: Object as PropType<Currency>,
+			required: true,
+		}
 	},
 
 	created() {
-		console.log(this.currency)
 		this.config = {
 			...this.$detailPageConfig().currency,
 			data: this.currency

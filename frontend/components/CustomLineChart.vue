@@ -5,7 +5,7 @@
 		</div>
 		<div v-if="loaded" id="chart">
 			<LineChart
-				v-if="chartData"
+				v-if="Object.keys(chartData).length > 0"
 				:chartData="chartData"
 				:chartOptions="chartOptions"
 			/>
@@ -31,11 +31,11 @@
 export default {
 	data: () => ({
 		loaded: false,
-		from_date: null,
-		to_date: null,
+		from_date: null as string | null,
+		to_date: null as string | null,
 		period: "Monthly",
 		colors: ["#EC8A83", "#FFAD85", "#F9F176", "#8BE59D", "#6AB4F1", "#A983D8"],
-		chartData: null,
+		chartData: {},
 		chartOptions: {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -115,7 +115,7 @@ export default {
 	},
 
 	methods: {
-		updateDate(dates: any) {
+		updateDate(dates: {from_date: string, to_date: string}) {
 			this.from_date = dates.from_date;
 			this.to_date = dates.to_date;
 			this.update();
@@ -124,7 +124,7 @@ export default {
 		async update() {
 			this.loaded = false;
 
-			(this as any).chartData = {
+			this.chartData = {
 				datasets: []
 			}
 

@@ -13,15 +13,15 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(item, index) in assetValuations" :key="index" :class="(item as any).deleted ? 'deleted' : ''">
-					<td>{{(item as any).timestamp}}</td>
+				<tr v-for="(item, index) in assetValuations" :key="index" :class="item.deleted ? 'deleted' : ''">
+					<td>{{item.timestamp}}</td>
 					<td>
-						<input type="text" v-model="(item as any).amount" @input="update(index, 'amount')">
+						<input type="text" v-model="item.amount" @input="update(index, 'amount')">
 					</td>
 					<td>
-						<input type="text" v-model="(item as any).value_per_unit" @input="update(index, 'value_per_unit')">
+						<input type="text" v-model="item.value_per_unit" @input="update(index, 'value_per_unit')">
 					</td>
-					<td><input type="checkbox" v-model="(item as any).deleted"></td>
+					<td><input type="checkbox" v-model="item.deleted"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -32,11 +32,11 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		assetValuations: [],
-		originalAssetValuations: [],
+		assetValuations: [] as AssetValuation[],
+		originalAssetValuations: [] as AssetValuation[],
 		applyUpdatesForwards: true,
-		assets: [],
-		currencies: [],
+		assets: [] as Asset[],
+		currencies: [] as Currency[],
 	}),
 
 	props: {
@@ -47,10 +47,10 @@ export default {
 		this.assets = await $fetch("/api/v1/assets/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
 
-		const asset: any = this.assets.filter((x: any) => x.id == this.assetId)[0];
-		const minor_in_mayor = (this as any).currencies.filter((x: any) => x.id == asset.currency_id)[0].minor_in_mayor;
+		const asset = this.assets.filter(x => x.id == this.assetId)[0];
+		const minor_in_mayor = this.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
 
-		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as any).map((x: any) => {
+		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as AssetValuation[]).map(x => {
 			x.value_per_unit /= minor_in_mayor;
 			x.deleted = false;
 			return x;
@@ -59,13 +59,13 @@ export default {
 	},
 
 	methods: {
-		update(i: number, prop: string) {
+		update(i: number, prop: "value_per_unit" | "amount" | "timestamp" | "deleted") {
 			if(this.applyUpdatesForwards) {
-				if(Number.isNaN(Number(this.assetValuations[i][prop]))) return;
+				if(Number.isNaN(Number(this.assetValuations[i][prop])) || prop == "timestamp" || prop == "deleted") return;
 				const difference = Number(this.assetValuations[i][prop]) - Number(this.originalAssetValuations[i][prop]);
 				this.assetValuations = this.assetValuations.map((x, j) => {
 					if (j > i) {
-						(x[prop] as any) += difference;
+						x[prop] += difference;
 					}
 					return x;
 				});
@@ -74,15 +74,15 @@ export default {
 		},
 
 		async save() {
-			const asset: any = this.assets.filter((x: any) => x.id == this.assetId)[0];
-			const minor_in_mayor = (this as any).currencies.filter((x: any) => x.id == asset.currency_id)[0].minor_in_mayor;
+			const asset = this.assets.filter(x => x.id == this.assetId)[0];
+			const minor_in_mayor = this.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`, {
 					method: "POST",
 					body: this.assetValuations
-						.filter((x: any) => !x.deleted)
-						.map((x: any) => ({
+						.filter(x => !x.deleted)
+						.map(x => ({
 							amount: Number(x.amount),
 							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_mayor),
 							timestamp: x.timestamp
