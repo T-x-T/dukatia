@@ -1,9 +1,9 @@
 <template>
 	<div id="main">
 		<h2>This is the Dashboard</h2>
-		<div id="grid" v-if="show">
+		<div id="grid">
 			<div class="gridItem small" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
-				<TotalBalance :currency_id="currency_id" :amount="amount"/>	
+				<TotalBalance :currency_id="Number(currency_id)" :amount="amount"/>	
 			</div>
 			<div class="gridItem medium">
 				<CustomPieChart
@@ -59,13 +59,11 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		total_per_currency: null,
-		show: false
+		total_per_currency: null
 	}),
 
 	async mounted() {
 		this.total_per_currency = await $fetch("/api/v1/reports/total_per_currency");
-		nextTick(() => this.show = true); //Important to not error when user without accessToken cookie set visits the index page
 	}
 }
 </script>

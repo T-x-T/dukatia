@@ -174,7 +174,7 @@ export default {
 		});
 		this.applyDefaultSort();
 		this.fillSelectedRows();
-
+		
 		if(this.tableData.displaySum) this.getSum();
 	},
 
@@ -307,15 +307,15 @@ export default {
 					}
 				}
 
-				if(this.filters[i].type == "number" && !Number.isNaN(this.filters[i].value)) {
+				if(this.filters[i].type == "number" && typeof this.filters[i].value == "number") {
 					if(this.filters[i].option == "exact") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) === parseFloat(this.filters[i].value as string));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) === this.filters[i].value);
 					}
 					if(this.filters[i].option == "less") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) < parseFloat(this.filters[i].value as string));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) < (this.filters[i].value as number));
 					}
 					if(this.filters[i].option == "more") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) > parseFloat(this.filters[i].value as string));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) > (this.filters[i].value as number));
 					}
 				}
 
@@ -368,18 +368,15 @@ export default {
 		}
 	},
 	watch: {
-		selectedRows() {
-			let selectedRowContents: Row = [];
-			this.selectedRows.forEach((selected, i) => {
-				if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
-			});
-			this.$emit("rowSelect", selectedRowContents);
-		},
-
-		tableData() {
-			this.rows = this.tableData.rows;
-			this.sort();
-			this.filter();
+		selectedRows: {
+			handler() {
+				let selectedRowContents: Row = [];
+				this.selectedRows.forEach((selected, i) => {
+					if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
+				});
+				this.$emit("rowSelect", selectedRowContents);
+			},
+			deep: true,
 		}
 	}
 }

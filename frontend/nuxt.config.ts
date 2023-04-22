@@ -1,4 +1,5 @@
 export default defineNuxtConfig ({
+  ssr: false,
   devServer: {
     host: "0.0.0.0",
     port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000

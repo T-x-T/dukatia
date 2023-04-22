@@ -43,7 +43,7 @@ export default {
 
 	methods: {
 		async updateSelectData() {
-			this.sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
+			this.sortedSelectData = Object.keys(this.filteredSelectData).length > 0 ? this.filteredSelectData : this.selectData;
 			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
 
 			if(this.selectData.selected) {

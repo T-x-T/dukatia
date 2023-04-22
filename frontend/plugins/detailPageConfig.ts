@@ -39,7 +39,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 						tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
 					}),
 					defaultData: {
-						id: "",
 						name: "",
 						//default_currency_id: useMainStore().currencies.filter((x: any) => x.id == 0)[0],
 						tag_ids: []
@@ -111,7 +110,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 						parent_id: typeof x.parent_id == "number" ? x.parent_id : undefined
 					}),
 					defaultData: {
-						id: "",
 						name: "",
 						parent_id: null
 					},
@@ -179,7 +177,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 						timestamp: new Date(x.timestamp),
 					}),
 					defaultData: {
-						id: "",
 						name: null,
 						description: "",
 						amount: 0,
@@ -232,7 +229,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 						symbol: x.symbol
 					}),
 					defaultData: {
-						id: "",
 						name: "",
 						minor_in_mayor: 100,
 						symbol: ""

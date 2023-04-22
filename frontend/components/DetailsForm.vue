@@ -151,7 +151,7 @@ export default {
 				}
 			} catch(e: any) {
 				console.error(e?.data?.data);
-				window.alert(e?.data?.data?.error);
+				window.alert(e?.data?.data);
 				return;
 			}
 
@@ -181,12 +181,11 @@ export default {
 		async deleteThis() {
 			try {
 				await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
+				this.$emit("back");
 			} catch(e: any) {
-				console.error(e?.data?.data);
-				window.alert(e?.data?.data?.error);
-				return;
+				console.error(e);
+				window.alert(e);
 			}
-			this.$emit("back");
 		},
 
 		async closeSubForm() {

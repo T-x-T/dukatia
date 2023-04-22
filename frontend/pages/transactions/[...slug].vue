@@ -29,7 +29,7 @@
 
 					<div>
 						<CustomSelect
-							v-if="selectData"
+							v-if="Object.keys(selectData).length > 0"
 							:selectData="selectData"
 							v-on:update="tagUpdate"
 						/>	
@@ -39,7 +39,6 @@
 				</div>		
 			</div>
 			<CustomTable
-				ref="table"
 				v-if="Object.keys(tableData).length > 0"
 				:tableData="tableData"
 				v-on:rowClick="rowClick"
@@ -49,7 +48,7 @@
 
 		<div v-if="detailsOpen" id="detailBar">
 			<TransactionDetails 
-				v-if="selectedRow"
+				v-if="Object.keys(selectedRow).length > 0"
 				:transaction="selectedRow"
 				v-on:back="updateAndLoadTable"
 				v-on:updateData="updateTable"
@@ -63,13 +62,13 @@ export default {
 	data: () => ({
 		tableData: {} as TableData,
 		detailsOpen: false,
-		selectedRow: {} as Transaction | null,
-		selectedRows: [] as Transaction[] | null,
+		selectedRow: {} as Transaction,
+		selectedRows: [] as Row[],
 		batchaccount_id: null as null | number,
 		batchrecipient_id: null as null | number,
 		batchasset_id: null as null | number,
 		batchtag_ids: [],
-		selectData: null as unknown as SelectData,
+		selectData: {} as SelectData,
 		tags: [] as Tag[],
 		accounts: [] as Account[],
 		currencies: [] as Currency[],
@@ -108,36 +107,38 @@ export default {
 				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
 				return x;
 			});
-
-			this.tableData = {
-				multiSelect: true,
-				displaySum: true,
-				sumColumn: 5,
-				defaultSort: {
-					column: 4,
-					sort: "desc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Account", type: "choice", options: [...new Set(this.accounts.map(x => x.name))]},
-					{name: "Recipient", type: "choice", options: [...new Set(this.recipients.map(x => x.name))]},
-					{name: "Asset", type: "choice", options: [...new Set(this.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
-					{name: "Timestamp", type: "date"},
-					{name: "Amount", type: "number"},
-					{name: "Comment", type: "string"},
-					{name: "Tags", type: "choice", options: [...new Set(this.tags.map(x => x.name))]}
-				],
-				rows: transactionsForDisplay.map(x => ([
-					x.id,
-					x.account?.name,
-					x.recipient?.name,
-					x.asset ? x.asset.name : "",
-					new Date(x.timestamp).toISOString().substring(0, 10),
-					`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
-					x.comment,
-					this.tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
-				]))
-			}
+			this.tableData = {} as TableData;
+			this.$nextTick(() => {
+				this.tableData = {
+					multiSelect: true,
+					displaySum: true,
+					sumColumn: 5,
+					defaultSort: {
+						column: 4,
+						sort: "desc"
+					},
+					columns: [
+						{name: "ID", type: "number"},
+						{name: "Account", type: "choice", options: [...new Set(this.accounts.map(x => x.name))]},
+						{name: "Recipient", type: "choice", options: [...new Set(this.recipients.map(x => x.name))]},
+						{name: "Asset", type: "choice", options: [...new Set(this.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
+						{name: "Timestamp", type: "date"},
+						{name: "Amount", type: "number"},
+						{name: "Comment", type: "string"},
+						{name: "Tags", type: "choice", options: [...new Set(this.tags.map(x => x.name))]}
+					],
+					rows: transactionsForDisplay.map(x => ([
+						x.id,
+						x.account?.name,
+						x.recipient?.name,
+						x.asset ? x.asset.name : "",
+						new Date(x.timestamp).toISOString().substring(0, 10),
+						`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+						x.comment,
+						this.tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
+					]))
+				};
+			});
 		},
 
 		rowClick(row: Row) {
@@ -154,7 +155,7 @@ export default {
 		},
 
 		rowSelect(rows: Row) {
-			this.selectedRows = null;
+			//this.selectedRows = null;
 			this.selectedRows = rows;
 		},
 
@@ -181,7 +182,7 @@ export default {
 		async applyBatchEdit() {
 			if(!this.selectedRows) return;
 			await Promise.all(this.selectedRows.map(async row => {
-				let transaction = {...this.transactions.filter(x => row && x.id === row.id)[0]};
+				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
 				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = typeof this.batchrecipient_id == "number" ? this.batchrecipient_id : transaction.recipient_id;
 				transaction.asset_id = typeof this.batchasset_id == "number"  ? this.batchasset_id : transaction.asset_id;
@@ -207,7 +208,7 @@ export default {
 			this.transactions = await $fetch("/api/v1/transactions/all");
 			this.updateTransactions();
 			this.detailsOpen = false;
-			this.selectedRow = null;
+			this.selectedRow = {} as Transaction;
 			history.pushState({}, "", "/transactions");
 		},
 

@@ -130,15 +130,15 @@ export default {
 	methods: {
 		async update() {
 			try {
-				this.currencies = await $fetch("/api/v1/currencies/all");
+				this.currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 				this.assets = await $fetch("/api/v1/assets/all");
 				this.accounts = await $fetch("/api/v1/accounts/all");
 			} catch(e: any) {
 				console.error(e?.data?.data);
 				window.alert(e?.data?.data?.error);
 			}
-
-			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: undefined} : this.propAsset;
+			
+			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
 			
 			if(this.asset.id !== undefined) {
 				this.api_data = await $fetch(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
