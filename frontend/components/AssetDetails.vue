@@ -102,7 +102,7 @@
 export default {
 	data: () => ({
 		asset: {} as Asset,
-		config: {},
+		config: {} as DetailFormConfig,
 		transactionData: {} as {[key: string]: any},
 		updateData: {} as {[key: string]: any},
 		renderCharts: false,

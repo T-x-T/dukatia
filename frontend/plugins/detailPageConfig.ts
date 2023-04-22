@@ -44,7 +44,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						//default_currency_id: useMainStore().currencies.filter((x: any) => x.id == 0)[0],
 						tag_ids: []
 					},
-				},
+				} as DetailFormConfig,
 				recipient: {
 					fields: [
 						{
@@ -80,7 +80,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						name: "",
 						tag_ids: []
 					}
-				},
+				} as DetailFormConfig,
 				tags: {
 					fields: [
 						{
@@ -116,7 +116,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						parent_id: null
 					},
 					deletable: true
-				},
+				} as DetailFormConfig,
 				asset: {
 					fields: [
 						{
@@ -193,7 +193,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 					deletable: true,
 					noSaveAndNew: true,
 					noGoBackOnSave: true
-				},
+				} as DetailFormConfig,
 				currency: {
 					fields: [
 						{
@@ -237,7 +237,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						minor_in_mayor: 100,
 						symbol: ""
 					}
-				},
+				} as DetailFormConfig,
 			})
     }
   }

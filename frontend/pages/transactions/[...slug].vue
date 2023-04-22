@@ -61,13 +61,13 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		tableData: {},
+		tableData: {} as TableData,
 		detailsOpen: false,
 		selectedRow: {} as Transaction | null,
 		selectedRows: [] as Transaction[] | null,
-		batchaccount_id: null,
-		batchrecipient_id: null,
-		batchasset_id: null,
+		batchaccount_id: null as null | number,
+		batchrecipient_id: null as null | number,
+		batchasset_id: null as null | number,
 		batchtag_ids: [],
 		selectData: null as unknown as SelectData,
 		tags: [] as Tag[],
@@ -181,10 +181,10 @@ export default {
 		async applyBatchEdit() {
 			if(!this.selectedRows) return;
 			await Promise.all(this.selectedRows.map(async row => {
-				let transaction = {...this.transactions.filter(x => row && x.id === (row as any)[0])[0]};
-				(transaction as any).account_id = Number.isInteger(this.batchaccount_id) ? this.batchaccount_id : transaction.account_id;
-				(transaction as any).recipient_id = Number.isInteger(this.batchrecipient_id) ? this.batchrecipient_id : transaction.recipient_id;
-				(transaction as any).asset_id = Number.isInteger(this.batchasset_id) ? this.batchasset_id : transaction.asset_id;
+				let transaction = {...this.transactions.filter(x => row && x.id === row.id)[0]};
+				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
+				transaction.recipient_id = typeof this.batchrecipient_id == "number" ? this.batchrecipient_id : transaction.recipient_id;
+				transaction.asset_id = typeof this.batchasset_id == "number"  ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {

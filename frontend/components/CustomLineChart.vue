@@ -73,11 +73,11 @@ export default {
 				}
 			}
 		},
-		accounts: [],
-		currencies: [],
-		recipients: [],
-		assets: [],
-		transactions: []
+		accounts: [] as Account[],
+		currencies: [] as Currency[],
+		recipients: [] as Recipient[],
+		assets: [] as Asset[],
+		transactions: [] as Transaction[],
 	}),
 
 	props: {
@@ -152,7 +152,7 @@ export default {
 			}
 
 			if(this.type == "simple_monetary") {
-				const minor_in_mayor = (this as any).currencies.filter((x: any) => x.id == this.currency_id)[0].minor_in_mayor;
+				const minor_in_mayor = this.currencies.filter(x => x.id == this.currency_id)[0].minor_in_mayor;
 				(this as any).chartData.datasets.push({
 					...common,
 					label: "",

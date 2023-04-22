@@ -11,7 +11,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {}
+		config: {} as DetailFormConfig
 	}),
 
 	props: {
@@ -40,7 +40,7 @@ export default {
 		this.config = {
 			...this.$detailPageConfig().account,
 			data: this.account,
-			resetdefault_currency_id: true,
+			reset_default_currency_id: true,
 			tableData : {
 				multiSelect: false,
 				defaultSort: {
@@ -57,7 +57,7 @@ export default {
 					{name: "Tags", type: "choice", options: [...new Set(tags.map(x => x.name))]}
 				],
 				rows: transactionsForDisplay.map(x => {
-					if(!x.account || !x.recipient || !x.currency) return;
+					if(!x.account || !x.recipient || !x.currency) return [];
 					return [
 						x.id,
 						x.account.name,

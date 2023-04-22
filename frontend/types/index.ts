@@ -131,4 +131,29 @@ declare global {
 		start?: string,
 		end?: string,
 	}
+
+	type DetailFormField = {
+		label: string,
+		property: string,
+		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset",
+		disabled?: boolean,
+		step?: string,
+		initial?: number,
+		suffix?: "currencyOfAccountSymbol",
+		addNew?: boolean,
+	}
+
+	type DetailFormConfig = {
+		fields: DetailFormField[],
+		data: any,
+		apiEndpoint: string,
+		prepareForApi: (x: any) => any,
+		defaultData: Object,
+		deletable?: boolean,
+		noSaveAndNew?: boolean,
+		noGoBackOnSave?: boolean,
+		reset_default_currency_id?: boolean,
+		populateTagsUsingRecipient?: boolean,
+		tableData?: TableData,
+	}
 }

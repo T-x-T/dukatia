@@ -54,11 +54,11 @@ export default {
     		}
 			}
 		},
-		accounts: [],
-		currencies: [],
-		recipients: [],
-		assets: [],
-		transactions: []
+		accounts: [] as Account[],
+		currencies: [] as Currency[],
+		recipients: [] as Recipient[],
+		assets: [] as Asset[],
+		transactions: [] as Transaction[],
 	}),
 
 	props: {
@@ -82,7 +82,7 @@ export default {
 	},
 
 	methods: {
-		updateDate(dates: any) {
+		updateDate(dates: {from_date: string, to_date: string}) {
 			this.from_date = dates.from_date;
 			this.to_date = dates.to_date;
 			this.update();
@@ -110,9 +110,9 @@ export default {
 			this.no_data = Object.keys(api_data).length === 0;
 			for(const id in api_data) {
 				let total_value = 0;
-				let label = (id as any) == 4294967295 ? "other: " : `${(this as any)[(this as any).type].filter((x: any) => x.id === Number(id))[0][(this as any).label_property]}: `;
+				let label = Number(id) == 4294967295 ? "other: " : `${(this as any)[(this as any).type].filter((x: any) => x.id === Number(id))[0][(this as any).label_property]}: `;
 				for(const currency_id in api_data[id].data) {
-					const currency: any = this.currencies.filter((c: any) => c.id === Number(currency_id))[0];
+					const currency = this.currencies.filter(c => c.id === Number(currency_id))[0];
 					const value = api_data[id].data[currency_id] / currency.minor_in_mayor;
 					total_value += value;
 					label += `${value}${currency.symbol}, `;

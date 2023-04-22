@@ -3,7 +3,7 @@
 		<h2>This is the Dashboard</h2>
 		<div id="grid" v-if="show">
 			<div class="gridItem small" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
-				<TotalBalance :currency_id="parseInt((currency_id as any))" :amount="amount"/>	
+				<TotalBalance :currency_id="currency_id" :amount="amount"/>	
 			</div>
 			<div class="gridItem medium">
 				<CustomPieChart

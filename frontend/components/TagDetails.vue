@@ -1,7 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
-			v-if="config"
+			v-if="Object.keys(config).length > 0"
 			:config="config"
 			v-on:back="$emit('back')"
 		/>
@@ -11,7 +11,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: null
+		config: {} as DetailFormConfig
 	}),
 
 	props: {
@@ -19,7 +19,7 @@ export default {
 	},
 
 	created() {
-		(this as any).config = {
+		this.config = {
 			...this.$detailPageConfig().tags,
 			data: this.tag
 		}

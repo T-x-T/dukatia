@@ -1,7 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
-			v-if="config"
+			v-if="Object.keys(config).length > 0"
 			:config="config"
 			v-on:back="$emit('back')"
 			v-on:updateData="$emit('updateData')"
@@ -12,22 +12,25 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: null,
-		accounts: [],
-		currencies: []
+		config: {} as DetailFormConfig,
+		accounts: [] as Account[],
+		currencies: [] as Currency[],
 	}),
 
 	props: {
-		transaction: Object
+		transaction: {
+			type: Object as PropType<Transaction>,
+			required: true,
+		}
 	},
 
 	async created() {
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
-		(this as any).transaction.tag_ids = Array.isArray((this as any).transaction.tag_ids) ? [...(this as any).transaction.tag_ids] : [null];
-		(this as any).transaction.asset_id = (this as any).transaction.asset?.id;
+		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
+		this.transaction.asset_id = this.transaction.asset?.id;
 		
-		(this as any).config = {
+		this.config = {
 			fields: [
 				{
 					label: "ID",
@@ -71,7 +74,7 @@ export default {
 				},
 				{
 					label: "Tags",
-					propety: "tag_ids",
+					property: "tag_ids",
 					type: "tags",
 					addNew: true
 				}
@@ -79,9 +82,9 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: (x: any) => {
-				const account: any = this.accounts.filter((y: any) => y.id == x.account_id)[0];
-				const minor_in_mayor = (this as any).currencies.filter((y: any) => y.id == account.default_currency_id)[0].minor_in_mayor;
+			prepareForApi: (x: Transaction) => {
+				const account = this.accounts.filter(y => y.id == x.account_id)[0];
+				const minor_in_mayor = this.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -103,7 +106,7 @@ export default {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
-				currency: this.currencies.filter((x: any) => x.id == 0)[0],
+				currency: this.currencies.filter(x => x.id == 0)[0],
 				tag_ids: []
 			},
 			deletable: true

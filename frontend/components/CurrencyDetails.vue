@@ -1,7 +1,8 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
-			:config="config"
+			v-if="Object.keys(config).length > 0"
+			:config="(config as DetailFormConfig)"
 			v-on:back="$emit('back')"
 		/>
 	</div>
