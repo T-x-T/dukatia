@@ -9,11 +9,11 @@
     "start": "npx nuxi start"
   },
   "dependencies": {
+    "nuxt": "^3.4.2",
     "@nuxtjs/color-mode": "^3.2.0",
-    "consola": "^3.0.2",
-    "nuxt": "^3.4.1",
     "chart.js": "^4.2.1",
     "chartjs-adapter-date-fns": "^3.0.0",
+    "consola": "^3.0.2",
     "date-fns": "^2.29.3",
     "sass": "^1.62.0",
     "sass-loader": "^13.2.2",
