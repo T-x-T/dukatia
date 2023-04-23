@@ -73,11 +73,6 @@ export default {
 				}
 			}
 		},
-		accounts: [] as Account[],
-		currencies: [] as Currency[],
-		recipients: [] as Recipient[],
-		assets: [] as Asset[],
-		transactions: [] as Transaction[],
 	}),
 
 	props: {
@@ -92,12 +87,6 @@ export default {
 	},
 
 	async mounted() {
-		this.accounts = await $fetch("/api/v1/accounts/all");
-		this.currencies = await $fetch("/api/v1/currencies/all");
-		this.recipients = await $fetch("/api/v1/recipients/all");
-		this.assets = await $fetch("/api/v1/assets/all");
-		this.transactions = await $fetch("/api/v1/transactions/all");
-
 		if(this.$colorMode.preference == "light") {
 			this.chartOptions.scales.x.ticks.fontColor = "#111";
 			this.chartOptions.scales.x.gridLines.color = "#0002";
@@ -152,7 +141,7 @@ export default {
 			}
 
 			if(this.type == "simple_monetary") {
-				const minor_in_mayor = this.currencies.filter(x => x.id == this.currency_id)[0].minor_in_mayor;
+				const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.currency_id}`) as Currency).minor_in_mayor;
 				(this as any).chartData.datasets.push({
 					...common,
 					label: "",
@@ -169,7 +158,7 @@ export default {
 					backgroundColor: this.colors[0],
 				});				
 			} else if(this.type) {
-				(this as any)[this.type].forEach((item: any) => {
+				(await $fetch(`/api/v1/${this.type}/all`) as any).forEach((item: any) => {
 					let minor_in_mayor = 100;
 					if(this.type == "currencies") {
 						minor_in_mayor = item.minor_in_mayor;

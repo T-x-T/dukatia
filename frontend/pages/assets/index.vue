@@ -2,7 +2,6 @@
 	<div>
 		<button class="green" @click="newAsset">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
@@ -19,7 +18,7 @@ const assetsForDisplay = assets.map(x => {
 	return x;
 });
 
-const tableData = {
+const tableData: TableData = {
 	multiSelect: false,
 	displaySum: true,
 	sumColumn: 5,

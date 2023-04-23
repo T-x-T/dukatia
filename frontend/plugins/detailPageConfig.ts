@@ -29,7 +29,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 					data: {
 						id: "",
 						name: "",
-						//default_currency: useMainStore().currencies.filter((x: any) => x.id == 0)[0],
 						tag_ids: []
 					},
 					apiEndpoint: "/api/v1/accounts",
@@ -40,7 +39,6 @@ export default defineNuxtPlugin(_nuxtApp => {
 					}),
 					defaultData: {
 						name: "",
-						//default_currency_id: useMainStore().currencies.filter((x: any) => x.id == 0)[0],
 						tag_ids: []
 					},
 				} as DetailFormConfig,
@@ -177,7 +175,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						timestamp: new Date(x.timestamp),
 					}),
 					defaultData: {
-						name: null,
+						name: "",
 						description: "",
 						amount: 0,
 						value_per_unit: 0,

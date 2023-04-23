@@ -2,7 +2,6 @@
 	<div>
 		<button class="green" @click="newRecipient">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
@@ -13,7 +12,7 @@
 const recipients = (await useFetch("/api/v1/recipients/all")).data.value as Recipient[];
 const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
 
-const tableData = {
+const tableData: TableData = {
 	multiSelect: false,
 	defaultSort: {
 		column: 0,

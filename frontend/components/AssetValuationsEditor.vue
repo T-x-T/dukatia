@@ -34,9 +34,7 @@ export default {
 	data: () => ({
 		assetValuations: [] as AssetValuation[],
 		originalAssetValuations: [] as AssetValuation[],
-		applyUpdatesForwards: true,
-		assets: [] as Asset[],
-		currencies: [] as Currency[],
+		applyUpdatesForwards: true
 	}),
 
 	props: {
@@ -44,11 +42,8 @@ export default {
 	},
 
 	async created() {
-		this.assets = await $fetch("/api/v1/assets/all");
-		this.currencies = await $fetch("/api/v1/currencies/all");
-
-		const asset = this.assets.filter(x => x.id == this.assetId)[0];
-		const minor_in_mayor = this.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+		const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
+		const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
 
 		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as AssetValuation[]).map(x => {
 			x.value_per_unit /= minor_in_mayor;
@@ -74,8 +69,8 @@ export default {
 		},
 
 		async save() {
-			const asset = this.assets.filter(x => x.id == this.assetId)[0];
-			const minor_in_mayor = this.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+			const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`, {

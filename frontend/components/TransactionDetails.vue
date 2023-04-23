@@ -13,8 +13,6 @@
 export default {
 	data: () => ({
 		config: {} as DetailFormConfig,
-		accounts: [] as Account[],
-		currencies: [] as Currency[],
 	}),
 
 	props: {
@@ -25,8 +23,6 @@ export default {
 	},
 
 	async created() {
-		this.accounts = await $fetch("/api/v1/accounts/all");
-		this.currencies = await $fetch("/api/v1/currencies/all");
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
 		this.transaction.asset_id = this.transaction.asset?.id;
 		
@@ -82,9 +78,9 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: (x: Transaction) => {
-				const account = this.accounts.filter(y => y.id == x.account_id)[0];
-				const minor_in_mayor = this.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
+			prepareForApi: async (x: Transaction) => {
+				const account: Account = await $fetch(`/api/v1/accounts/${x.account_id}`);
+				const minor_in_mayor = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_mayor;
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -106,7 +102,7 @@ export default {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
-				currency: this.currencies.filter(x => x.id == 0)[0],
+				currency: (await $fetch("/api/v1/currencies/0") as Currency),
 				tag_ids: []
 			},
 			deletable: true

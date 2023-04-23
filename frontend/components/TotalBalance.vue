@@ -9,7 +9,6 @@ export default {
 	data: () => ({
 		amount_for_display: 0,
 		symbol: "",
-		currencies: [] as Currency[],
 	}),
 
 	props: {
@@ -24,8 +23,7 @@ export default {
 	},
 
 	async created() {
-		this.currencies = await $fetch("/api/v1/currencies/all");
-		const currency = this.currencies.filter(x => x.id == this.currency_id)[0];
+		const currency: Currency = await $fetch(`/api/v1/currencies/${this.currency_id}`);
 		this.symbol = currency.symbol;
 		this.amount_for_display = this.amount / currency.minor_in_mayor;
 	}

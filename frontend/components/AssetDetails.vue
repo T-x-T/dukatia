@@ -111,7 +111,6 @@ export default {
 		api_data_value: {} as {[key: string]: number},
 		api_data_amount: {} as {[key: string]: number},
 		api_data_total_value: {} as {[key: string]: number},
-		currencies: [] as Currency[],
 		assets: [] as Asset[],
 		accounts: [] as Account[],
 	}),
@@ -130,7 +129,6 @@ export default {
 	methods: {
 		async update() {
 			try {
-				this.currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 				this.assets = await $fetch("/api/v1/assets/all");
 				this.accounts = await $fetch("/api/v1/accounts/all");
 			} catch(e: any) {
@@ -152,7 +150,7 @@ export default {
 				}
 			}
 
-			const minor_in_mayor = this.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			if(!this.asset) {
 				console.error("this.asset isnt defined!")
@@ -198,7 +196,7 @@ export default {
 		},
 
 		async saveTransaction() {
-			const minor_in_mayor = this.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
@@ -227,7 +225,7 @@ export default {
 		},
 
 		async saveUpdate() {
-			const minor_in_mayor = this.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {

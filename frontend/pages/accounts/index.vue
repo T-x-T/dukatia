@@ -2,7 +2,6 @@
 	<div>
 		<button class="green" @click="newAccount">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
@@ -15,7 +14,7 @@ const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Curr
 const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
 const transactions = (await useFetch("/api/v1/transactions/all")).data.value as Transaction[];
 
-const tableData = {
+const tableData: TableData = {
 	multiSelect: false,
 	defaultSort: {
 		column: 0,

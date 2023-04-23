@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<RecipientDetails 
+			v-if="Object.keys(recipientData).length > 0"
 			:recipient="recipientData"
 			v-on:back="useRouter().push('/recipients')"
 		/>		
@@ -10,20 +11,17 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		recipientData: {}
+		recipientData: {} as Recipient
 	}),
 
 	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
 			this.recipientData = {
-				id: "",
 				name: ""
 			};
 		} else {
-			const recipients = await $fetch("/api/v1/recipients/all") as Recipient[];
 			const id = Number(useRoute().path.split("/")[2]);
-			const recipientFromStore = recipients.filter(x => x.id == id)[0];
-			this.recipientData = {...recipientFromStore};
+			this.recipientData = await $fetch(`/api/v1/recipients/${id}`);
 		}
 	}
 }

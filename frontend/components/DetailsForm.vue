@@ -141,12 +141,12 @@ export default {
 				if(typeof this.config.data.id == "number") {
 					res = await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, {
 						method: "PUT",
-						body: this.config.prepareForApi(this.config.data)
+						body: await this.config.prepareForApi(this.config.data)
 					});
 				} else {
 					res = await $fetch(this.config.apiEndpoint, {
 						method: "POST",
-						body: this.config.prepareForApi(this.config.data)
+						body: await this.config.prepareForApi(this.config.data)
 					});
 				}
 			} catch(e: any) {

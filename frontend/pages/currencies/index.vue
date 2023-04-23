@@ -2,7 +2,6 @@
 	<div>
 		<button class="green" @click="newCurrency">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
@@ -12,7 +11,7 @@
 <script lang="ts" setup>
 const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
 
-const tableData = {
+const tableData: TableData = {
 	multiSelect: false,
 	defaultSort: {
 		column: 0,

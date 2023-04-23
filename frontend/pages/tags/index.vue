@@ -2,7 +2,6 @@
 	<div>
 		<button class="green" @click="newTag()">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
@@ -12,7 +11,7 @@
 <script lang="ts" setup>
 const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
 
-const tableData = {
+const tableData: TableData = {
 	multiSelect: false,
 	defaultSort: {
 		column: 0,
