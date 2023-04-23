@@ -41,10 +41,6 @@ pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, 
 		.await?
 		.query("SELECT * FROM public.\"AssetData\" WHERE \"userId\"=$1;", &[&(user_id as i32)])
 		.await?;
-	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
-	}
 
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
 }
@@ -56,7 +52,7 @@ pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Erro
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("asset"), filter: format!("id={asset_id}") } ));
 	}
 
 	return Ok(turn_row_into_asset(&rows[0]));

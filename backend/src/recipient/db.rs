@@ -55,7 +55,7 @@ pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("recipient"), filter: format!("id={}", recipient_id)}));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("recipient"), filter: format!("id={recipient_id}")}));
 	}
 
 	return Ok(turn_row_into_recipient(&rows[0]));

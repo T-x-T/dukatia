@@ -55,6 +55,10 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
+	return db::get_by_id(pool, transaction_id).await;
+}
+ 
 pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let mut transaction = transaction.clone();
 

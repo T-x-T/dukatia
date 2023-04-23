@@ -63,7 +63,7 @@ pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, 
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("transaction"), filter: format!("id={}", transaction_id) }));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("transaction"), filter: format!("id={transaction_id}") }));
 	}
 
 	return Ok(turn_row_into_transaction(&rows[0]));

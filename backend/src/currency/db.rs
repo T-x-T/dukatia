@@ -7,10 +7,6 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
 	let rows = pool.get().await?
 		.query("SELECT * FROM public.\"Currencies\";", &[])
 		.await?;
-
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound{item_type: String::from("currency")}));
-	}
 	
 	return Ok(
 		rows
@@ -27,7 +23,7 @@ pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dy
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("currency") }));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("currency"), filter: format!("id={currency_id}") } ));
 	}
 
 	return Ok(turn_row_into_currency(&rows[0]));
