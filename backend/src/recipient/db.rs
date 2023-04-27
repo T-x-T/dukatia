@@ -7,7 +7,7 @@ pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error
 	let client = pool.get().await.unwrap();
 	let id: i32 = client
 		.query(
-			"INSERT INTO public.\"Recipients\" (id, name, \"user\") VALUES (DEFAULT, $1, $2) RETURNING id;",
+			"INSERT INTO public.recipients (id, name, user_id) VALUES (DEFAULT, $1, $2) RETURNING id;",
 			&[&recipient.name, &(recipient.user_id.unwrap_or(0) as i32)]
 		)
 		.await?
@@ -16,7 +16,7 @@ pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error
 	if recipient.tag_ids.is_some() {
 		for tag_id in recipient.clone().tag_ids.unwrap() {
 			client.query(
-				"INSERT INTO public.\"RecipientTags\" (recipient, tag) VALUES ($1, $2);",
+				"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
 				&[&id, &(tag_id as i32)]
 			).await?;
 		}
@@ -28,7 +28,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT r.id, r.name, r.user, array_agg(t.tag) as tags FROM public.\"Recipients\" r LEFT JOIN public.\"RecipientTags\" t ON r.id = t.recipient GROUP BY r.id;",
+			"SELECT r.id, r.name, r.user_id, array_agg(t.tag_id) as tags FROM public.recipients r LEFT JOIN public.recipient_tags t ON r.id = t.recipient_id GROUP BY r.id;",
 			&[]
 		)
 		.await?;
@@ -49,7 +49,7 @@ pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT r.id, r.name, r.user, array_agg(t.tag) as tags FROM public.\"Recipients\" r LEFT JOIN public.\"RecipientTags\" t ON r.id = t.recipient WHERE r.id=$1 GROUP BY r.id;",
+			"SELECT r.id, r.name, r.user_id, array_agg(t.tag_id) as tags FROM public.recipients r LEFT JOIN public.recipient_tags t ON r.id = t.recipient_id WHERE r.id=$1 GROUP BY r.id;",
 			&[&(recipient_id as i32)]
 		)
 		.await?;
@@ -71,20 +71,20 @@ pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Er
 	let client = pool.get().await?;
 	
 	client.query(
-			"UPDATE public.\"Recipients\" SET name=$1 WHERE id=$2;",
+			"UPDATE public.recipients SET name=$1 WHERE id=$2;",
 			&[&recipient.name, &(recipient.id.unwrap() as i32)]
 		)
 		.await?;
 	
 	client.query(
-			"DELETE FROM public.\"RecipientTags\" WHERE recipient=$1",
+			"DELETE FROM public.recipient_tags WHERE recipient_id=$1",
 			&[&(recipient.id.unwrap() as i32)]
 		).await?;
 
 	if recipient.tag_ids.is_some() {
 		for tag_id in recipient.tag_ids.clone().unwrap() {
 			client.query(
-				"INSERT INTO public.\"RecipientTags\" (recipient, tag) VALUES ($1, $2);",
+				"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
 				&[&(recipient.id.unwrap() as i32), &(tag_id as i32)]
 			).await?;
 		}

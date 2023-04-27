@@ -5,7 +5,7 @@ use super::super::CustomError;
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
 	let rows = pool.get().await?
-		.query("SELECT * FROM public.\"Currencies\";", &[])
+		.query("SELECT * FROM public.currencies;", &[])
 		.await?;
 	
 	return Ok(
@@ -19,7 +19,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
 pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"Currencies\" WHERE id=$1;", &[&(currency_id as i32)])
+		.query("SELECT * FROM public.currencies WHERE id=$1;", &[&(currency_id as i32)])
 		.await?;
 
 	if rows.is_empty() {
@@ -34,7 +34,7 @@ pub async fn add(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>>
 		.await
 		.unwrap()
 		.query(
-			"INSERT INTO public.\"Currencies\" (id, name, minorinmayor, symbol) VALUES (DEFAULT, $1, $2, $3)", 
+			"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3)", 
 			&[&currency.name, &(currency.minor_in_mayor as i32), &currency.symbol])
 		.await?;
 
@@ -52,7 +52,7 @@ pub async fn update(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Erro
 		.await
 		.unwrap()
 		.query(
-			"UPDATE public.\"Currencies\" SET name=$1, minorinmayor=$2, symbol=$3 WHERE id=$4", 
+			"UPDATE public.currencies SET name=$1, minor_in_mayor=$2, symbol=$3 WHERE id=$4", 
 			&[&currency.name, &(currency.minor_in_mayor as i32), &currency.symbol, &(currency.id.unwrap() as i32)])
 		.await?;
 

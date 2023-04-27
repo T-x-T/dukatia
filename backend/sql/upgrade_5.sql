@@ -110,10 +110,6 @@ ALTER TABLE IF EXISTS public.currencies
 		RENAME CONSTRAINT "Currency_pkey" TO currencies_pkey;
 
 
-ALTER TABLE IF EXISTS public."Meta"
-    RENAME TO meta;
-
-
 ALTER TABLE IF EXISTS public."RecipientTags"
     RENAME TO recipient_tags;
 ALTER TABLE IF EXISTS public.recipient_tags
