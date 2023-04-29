@@ -1,4 +1,4 @@
-FROM node:19-alpine
+FROM node:16-alpine
 
 WORKDIR /frontend
 ENV NODE_ENV=production
