@@ -25,6 +25,10 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> {
+	return db::get_by_id(pool, tag_id).await;
+}
+
 pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), tag.id).await {
 		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));

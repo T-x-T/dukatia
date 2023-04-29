@@ -14,7 +14,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		username: "",
@@ -25,16 +25,19 @@ export default {
 	methods: {
 		async login() {
 			try {
-				const res = await this.$axios.$post("/api/v1/login", {
-					name: this.username,
-					secret: this.password
+				const res: any = await $fetch("/api/v1/login", {
+					method: "POST",
+					body: {
+						name: this.username,
+						secret: this.password
+					}
 				});
 				this.error = "";
 				document.cookie =`accessToken=${res.accessToken};SameSite=Strict`;
-				await this.$router.replace("/");
+				await useRouter().replace("/");
 				location.reload();
-			} catch(e) {
-				this.error = e.response.data.error
+			} catch(e: any) {
+				this.error = e?.data?.data?.error
 			}
 		}
 	}

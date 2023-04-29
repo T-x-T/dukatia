@@ -7,7 +7,7 @@ pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	pool.get()
 		.await?
 		.query(
-			"INSERT INTO public.\"Tags\" (id, name, parent, \"user\") VALUES (DEFAULT, $1, $2, $3);",
+			"INSERT INTO public.tags (id, name, parent_id, user_id) VALUES (DEFAULT, $1, $2, $3);",
 			&[&tag.name, &(tag.parent_id.map(|x| x as i32)), &(tag.user_id as i32)]
 		).await?;
 	return Ok(());
@@ -17,7 +17,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 	return Ok(
 		pool.get()
 		.await?
-		.query("SELECT * FROM public.\"Tags\";", &[])
+		.query("SELECT * FROM public.tags;", &[])
 		.await?
 		.iter()
 		.map(|x| turn_row_into_tag(&x))
@@ -28,7 +28,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"Tags\" WHERE id=$1;", &[&(tag_id as i32)]).await?;
+		.query("SELECT * FROM public.tags WHERE id=$1;", &[&(tag_id as i32)]).await?;
 
 	if rows.is_empty() {
 		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("tag"), filter: format!("id={}", tag_id)}));
@@ -47,7 +47,7 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	pool.get()
 		.await?
 		.query(
-			"UPDATE public.\"Tags\" SET name=$1, parent=$2 WHERE id=$3;",
+			"UPDATE public.tags SET name=$1, parent_id=$2 WHERE id=$3;",
 			&[&tag.name, &tag.parent_id.map(|x| x as i32), &tag.id.map(|x| x as i32)]
 		)
 		.await?;
@@ -58,10 +58,10 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
 	pool.get()
 		.await?
-		.query("DELETE FROM public.\"Tags\" WHERE id=$1;", &[&(tag_id as i32)]).await?;
+		.query("DELETE FROM public.tags WHERE id=$1;", &[&(tag_id as i32)]).await?;
 
 	pool.get().await?
-		.query("UPDATE public.\"Tags\" SET parent=null WHERE parent=$1", &[&(tag_id as i32)]).await?;
+		.query("UPDATE public.tags SET parent_id=null WHERE parent_id=$1", &[&(tag_id as i32)]).await?;
 
 	return Ok(());
 }

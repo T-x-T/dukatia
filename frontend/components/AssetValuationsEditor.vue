@@ -29,34 +29,34 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
-		assetValuations: [],
-		originalAssetValuations: [],
-		applyUpdatesForwards: true,
+		assetValuations: [] as AssetValuation[],
+		originalAssetValuations: [] as AssetValuation[],
+		applyUpdatesForwards: true
 	}),
 
 	props: {
 		assetId: Number
 	},
 
-	async fetch() {
-		const asset = this.$store.state.assets.filter(x => x.id == this.assetId)[0];
-		const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+	async created() {
+		const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
+		const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
 
-		this.assetValuations = (await this.$axios.$get(`/api/v1/assets/${this.assetId}/valuation_history`)).map(x => {
+		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as AssetValuation[]).map(x => {
 			x.value_per_unit /= minor_in_mayor;
 			x.deleted = false;
 			return x;
 		});
-		this.originalAssetValuations = structuredClone(this.assetValuations);
+		this.originalAssetValuations = structuredClone(toRaw(this.assetValuations));
 	},
 
 	methods: {
-		update(i, prop) {
+		update(i: number, prop: "value_per_unit" | "amount" | "timestamp" | "deleted") {
 			if(this.applyUpdatesForwards) {
-				if(Number.isNaN(Number(this.assetValuations[i][prop]))) return;
+				if(Number.isNaN(Number(this.assetValuations[i][prop])) || prop == "timestamp" || prop == "deleted") return;
 				const difference = Number(this.assetValuations[i][prop]) - Number(this.originalAssetValuations[i][prop]);
 				this.assetValuations = this.assetValuations.map((x, j) => {
 					if (j > i) {
@@ -65,27 +65,27 @@ export default {
 					return x;
 				});
 			}
-			this.originalAssetValuations = structuredClone(this.assetValuations);
+			this.originalAssetValuations = structuredClone(toRaw(this.assetValuations).map(x => toRaw(x)));
 		},
 
 		async save() {
-			const asset = this.$store.state.assets.filter(x => x.id == this.assetId)[0];
-			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == asset.currency_id)[0].minor_in_mayor;
+			const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
-				await this.$axios.$post(
-					`/api/v1/assets/${this.assetId}/valuation_history`, 
-					this.assetValuations
+				await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`, {
+					method: "POST",
+					body: this.assetValuations
 						.filter(x => !x.deleted)
 						.map(x => ({
 							amount: Number(x.amount),
 							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_mayor),
 							timestamp: x.timestamp
 						}))
-				);
-			} catch(e) {
-				console.error(e.response);
-				window.alert(e.response.data);
+				});
+			} catch(e: any) {
+				console.error(e?.data?.data);
+				window.alert(e?.data?.data?.error);
 				return;
 			}
 		}

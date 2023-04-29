@@ -1,6 +1,7 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
+			v-if="Object.keys(config).length > 0"
 			:config="config"
 			v-on:back="$emit('back')"
 			v-on:updateData="$emit('updateData')"
@@ -8,18 +9,21 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
-		config: {}
+		config: {} as DetailFormConfig,
 	}),
 
 	props: {
-		transaction: Object
+		transaction: {
+			type: Object as PropType<Transaction>,
+			required: true,
+		}
 	},
 
-	created() {
-		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [null]
+	async created() {
+		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
 		this.transaction.asset_id = this.transaction.asset?.id;
 		
 		this.config = {
@@ -66,7 +70,7 @@ export default {
 				},
 				{
 					label: "Tags",
-					propety: "tag_ids",
+					property: "tag_ids",
 					type: "tags",
 					addNew: true
 				}
@@ -74,9 +78,9 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: (x) => {
-				const account = this.$store.state.accounts.filter(y => y.id == x.account_id)[0];
-				const minor_in_mayor = this.$store.state.currencies.filter(y => y.id == account.default_currency_id)[0].minor_in_mayor;
+			prepareForApi: async (x: Transaction) => {
+				const account: Account = await $fetch(`/api/v1/accounts/${x.account_id}`);
+				const minor_in_mayor = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_mayor;
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -98,7 +102,7 @@ export default {
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				amount: 0,
 				comment: "",
-				currency: this.$store.state.currencies.filter(x => x.id == 0)[0],
+				currency: (await $fetch("/api/v1/currencies/0") as Currency),
 				tag_ids: []
 			},
 			deletable: true

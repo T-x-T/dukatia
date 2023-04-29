@@ -21,6 +21,10 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<dyn Error>> {
+	return db::get_by_id(pool, recipient_id).await;
+}
+
 pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
 	return db::update(&pool, &recipient).await;
 }

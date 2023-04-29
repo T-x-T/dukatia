@@ -17,6 +17,25 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 	}
 }
 
+#[get("/api/v1/transactions/{transaction_id}")]
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::get_by_id(&data.pool, transaction_id.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => {
+			if e.to_string().starts_with("specified item of type transaction not found with filter") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
+			} else {
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+			}
+		}
+	}
+}
+
 #[derive(Deserialize)]
 struct TransactionPost {
 	account_id: u32,

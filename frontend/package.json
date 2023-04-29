@@ -1,21 +1,22 @@
 {
   "name": "fronted",
-  "version": "0.11.1",
+  "version": "0.12.0",
   "description": "front end written in nuxt.js for TxTs Treasury",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_OPTIONS=--openssl-legacy-provider nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start"
+    "dev": "npx nuxi dev",
+    "build": "npx nuxi build",
+    "start": "npx nuxi start"
   },
-  "dependencies": {
-    "@nuxtjs/axios": "^5.13.6",
-    "chart.js": "^2.9.4",
-    "nuxt": "^2.15.8",
-    "sass": "^1.43.2",
-    "sass-loader": "^8.0.2",
-    "vue-chartjs": "^3.5.1",
-    "webpack": "^4.45.0",
-    "@nuxtjs/color-mode": "^2.1.1"
+  "devDependencies": {
+    "nuxt": "^3.4.3",
+    "@nuxtjs/color-mode": "^3.2.0",
+    "chart.js": "^4.2.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "consola": "^3.0.2",
+    "date-fns": "^2.29.3",
+    "sass": "^1.62.0",
+    "sass-loader": "^13.2.2",
+    "vue-chartjs": "^5.2.0"
   }
 }

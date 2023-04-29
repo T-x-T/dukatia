@@ -6,3 +6,4 @@ docker-compose-testing.yml
 target
 old_backend
 .vscode
+.output

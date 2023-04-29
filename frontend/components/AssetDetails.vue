@@ -7,7 +7,7 @@
 				<div id="inner">
 					<h3>Asset data</h3>
 					<DetailsForm
-						v-if="config"
+						v-if="Object.keys(config).length > 0"
 						:config="config"
 						v-on:back="$emit('back')"
 						v-on:updateData="reload"
@@ -15,7 +15,7 @@
 				</div>
 			</div>
 				
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
+			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem form">
 				<div id="inner">
 					<h3>Buy/Sell with transaction</h3>
 					<div id="transactionForm">
@@ -30,7 +30,7 @@
 						<br>
 						<label for="transactionAccount">Account:</label>
 						<select id="transactionAccount" v-model="transactionData.account_id">
-							<option v-for="(account, index) in $store.state.accounts.filter(x => x.default_currency_id === asset.currency_id)" :key="index" :value="account.id">{{account.name}}</option>
+							<option v-for="(account, index) in accounts.filter(x => x.default_currency_id === asset.currency_id)" :key="index" :value="account.id">{{account.name}}</option>
 						</select>
 						<br>
 						<label for="transactionTimestamp">Timestamp:</label>
@@ -43,7 +43,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem form">
+			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem form">
 				<div id="inner">
 					<h3>Update without transaction</h3>
 					<div id="updateForm">
@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
+			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<CustomLineChart
 					:api_data="api_data_total_value"
 					title="Total value over time"
@@ -69,7 +69,7 @@
 					:currency_id="asset.currency_id"
 				/>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
+			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<CustomLineChart
 					:api_data="api_data_value"
 					title="Value over time per single unit"
@@ -78,7 +78,7 @@
 					:currency_id="asset.currency_id"
 				/>
 			</div>
-			<div v-if="asset.id !== '' && renderCharts" class="gridItem chart">
+			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<CustomLineChart
 					:api_data="api_data_amount"
 					title="Amount over time"
@@ -98,23 +98,28 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
-		asset: null,
-		config: null,
-		transactionData: {},
-		updateData: {},
+		asset: {} as Asset,
+		config: {} as DetailFormConfig,
+		transactionData: {} as {[key: string]: any},
+		updateData: {} as {[key: string]: any},
 		renderCharts: false,
 		showAssetValuationEditor: false,
-		api_data: null,
-		api_data_value: null,
-		api_data_amount: null,
-		api_data_total_value: null,
+		api_data: {} as {[key: string]: number[]},
+		api_data_value: {} as {[key: string]: number},
+		api_data_amount: {} as {[key: string]: number},
+		api_data_total_value: {} as {[key: string]: number},
+		assets: [] as Asset[],
+		accounts: [] as Account[],
 	}),
 
 	props: {
-		propAsset: Object
+		propAsset: {
+			type: Object as PropType<Asset>,
+			required: true,
+		}
 	},
 
 	created() {
@@ -123,10 +128,18 @@ export default {
 
 	methods: {
 		async update() {
-			this.asset = this.asset ? this.asset : this.propAsset.name === null ? {...this.propAsset, id: ""} : this.propAsset;
+			try {
+				this.assets = await $fetch("/api/v1/assets/all");
+				this.accounts = await $fetch("/api/v1/accounts/all");
+			} catch(e: any) {
+				console.error(e?.data?.data);
+				window.alert(e?.data?.data?.error);
+			}
 			
-			if(this.asset.id !== '') {
-				this.api_data = await this.$axios.$get(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
+			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
+			
+			if(this.asset.id !== undefined) {
+				this.api_data = await $fetch(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
 				this.api_data_value = {};
 				this.api_data_amount = {};
 				this.api_data_total_value = {};
@@ -137,15 +150,23 @@ export default {
 				}
 			}
 
-			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
+
+			if(!this.asset) {
+				console.error("this.asset isnt defined!")
+				return;
+			} else {
+				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = 0;
+			}
 
 			this.config = {
-				...this.$detailPageConfig.asset,
+				...this.$detailPageConfig().asset,
 				data: {
 					...this.asset,
 					value_per_unit: this.asset.value_per_unit / minor_in_mayor,
 				},
 			};
+
 			this.transactionData = {
 				amount: 0,
 				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
@@ -163,11 +184,11 @@ export default {
 			this.renderCharts = true;
 		},
 
-		async reload(res) {
-			await this.$store.dispatch("fetchAssets");
-			await this.$store.dispatch("fetchTransactions");
+		async reload(res?: any) {
+			this.assets = await $fetch("/api/v1/assets/all");
+
 			if (res?.id) this.asset.id = res.id;
-			this.asset = this.$store.state.assets.filter(x => x.id == this.asset.id)[0];
+			this.asset = this.assets.filter(x => x.id == this.asset.id)[0];
 			
 			await this.update();
 			this.renderCharts = false;
@@ -175,20 +196,23 @@ export default {
 		},
 
 		async saveTransaction() {
-			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
-					amount_change: Number(this.transactionData.amount),
-					value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
-					timestamp: new Date(this.transactionData.timestamp),
-					account_id: this.transactionData.account_id,
-					cost: Math.round(this.transactionData.cost * minor_in_mayor),
-					total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
+				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
+					method: "POST",
+					body: {
+						amount_change: Number(this.transactionData.amount),
+						value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
+						timestamp: new Date(this.transactionData.timestamp),
+						account_id: this.transactionData.account_id,
+						cost: Math.round(this.transactionData.cost * minor_in_mayor),
+						total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
+					}
 				})
-			} catch(e) {
-				console.error(e.response);
-				window.alert(e.response.data);
+			} catch(e: any) {
+				console.error(e?.data?.data);
+				window.alert(e?.data?.data?.error);
 				return;
 			}
 
@@ -201,17 +225,20 @@ export default {
 		},
 
 		async saveUpdate() {
-			const minor_in_mayor = this.$store.state.currencies.filter(x => x.id == this.asset.currency_id)[0].minor_in_mayor;
+			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			try {
-				await this.$axios.$post(`/api/v1/assets/${this.asset.id}/valuations`, {
-					amount: Number(this.updateData.amount),
-					value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
-					timestamp: new Date(this.updateData.timestamp)
+				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
+					method: "POST",
+					body: {
+						amount: Number(this.updateData.amount),
+						value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
+						timestamp: new Date(this.updateData.timestamp)
+					}
 				})
-			} catch(e) {
-				console.error(e.response);
-				window.alert(e.response.data);
+			} catch(e: any) {
+				console.error(e?.data?.data);
+				window.alert(e?.data?.data?.error);
 				return;
 			}
 

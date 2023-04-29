@@ -9,7 +9,7 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	let client = pool.get().await?;
 
 	let id: i32 = client.query(
-			"INSERT INTO public.\"Assets\" (id, name, description, \"userId\", \"currencyId\") VALUES (DEFAULT, $1, $2, $3, $4) RETURNING id;", 
+			"INSERT INTO public.assets (id, name, description, user_id, currency_id) VALUES (DEFAULT, $1, $2, $3, $4) RETURNING id;", 
 			&[&asset.name, &asset.description, &(asset.user_id as i32), &(asset.currency_id as i32)]
 		).await?
 		[0].get(0);
@@ -17,7 +17,7 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	if asset.tag_ids.is_some() {
 		for tag_id in asset.tag_ids.clone().unwrap() {
 			client.query(
-					"INSERT INTO public.\"AssetTags\" (\"assetId\", \"tagId\") VALUES ($1, $2);",
+					"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
 					&[&id, &(tag_id as i32)]
 				).await?;
 		}
@@ -30,7 +30,7 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"AssetData\";", &[])
+		.query("SELECT * FROM public.asset_data;", &[])
 		.await?;
 	
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
@@ -39,12 +39,8 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"AssetData\" WHERE \"userId\"=$1;", &[&(user_id as i32)])
+		.query("SELECT * FROM public.asset_data WHERE user_id=$1;", &[&(user_id as i32)])
 		.await?;
-	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
-	}
 
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
 }
@@ -52,11 +48,11 @@ pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, 
 pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"AssetData\" WHERE id=$1;", &[&(asset_id as i32)])
+		.query("SELECT * FROM public.asset_data WHERE id=$1;", &[&(asset_id as i32)])
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("asset"), filter: format!("id={asset_id}") } ));
 	}
 
 	return Ok(turn_row_into_asset(&rows[0]));
@@ -67,7 +63,7 @@ pub async fn get_amount_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> R
 	let res = pool.get()
 		.await?
 		.query(
-			"SELECT * FROM public.\"AssetAmounts\" WHERE \"assetId\" = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
+			"SELECT * FROM public.asset_amounts WHERE asset_id = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
 			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
 		).await?;
 
@@ -83,7 +79,7 @@ pub async fn get_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Re
 	let res = pool.get()
 		.await?
 		.query(
-			"SELECT * FROM public.\"AssetValuations\" WHERE \"assetId\" = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
+			"SELECT * FROM public.asset_valuations WHERE asset_id = $1 AND timestamp < $2 ORDER BY timestamp DESC LIMIT 1;",
 			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
 		).await?;
 
@@ -98,7 +94,7 @@ pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BT
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT \"timestamp\", \"valuePerUnit\"	FROM public.\"AssetValuations\" WHERE \"assetId\"=$1;",
+			"SELECT \"timestamp\", value_per_unit	FROM public.asset_valuations WHERE asset_id=$1;",
 			&[&(asset_id as i32)]
 		).await?;
 
@@ -117,7 +113,7 @@ pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<c
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT \"timestamp\", \"amount\"	FROM public.\"AssetAmounts\" WHERE \"assetId\"=$1;",
+			"SELECT timestamp, amount FROM public.asset_amounts WHERE asset_id=$1;",
 			&[&(asset_id as i32)]
 		).await?;
 
@@ -142,19 +138,19 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 	let client = pool.get().await?;
 
 	client.query(
-		"UPDATE public.\"Assets\" SET name=$1, description=$2 WHERE id=$3",
+		"UPDATE public.assets SET name=$1, description=$2 WHERE id=$3",
 		&[&asset.name, &asset.description, &(asset.id.unwrap() as i32)]
 	).await?;
 
 	client.query(
-		"DELETE FROM public.\"AssetTags\" WHERE \"assetId\"=$1", 
+		"DELETE FROM public.asset_tags WHERE asset_id=$1", 
 		&[&(asset.id.unwrap() as i32)]
 	).await?;
 
 	if asset.tag_ids.is_some() {
 		for tag_id in asset.tag_ids.clone().unwrap() {
 			client.query(
-					"INSERT INTO public.\"AssetTags\" (\"assetId\", \"tagId\") VALUES ($1, $2);",
+					"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
 					&[&(asset.id.unwrap() as i32), &(tag_id as i32)]
 				).await?;
 		}
@@ -168,7 +164,7 @@ pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Re
 
 	let rows = pool.get()
 		.await?
-		.query("SELECT * FROM public.\"AssetValuationHistory\" WHERE assetId=$1",
+		.query("SELECT * FROM public.asset_valuation_history WHERE asset_id=$1",
 		&[&(asset_id as i32)]
 	).await?;
 
@@ -181,12 +177,12 @@ pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asse
 	let client = pool.get().await?;
 
 	client.query(
-		"DELETE FROM public.\"AssetAmounts\" WHERE \"assetId\"=$1",
+		"DELETE FROM public.asset_amounts WHERE asset_id=$1",
 		&[&(asset_id as i32)]
 	).await?;
 
 	client.query(
-		"DELETE FROM public.\"AssetValuations\" WHERE \"assetId\"=$1",
+		"DELETE FROM public.asset_valuations WHERE asset_id=$1",
 		&[&(asset_id as i32)]
 	).await?;
 
@@ -203,12 +199,12 @@ pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetVa
 	let client = pool.get().await?;
 	
 	client.query(
-		"INSERT INTO public.\"AssetAmounts\" (\"assetId\", timestamp, amount) VALUES ($1, $2, $3);",
+		"INSERT INTO public.asset_amounts (asset_id, timestamp, amount) VALUES ($1, $2, $3);",
 		&[&(asset_id as i32), &asset_valuation.timestamp, &asset_valuation.amount]
 	).await?;
 	
 	client.query(
-		"INSERT INTO public.\"AssetValuations\" (\"assetId\", timestamp, \"valuePerUnit\") VALUES ($1, $2, $3)", 
+		"INSERT INTO public.asset_valuations (asset_id, timestamp, value_per_unit) VALUES ($1, $2, $3)", 
 		&[&(asset_id as i32), &asset_valuation.timestamp, &(asset_valuation.value_per_unit as i32)]
 	).await?;
 
@@ -219,7 +215,7 @@ pub async fn delete_by_id(pool: &Pool, asset_id: u32) -> Result<(), Box<dyn Erro
 	pool.get()
 		.await?
 		.query(
-			"DELETE FROM public.\"Assets\" WHERE id=$1;", 
+			"DELETE FROM public.assets WHERE id=$1;", 
 			&[&(asset_id as i32)]
 		).await?;
 

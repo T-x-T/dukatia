@@ -1,17 +1,25 @@
+<template>
+	<Line
+		:data="chartData"
+		:options="chartOptions"
+	/>
+</template>
+
 <script>
-import { Line, mixins } from 'vue-chartjs'
+import 'chartjs-adapter-date-fns';
+import { Line } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, TimeScale, PointElement, LineElement } from 'chart.js'
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, TimeScale, PointElement, LineElement)
 
 export default {
-  extends: Line,
-	mixins: [mixins.reactiveProp],
 	props: {
 		chartData: Object,
 		chartOptions: Object
 	},
 
-  mounted() {
-    this.renderChart(this.chartData, this.chartOptions)
-  }
+	components: {
+		Line
+	}
 }
 </script>
 

@@ -32,6 +32,30 @@ Response:
 | name | name of the tag |
 | user_id | user_id that created this tag |
 | parent_id | id of the parent tag or `null` if not set |
+### get by id
+
+This endpoint is used to retrieve a single tag by its id. 
+You need to specify the id of the tag you want to retrieve in the request path. 
+
+Request:  
+`GET /api/v1/tags/{tag_id}`
+
+Response:
+```json
+{
+	"id": 42,
+	"name": "something",
+	"user_id": 0,
+	"parent_id": 3 | null
+}
+```
+
+| Property | Description |
+| ----------- | ----------- |
+| id | id of the tag |
+| name | name of the tag |
+| user_id | user_id that created this tag |
+| parent_id | id of the parent tag or `null` if not set |
 
 ### create tag
 

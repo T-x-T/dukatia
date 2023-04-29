@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<p>Count: {{rowsForDisplay.length}}</p>
-		<p v-if="tableData.displaySum">{{getSum()}}</p>
+		<p>Count: {{rowsForDisplay?.length}}</p>
+		<p v-if="sum">{{sum}}</p>
 		<table>
 			<colgroup>
 					<col v-if="tableData.multiSelect" class="multiselect">
@@ -132,7 +132,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="row[0]">
+				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
@@ -141,36 +141,41 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
-		rows: [],
-		currentSort: [],
-		filters: [],
-		rowsForDisplay: [],
-		selectedRows: [],
-		openFilter: null,
-		allRowsSelected: false
+		rows: [] as Row[],
+		currentSort: [] as {index: number, direction: "asc" | "desc"}[],
+		filters: [] as TableFilter[],
+		rowsForDisplay: [] as Row[],
+		selectedRows: [] as boolean[],
+		openFilter: null as number | null,
+		allRowsSelected: false,
+		sum: ""
 	}),
 
 	props: {
-		tableData: Object,
+		tableData: {
+			type: Object as PropType<TableData>,
+			required: true,
+		},
 	},
-
-	fetch() {
+	
+	created() {
 		this.rows = this.tableData.rows;
 		this.rowsForDisplay = this.rows;
-
+		
 		this.tableData.columns.forEach(c => {
 			this.filters.push({
 				type: c.type,
-				option: c.type == "choice" ? "is" : c.type == "date" ? "between" : c.type == "number" ? "exact" : c.type == "string" ? "contains" : null,
-				empty: c.type == "string" ? "anything" : undefined
+				option: c.type == "choice" ? "is" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
+				empty: c.type == "string" ? "anything" : ""
 			});
 		});
-		
 		this.applyDefaultSort();
 		this.fillSelectedRows();
+		
+		if(this.tableData.displaySum) this.getSum();
 	},
 
 	methods: {
@@ -189,10 +194,10 @@ export default {
 				index: this.tableData.defaultSort.column,
 				direction: this.tableData.defaultSort.sort
 			}
-			this.sort(this.tableData.defaultSort.column)
+			this.sort();
 		},
 
-		updateSort(i) {
+		updateSort(i: number) {
 			if(this.currentSort.filter(x => x.index === i).length !== 0) { //If column i is sorted
 				const currentSortPrio = this.currentSort.findIndex(x => x.index === i);
 				if(this.currentSort[currentSortPrio].direction === "asc") {
@@ -212,7 +217,11 @@ export default {
 					return;
 				}
 			} else {
-				if(this.currentSort.length === 1 && this.currentSort[0].index === this.tableData.defaultSort.column && this.currentSort[0].direction === this.tableData.defaultSort.sort) { //If default sort is applied
+				if(
+					this.currentSort.length === 1 &&
+					this.currentSort[0].index === this.tableData.defaultSort.column &&
+					this.currentSort[0].direction === this.tableData.defaultSort.sort
+				) { //If default sort is applied
 					this.currentSort.shift();
 				}
 				this.currentSort.unshift({
@@ -249,13 +258,13 @@ export default {
 			}
 		},
 
-		sortNumberColumn(i, asc) {
+		sortNumberColumn(i: number, asc: boolean) {
 			this.rows.sort((a, b) => {
 				return asc ? parseInt(b[i]) - parseInt(a[i]) : parseInt(a[i]) - parseInt(b[i]);
 			});
 		},
 
-		sortStringColumn(i, asc) {
+		sortStringColumn(i: number, asc: boolean) {
 			this.rows.sort((a, b) => {
 				if(a[i].toLowerCase() > b[i].toLowerCase()) {
 					return asc ? 1 : -1;
@@ -267,7 +276,7 @@ export default {
 			});
 		},
 
-		sortDateColumn(i, asc) {
+		sortDateColumn(i: number, asc: boolean) {
 			this.rows.sort((a, b) => {
 				return asc ? Date.parse(b[i]) - Date.parse(a[i]) : Date.parse(a[i]) - Date.parse(b[i]);
 			});
@@ -279,34 +288,34 @@ export default {
 			for(let i = 0; i < this.filters.length; i++) {
 				if(this.filters[i].type == "choice" && this.filters[i].value) {
 					if(this.filters[i].option == "is") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === this.filters[i].value.toLowerCase());
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === (this.filters[i].value as string)?.toLowerCase());
 					}
 					if(this.filters[i].option == "isnt") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() !== this.filters[i].value.toLowerCase());
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() !== (this.filters[i].value as string)?.toLowerCase());
 					}
 					if(this.filters[i].option == "contains") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes(this.filters[i].value.toLowerCase()));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
 					}
 				}
 
 				if(this.filters[i].type == "date" && this.filters[i].start && this.filters[i].end) {
 					if(this.filters[i].option == "between") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) > Date.parse(this.filters[i].start) && Date.parse(x[i]) < Date.parse(this.filters[i].end));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) > Date.parse(this.filters[i].start as string) && Date.parse(x[i]) < Date.parse(this.filters[i].end as string));
 					}
 					if(this.filters[i].option == "outside") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) < Date.parse(this.filters[i].start) || Date.parse(x[i]) > Date.parse(this.filters[i].end));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) < Date.parse(this.filters[i].start as string) || Date.parse(x[i]) > Date.parse(this.filters[i].end as string));
 					}
 				}
 
-				if(this.filters[i].type == "number" && this.filters[i].value) {
+				if(this.filters[i].type == "number" && typeof this.filters[i].value == "number") {
 					if(this.filters[i].option == "exact") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) === parseFloat(this.filters[i].value));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) === this.filters[i].value);
 					}
 					if(this.filters[i].option == "less") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) < parseFloat(this.filters[i].value));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) < (this.filters[i].value as number));
 					}
 					if(this.filters[i].option == "more") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) > parseFloat(this.filters[i].value));
+						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) > (this.filters[i].value as number));
 					}
 				}
 
@@ -319,53 +328,55 @@ export default {
 					}
 					if(this.filters[i].value) {
 						if(this.filters[i].option == "contains") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes(this.filters[i].value.toLowerCase()));
+							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
 						}
 						if(this.filters[i].option == "exact") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === this.filters[i].value.toLowerCase());
+							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === (this.filters[i].value as string)?.toLowerCase());
 						}
 						if(this.filters[i].option == "begins") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().startsWith(this.filters[i].value.toLowerCase()));
+							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().startsWith((this.filters[i].value as string)?.toLowerCase()));
 						}
 						if(this.filters[i].option == "ends") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().endsWith(this.filters[i].value.toLowerCase()));
+							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().endsWith((this.filters[i].value as string)?.toLowerCase()));
 						}
 						if(this.filters[i].option == "doesntcontain") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => !x[i].toLowerCase().includes(this.filters[i].value.toLowerCase()));
+							this.rowsForDisplay = this.rowsForDisplay.filter(x => !x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
 						}
 					}
 				}
 			}
 		},
 
-		getSum() {
+		async getSum() {
+			if(typeof this.tableData.sumColumn != "number") {
+				console.error("CustomTable#getSum got called with missing this.tableData.sumColumn: ", this.tableData);
+				return;
+			}
+			const currencies: Currency[] = await $fetch("/api/v1/currencies/all");
+
 			let output = "Sum:";
-			this.$store.state.currencies.forEach(currency => {
+			currencies.forEach(currency => {
 				output += " ";
 				let total = 0;
-				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn].replace(currency.symbol, "")) : null);
+				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn as number].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn as number].replace(currency.symbol, "")) : null);
 				if(total !== 0) {
 					output += total.toFixed(2);
 					output += currency.symbol;
 				}
 			});
-			return output;
+			this.sum = output;
 		}
 	},
 	watch: {
-		selectedRows() {
-			let selectedRowContents = [];
-			this.selectedRows.forEach((selected, i) => {
-				if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
-			});
-			this.$emit("rowSelect", selectedRowContents);
-		},
-
-		tableData() {
-			this.rows = this.tableData.rows;
-			//this.rowsForDisplay = this.rows;
-			this.sort();
-			this.filter();
+		selectedRows: {
+			handler() {
+				let selectedRowContents: Row = [];
+				this.selectedRows.forEach((selected, i) => {
+					if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
+				});
+				this.$emit("rowSelect", selectedRowContents);
+			},
+			deep: true,
 		}
 	}
 }

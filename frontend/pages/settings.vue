@@ -25,18 +25,18 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		oldPassword: null,
 		newPassword: null,
 		newPasswordConfirmation: null,
-		passwordUpdateMessage: null
+		passwordUpdateMessage: ""
 	}),
 
 	methods: {
 		async updatePassword() {
-			this.passwordUpdateMessage = null;
+			this.passwordUpdateMessage = "";
 
 			if(this.newPassword !== this.newPasswordConfirmation) {
 				this.passwordUpdateMessage = "The entered new passwords don't match";
@@ -44,12 +44,15 @@ export default {
 			}
 
 			try {
-				await this.$axios.$put("/api/v1/users/me/secret", {
-					old_secret: this.oldPassword,
-					new_secret: this.newPassword 
+				await $fetch("/api/v1/users/me/secret", {
+					method: "PUT",
+					body: {
+						old_secret: this.oldPassword,
+						new_secret: this.newPassword 
+					}
 				});
-			} catch(e) {
-				this.passwordUpdateMessage = e.response.data;
+			} catch(e: any) {
+				this.passwordUpdateMessage = e?.data?.data?.error;
 			}
 		}
 	}

@@ -64,6 +64,36 @@
 					}
 				},
 				{
+					"name": "get single currency by id works",
+					"endpoint": "/api/v1/currencies/1",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}
+					}
+				},
+				{
+					"name": "attempting to get single currency with non existant id returns 404",
+					"endpoint": "/api/v1/currencies/5",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type currency not found with filter id=5"}
+					}
+				},
+				{
 					"name": "new currency created correctly",
 					"endpoint": "/api/v1/currencies/all",
 					"method": "GET",
@@ -165,6 +195,36 @@
 					}
 				},
 				{
+					"name": "get single recipient by id works",
+					"endpoint": "/api/v1/recipients/1",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":1,"name":"test","user_id":0,"tag_ids":[]}
+					}
+				},
+				{
+					"name": "attempting to get single recipient with non existant id returns 404",
+					"endpoint": "/api/v1/recipients/5",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type recipient not found with filter id=5"}
+					}
+				},
+				{
 					"name": "updating name of recipient returns 200",
 					"endpoint": "/api/v1/recipients/1",
 					"method": "PUT",
@@ -250,6 +310,36 @@
 					}
 				},
 				{
+					"name": "get single account by id works",
+					"endpoint": "/api/v1/accounts/1",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[]}
+					}
+				},
+				{
+					"name": "attempting to get single account with non existant id returns 404",
+					"endpoint": "/api/v1/accounts/2",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type account not found with filter id=2"}
+					}
+				},
+				{
 					"name": "updating details of account returns 200",
 					"endpoint": "/api/v1/accounts/1",
 					"method": "PUT",
@@ -332,6 +422,36 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"test","user_id":0,"parent_id":null}]
+					}
+				},
+				{
+					"name": "get single tag by id works",
+					"endpoint": "/api/v1/tags/0",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":0,"name":"test","user_id":0,"parent_id":null}
+					}
+				},
+				{
+					"name": "attempting to get single tag with non existant id returns 404",
+					"endpoint": "/api/v1/tags/5",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type tag not found with filter id=5"}
 					}
 				},
 				{
@@ -694,6 +814,36 @@
 					}
 				},
 				{
+					"name": "get single transaction by id works",
+					"endpoint": "/api/v1/transactions/0",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}
+					}
+				},
+				{
+					"name": "attempting to get single transaction with non existant id returns 404",
+					"endpoint": "/api/v1/transactions/5",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type transaction not found with filter id=5"}
+					}
+				},
+				{
 					"name": "updating details of transaction returns 200",
 					"endpoint": "/api/v1/transactions/0",
 					"method": "PUT",
@@ -878,6 +1028,36 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "get single asset by id works",
+					"endpoint": "/api/v1/assets/0",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}
+					}
+				},
+				{
+					"name": "attempting to get single asset with non existant id returns 404",
+					"endpoint": "/api/v1/assets/2",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 404,
+						"body_equals": {"error":"specified item of type asset not found with filter id=2"}
 					}
 				},
 				{

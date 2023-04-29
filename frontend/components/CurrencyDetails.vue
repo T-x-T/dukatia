@@ -1,25 +1,29 @@
 <template>
 	<div id="wrapper">
 		<DetailsPage
-			:config="config"
+			v-if="Object.keys(config).length > 0"
+			:config="(config as DetailFormConfig)"
 			v-on:back="$emit('back')"
 		/>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		config: {}
 	}),
 
 	props: {
-		currency: Object
+		currency: {
+			type: Object as PropType<Currency>,
+			required: true,
+		}
 	},
 
 	created() {
 		this.config = {
-			...this.$detailPageConfig.currency,
+			...this.$detailPageConfig().currency,
 			data: this.currency
 		}
 	}

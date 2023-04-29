@@ -39,6 +39,25 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 	}
 }
 
+#[get("/api/v1/assets/{asset_id}")]
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+
+	match super::get_by_id(&data.pool, asset_id.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => {
+			if e.to_string().starts_with("specified item of type asset not found with filter") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
+			} else {
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+			}
+		}
+	}
+}
+
 #[post("/api/v1/assets")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {

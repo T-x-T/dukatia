@@ -2,56 +2,49 @@
 	<div>
 		<button class="green" @click="newAccount">Add</button>
 		<CustomTable
-			v-if="tableData"
 			:tableData="tableData"
 			v-on:rowClick="rowClick"
 		/>
 	</div>
 </template>
 
-<script>
-export default {
-	data: () => ({
-		tableData: null
-	}),
+<script lang="ts" setup>
+const accounts = (await useFetch("/api/v1/accounts/all")).data.value as Account[];
+const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
+const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
+const transactions = (await useFetch("/api/v1/transactions/all")).data.value as Transaction[];
 
-	async fetch() {
-		await this.updateAccounts();
+const tableData: TableData = {
+	multiSelect: false,
+	defaultSort: {
+		column: 0,
+		sort: "asc"
 	},
+	columns: [
+		{name: "ID", type: "number"},
+		{name: "Name", type: "string"},
+		{name: "Currency", type: "choice", options: currencies.map(x => x.name)},
+		{name: "Tags", type: "choice", options: [...new Set(tags.map(x => x.name))]},
+		{name: "Balance", type: "number"}
+	],
+	rows: accounts.map(x => ([
+		x.id,
+		x.name,
+		currencies.filter(c => c.id == x.default_currency_id)[0].name,
+		tags.filter(t => x.tag_ids?.includes(t.id ? t.id : -1)).map(t => t.name).join(", "),
+		transactions
+			.filter(t => t.account_id == x.id)
+			.reduce((a, b) => a + b.amount, 0) 
+			/ currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor 
+			+ currencies.filter(c => c.id == x.default_currency_id)[0].symbol
+	]))
+};
 
-	methods: {
-		async updateAccounts() {
-			await this.$store.dispatch("fetchAccounts");
-			this.tableData = {
-				multiSelect: false,
-				defaultSort: {
-					column: 0,
-					sort: "asc"
-				},
-				columns: [
-					{name: "ID", type: "number"},
-					{name: "Name", type: "string"},
-					{name: "Currency", type: "choice", options: this.$store.state.currencies.map(x => x.name)},
-					{name: "Tags", type: "choice", options: [...new Set(this.$store.state.tags.map(x => x.name))]},
-					{name: "Balance", type: "number"}
-				],
-				rows: this.$store.state.accounts.map(x => ([
-					x.id,
-					x.name,
-					this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].name,
-					this.$store.state.tags.filter(y => x.tag_ids?.includes(y.id)).map(y => y.name).join(", "),
-					this.$store.state.transactions.filter(t => t.account_id == x.id).reduce((a, b) => a + b.amount, 0) / this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor + this.$store.state.currencies.filter(c => c.id == x.default_currency_id)[0].symbol
-				]))
-			}
-		},
-		
-		rowClick(row) {
-			this.$router.push(`/accounts/${row[0]}`);
-		},
+async function rowClick(row: Row) {
+await useRouter().push(`/accounts/${row[0]}`);
+};
 
-		async newAccount() {
-			this.$router.push("/accounts/new");
-		}
-	}
-}
+async function newAccount() {
+await useRouter().push("/accounts/new");
+};
 </script>

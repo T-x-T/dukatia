@@ -1,7 +1,7 @@
 <template>
 	<div id="wrapper">
 		<div id="input" @click="toggleDropdown()" @keypress="(e) => {if(e.keyCode == 32) toggleDropdown()}">
-			<label for="thething">{{this.selectData.label}}</label>
+			<label for="thething">{{selectData.label}}</label>
 			<input id="thething" type="text" v-model="displayText" readonly>
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
 		</div>
@@ -9,8 +9,8 @@
 		<div id="dropdown" v-if="dropdown" :class="selectData.openTop ? 'opentop' : ''">
 			<input type="text" id="dropdownSearch" placeholder="filter" ref="dropdownSearch" v-model="searchTerm" @keydown="keypressDropdownInput">
 			<ul>
-				<li v-for="(item, index) in sortedSelectData.options" :key="index" class="listItem" @click="toggleOption(item.id)">
-					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" :tabindex="index === 0 ? 0 : -1" :ref="'dropdown' + index" :id="index" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
+				<li v-for="(item, index) in sortedSelectData?.options" :key="index" class="listItem" @click="toggleOption(item.id)">
+					<input class="checkbox" type="checkbox" v-model="optionStates[item.id]" :tabindex="index === 0 ? 0 : -1" :ref="'dropdown' + index" :id="(index as unknown as string)" @focusout="focusOutDropdown" @keydown="keypressDropdownInput">
 					<span>{{item.name}}</span>
 				</li>
 			</ul>
@@ -18,28 +18,32 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		displayText: "",
 		dropdown: false,
-		sortedSelectData: {},
-		filteredSelectData: null,
-		optionStates: [],
+		sortedSelectData: {} as SelectData,
+		filteredSelectData: {} as SelectData,
+		optionStates: [] as boolean[],
 		searchTerm: ""
 	}),
 
 	props: {
-		selectData: Object
+		selectData: {
+			type: Object as PropType<SelectData>,
+			required: true,
+		}
 	},
 
-	mounted() {
-		this.updateSelectData();
+	async created() {
+		if(!this.selectData?.options) return;
+		await this.updateSelectData();
 	},
 
 	methods: {
-		updateSelectData() {
-			this.sortedSelectData = this.filteredSelectData ? this.filteredSelectData : this.selectData;
+		async updateSelectData() {
+			this.sortedSelectData = Object.keys(this.filteredSelectData).length > 0 ? this.filteredSelectData : this.selectData;
 			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
 
 			if(this.selectData.selected) {
@@ -51,7 +55,7 @@ export default {
 		toggleDropdown() {
 			this.dropdown = !this.dropdown;
 			this.searchTerm = "";
-			this.$nextTick(() => this.$refs["dropdownSearch"]?.focus());
+			this.$nextTick(() => (this as any).$refs["dropdownSearch"]?.focus());
 			this.updateDisplayText();
 		},
 
@@ -63,25 +67,25 @@ export default {
 			this.dropdown = true;
 		},
 
-		focusOutDropdown(e) {
-			if(e.relatedTarget?.parentNode?.className != "listItem" && e.relatedTarget !== null) return this.closeDropdown();
-			if(e.relatedTarget === null) this.$nextTick(() => focus(e.target));
+		focusOutDropdown(e: FocusEvent) {
+			if(((e.relatedTarget as HTMLElement)?.parentNode as HTMLElement)?.className != "listItem" && e.relatedTarget !== null) return this.closeDropdown();
+			if(e.relatedTarget === null) this.$nextTick(() => (e.target as HTMLElement)?.focus());
 		},
 
-		keypressDropdownInput(e) {
+		keypressDropdownInput(e: KeyboardEvent) {
 			if(e.keyCode == 40) { //Down
 				e.preventDefault();
-				if(Number(e.target.id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1 || e.target.id == "dropdownSearch") {
-					this.$refs["dropdown0"]?.[0]?.focus();
+				if(Number((e.target as HTMLElement).id) + 1 > Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1 || (e.target as HTMLElement).id == "dropdownSearch") {
+					(this as any).$refs["dropdown0"]?.[0]?.focus();
 				} else {
-					this.$refs["dropdown" + (Number(e.target.id) + 1)]?.[0]?.focus();
+					(this as any).$refs["dropdown" + (Number((e.target as HTMLElement).id) + 1)]?.[0]?.focus();
 				}
 			} else if(e.keyCode == 38) { //Up
 				e.preventDefault();
-				if(Number(e.target.id) - 1 < 0) {
-					this.$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
+				if(Number((e.target as HTMLElement).id) - 1 < 0) {
+					(this as any).$refs["dropdown" + (Object.keys(this.$refs).filter(x => x.startsWith("dropdown")).length - 1)]?.[0]?.focus();
 				} else {
-					this.$refs["dropdown" + (Number(e.target.id) - 1)]?.[0]?.focus();
+					(this as any).$refs["dropdown" + (Number((e.target as HTMLElement).id) - 1)]?.[0]?.focus();
 				}
 			} else if(e.keyCode == 9) { //Tab
 				if(Object.keys(this.sortedSelectData.options).length === 0) {
@@ -90,10 +94,10 @@ export default {
 			}
 		},
 
-		toggleOption(id) {
+		toggleOption(id: number) {
 			let optionStates = this.optionStates;
 			optionStates[id] = !optionStates[id];
-			this.optionStates = null;
+			//this.optionStates = null;
 			this.optionStates = optionStates;
 			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();
@@ -110,24 +114,24 @@ export default {
 			if(this.displayText) this.displayText = this.displayText.slice(0, this.displayText.length - 2);
 		},
 
-		sortStrings(a, b) {
+		sortStrings(a: string, b: string) {
 			if(a.toLowerCase() > b.toLowerCase()) return 1;
 			if(a.toLowerCase() < b.toLowerCase()) return -1;
 			return 0;
 		},
 
-		applyFilter() {
+		async applyFilter() {
 			this.filteredSelectData = {...this.selectData};
 			this.filteredSelectData.options = this.selectData.options.filter(x => 
 				x.name.toLowerCase().includes(this.searchTerm.toLowerCase())
 			);
-			this.updateSelectData();
+			await this.updateSelectData();
 		}
 	},
 
 	watch: {
-		selectData() {
-			this.updateSelectData();
+		async selectData() {
+			await this.updateSelectData();
 		},
 		searchTerm() {
 			this.applyFilter();

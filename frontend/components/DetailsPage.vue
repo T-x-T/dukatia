@@ -11,7 +11,7 @@
 			/>
 		</div>
 
-		<div v-if="config.tableData" id="table">
+		<div v-if="config?.tableData" id="table">
 			<CustomTable
 				:tableData="config.tableData"
 			/>
@@ -19,14 +19,17 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 	data: () => ({
 		selectData: {}
 	}),
 
 	props: {
-		config: Object
+		config: {
+			type: Object as PropType<DetailFormConfig>,
+			required: true,
+		}
 	}
 }
 </script>
