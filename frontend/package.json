@@ -8,7 +8,7 @@
     "build": "npx nuxi build",
     "start": "npx nuxi start"
   },
-  "dependencies": {
+  "devDependencies": {
     "nuxt": "^3.4.3",
     "@nuxtjs/color-mode": "^3.2.0",
     "chart.js": "^4.2.1",
