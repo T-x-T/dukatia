@@ -180,8 +180,7 @@ export default {
 
 		async deleteThis() {
 			try {
-				//await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
-				await $fetch("/api/v1/transactions/308", { method: "DELETE" });
+				await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
 				this.$emit("back");
 			} catch(e: any) {
 				console.error(e);

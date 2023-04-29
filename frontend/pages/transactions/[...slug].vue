@@ -155,7 +155,6 @@ export default {
 		},
 
 		rowSelect(rows: Row) {
-			//this.selectedRows = null;
 			this.selectedRows = rows;
 		},
 
