@@ -6,7 +6,7 @@
 				<div v-if="field.type == 'number'">
 					<label>{{`${field.label}: `}}</label>
 					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
-					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{currencies.filter(y => y.id == accounts.filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
+					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 				</div>
 
 				<div v-else-if="field.type == 'string'">
@@ -180,7 +180,8 @@ export default {
 
 		async deleteThis() {
 			try {
-				await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
+				//await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, { method: "DELETE" });
+				await $fetch("/api/v1/transactions/308", { method: "DELETE" });
 				this.$emit("back");
 			} catch(e: any) {
 				console.error(e);
