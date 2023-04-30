@@ -19,6 +19,7 @@ mod recipient;
 mod transaction;
 mod reports;
 mod asset;
+mod dashboard;
 
 use std::fmt;
 use std::error::Error;

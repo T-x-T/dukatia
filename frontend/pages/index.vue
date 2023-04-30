@@ -1,6 +1,7 @@
 <template>
-	<div id="main">
-		<h2>This is the Dashboard</h2>
+	<div>
+		<Dashboards />
+		<!-- <h2>This is the Dashboard</h2>
 		<div id="grid">
 			<div class="gridItem small" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
 				<TotalBalance :currency_id="Number(currency_id)" :amount="amount"/>	
@@ -52,7 +53,7 @@
 					title="Balance per Account over Time"
 				/>
 			</div>
-		</div>
+		</div> -->
 	</div>
 </template>
 

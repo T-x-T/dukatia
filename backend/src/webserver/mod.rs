@@ -13,6 +13,7 @@ use super::recipient;
 use super::transaction;
 use super::reports;
 use super::asset;
+use super::dashboard;
 use super::access_token::get_user_of_token;
 
 pub struct AppState {
@@ -73,6 +74,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(asset::rest_api::post_valuation)
 			.service(asset::rest_api::get_valuation_history_by_asset_id)
 			.service(asset::rest_api::replace_valuation_history_of_asset)
+			.service(dashboard::rest_api::get_all_of_user)
 			.service(currency::rest_api::get_all)
 			.service(currency::rest_api::get_by_id)
 			.service(currency::rest_api::post)

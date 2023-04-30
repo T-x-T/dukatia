@@ -53,3 +53,30 @@ Request:
 
 Response:   
 Empty body
+
+### get dashboards
+
+This endpoint is used to retrieve the dashboards of the currently logged in user. 
+
+Request:  
+`GET /api/v1/users/me/dasboards`
+```json
+[
+	{
+		"id":0,
+		"user_id":0,
+		"name":"Default",
+		"description":"The default Dashboard"
+	}
+]
+```
+
+| Property | Description |
+| ----------- | ----------- |
+| id | id of the dashboard |
+| user_id | id of the user owning the dashboard | 
+| name | name of the dashboard | 
+| description | optional description of the dashboard | 
+
+Response:   
+Empty body

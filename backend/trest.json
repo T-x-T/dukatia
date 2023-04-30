@@ -1482,6 +1482,26 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "dashboard",
+			"tests": [
+				{
+					"name": "getting own dashboards returns default dashboard on default db",
+					"endpoint": "/api/v1/users/me/dashboards",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"user_id":0,"name":"Default","description":"The default Dashboard"}]
+					}
+				}
+			]
 		}
 	]
 }

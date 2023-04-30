@@ -12,3 +12,62 @@ SELECT r.id, r.name, r.user_id, array_agg(t.tag_id) as tags FROM public.recipien
 
 ALTER TABLE public.recipient_data
     OWNER TO postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.dashboards
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 0 MINVALUE 0 MAXVALUE 2147483647 CACHE 1 ),
+    user_id integer NOT NULL,
+    name text COLLATE pg_catalog."default" NOT NULL,
+    description text COLLATE pg_catalog."default",
+    CONSTRAINT user_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.dashboards
+    OWNER to postgres;
+ALTER TABLE IF EXISTS public.dashboards
+    ADD CONSTRAINT dashboard_id_unique UNIQUE (id);
+
+CREATE TABLE IF NOT EXISTS public.charts
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 0 MINVALUE 0 MAXVALUE 2147483647 CACHE 1 ),
+    user_id integer,
+    chart_data json NOT NULL,
+    CONSTRAINT user_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.charts
+    OWNER to postgres;
+ALTER TABLE IF EXISTS public.charts
+    ADD CONSTRAINT chart_id_unique UNIQUE (id);
+
+
+CREATE TABLE IF NOT EXISTS public.dashboard_charts
+(
+    dashboard_id integer NOT NULL,
+    chart_id integer NOT NULL,
+    CONSTRAINT dashboard_charts_pkey PRIMARY KEY (dashboard_id, chart_id),
+    CONSTRAINT chart_id FOREIGN KEY (chart_id)
+        REFERENCES public.charts (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT dashboard_id FOREIGN KEY (dashboard_id)
+        REFERENCES public.dashboards (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.dashboard_charts
+    OWNER to postgres;
