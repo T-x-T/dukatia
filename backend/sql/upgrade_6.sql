@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS public.dashboards
     user_id integer NOT NULL,
     name text COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default",
+    CONSTRAINT dashboards_pkey PRIMARY KEY (id),
     CONSTRAINT user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE
@@ -37,7 +38,12 @@ CREATE TABLE IF NOT EXISTS public.charts
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 0 MINVALUE 0 MAXVALUE 2147483647 CACHE 1 ),
     user_id integer,
-    chart_data json NOT NULL,
+    grid_size text COLLATE pg_catalog."default" NOT NULL,
+    chart_type text COLLATE pg_catalog."default" NOT NULL,
+    title text COLLATE pg_catalog."default" NOT NULL,
+    text_template text COLLATE pg_catalog."default",
+    CONSTRAINT charts_pkey PRIMARY KEY (id),
+    CONSTRAINT chart_id_unique UNIQUE (id),
     CONSTRAINT user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE

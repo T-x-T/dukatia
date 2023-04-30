@@ -20,6 +20,7 @@ mod transaction;
 mod reports;
 mod asset;
 mod dashboard;
+mod chart;
 
 use std::fmt;
 use std::error::Error;

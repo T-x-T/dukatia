@@ -163,4 +163,12 @@ declare global {
 		name: string,
 		description?: string,
 	}
+
+	type ChartOptions = {
+		id: number,
+		grid_size: "small" | "medium" | "large",
+		chart_type: "text" | "pie" | "line",
+		title: string,
+		text_template?: string,
+	}
 }
