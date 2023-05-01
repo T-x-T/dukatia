@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<p>{{ chart_options.title }}</p>
+		<h5>{{ chart_options.title }}</h5>
 		<p>{{ chart_data?.text }}</p>
 	</div>
 </template>

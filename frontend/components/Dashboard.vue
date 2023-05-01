@@ -32,14 +32,15 @@ export default {
 div#grid
 	display: grid
 	width: 100%
-	grid-template-columns: repeat(auto-fit, minmax(10%, 1fr))
-	grid-auto-rows: 100px
+	grid-auto-rows: 10%
+	grid-auto-columns: 10%
 	align-items: stretch
 	justify-items: stretch
 	grid-gap: 10px
 
 div.gridItem
 	padding: 10px
+	overflow: scroll
 
 div.small
 	grid-column: span 1
@@ -47,10 +48,10 @@ div.small
 
 div.medium
 	grid-column: span 2
-	grid-row: span 4
+	grid-row: span 2
 
 div.large
 	grid-column: span 4
-	grid-row: span 4
+	grid-row: span 2
 	
 </style>
