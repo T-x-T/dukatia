@@ -1,7 +1,18 @@
 <template>
 	<div>
 		<h5>{{ chart_options.title }}</h5>
-		<p>{{ chart_data?.text }}</p>
+		<div v-if="chart_options.chart_type == 'text'">
+			<ChartText
+				v-if="chart_data.text"
+				:text="chart_data.text"
+			/>
+		</div>
+		<div v-if="chart_options.chart_type == 'pie'">
+			<ChartPie
+				v-if="chart_data.pie"
+				:pie="chart_data.pie"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -25,6 +36,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-p
-	white-space: pre-line
+h5
+	text-align: center
 </style>

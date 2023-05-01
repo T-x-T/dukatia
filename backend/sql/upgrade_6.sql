@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS public.charts
     chart_type text COLLATE pg_catalog."default" NOT NULL,
     title text COLLATE pg_catalog."default" NOT NULL,
     text_template text COLLATE pg_catalog."default",
+    default_filter_from timestamp with time zone,
+    default_filter_to timestamp with time zone,
+    default_filter_collection text COLLATE pg_catalog."default",
     CONSTRAINT charts_pkey PRIMARY KEY (id),
     CONSTRAINT chart_id_unique UNIQUE (id),
     CONSTRAINT user_id FOREIGN KEY (user_id)

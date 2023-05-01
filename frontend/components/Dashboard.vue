@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-const charts: ChartOptions[] = [(await useFetch("/api/v1/charts/0")).data.value];
+const charts: ChartOptions[] = (await useFetch("/api/v1/dashboards/0/charts")).data.value;
 </script>
 
 <script lang="ts">
