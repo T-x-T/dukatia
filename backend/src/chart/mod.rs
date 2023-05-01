@@ -5,7 +5,7 @@ pub mod rest_api;
 
 use crate::CustomError;
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::error::Error;
 use deadpool_postgres::Pool;
 use std::collections::BTreeMap;
@@ -24,6 +24,13 @@ pub struct Chart {
 	pub filter_collection: Option<String>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChartOptions {
+	pub from_date: Option<DateTime<Utc>>,
+	pub to_date: Option<DateTime<Utc>>,
+	pub only_parents: Option<bool>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct ChartData {
 	pub text: Option<String>,
@@ -38,8 +45,16 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 	return db::get_all_charts_in_dashboard(pool, dashboard_id).await;
 }
 
-pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32) -> Result<ChartData, Box<dyn Error>> {
-	let chart = get_by_id(pool, chart_id).await.unwrap();
+pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+	let mut chart = get_by_id(pool, chart_id).await.unwrap();
+	
+	if options.from_date.is_some() {
+		chart.filter_from = options.from_date;
+	}
+	
+	if options.to_date.is_some() {
+		chart.filter_to = options.to_date;
+	}
 
 	if chart.chart_type == "text" {
 		return text::get_chart_data(pool, chart).await;

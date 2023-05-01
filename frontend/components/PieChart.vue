@@ -1,5 +1,6 @@
 <template>
 	<Pie
+		ref="chart"
 		:data="chartData"
 		:options="chartOptions"
 	/>
@@ -18,7 +19,16 @@ export default {
 
 	components: {
 		Pie
-	}
+	},
+
+/* 	watch: {
+		chartData: {
+			handler() {
+				this.$refs.chart.chart.update();
+			},
+			deep: true,
+		}
+	}, */
 }
 </script>
 

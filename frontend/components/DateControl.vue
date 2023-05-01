@@ -26,7 +26,6 @@ export default {
 		from_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 28).toISOString().slice(0, 10),
 		to_date: new Date().toISOString().slice(0, 10),
 		date_range: "0",
-		initialized: false
 	}),
 
 	props: {
@@ -133,13 +132,10 @@ export default {
 				}
 			}
 
-			if(this.initialized) {
-				this.$emit("update", {
-					from_date: this.from_date,
-					to_date: this.to_date
-				});
-			}
-			this.initialized = true;
+			this.$emit("update", {
+				from_date: this.from_date,
+				to_date: this.to_date
+			});
 		}
 	}
 }

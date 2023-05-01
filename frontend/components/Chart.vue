@@ -11,7 +11,20 @@
 			<ChartPie
 				v-if="chart_data.pie"
 				:pie="chart_data.pie"
+				:key="key"
 			/>
+		</div>
+
+		<div id="controls">
+			<DateControl 
+				v-if="chart_options.chart_type == 'pie' || chart_options.chart_type == 'line'"
+				v-on:update="update_date"
+				default_date_range="0"
+			/>
+<!-- 			<div v-if="showOnlyParentsToggle">
+				<label for="parent">Only Parents:</label>
+				<input type="checkbox" id="parent" v-model="only_parents">
+			</div> -->
 		</div>
 	</div>
 </template>
@@ -19,7 +32,8 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		chart_data: {} as any
+		chart_data: {} as any,
+		key: 0,
 	}),
 
 	props: {
@@ -30,8 +44,15 @@ export default {
 	},
 
 	async mounted() {
-		this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data`);
-	}
+		if(this.chart_options.chart_type == "text") this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data`);
+	},
+
+	methods: {
+		async update_date(dates: {from_date: string, to_date: string}) {
+			this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data?from_date=${new Date(dates.from_date).toISOString()}&to_date=${new Date(dates.to_date).toISOString()}`);
+			this.key++;
+		}
+	},
 }
 </script>
 

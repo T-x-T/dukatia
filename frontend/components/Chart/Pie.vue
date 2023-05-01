@@ -47,15 +47,20 @@ export default {
 		if(this.$colorMode.preference == "light") {
 			this.chart_options.plugins.legend.labels.color = "#000";
 		}
+		this.update();
+	},
 
-		Object.keys(this.pie).forEach(x => {
-			this.chart_data.datasets[0].data.push(this.pie[x][1]);
-			this.chart_data.labels.push(x);
-		});
+	methods: {
+		update() {
+			Object.keys(this.pie).forEach(x => {
+				this.chart_data.datasets[0].data.push(this.pie[x][1]);
+				this.chart_data.labels.push(x);
+			});
 
-		(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-			return " " + this.pie[context.label][0];
-		}
+			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
+				return " " + this.pie[context.label][0];
+			}
+		},
 	}
 }
 </script>
