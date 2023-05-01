@@ -1,9 +1,11 @@
 <template>
-	<Pie
-		ref="chart"
-		:data="chartData"
-		:options="chartOptions"
-	/>
+	<div>
+		<Pie
+			ref="chart"
+			:data="chartData"
+			:options="chartOptions"
+		/>
+	</div>
 </template>
 
 <script>
@@ -20,21 +22,9 @@ export default {
 	components: {
 		Pie
 	},
-
-/* 	watch: {
-		chartData: {
-			handler() {
-				this.$refs.chart.chart.update();
-			},
-			deep: true,
-		}
-	}, */
 }
 </script>
 
 <style lang="sass" scoped>
-div, canvas
-	width: 100%
-	height: 100%
-	position: relative
+
 </style>

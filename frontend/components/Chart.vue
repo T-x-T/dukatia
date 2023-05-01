@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="chart_wrapper">
 		<h5>{{ chart_options.title }}</h5>
 		<div v-if="chart_options.chart_type == 'text'">
 			<ChartText
@@ -57,6 +57,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+div#chart_wrapper
+	display: flex
+	flex-direction: column
+	height: 100%
+
 h5
 	text-align: center
 </style>

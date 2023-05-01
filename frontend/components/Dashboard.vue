@@ -32,8 +32,8 @@ export default {
 div#grid
 	display: grid
 	width: 100%
-	grid-auto-rows: 10%
-	grid-auto-columns: 10%
+	grid-auto-rows: 200px
+	grid-template-columns: repeat(10, 1fr)
 	align-items: stretch
 	justify-items: stretch
 	grid-gap: 10px
