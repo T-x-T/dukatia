@@ -1,6 +1,7 @@
 mod db;
 mod text;
 mod pie;
+mod line;
 pub mod rest_api;
 
 use crate::CustomError;
@@ -34,7 +35,8 @@ pub struct ChartOptions {
 #[derive(Debug, Clone, Serialize)]
 pub struct ChartData {
 	pub text: Option<String>,
-	pub pie: Option<BTreeMap<String, (String, i32)>>,
+	pub pie: Option<BTreeMap<String, (String, f64)>>,
+	pub line: Option<BTreeMap<u32, Vec<line::Point>>>,
 }
 
 pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {

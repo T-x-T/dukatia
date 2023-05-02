@@ -22,11 +22,11 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Pie chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
-	return Ok(ChartData { text: None, pie: Some(output) });
+	return Ok(ChartData { text: None, pie: Some(output), line: None });
 }
 
-async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, i32)>, Box<dyn Error>> {
-	let mut output: BTreeMap<String, (String, i32)> = BTreeMap::new();
+async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, f64)>, Box<dyn Error>> {
+	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_transactions(&pool, &chart).await?;
 	let recipients = recipient::get_all(&pool).await?;
@@ -43,13 +43,13 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 		output.insert(recipient.name, build_label_amount(amount_per_currency, &currencies));
 	});
 
-	output.retain(|_, v| v.1 > 0);
+	output.retain(|_, v| v.1 > 0.0);
 
 	return Ok(output)
 }
 
-async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, i32)>, Box<dyn Error>> {
-	let mut output: BTreeMap<String, (String, i32)> = BTreeMap::new();
+async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, f64)>, Box<dyn Error>> {
+	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_transactions(&pool, &chart).await?;
 	let tags = tag::get_all(&pool).await?;
@@ -66,7 +66,7 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (Str
 		output.insert(tag.name, build_label_amount(amount_per_currency, &currencies));
 	});
 
-	output.retain(|_, v| v.1 > 0);
+	output.retain(|_, v| v.1 > 0.0);
 
 	return Ok(output);
 }
@@ -81,18 +81,18 @@ async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<tra
 		}).collect());
 }
 
-fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<currency::Currency>) -> (String, i32) {
+fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<currency::Currency>) -> (String, f64) {
 	let mut amount_per_currency = amount_per_currency;
 
 	amount_per_currency.retain(|_, v| v > &mut 0);
 
-	let mut amount: i32 = 0;
+	let mut amount: f64 = 0.0;
 	let mut label = String::new();
 
 	amount_per_currency.into_iter().for_each(|x| {
 		let currency: currency::Currency = currencies.clone().into_iter().filter(|c| c.id.unwrap() == x.0).next().unwrap();
-		amount += x.1 / currency.minor_in_mayor as i32;
-		label.push_str(format!("{}{} ", x.1 / currency.minor_in_mayor as i32, currency.symbol).as_str());
+		amount += x.1 as f64 / currency.minor_in_mayor as f64;
+		label.push_str(format!("{}{} ", x.1 as f64 / currency.minor_in_mayor as f64, currency.symbol).as_str());
 	});
 
 	return (label, amount);
