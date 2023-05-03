@@ -36,7 +36,7 @@ pub struct ChartOptions {
 pub struct ChartData {
 	pub text: Option<String>,
 	pub pie: Option<BTreeMap<String, (String, f64)>>,
-	pub line: Option<BTreeMap<u32, Vec<line::Point>>>,
+	pub line: Option<BTreeMap<String, Vec<line::Point>>>,
 }
 
 pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
@@ -63,7 +63,7 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: Chart
 	} else if chart.chart_type == "pie" {
 		return pie::get_chart_data(pool, chart).await;
 	} else if chart.chart_type == "line" {
-			
+		return line::get_chart_data(pool, chart).await;
 	}
 
 	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie or line") }));

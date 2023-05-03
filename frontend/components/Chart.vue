@@ -14,6 +14,13 @@
 				:key="key"
 			/>
 		</div>
+		<div id="line_chart" v-if="chart_options.chart_type == 'line'">
+			<ChartLine
+				v-if="chart_data.line"
+				:line="chart_data.line"
+				:key="key"
+			/>
+		</div>
 
 		<div id="controls">
 			<DateControl 
@@ -64,4 +71,7 @@ div#chart_wrapper
 
 h5
 	text-align: center
+
+div#line_chart
+	flex-grow: 1
 </style>
