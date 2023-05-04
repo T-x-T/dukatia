@@ -49,10 +49,41 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 	let recipients = recipient::get_all(&pool).await?;
-	
-	let mut raw_output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
+
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Recipient);
+	let accumulated_raw_output = accumulate(raw_output);
+	let output = sum_currencies(accumulated_raw_output, currencies);
+	let named_output = add_names_to_output(output, NamedTypes::Recipient(recipients));
+
+	return Ok(named_output);
+}
+
+async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+	let currencies = currency::get_all(&pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+	let accounts = account::get_all(&pool).await?;
+
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Account);
+	let accumulated_raw_output = accumulate(raw_output);
+	let output = sum_currencies(accumulated_raw_output, currencies);
+	let named_output = add_names_to_output(output, NamedTypes::Account(accounts));
+
+	return Ok(named_output);
+}
+
+enum RawOutputProperties {
+	Recipient, Account	
+}
+
+fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOutputProperties) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
+	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
 	transactions.into_iter().for_each(|transaction| {
-		*raw_output.entry(transaction.recipient_id)
+		let id = match property {
+			RawOutputProperties::Recipient => transaction.recipient_id,
+			RawOutputProperties::Account => transaction.account_id,
+		};	
+
+		*output.entry(id)
 			.or_insert(BTreeMap::new())
 			.entry(transaction.timestamp.date())
 			.or_insert(PointWithCurrencies {
@@ -63,42 +94,48 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 			.or_insert(0) += transaction.amount;
 	});
 
-	let mut accumulated_raw_output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
-	raw_output.keys().for_each(|recipient| {
-		accumulated_raw_output.insert(*recipient, BTreeMap::new());
+	return output;
+}
+
+fn accumulate(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
+	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
+	input.keys().for_each(|id| {
+		output.insert(*id, BTreeMap::new());
 		
 		let mut previous = PointWithCurrencies {
 			timestamp: chrono::MIN_DATETIME,
 			value: BTreeMap::new(),
 		};
-		raw_output.get(&recipient).unwrap().iter().for_each(|x| {
-
-			let mut val: BTreeMap<Date<Utc>, PointWithCurrencies> = BTreeMap::new();
-			val.insert(x.0.clone(), x.1.clone());
+		input.get(&id).unwrap().iter().for_each(|dated_point| {
 			if previous.timestamp == chrono::MIN_DATETIME {
-				accumulated_raw_output.insert(*recipient, val);
-				previous = x.1.clone();
+				let mut val: BTreeMap<Date<Utc>, PointWithCurrencies> = BTreeMap::new();
+				val.insert(dated_point.0.clone(), dated_point.1.clone());
+				output.insert(*id, val);
+				previous = dated_point.1.clone();
 			} else {
 				let sum_point = PointWithCurrencies {
-					timestamp: x.0.clone().and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
-					value: add_maps(previous.value.clone(), x.1.value.clone()),
+					timestamp: dated_point.0.clone().and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
+					value: add_maps(previous.value.clone(), dated_point.1.value.clone()),
 				};
-				accumulated_raw_output.entry(*recipient)
+				output.entry(*id)
 					.or_default()
-					.insert(x.0.clone(), sum_point.clone());
+					.insert(dated_point.0.clone(), sum_point.clone());
 				previous = sum_point;
 			}
 		});
 	});
 
+	return output;
+}
+
+fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>, currencies: Vec<currency::Currency>) -> BTreeMap<u32, Vec<Point>> {
 	let mut output: BTreeMap<u32, Vec<Point>> = BTreeMap::new();
-	accumulated_raw_output.into_iter().for_each(|x| {
+	input.into_iter().for_each(|x| {
 		x.1.into_iter().for_each(|y| {
 			let mut value: f64 = 0.0;
 			let mut label = String::new();
 			y.1.value.into_iter().for_each(|z| {
 				let currency = currencies.iter().filter(|c| c.id.unwrap() == z.0).next().unwrap();
-
 				let current_value = z.1 as f64 / currency.minor_in_mayor as f64;
 				value += current_value;
 				label.push_str(
@@ -116,88 +153,30 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 		});
 	});
 
-	let mut named_output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
-	output.into_iter().for_each(|x| {
-		let recipient = recipients.iter().filter(|r| r.id.unwrap() == x.0).next().unwrap();
-		named_output.insert(recipient.name.clone(), x.1);
-	});
+	return output;
+} 
 
-	return Ok(named_output);
+#[derive(Debug, Clone)]
+enum NamedTypes {
+	Recipient(Vec<recipient::Recipient>),
+	Account(Vec<account::Account>),
 }
 
-async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
-	let accounts = account::get_all(&pool).await?;
-
-	let mut raw_output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithoutCurrencies>> = BTreeMap::new();
-	transactions.into_iter().for_each(|transaction| {
-		raw_output.entry(transaction.account_id)
-			.or_insert(BTreeMap::new())
-			.entry(transaction.timestamp.date())
-			.or_insert(PointWithoutCurrencies {
-				timestamp: transaction.timestamp,
-				value: 0,
-			})
-			.value += transaction.amount;
+fn add_names_to_output(input: BTreeMap<u32, Vec<Point>>, named_types: NamedTypes) -> BTreeMap<String, Vec<Point>> {
+	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
+	input.iter().for_each(|x| {
+		match &named_types {
+			NamedTypes::Recipient(recipients) => {
+				let recipient = recipients.iter().filter(|r| r.id.unwrap() == *x.0).next().unwrap();
+				output.insert(recipient.name.clone(), x.1.to_vec());
+			},
+			NamedTypes::Account(accounts) => {
+				let account = accounts.iter().filter(|r| r.id.unwrap() == *x.0).next().unwrap();
+				output.insert(account.name.clone(), x.1.to_vec());
+			},
+		}
 	});
-
-	let mut accumulated_raw_output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithoutCurrencies>> = BTreeMap::new();
-	raw_output.keys().for_each(|account| {
-		accumulated_raw_output.insert(*account, BTreeMap::new());
-		
-		let mut previous = PointWithoutCurrencies {
-			timestamp: chrono::MIN_DATETIME,
-			value: 0,
-		};
-		raw_output.get(&account).unwrap().iter().for_each(|x| {
-
-			let mut val: BTreeMap<Date<Utc>, PointWithoutCurrencies> = BTreeMap::new();
-			val.insert(x.0.clone(), x.1.clone());
-			if previous.timestamp == chrono::MIN_DATETIME {
-				accumulated_raw_output.insert(*account, val);
-				previous = x.1.clone();
-			} else {
-				let sum_point = PointWithoutCurrencies {
-					timestamp: x.0.clone().and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
-					value: previous.value + x.1.value,
-				};
-				accumulated_raw_output.entry(*account)
-					.or_default()
-					.insert(x.0.clone(), sum_point.clone());
-				previous = sum_point;
-			}
-		});
-	});
-
-	let mut output: BTreeMap<u32, Vec<Point>> = BTreeMap::new();
-	accumulated_raw_output.into_iter().for_each(|x| {
-		x.1.into_iter().for_each(|y| {
-			let mut label = String::new();
-			let account = accounts.iter().filter(|a| a.id.unwrap() == x.0).next().unwrap();
-			let currency = currencies.iter().filter(|c| c.id.unwrap() == account.default_currency_id).next().unwrap();
-
-			let value = y.1.value as f64 / currency.minor_in_mayor as f64;
-			label.push_str(
-				format!("{}{} ", value, currency.symbol).as_str()
-			);
-
-			output.entry(x.0)
-				.or_insert(Vec::new())
-				.append(&mut vec![Point {
-					timestamp: y.0.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
-					value,
-					label,
-				}]);
-		});
-	});
-
-	let mut named_output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
-	output.into_iter().for_each(|x| {
-		let account = accounts.iter().filter(|a| a.id.unwrap() == x.0).next().unwrap();
-		named_output.insert(account.name.clone(), x.1);
-	});
-	return Ok(named_output);
+	return output;
 }
 
 async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
