@@ -38,6 +38,25 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 	)
 }
 
+pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+	let user_id: Option<i32> = match chart.user_id {
+    Some(x) => Some(x as i32),
+    None => None,
+	};
+
+	pool.get()
+		.await
+		.unwrap()
+		.query(
+			"INSERT INTO public.charts 
+				(id, user_id, grid_size, chart_type, title, text_template, default_filter_from, default_filter_to, default_filter_collection)
+				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8);", 
+			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection]
+		).await?;
+
+	return Ok(());
+}
+
 fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let id: i32 = row.get(0);
 	let user_id: Option<i32> = row.get(1);

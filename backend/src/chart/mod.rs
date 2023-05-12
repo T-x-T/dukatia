@@ -47,6 +47,10 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 	return db::get_all_charts_in_dashboard(pool, dashboard_id).await;
 }
 
+pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+	return db::add(pool, chart).await;
+}
+
 pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let mut chart = get_by_id(pool, chart_id).await.unwrap();
 	
