@@ -43,7 +43,8 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 		output.insert(recipient.name, build_label_amount(amount_per_currency, &currencies));
 	});
 
-	output.retain(|_, v| v.1 > 0.0);
+
+	output.retain(|_, v| v.1 != 0.0);
 
 	return Ok(output)
 }
@@ -66,7 +67,7 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (Str
 		output.insert(tag.name, build_label_amount(amount_per_currency, &currencies));
 	});
 
-	output.retain(|_, v| v.1 > 0.0);
+	output.retain(|_, v| v.1 != 0.0);
 
 	return Ok(output);
 }
@@ -84,7 +85,7 @@ async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<tra
 fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<currency::Currency>) -> (String, f64) {
 	let mut amount_per_currency = amount_per_currency;
 
-	amount_per_currency.retain(|_, v| v > &mut 0);
+	amount_per_currency.retain(|_, v| v != &mut 0);
 
 	let mut amount: f64 = 0.0;
 	let mut label = String::new();

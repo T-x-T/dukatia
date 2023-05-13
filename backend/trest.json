@@ -703,6 +703,118 @@
 					"expected_outcome": {
 						"status_code_equals": 400
 					}
+				},
+				{
+					"name": "post of new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag1"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag2"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of transaction with tag 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 0 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null}
+						]
+					}
+				},
+				{
+					"name": "post of transaction with tag 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 1 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null},
+							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null}
+						]
+					}
+				},
+				{
+					"name": "post of transaction with tags 0 and 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0, 1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 0 and 1 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null},
+							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null},
+							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null}
+						]
+					}
 				}
 			]
 		},
@@ -1069,6 +1181,620 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"name":"Default","description":"The default Dashboard"}]
+					}
+				}
+			]
+		},
+		{
+			"name": "charts",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
+			"tests": [
+				{
+					"name": "adding text chart using foreach_currency returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "small",
+						"chart_type": "text",
+						"title": "Current Balance",
+						"text_template": "%foreach_currency{$name: $current_balance$symbol*}%"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "text chart using foreach_currency got created correctly",
+					"endpoint": "/api/v1/charts/0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":0,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null}
+					}
+				},
+				{
+					"name": "adding pie chart using filter_collection recipients returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "medium",
+						"chart_type": "pie",
+						"title": "Spending per recipient in date range",
+						"filter_collection": "recipients"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "pie chart using filter_collection recipients got created correctly",
+					"endpoint": "/api/v1/charts/1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":1,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients"}
+					}
+				},
+				{
+					"name": "adding pie chart using filter_collection tags returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "medium",
+						"chart_type": "pie",
+						"title": "Spending per tag in date range",
+						"filter_collection": "tags"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "pie chart using filter_collection tags got created correctly",
+					"endpoint": "/api/v1/charts/2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":2,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags"}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection recipients returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Spending per recipient over time",
+						"filter_collection": "recipients"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection recipients got created correctly",
+					"endpoint": "/api/v1/charts/3",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":3,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients"}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection accounts returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Spending per account over time",
+						"filter_collection": "accounts"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection accounts got created correctly",
+					"endpoint": "/api/v1/charts/4",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":4,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts"}
+					}
+				},
+				{
+					"name": "post of new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag1"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag2"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account with Euro Currency returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "euro",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account with USD Currency returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "USD",
+						"default_currency_id": 1
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": -45,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 1000,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of text chart using foreach_currency returns correct output",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 123€\nUSD: 10$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients returns correct output",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["123.45€ ",123.45],"test":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags returns correct output",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["123€ ",123],"tag2":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients returns correct output",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"test":[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts returns correct output",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}],"euro":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]}}
+					}
+				},
+				{
+					"name": "post of new transaction in the past in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 100,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the past in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 200,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the past in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 300,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 100,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 200,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 300,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of text chart using foreach_currency returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 129€\nUSD: 16$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["125.45€ ",125.45],"test":["3.55€ 16$ ",19.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["129€ ",129],"tag2":["3.55€ 16$ ",19.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}
+							],
+							"test":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":14.55,"label":"1.55€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":19.55,"label":"3.55€ 16$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}
+							],
+							"euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":3.55,"label":"3.55€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients within date range returns correct output",
+					"endpoint": "/api/v1/charts/1/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["123.45€ ",123.45],"test":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags within date range returns correct output",
+					"endpoint": "/api/v1/charts/2/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["123€ ",123],"tag2":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients within date range returns correct output",
+					"endpoint": "/api/v1/charts/3/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"test":[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts within date range returns correct output",
+					"endpoint": "/api/v1/charts/4/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}],"euro":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]}}
+					}
+				},
+				{
+					"name": "post of new transaction in account 0 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 1 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": -45,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 2 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": 1000,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of text chart using foreach_currency with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 252€\nUSD: 26$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["248.9€ ",248.9],"test":["3.1€ 26$ ",29.1]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["252€ ",252],"tag2":["3.1€ 26$ ",29.1]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}
+							],
+							"test":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":24.10,"label":"1.1€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":29.10,"label":"3.1€ 26$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}
+							],
+							"euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":1.10,"label":"1.1€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":3.10,"label":"3.1€ "}
+							]
+						}}
 					}
 				}
 			]

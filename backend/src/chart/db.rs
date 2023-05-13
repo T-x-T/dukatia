@@ -49,7 +49,7 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 		.unwrap()
 		.query(
 			"INSERT INTO public.charts 
-				(id, user_id, grid_size, chart_type, title, text_template, default_filter_from, default_filter_to, default_filter_collection)
+				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection)
 				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8);", 
 			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection]
 		).await?;
@@ -64,9 +64,9 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let chart_type: String = row.get(3);
 	let title: String = row.get(4);
 	let text_template: Option<String> = row.get(5);
-	let default_filter_from: Option<DateTime<Utc>> = row.get(6);
-	let default_filter_to: Option<DateTime<Utc>> = row.get(7);
-	let default_filter_collection: Option<String> = row.get(8);
+	let filter_from: Option<DateTime<Utc>> = row.get(6);
+	let filter_to: Option<DateTime<Utc>> = row.get(7);
+	let filter_collection: Option<String> = row.get(8);
 
 	return Chart {
 		id: Some(id as u32),
@@ -75,8 +75,8 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		chart_type,
 		title,
 		text_template,
-		filter_from: default_filter_from,
-		filter_to: default_filter_to,
-		filter_collection: default_filter_collection,
+		filter_from,
+		filter_to,
+		filter_collection,
 	};
 }
