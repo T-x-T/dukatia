@@ -40,6 +40,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		"recipients" => compute_recipients(pool, chart).await?,
 		"accounts" => compute_accounts(pool, chart).await?,
 		"currencies" => compute_currencies(pool, chart).await?,
+		"earning_spending_net" => compute_earning_spending_net(pool, chart).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Line chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
@@ -84,8 +85,20 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	return Ok(named_output);
 }
 
+async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+	let currencies = currency::get_all(&pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+
+	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet);
+	let accumulated_raw_output = accumulate(raw_output);
+	let output = sum_currencies(accumulated_raw_output, currencies.clone());
+	let named_output = add_names_to_output(output, NamedTypes::EarningSpendingNet);
+
+	return Ok(named_output);
+}
+
 enum RawOutputProperties {
-	Recipient, Account, Currency
+	Recipient, Account, Currency, EarningSpendingNet
 }
 
 fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOutputProperties) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
@@ -95,6 +108,23 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 			RawOutputProperties::Recipient => transaction.recipient_id,
 			RawOutputProperties::Account => transaction.account_id,
 			RawOutputProperties::Currency => transaction.currency_id.unwrap(),
+			RawOutputProperties::EarningSpendingNet => {
+				*output.entry(2)
+					.or_insert(BTreeMap::new())
+					.entry(transaction.timestamp.date())
+					.or_insert(PointWithCurrencies {
+						timestamp: transaction.timestamp,
+						value: BTreeMap::new(),
+					})
+					.value.entry(transaction.currency_id.unwrap())
+					.or_insert(0) += transaction.amount;
+				
+				if transaction.amount > 0 {
+					0
+				} else { 
+					1
+				}
+			},
 		};	
 
 		*output.entry(id)
@@ -175,6 +205,7 @@ enum NamedTypes {
 	Recipient(Vec<recipient::Recipient>),
 	Account(Vec<account::Account>),
 	Currency(Vec<currency::Currency>),
+	EarningSpendingNet,
 }
 
 fn add_names_to_output(input: BTreeMap<u32, Vec<Point>>, named_types: NamedTypes) -> BTreeMap<String, Vec<Point>> {
@@ -192,6 +223,13 @@ fn add_names_to_output(input: BTreeMap<u32, Vec<Point>>, named_types: NamedTypes
 			NamedTypes::Currency(currencies) => {
 				let currency = currencies.iter().filter(|c| c.id.unwrap() == *x.0).next().unwrap();
 				output.insert(currency.name.clone(), x.1.to_vec());
+			},
+			NamedTypes::EarningSpendingNet => {
+				match x.0 {
+					0 => output.insert(String::from("Earning"), x.1.to_vec()),
+					1 => output.insert(String::from("Spending"), x.1.to_vec()),
+					_ => output.insert(String::from("Net"), x.1.to_vec()),
+				};
 			},
 		}
 	});

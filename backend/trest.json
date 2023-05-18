@@ -1335,6 +1335,32 @@
 					}
 				},
 				{
+					"name": "adding line chart using filter_collection earning_spending_net returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Earning and spending over time",
+						"filter_collection": "earning_spending_net"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection earning_spending_net got created correctly",
+					"endpoint": "/api/v1/charts/6",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":6,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net"}
+					}
+				},
+
+
+
+				{
 					"name": "post of new tag returns 200",
 					"endpoint": "/api/v1/tags",
 					"method": "POST",
@@ -1391,6 +1417,9 @@
 						"status_code_equals": 200
 					}
 				},
+
+
+
 				{
 					"name": "post of new transaction in account 0 returns 200",
 					"endpoint": "/api/v1/transactions",
@@ -1442,6 +1471,9 @@
 						"status_code_equals": 200
 					}
 				},
+
+
+
 				{
 					"name": "retrieval of text chart using foreach_currency returns correct output",
 					"endpoint": "/api/v1/charts/0/data",
@@ -1496,6 +1528,18 @@
 						"body_equals": {"text":null,"pie":null,"line":{"Euro":[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]}}
 					}
 				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output",
+					"endpoint": "/api/v1/charts/6/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Earning":[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}],"Spending":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}],"Net":[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]}}
+					}
+				},
+
+
+
 				{
 					"name": "post of new transaction in the past in account 0 returns 200",
 					"endpoint": "/api/v1/transactions",
@@ -1598,6 +1642,9 @@
 						"status_code_equals": 200
 					}
 				},
+
+
+
 				{
 					"name": "retrieval of text chart using foreach_currency returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/0/data",
@@ -1691,6 +1738,32 @@
 					}
 				},
 				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/6/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":139.45,"label":"126.45€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":145.45,"label":"129.45€ 16$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":139.0,"label":"126€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":145.0,"label":"129€ 16$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
 					"name": "retrieval of pie chart using filter_collection recipients within date range returns correct output",
 					"endpoint": "/api/v1/charts/1/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
@@ -1735,6 +1808,18 @@
 						"body_equals": {"text":null,"pie":null,"line":{"Euro":[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]}}
 					}
 				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net within date range returns correct output",
+					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Earning":[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}],"Spending":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}],"Net":[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]}}
+					}
+				},
+
+
+
 				{
 					"name": "post of new transaction in account 0 on same day returns 200",
 					"endpoint": "/api/v1/transactions",
@@ -1786,6 +1871,9 @@
 						"status_code_equals": 200
 					}
 				},
+
+
+
 				{
 					"name": "retrieval of text chart using foreach_currency with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/0/data",
@@ -1874,6 +1962,29 @@
 								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
 								{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},
 								{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/6/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}
 							]
 						}}
 					}
