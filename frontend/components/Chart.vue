@@ -23,10 +23,11 @@
 		</div>
 
 		<div id="controls">
-			<DateControl 
+			<ChartControl 
 				v-if="chart_options.chart_type == 'pie' || chart_options.chart_type == 'line'"
 				v-on:update="update_date"
 				default_date_range="0"
+				:default_date_period="chart_options.date_period"
 			/>
 <!-- 			<div v-if="showOnlyParentsToggle">
 				<label for="parent">Only Parents:</label>
@@ -55,8 +56,8 @@ export default {
 	},
 
 	methods: {
-		async update_date(dates: {from_date: string, to_date: string}) {
-			this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data?from_date=${new Date(dates.from_date).toISOString()}&to_date=${new Date(dates.to_date).toISOString()}`);
+		async update_date(options: {from_date: string, to_date: string, date_period: string}) {
+			this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`);
 			this.key++;
 		}
 	},

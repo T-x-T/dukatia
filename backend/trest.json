@@ -1216,7 +1216,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null}
+						"body_equals": {"id":0,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null}
 					}
 				},
 				{
@@ -1239,7 +1239,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":1,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients"}
+						"body_equals": {"id":1,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null}
 					}
 				},
 				{
@@ -1262,7 +1262,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":2,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags"}
+						"body_equals": {"id":2,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null}
 					}
 				},
 				{
@@ -1273,7 +1273,8 @@
 						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per recipient over time",
-						"filter_collection": "recipients"
+						"filter_collection": "recipients",
+						"date_period": "daily"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -1285,7 +1286,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":3,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients"}
+						"body_equals": {"id":3,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period": "daily"}
 					}
 				},
 				{
@@ -1296,7 +1297,8 @@
 						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per account over time",
-						"filter_collection": "accounts"
+						"filter_collection": "accounts",
+						"date_period": "daily"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -1308,7 +1310,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":4,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts"}
+						"body_equals": {"id":4,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period": "daily"}
 					}
 				},
 				{
@@ -1319,7 +1321,8 @@
 						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per currency over time",
-						"filter_collection": "currencies"
+						"filter_collection": "currencies",
+						"date_period": "daily"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -1331,7 +1334,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":5,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies"}
+						"body_equals": {"id":5,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period": "daily"}
 					}
 				},
 				{
@@ -1342,7 +1345,8 @@
 						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Earning and spending over time",
-						"filter_collection": "earning_spending_net"
+						"filter_collection": "earning_spending_net",
+						"date_period": "monthly"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -1354,7 +1358,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":6,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net"}
+						"body_equals": {"id":6,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly"}
 					}
 				},
 
@@ -1530,7 +1534,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output",
-					"endpoint": "/api/v1/charts/6/data",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -1739,7 +1743,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/6/data",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -1810,7 +1814,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection earning_spending_net within date range returns correct output",
-					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z&date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -1968,7 +1972,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection earning_spending_net with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/6/data",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -1985,6 +1989,101 @@
 							],
 							"Spending":[
 								{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of line chart with date_period daily returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period monthly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=monthly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period quarterly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=quarterly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period yearly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=yearly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
 							]
 						}}
 					}

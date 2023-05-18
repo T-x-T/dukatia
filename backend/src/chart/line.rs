@@ -2,7 +2,7 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
 use serde::Serialize;
-use chrono::{DateTime, Date, NaiveTime, Utc, MIN_DATETIME, MAX_DATETIME};
+use chrono::{DateTime, Date, NaiveTime, NaiveDate, Datelike, Utc, MIN_DATETIME, MAX_DATETIME};
 
 use super::{Chart, ChartData};
 
@@ -52,7 +52,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 	let recipients = recipient::get_all(&pool).await?;
 
-	let raw_output = build_raw_output(transactions, RawOutputProperties::Recipient);
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Recipient, chart.date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
 	let output = sum_currencies(accumulated_raw_output, currencies);
 	let named_output = add_names_to_output(output, NamedTypes::Recipient(recipients));
@@ -65,7 +65,7 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, 
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 	let accounts = account::get_all(&pool).await?;
 
-	let raw_output = build_raw_output(transactions, RawOutputProperties::Account);
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, chart.date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
 	let output = sum_currencies(accumulated_raw_output, currencies);
 	let named_output = add_names_to_output(output, NamedTypes::Account(accounts));
@@ -77,7 +77,7 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 
-	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency);
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency, chart.date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
 	let output = sum_currencies(accumulated_raw_output, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::Currency(currencies));
@@ -89,7 +89,7 @@ async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<BTree
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 
-	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet);
+	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet, chart.date_period.unwrap_or(String::from("monthly")));
 	let accumulated_raw_output = accumulate(raw_output);
 	let output = sum_currencies(accumulated_raw_output, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::EarningSpendingNet);
@@ -101,7 +101,7 @@ enum RawOutputProperties {
 	Recipient, Account, Currency, EarningSpendingNet
 }
 
-fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOutputProperties) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
+fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOutputProperties, date_period: String) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
 	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
 	transactions.into_iter().for_each(|transaction| {
 		let id = match property {
@@ -111,7 +111,7 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 			RawOutputProperties::EarningSpendingNet => {
 				*output.entry(2)
 					.or_insert(BTreeMap::new())
-					.entry(transaction.timestamp.date())
+					.entry(get_date_for_period(&date_period, &transaction.timestamp))
 					.or_insert(PointWithCurrencies {
 						timestamp: transaction.timestamp,
 						value: BTreeMap::new(),
@@ -129,7 +129,7 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 
 		*output.entry(id)
 			.or_insert(BTreeMap::new())
-			.entry(transaction.timestamp.date())
+			.entry(get_date_for_period(&date_period, &transaction.timestamp))
 			.or_insert(PointWithCurrencies {
 				timestamp: transaction.timestamp,
 				value: BTreeMap::new(),
@@ -139,6 +139,37 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 	});
 
 	return output;
+}
+
+fn get_date_for_period(date_period: &String, timestamp: &DateTime<Utc>) -> Date<Utc> {
+	match date_period.as_str() {
+		"daily" => {
+			timestamp.date()
+		},
+		"monthly" => {
+			Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), timestamp.month(), 1).unwrap(), Utc)
+		},
+		"quarterly" => {
+			match timestamp.month() {
+				1 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc),
+				2 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc),
+				3 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc),
+				4 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(), Utc),
+				5 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(), Utc),
+				6 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(), Utc),
+				7 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(), Utc),
+				8 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(), Utc),
+				9 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(), Utc),
+				10 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(), Utc),
+				11 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(), Utc),
+				_ => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(), Utc)
+			}
+		},
+		"yearly" => {
+			Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc)
+		},
+		_ => chrono::MIN_DATE,
+	}
 }
 
 fn accumulate(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {

@@ -23,6 +23,7 @@ pub struct Chart {
 	pub filter_from: Option<DateTime<Utc>>,
 	pub filter_to: Option<DateTime<Utc>>,
 	pub filter_collection: Option<String>,
+	pub date_period: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -30,6 +31,7 @@ pub struct ChartOptions {
 	pub from_date: Option<DateTime<Utc>>,
 	pub to_date: Option<DateTime<Utc>>,
 	pub only_parents: Option<bool>,
+	pub date_period: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -60,6 +62,10 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: Chart
 	
 	if options.to_date.is_some() {
 		chart.filter_to = options.to_date;
+	}
+
+	if options.date_period.is_some() {
+		chart.date_period = options.date_period;
 	}
 
 	if chart.chart_type == "text" {

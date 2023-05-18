@@ -49,9 +49,9 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 		.unwrap()
 		.query(
 			"INSERT INTO public.charts 
-				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection)
-				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8);", 
-			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection]
+				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period)
+				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9);", 
+			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period]
 		).await?;
 
 	return Ok(());
@@ -67,6 +67,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let filter_from: Option<DateTime<Utc>> = row.get(6);
 	let filter_to: Option<DateTime<Utc>> = row.get(7);
 	let filter_collection: Option<String> = row.get(8);
+	let date_period: Option<String> = row.get(9);
 
 	return Chart {
 		id: Some(id as u32),
@@ -78,5 +79,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		filter_from,
 		filter_to,
 		filter_collection,
+		date_period,
 	};
 }

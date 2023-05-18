@@ -53,6 +53,7 @@ struct ChartPost {
 	filter_from: Option<DateTime<Utc>>,
 	filter_to: Option<DateTime<Utc>>,
 	filter_collection: Option<String>,
+	date_period: Option<String>,
 }
 
 #[post("/api/v1/charts")]
@@ -72,6 +73,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		filter_from: body.filter_from,
 		filter_to: body.filter_to,
 		filter_collection: body.filter_collection,
+		date_period: body.date_period,
 	};
 
 	match super::add(&data.pool, &chart).await {
