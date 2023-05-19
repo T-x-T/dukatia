@@ -81,3 +81,24 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.dashboard_charts
     OWNER to postgres;
+
+
+ALTER TABLE public.charts DISABLE TRIGGER ALL;
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'small', 'text', 'Current balance', '%foreach_currency{$name: $current_balance$symbol*}%', NULL, NULL, NULL, 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'medium', 'pie', 'Spending per Recipient in Date Range', NULL, NULL, NULL, 'recipients', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'medium', 'pie', 'Spending per Tag in Date Range', NULL, NULL, NULL, 'tags', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per Recipient over Time', NULL, NULL, NULL, 'recipients', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per Account over Time', NULL, NULL, NULL, 'accounts', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per currency over Time', NULL, NULL, NULL, 'currencies', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Earning and spending over Time', NULL, NULL, NULL, 'earning_spending_net', 'monthly');
+ALTER TABLE public.charts ENABLE TRIGGER ALL;
+
+ALTER TABLE public.dashboard_charts DISABLE TRIGGER ALL;
+INSERT INTO public.dashboard_charts VALUES (0, 0);
+INSERT INTO public.dashboard_charts VALUES (0, 1);
+INSERT INTO public.dashboard_charts VALUES (0, 2);
+INSERT INTO public.dashboard_charts VALUES (0, 3);
+INSERT INTO public.dashboard_charts VALUES (0, 4);
+INSERT INTO public.dashboard_charts VALUES (0, 5);
+INSERT INTO public.dashboard_charts VALUES (0, 6);
+ALTER TABLE public.dashboard_charts ENABLE TRIGGER ALL;

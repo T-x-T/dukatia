@@ -1212,11 +1212,11 @@
 				},
 				{
 					"name": "text chart using foreach_currency got created correctly",
-					"endpoint": "/api/v1/charts/0",
+					"endpoint": "/api/v1/charts/7",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null}
+						"body_equals": {"id":7,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null}
 					}
 				},
 				{
@@ -1235,11 +1235,11 @@
 				},
 				{
 					"name": "pie chart using filter_collection recipients got created correctly",
-					"endpoint": "/api/v1/charts/1",
+					"endpoint": "/api/v1/charts/8",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":1,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null}
+						"body_equals": {"id":8,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null}
 					}
 				},
 				{
@@ -1258,11 +1258,11 @@
 				},
 				{
 					"name": "pie chart using filter_collection tags got created correctly",
-					"endpoint": "/api/v1/charts/2",
+					"endpoint": "/api/v1/charts/9",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":2,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null}
+						"body_equals": {"id":9,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null}
 					}
 				},
 				{
@@ -1282,11 +1282,11 @@
 				},
 				{
 					"name": "line chart using filter_collection recipients got created correctly",
-					"endpoint": "/api/v1/charts/3",
+					"endpoint": "/api/v1/charts/10",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":3,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period": "daily"}
+						"body_equals": {"id":10,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period": "daily"}
 					}
 				},
 				{
@@ -1306,11 +1306,11 @@
 				},
 				{
 					"name": "line chart using filter_collection accounts got created correctly",
-					"endpoint": "/api/v1/charts/4",
+					"endpoint": "/api/v1/charts/11",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":4,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period": "daily"}
+						"body_equals": {"id":11,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period": "daily"}
 					}
 				},
 				{
@@ -1330,11 +1330,11 @@
 				},
 				{
 					"name": "line chart using filter_collection currencies got created correctly",
-					"endpoint": "/api/v1/charts/5",
+					"endpoint": "/api/v1/charts/12",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":5,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period": "daily"}
+						"body_equals": {"id":12,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period": "daily"}
 					}
 				},
 				{
@@ -1354,11 +1354,11 @@
 				},
 				{
 					"name": "line chart using filter_collection earning_spending_net got created correctly",
-					"endpoint": "/api/v1/charts/6",
+					"endpoint": "/api/v1/charts/13",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":6,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly"}
+						"body_equals": {"id":13,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly"}
 					}
 				},
 
