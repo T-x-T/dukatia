@@ -17,7 +17,6 @@ mod account;
 mod tag;
 mod recipient;
 mod transaction;
-mod reports;
 mod asset;
 mod dashboard;
 mod chart;
