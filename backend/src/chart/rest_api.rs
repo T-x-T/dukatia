@@ -74,6 +74,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		filter_to: body.filter_to,
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
+		asset_id: None,
 	};
 
 	match super::add(&data.pool, &chart).await {

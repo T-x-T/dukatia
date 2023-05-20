@@ -80,5 +80,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		filter_to,
 		filter_collection,
 		date_period,
+		asset_id: None,
 	};
 }

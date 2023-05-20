@@ -2,7 +2,7 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
 use serde::Serialize;
-use chrono::{DateTime, Date, NaiveTime, NaiveDate, Datelike, Utc, MIN_DATETIME, MAX_DATETIME};
+use chrono::{DateTime, Date, NaiveTime, NaiveDate, Datelike, Utc, MIN_DATETIME, MAX_DATETIME, Duration};
 
 use super::{Chart, ChartData};
 
@@ -11,6 +11,7 @@ use crate::transaction;
 use crate::currency;
 use crate::recipient;
 use crate::account;
+use crate::asset;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Point {
@@ -41,6 +42,9 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		"accounts" => compute_accounts(pool, chart).await?,
 		"currencies" => compute_currencies(pool, chart).await?,
 		"earning_spending_net" => compute_earning_spending_net(pool, chart).await?,
+		"asset_total_value" => compute_asset_total_value(pool, chart).await?,
+		"asset_single_value" => compute_asset_single_value(pool, chart).await?,
+		"asset_amount" => compute_asset_amount(pool, chart).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Line chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
@@ -288,4 +292,128 @@ fn add_maps(a: BTreeMap<u32, i32>, b: BTreeMap<u32, i32>) -> BTreeMap<u32, i32> 
 		*a.entry(*x.0).or_insert(0) += x.1;
 	});
 	return a;
+}
+
+//TODO: add tests
+async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+	if chart.asset_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
+	}
+	
+	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
+	let currency = currency::get_by_id(&pool, asset.currency_id).await?;
+	let value_history = asset::get_value_per_unit_history(&pool, chart.asset_id.unwrap()).await?;
+	let amount_history = asset::get_amount_history(&pool, chart.asset_id.unwrap()).await?;
+
+	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
+	output.insert(asset.name.clone(), Vec::new());
+
+	if value_history.len() == 0 || amount_history.len() == 0 {
+		return Ok(output);
+	}
+
+	let first_day = get_first_day_of_asset_valuations(&value_history, &amount_history);
+	let tomorrow: Date<Utc> = Utc::now().date().checked_add_signed(chrono::Duration::days(1)).unwrap();
+
+	let mut current_day = first_day;
+	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
+		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
+		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
+
+		let value = (**no_future_values.last_key_value().unwrap().1 as f64 * **no_future_amounts.last_key_value().unwrap().1) / currency.minor_in_mayor as f64;
+		let point = Point {
+			timestamp: current_day.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
+			value,
+			label: format!("{}{}", value, currency.symbol),
+		};
+		output.entry(asset.name.clone()).or_default().push(point);
+		current_day = current_day + Duration::days(1);
+	}
+
+	return Ok(output);
+}
+
+//TODO: add tests
+async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+	if chart.asset_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
+	}
+	
+	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
+	let currency = currency::get_by_id(&pool, asset.currency_id).await?;
+	let value_history = asset::get_value_per_unit_history(&pool, chart.asset_id.unwrap()).await?;
+
+	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
+	output.insert(asset.name.clone(), Vec::new());
+
+	if value_history.len() == 0 {
+		return Ok(output);
+	}
+
+	let first_day = get_first_day_of_asset_valuations(&value_history, &BTreeMap::new());
+	let tomorrow: Date<Utc> = Utc::now().date().checked_add_signed(chrono::Duration::days(1)).unwrap();
+
+	let mut current_day = first_day;
+	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
+		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
+
+		let value = (**no_future_values.last_key_value().unwrap().1 / currency.minor_in_mayor) as f64;
+		let point = Point {
+			timestamp: current_day.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
+			value,
+			label: format!("{}{}", value, currency.symbol),
+		};
+		output.entry(asset.name.clone()).or_default().push(point);
+		current_day = current_day + Duration::days(1);
+	}
+
+	return Ok(output);
+}
+
+//TODO: add tests
+async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+	if chart.asset_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
+	}
+	
+	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
+	let amount_history = asset::get_amount_history(&pool, chart.asset_id.unwrap()).await?;
+
+	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
+	output.insert(asset.name.clone(), Vec::new());
+
+	if amount_history.len() == 0 {
+		return Ok(output);
+	}
+
+	let first_day = get_first_day_of_asset_valuations(&BTreeMap::new(), &amount_history);
+	let tomorrow: Date<Utc> = Utc::now().date().checked_add_signed(chrono::Duration::days(1)).unwrap();
+
+	let mut current_day = first_day;
+	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
+		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
+
+		let value = **no_future_amounts.last_key_value().unwrap().1;
+		let point = Point {
+			timestamp: current_day.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
+			value,
+			label: format!("{}", value),
+		};
+		output.entry(asset.name.clone()).or_default().push(point);
+		current_day = current_day + Duration::days(1);
+	}
+
+	return Ok(output);
+}
+
+fn get_first_day_of_asset_valuations(value_history: &BTreeMap<DateTime<Utc>, u32>, amount_history: &BTreeMap<DateTime<Utc>, f64>) -> Date<Utc> {
+	let mut first_day: Date<Utc> = Utc::now().date();
+	if value_history.len() > 0 && value_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
+		first_day = value_history.first_key_value().unwrap().0.date();	
+	}
+	if amount_history.len() > 0 && amount_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
+		first_day = amount_history.first_key_value().unwrap().0.date();	
+	}
+
+	return first_day;
 }

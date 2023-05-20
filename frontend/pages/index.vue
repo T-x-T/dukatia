@@ -1,59 +1,6 @@
 <template>
 	<div>
 		<Dashboards />
-		<!-- <h2>This is the Dashboard</h2>
-		<div id="grid">
-			<div class="gridItem small" v-for="(amount, currency_id, i) in total_per_currency" :key="i">
-				<TotalBalance :currency_id="Number(currency_id)" :amount="amount"/>	
-			</div>
-			<div class="gridItem medium">
-				<CustomPieChart
-					type="recipients"
-					api_path="/api/v1/reports/spending_per_recipient_in_date_range"
-					label_property="name"
-				/>
-			</div>
-			<div class="gridItem medium">
-				<CustomPieChart
-					type="tags"
-					api_path="/api/v1/reports/spending_per_tag_in_date_range"
-					label_property="name"
-					:showOnlyParentsToggle="true"
-				/>
-			</div>
-			<div class="gridItem large">
-				<CustomLineChart
-					api_path="/api/v1/reports/balance_over_time"
-					label_property="symbol"
-					:aggregated="true"
-					title="Earning and spending per period"
-				/>
-			</div>
-			<div class="gridItem large">
-				<CustomLineChart
-					type="currencies"
-					api_path="/api/v1/reports/balance_over_time_per_currency"
-					label_property="symbol"
-					title="Balance per Currency over Time"
-				/>
-			</div>
- 			<div class="gridItem large">
-				<CustomLineChart
-					type="recipients"
-					api_path="/api/v1/reports/balance_over_time_per_recipient"
-					label_property="name"
-					title="Balance per Recipient over Time"
-				/>
-			</div>
-			<div class="gridItem large">
-				<CustomLineChart
-					type="accounts"
-					api_path="/api/v1/reports/balance_over_time_per_account"
-					label_property="name"
-					title="Balance per Account over Time"
-				/>
-			</div>
-		</div> -->
 	</div>
 </template>
 
@@ -62,10 +9,6 @@ export default {
 	data: () => ({
 		total_per_currency: null
 	}),
-
-	async mounted() {
-		this.total_per_currency = await $fetch("/api/v1/reports/total_per_currency");
-	}
 }
 </script>
 

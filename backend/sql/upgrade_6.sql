@@ -91,6 +91,9 @@ INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per Reci
 INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per Account over Time', NULL, NULL, NULL, 'accounts', 'daily');
 INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Balance per currency over Time', NULL, NULL, NULL, 'currencies', 'daily');
 INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Earning and spending over Time', NULL, NULL, NULL, 'earning_spending_net', 'monthly');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Total value over time', NULL, NULL, NULL, 'asset_total_value', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Value over time per single unit', NULL, NULL, NULL, 'asset_single_value', 'daily');
+INSERT INTO public.charts VALUES (DEFAULT, 0, 'large', 'line', 'Amount over time', NULL, NULL, NULL, 'asset_amount', 'daily');
 ALTER TABLE public.charts ENABLE TRIGGER ALL;
 
 ALTER TABLE public.dashboard_charts DISABLE TRIGGER ALL;

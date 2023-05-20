@@ -61,29 +61,14 @@
 				</div>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<CustomLineChart
-					:api_data="api_data_total_value"
-					title="Total value over time"
-					type="simple_monetary"
-					:no_controls="true"
-					:currency_id="asset.currency_id"
+				<Chart
+					:chart_options="asset_total_value_chart"
 				/>
-			</div>
-			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<CustomLineChart
-					:api_data="api_data_value"
-					title="Value over time per single unit"
-					type="simple_monetary"
-					:no_controls="true"
-					:currency_id="asset.currency_id"
+				<Chart
+					:chart_options="asset_single_value_chart"
 				/>
-			</div>
-			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<CustomLineChart
-					:api_data="api_data_amount"
-					title="Amount over time"
-					type="simple"
-					:no_controls="true"
+				<Chart
+					:chart_options="asset_amount_chart"
 				/>
 			</div>
 		</div>
@@ -107,12 +92,11 @@ export default {
 		updateData: {} as {[key: string]: any},
 		renderCharts: false,
 		showAssetValuationEditor: false,
-		api_data: {} as {[key: string]: number[]},
-		api_data_value: {} as {[key: string]: number},
-		api_data_amount: {} as {[key: string]: number},
-		api_data_total_value: {} as {[key: string]: number},
 		assets: [] as Asset[],
 		accounts: [] as Account[],
+		asset_total_value_chart: {} as ChartOptions,
+		asset_single_value_chart: {} as ChartOptions,
+		asset_amount_chart: {} as ChartOptions,
 	}),
 
 	props: {
@@ -129,7 +113,7 @@ export default {
 	methods: {
 		async update() {
 			try {
-				this.assets = await $fetch("/api/v1/assets/all");
+				this.assets = await $fetch("/api/v1/assets/all") as Asset[];
 				this.accounts = await $fetch("/api/v1/accounts/all");
 			} catch(e: any) {
 				console.error(e?.data?.data);
@@ -138,18 +122,6 @@ export default {
 			
 			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
 			
-			if(this.asset.id !== undefined) {
-				this.api_data = await $fetch(`/api/v1/reports/daily_valuation_of_asset/${this.asset.id}`);
-				this.api_data_value = {};
-				this.api_data_amount = {};
-				this.api_data_total_value = {};
-				for (let k in this.api_data) {
-					this.api_data_value[k] = this.api_data[k][0];
-					this.api_data_amount[k] = this.api_data[k][1];
-					this.api_data_total_value[k] = this.api_data[k][1] * this.api_data[k][0];
-				}
-			}
-
 			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
 
 			if(!this.asset) {
@@ -180,6 +152,13 @@ export default {
 				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
 			};
+
+			this.asset_total_value_chart = await $fetch("/api/v1/charts/7");
+			this.asset_total_value_chart.asset_id = this.asset.id;
+			this.asset_single_value_chart = await $fetch("/api/v1/charts/8");
+			this.asset_single_value_chart.asset_id = this.asset.id;
+			this.asset_amount_chart = await $fetch("/api/v1/charts/9");
+			this.asset_amount_chart.asset_id = this.asset.id;
 
 			this.renderCharts = true;
 		},

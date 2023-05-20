@@ -57,7 +57,9 @@ export default {
 
 	methods: {
 		async update_date(options: {from_date: string, to_date: string, date_period: string}) {
-			this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`);
+			let query = `?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`;
+			if (Number.isInteger(this.chart_options.asset_id)) query += `&asset_id=${this.chart_options.asset_id}`;
+ 			this.chart_data = await $fetch(`/api/v1/charts/${this.chart_options.id}/data${query}`);
 			this.key++;
 		}
 	},

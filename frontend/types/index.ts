@@ -171,5 +171,6 @@ declare global {
 		title: string,
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",
+		asset_id: number | undefined,
 	}
 }
