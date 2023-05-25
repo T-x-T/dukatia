@@ -1361,6 +1361,78 @@
 						"body_equals": {"id":16,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly","asset_id":null}
 					}
 				},
+				{
+					"name": "adding line chart using filter_collection asset_total_value returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Total value over time",
+						"filter_collection": "asset_total_value",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_total_value got created correctly",
+					"endpoint": "/api/v1/charts/17",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":17,"user_id":0,"grid_size":"large","chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection asset_single_value returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Value over time per single unit",
+						"filter_collection": "asset_single_value",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_single_value got created correctly",
+					"endpoint": "/api/v1/charts/18",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":18,"user_id":0,"grid_size":"large","chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection asset_amount returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Amount over time",
+						"filter_collection": "asset_amount",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_amount got created correctly",
+					"endpoint": "/api/v1/charts/19",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":19,"user_id":0,"grid_size":"large","chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period": "daily","asset_id":null}
+					}
+				},
 
 
 
@@ -2084,6 +2156,90 @@
 							],
 							"Spending":[
 								{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
+					"name": "post of new asset returns 200",
+					"endpoint": "/api/v1/assets",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"description": "description",
+						"currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of first valuation returns 200",
+					"endpoint": "/api/v1/assets/0/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 123,
+						"amount": 10,
+						"timestamp": "2021-03-18T11:22:00Z"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second valuation returns 200",
+					"endpoint": "/api/v1/assets/0/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 100,
+						"amount": 20,
+						"timestamp": "2022-03-18T11:22:00Z"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_total_value returns correct output two valuations",
+					"endpoint": "/api/v1/charts/17/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":12.3,"label":"12.3€"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20€"}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_single_value returns correct output two valuations",
+					"endpoint": "/api/v1/charts/18/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":1.23,"label":"1.23€"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":1.0,"label":"1€"}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_amount returns correct output two valuations",
+					"endpoint": "/api/v1/charts/19/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":10.0,"label":"10"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20"}
 							]
 						}}
 					}
