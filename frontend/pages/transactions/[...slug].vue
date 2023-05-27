@@ -135,7 +135,7 @@ export default {
 						new Date(x.timestamp).toISOString().substring(0, 10),
 						`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
 						x.comment,
-						this.tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
+						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
 				};
 			});
