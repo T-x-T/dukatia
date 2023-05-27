@@ -51,7 +51,7 @@
 
 				<div v-else-if="field.type == 'tags'">
 					<CustomSelect
-						v-if="Object.keys(selectData).length > 0"
+						v-if="Object.keys(selectData).length > 0 && renderCustomSelect"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
 					/>
@@ -107,6 +107,7 @@ export default {
 		recipients: [] as Recipient[],
 		accounts: [] as Account[],
 		currencies: [] as Currency[],
+		renderCustomSelect: true,
 	}),
 
 	props: {
@@ -166,13 +167,17 @@ export default {
 				this.config.data = {...this.config.defaultData};
 				(this as any).$refs.forminput1[0].focus()
 				if(this.config.reset_default_currency_id) this.config.data.default_currency_id = this.config.data.default_currency.id;
-				await this.updateSelectData();
+				this.renderCustomSelect = false;
+				this.$nextTick(() => {
+					this.renderCustomSelect = true;
+					this.updateSelectData();
+				})
 			}
 		},
 
 		async updateSelectData() {
 			this.selectData = {
-				options: [...this.tags.map(x => ({id: x.id? x.id : -1, name: x.name}))],
+				options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
 				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : [],
 				label: "Tags:"
 			};

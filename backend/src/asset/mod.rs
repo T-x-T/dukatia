@@ -72,6 +72,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
 }
 
+#[allow(unused)]
 pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
 	return db::get_all_from_user(pool, user_id).await;
 }

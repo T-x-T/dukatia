@@ -17,6 +17,14 @@
 			<option value="6">Last 365 days</option>
 			<option value="7">Total</option>
 		</select>
+
+		<label for="period">Period: </label>
+		<select id="period" v-model="date_period" @change="update">
+			<option value="daily">Daily</option>
+			<option value="monthly">Monthly</option>
+			<option value="quarterly">Quarterly</option>
+			<option value="yearly">Yearly</option>
+		</select>
 	</div>
 </template>
 
@@ -26,16 +34,18 @@ export default {
 		from_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 28).toISOString().slice(0, 10),
 		to_date: new Date().toISOString().slice(0, 10),
 		date_range: "0",
-		initialized: false
+		date_period: "",
 	}),
 
 	props: {
-		default_date_range: String
+		default_date_range: String,
+		default_date_period: String,
 	},
 
 	mounted() {
 		if(this.default_date_range) {
 			this.date_range = this.default_date_range;
+			if(this.default_date_period) this.date_period = this.default_date_period;
 			this.update();
 		}
 	},
@@ -133,13 +143,11 @@ export default {
 				}
 			}
 
-			if(this.initialized) {
-				this.$emit("update", {
-					from_date: this.from_date,
-					to_date: this.to_date
-				});
-			}
-			this.initialized = true;
+			this.$emit("update", {
+				from_date: this.from_date,
+				to_date: this.to_date,
+				date_period: this.date_period
+			});
 		}
 	}
 }

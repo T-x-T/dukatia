@@ -47,6 +47,13 @@ pub async fn add(pool: &Pool, user: &User, encrypted_secret: &String) -> Result<
 			"INSERT INTO public.users (id, name, secret, superuser) VALUES (DEFAULT, $1, $2, $3);",
 			&[&user.name, &encrypted_secret, &user.superuser]
 		).await?;
+
+	pool.get()
+		.await?
+		.query(
+			"INSERT INTO public.dashboards(id, user_id, name, description) VALUES (DEFAULT, $1, 'Default', 'The default Dashboard');",
+			&[&(user.id.unwrap_or(0) as i32)]
+		).await?;
 		
 	return Ok(());
 }

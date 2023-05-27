@@ -28,21 +28,23 @@
 	"tests": [
 		{
 			"name": "currency",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all currencies works",
 					"endpoint": "/api/v1/currencies/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}]
-					} 
+					}
 				},
 				{
 					"name": "post of new currency returns 200",
@@ -53,12 +55,6 @@
 						"minor_in_mayor": 100,
 						"symbol": "*"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -67,12 +63,6 @@
 					"name": "get single currency by id works",
 					"endpoint": "/api/v1/currencies/1",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}
@@ -82,12 +72,6 @@
 					"name": "attempting to get single currency with non existant id returns 404",
 					"endpoint": "/api/v1/currencies/5",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type currency not found with filter id=5"}
@@ -97,12 +81,6 @@
 					"name": "new currency created correctly",
 					"endpoint": "/api/v1/currencies/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"test","minor_in_mayor":100,"symbol":"*"}]
@@ -117,12 +95,6 @@
 						"minor_in_mayor": 12,
 						"symbol": "/"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -131,12 +103,6 @@
 					"name": "updated currency details saved correctly",
 					"endpoint": "/api/v1/currencies/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"}]
@@ -146,17 +112,19 @@
 		},
 		{
 			"name": "recipients",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all recipients works",
 					"endpoint": "/api/v1/recipients/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}]
@@ -169,12 +137,6 @@
 					"body": {
 						"name": "test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -183,12 +145,6 @@
 					"name": "new recipient created correctly",
 					"endpoint": "/api/v1/recipients/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}, {"id":1,"name":"test","user_id":0,"tag_ids":[]}]
@@ -198,12 +154,6 @@
 					"name": "get single recipient by id works",
 					"endpoint": "/api/v1/recipients/1",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":1,"name":"test","user_id":0,"tag_ids":[]}
@@ -213,12 +163,6 @@
 					"name": "attempting to get single recipient with non existant id returns 404",
 					"endpoint": "/api/v1/recipients/5",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type recipient not found with filter id=5"}
@@ -231,12 +175,6 @@
 					"body": {
 						"name":"edited test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -245,12 +183,6 @@
 					"name": "updated recipient name saved correctly",
 					"endpoint": "/api/v1/recipients/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}, {"id":1,"name":"edited test","user_id":0,"tag_ids":[]}]
@@ -260,17 +192,19 @@
 		},
 		{
 			"name": "accounts",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all accounts works",
 					"endpoint": "/api/v1/accounts/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]}]
@@ -284,12 +218,6 @@
 						"name": "test",
 						"default_currency_id": 0
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -298,12 +226,6 @@
 					"name": "new account created correctly",
 					"endpoint": "/api/v1/accounts/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]},{"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[]}]
@@ -313,12 +235,6 @@
 					"name": "get single account by id works",
 					"endpoint": "/api/v1/accounts/1",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[]}
@@ -328,12 +244,6 @@
 					"name": "attempting to get single account with non existant id returns 404",
 					"endpoint": "/api/v1/accounts/2",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type account not found with filter id=2"}
@@ -347,12 +257,6 @@
 						"name":"edited test",
 						"default_currency_id": 1
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -361,12 +265,6 @@
 					"name": "updated account name saved correctly",
 					"endpoint": "/api/v1/accounts/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]},{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[]}]
@@ -376,17 +274,19 @@
 		},
 		{
 			"name": "tags",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all tags works with no tags in the database",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": []
@@ -399,12 +299,6 @@
 					"body": {
 						"name": "test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -413,12 +307,6 @@
 					"name": "new tag created correctly",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"test","user_id":0,"parent_id":null}]
@@ -428,12 +316,6 @@
 					"name": "get single tag by id works",
 					"endpoint": "/api/v1/tags/0",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":0,"name":"test","user_id":0,"parent_id":null}
@@ -443,12 +325,6 @@
 					"name": "attempting to get single tag with non existant id returns 404",
 					"endpoint": "/api/v1/tags/5",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type tag not found with filter id=5"}
@@ -461,12 +337,6 @@
 					"body": {
 						"name":"edited test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -475,12 +345,6 @@
 					"name": "updated tag name saved correctly",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"edited test","user_id":0,"parent_id":null}]
@@ -490,12 +354,6 @@
 					"name": "deleting tag returns 200",
 					"endpoint": "/api/v1/tags/0",
 					"method": "DELETE",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -504,12 +362,6 @@
 					"name": "deleted tag doesnt get returned by get all anymore",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": []
@@ -522,12 +374,6 @@
 					"body": {
 						"name": "test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -536,12 +382,6 @@
 					"name": "second tag gets ID 1, even though tag with ID 0 got deleted",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":1,"name":"test","user_id":0,"parent_id":null}]
@@ -554,12 +394,6 @@
 					"body": {
 						"name": "test"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -572,12 +406,6 @@
 						"name":"edited test",
 						"parent_id": 2
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -586,12 +414,6 @@
 					"name": "updated tag parent_id saved correctly",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":2,"name":"test","user_id":0,"parent_id":null},{"id":1,"name":"edited test","user_id":0,"parent_id":2}]
@@ -605,12 +427,6 @@
 						"name":"edited test",
 						"parent_id": 1
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 400,
 						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
@@ -620,12 +436,6 @@
 					"name": "deleting tag thats used as a parent returns 200",
 					"endpoint": "/api/v1/tags/2",
 					"method": "DELETE",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -634,12 +444,6 @@
 					"name": "tag whose parent got deleted now has null as parent_id",
 					"endpoint": "/api/v1/tags/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":1,"name":"edited test","user_id":0,"parent_id":null}]
@@ -653,12 +457,6 @@
 						"name":"edited test",
 						"parent_id": 420
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 400,
 						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
@@ -672,12 +470,6 @@
 						"name":"edited test",
 						"parent_id": 420
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 400,
 						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
@@ -760,17 +552,19 @@
 		},
 		{
 			"name": "transactions",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all transactions works with none in the database",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": []
@@ -788,12 +582,6 @@
 						"amount": 12345,
 						"comment": "this is a comment"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -802,12 +590,6 @@
 					"name": "new transaction created correctly",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}]
@@ -817,12 +599,6 @@
 					"name": "get single transaction by id works",
 					"endpoint": "/api/v1/transactions/0",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}
@@ -832,12 +608,6 @@
 					"name": "attempting to get single transaction with non existant id returns 404",
 					"endpoint": "/api/v1/transactions/5",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type transaction not found with filter id=5"}
@@ -855,12 +625,6 @@
 						"amount": -12345,
 						"comment": "this is an edited comment"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -869,12 +633,6 @@
 					"name": "updated transaction details saved correctly",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","amount":-12345,"comment":"this is an edited comment","tag_ids":[],"asset":null}]
@@ -892,12 +650,6 @@
 						"amount": 12345,
 						"comment": "this is a comment"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -906,12 +658,6 @@
 					"name": "deleting transaction returns 200",
 					"endpoint": "/api/v1/transactions/0",
 					"method": "DELETE",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -920,12 +666,6 @@
 					"name": "correct transaction got deleted",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null}]
@@ -943,12 +683,6 @@
 						"amount": 12345,
 						"comment": "this is a comment"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 400,
 						"body_equals": {"error":"specified item of type Account not found with filter account_id=10"}
@@ -966,31 +700,139 @@
 						"amount": 12345,
 						"comment": "this is a comment"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 400
+					}
+				},
+				{
+					"name": "post of new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag1"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag2"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of transaction with tag 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 0 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null}
+						]
+					}
+				},
+				{
+					"name": "post of transaction with tag 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 1 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null},
+							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null}
+						]
+					}
+				},
+				{
+					"name": "post of transaction with tags 0 and 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0, 1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction with tag 0 and 1 got created correctly",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null},
+							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null},
+							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null},
+							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null}
+						]
 					}
 				}
 			]
 		},
 		{
 			"name": "assets",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
 			"tests": [
 				{
 					"name": "retrieval of all assets works when none are created yet",
 					"endpoint": "/api/v1/assets/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": []
@@ -1005,12 +847,6 @@
 						"description": "description",
 						"currency_id": 0
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1019,12 +855,6 @@
 					"name": "new asset created correctly",
 					"endpoint": "/api/v1/assets/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}]
@@ -1034,12 +864,6 @@
 					"name": "get single asset by id works",
 					"endpoint": "/api/v1/assets/0",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}
@@ -1049,12 +873,6 @@
 					"name": "attempting to get single asset with non existant id returns 404",
 					"endpoint": "/api/v1/assets/2",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 404,
 						"body_equals": {"error":"specified item of type asset not found with filter id=2"}
@@ -1069,12 +887,6 @@
 						"description": "edited description",
 						"currency_id": 0
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1083,12 +895,6 @@
 					"name": "updated asset details saved correctly",
 					"endpoint": "/api/v1/assets/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"name":"edited test","description":"edited description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}]
@@ -1103,12 +909,6 @@
 						"description": "description",
 						"currency_id": 0
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1117,12 +917,6 @@
 					"name": "deleting asset returns 200",
 					"endpoint": "/api/v1/assets/0",
 					"method": "DELETE",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1131,12 +925,6 @@
 					"name": "correct asset got deleted",
 					"endpoint": "/api/v1/assets/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":0,"amount":0.0,"tag_ids":[]}]
@@ -1151,12 +939,6 @@
 						"amount": 10,
 						"timestamp": "2023-03-18T11:22:00Z"
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1165,12 +947,6 @@
 					"name": "valuation got correctly saved",
 					"endpoint": "/api/v1/assets/1/valuation_history",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"}]
@@ -1186,12 +962,6 @@
 						"timestamp": "2023-03-19T11:22:00Z",
 						"cost": 100
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1200,12 +970,6 @@
 					"name": "valuation got correctly saved",
 					"endpoint": "/api/v1/assets/1/valuation_history",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"},{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z"}]
@@ -1215,12 +979,6 @@
 					"name": "no transactions created, because account_id wasnt specified",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": []
@@ -1236,12 +994,6 @@
 						"timestamp": "2023-03-20T11:22:00Z",
 						"account_id": 0
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1250,12 +1002,6 @@
 					"name": "transaction gets correctly created",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}]
@@ -1272,12 +1018,6 @@
 						"account_id": 0,
 						"cost": 100
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1286,12 +1026,6 @@
 					"name": "transaction gets correctly created",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null}}]
@@ -1308,12 +1042,6 @@
 						"account_id": 0,
 						"cost": 100
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1322,12 +1050,6 @@
 					"name": "transaction gets correctly created",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
@@ -1348,12 +1070,6 @@
 						"account_id": 0,
 						"cost": 100
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1362,12 +1078,6 @@
 					"name": "transaction gets correctly created",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
@@ -1389,12 +1099,6 @@
 						"account_id": 0,
 						"cost": 100
 					},
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1403,12 +1107,6 @@
 					"name": "transaction gets correctly created",
 					"endpoint": "/api/v1/transactions/all",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
@@ -1424,12 +1122,6 @@
 					"name": "valuation got correctly saved",
 					"endpoint": "/api/v1/assets/1/valuation_history",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
@@ -1452,12 +1144,6 @@
 						{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
 						{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
 					],
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
@@ -1466,12 +1152,6 @@
 					"name": "valuation got correctly overwritten",
 					"endpoint": "/api/v1/assets/1/valuation_history",
 					"method": "GET",
-					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
-					},
-					"before": [
-						"login_as_admin"
-					],
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
@@ -1479,6 +1159,1089 @@
 							{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
 							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
 						]
+					}
+				}
+			]
+		},
+		{
+			"name": "dashboard",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
+			"tests": [
+				{
+					"name": "getting own dashboards returns default dashboard on default db",
+					"endpoint": "/api/v1/users/me/dashboards",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"user_id":0,"name":"Default","description":"The default Dashboard"}]
+					}
+				}
+			]
+		},
+		{
+			"name": "charts",
+			"defaults": {
+				"cookies": {
+					"accessToken": "$login_as_admin.accessToken"
+				},
+				"before": [
+					"login_as_admin"
+				]
+			},
+			"tests": [
+				{
+					"name": "adding text chart using foreach_currency returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "small",
+						"chart_type": "text",
+						"title": "Current Balance",
+						"text_template": "%foreach_currency{$name: $current_balance$symbol*}%"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "text chart using foreach_currency got created correctly",
+					"endpoint": "/api/v1/charts/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null}
+					}
+				},
+				{
+					"name": "adding pie chart using filter_collection recipients returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "medium",
+						"chart_type": "pie",
+						"title": "Spending per recipient in date range",
+						"filter_collection": "recipients"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "pie chart using filter_collection recipients got created correctly",
+					"endpoint": "/api/v1/charts/11",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":11,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null}
+					}
+				},
+				{
+					"name": "adding pie chart using filter_collection tags returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "medium",
+						"chart_type": "pie",
+						"title": "Spending per tag in date range",
+						"filter_collection": "tags"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "pie chart using filter_collection tags got created correctly",
+					"endpoint": "/api/v1/charts/12",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":12,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection recipients returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Spending per recipient over time",
+						"filter_collection": "recipients",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection recipients got created correctly",
+					"endpoint": "/api/v1/charts/13",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":13,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection accounts returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Spending per account over time",
+						"filter_collection": "accounts",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection accounts got created correctly",
+					"endpoint": "/api/v1/charts/14",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":14,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection currencies returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Spending per currency over time",
+						"filter_collection": "currencies",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection currencies got created correctly",
+					"endpoint": "/api/v1/charts/15",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":15,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection earning_spending_net returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Earning and spending over time",
+						"filter_collection": "earning_spending_net",
+						"date_period": "monthly"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection earning_spending_net got created correctly",
+					"endpoint": "/api/v1/charts/16",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":16,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection asset_total_value returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Total value over time",
+						"filter_collection": "asset_total_value",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_total_value got created correctly",
+					"endpoint": "/api/v1/charts/17",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":17,"user_id":0,"grid_size":"large","chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection asset_single_value returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Value over time per single unit",
+						"filter_collection": "asset_single_value",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_single_value got created correctly",
+					"endpoint": "/api/v1/charts/18",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":18,"user_id":0,"grid_size":"large","chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period": "daily","asset_id":null}
+					}
+				},
+				{
+					"name": "adding line chart using filter_collection asset_amount returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"grid_size": "large",
+						"chart_type": "line",
+						"title": "Amount over time",
+						"filter_collection": "asset_amount",
+						"date_period": "daily"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "line chart using filter_collection asset_amount got created correctly",
+					"endpoint": "/api/v1/charts/19",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":19,"user_id":0,"grid_size":"large","chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period": "daily","asset_id":null}
+					}
+				},
+
+
+
+				{
+					"name": "post of new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag1"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second new tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "tag2"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account with Euro Currency returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "euro",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account with USD Currency returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "USD",
+						"default_currency_id": 1
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+
+
+
+				{
+					"name": "post of new transaction in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": -45,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"amount": 1000,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of text chart using foreach_currency returns correct output",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 123€\nUSD: 10$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients returns correct output",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["123.45€ ",123.45],"test":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags returns correct output",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["123€ ",123],"tag2":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients returns correct output",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"test":[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts returns correct output",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}],"euro":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection currencies returns correct output",
+					"endpoint": "/api/v1/charts/5/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Euro":[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Earning":[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}],"Spending":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}],"Net":[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]}}
+					}
+				},
+
+
+
+				{
+					"name": "post of new transaction in the past in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 100,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the past in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 200,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the past in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "1923-03-25T11:22:00.000Z",
+						"amount": 300,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 0 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 100,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 1 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 200,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in the future in account 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2123-03-25T11:22:00.000Z",
+						"amount": 300,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of text chart using foreach_currency returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 129€\nUSD: 16$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["125.45€ ",125.45],"test":["3.55€ 16$ ",19.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["129€ ",129],"tag2":["3.55€ 16$ ",19.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}
+							],
+							"test":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":14.55,"label":"1.55€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":19.55,"label":"3.55€ 16$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}
+							],
+							"euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":3.55,"label":"3.55€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection currencies returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/5/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":129.0,"label":"129€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output with more transactions",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":139.45,"label":"126.45€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":145.45,"label":"129.45€ 16$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":139.0,"label":"126€ 13$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":145.0,"label":"129€ 16$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of pie chart using filter_collection recipients within date range returns correct output",
+					"endpoint": "/api/v1/charts/1/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["123.45€ ",123.45],"test":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags within date range returns correct output",
+					"endpoint": "/api/v1/charts/2/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["123€ ",123],"tag2":["-0.45€ 10$ ",9.55]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients within date range returns correct output",
+					"endpoint": "/api/v1/charts/3/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"test":[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts within date range returns correct output",
+					"endpoint": "/api/v1/charts/4/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Default":[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}],"euro":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection currencies within date range returns correct output",
+					"endpoint": "/api/v1/charts/5/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Euro":[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}],"USD":[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net within date range returns correct output",
+					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z&date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{"Earning":[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}],"Spending":[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}],"Net":[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]}}
+					}
+				},
+
+
+
+				{
+					"name": "post of new transaction in account 0 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"tag_ids": [0],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": 12345,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 1 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 1,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [0,1],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": -45,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction in account 2 on same day returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 1,
+						"status": 1,
+						"tag_ids": [1],
+						"timestamp": "2023-03-25T12:22:00.000Z",
+						"amount": 1000,
+						"comment": "this is a comment"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of text chart using foreach_currency with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/0/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":"Euro: 252€\nUSD: 26$\n","pie":null,"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/1/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"Default":["248.9€ ",248.9],"test":["3.1€ 26$ ",29.1]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart using filter_collection tags with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/2/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":{"tag1":["252€ ",252],"tag2":["3.1€ 26$ ",29.1]},"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/3/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}
+							],
+							"test":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":24.10,"label":"1.1€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":29.10,"label":"3.1€ 26$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection accounts with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/4/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Default":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}
+							],
+							"euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":1.10,"label":"1.1€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":3.10,"label":"3.1€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection currencies with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/5/data",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Euro":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":249.0,"label":"249€ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":252.0,"label":"252€ "}
+							],
+							"USD":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection earning_spending_net with multiple transactions on one day returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
+					"name": "retrieval of line chart with date_period daily returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period monthly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=monthly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-03-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-03-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-03-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period quarterly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=quarterly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart with date_period yearly returns correct output",
+					"endpoint": "/api/v1/charts/6/data?date_period=yearly",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"Earning":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}
+							],
+							"Net":[
+								{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},
+								{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},
+								{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}
+							],
+							"Spending":[
+								{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}
+							]
+						}}
+					}
+				},
+
+
+
+				{
+					"name": "post of new asset returns 200",
+					"endpoint": "/api/v1/assets",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"description": "description",
+						"currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of first valuation returns 200",
+					"endpoint": "/api/v1/assets/0/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 123,
+						"amount": 10,
+						"timestamp": "2021-03-18T11:22:00Z"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of second valuation returns 200",
+					"endpoint": "/api/v1/assets/0/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": 100,
+						"amount": 20,
+						"timestamp": "2022-03-18T11:22:00Z"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_total_value returns correct output two valuations",
+					"endpoint": "/api/v1/charts/17/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":12.3,"label":"12.3€"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20€"}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_single_value returns correct output two valuations",
+					"endpoint": "/api/v1/charts/18/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":1.23,"label":"1.23€"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":1.0,"label":"1€"}
+							]
+						}}
+					}
+				},
+				{
+					"name": "retrieval of line chart using filter_collection asset_amount returns correct output two valuations",
+					"endpoint": "/api/v1/charts/19/data?asset_id=0",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":{
+							"test":[
+								{"timestamp":"2021-03-18T00:00:00Z","value":10.0,"label":"10"},
+								{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20"}
+							]
+						}}
 					}
 				}
 			]

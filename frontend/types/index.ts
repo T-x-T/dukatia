@@ -156,4 +156,21 @@ declare global {
 		populateTagsUsingRecipient?: boolean,
 		tableData?: TableData,
 	}
+
+	type Dashboard = {
+		id?: number,
+		user_id: number,
+		name: string,
+		description?: string,
+	}
+
+	type ChartOptions = {
+		id: number,
+		grid_size: "small" | "medium" | "large",
+		chart_type: "text" | "pie" | "line",
+		title: string,
+		text_template?: string,
+		date_period: "daily" | "monthly" | "quarterly" | "yearly",
+		asset_id: number | undefined,
+	}
 }

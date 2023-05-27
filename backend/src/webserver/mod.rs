@@ -11,8 +11,9 @@ use super::account;
 use super::tag;
 use super::recipient;
 use super::transaction;
-use super::reports;
 use super::asset;
+use super::dashboard;
+use super::chart;
 use super::access_token::get_user_of_token;
 
 pub struct AppState {
@@ -37,14 +38,6 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 					return res;
 				})
 			})
-			.service(reports::rest_api::balance_over_time_per_currency)
-			.service(reports::rest_api::balance_over_time_per_recipient)
-			.service(reports::rest_api::balance_over_time_per_account)
-			.service(reports::rest_api::balance_over_time)
-			.service(reports::rest_api::total_per_currency)
-			.service(reports::rest_api::spending_per_recipient_in_date_range)
-			.service(reports::rest_api::spending_per_tag_in_date_range)
-			.service(reports::rest_api::daily_valuation_of_asset)
 			.service(user::rest_api::post_login)
 			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
@@ -73,6 +66,11 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(asset::rest_api::post_valuation)
 			.service(asset::rest_api::get_valuation_history_by_asset_id)
 			.service(asset::rest_api::replace_valuation_history_of_asset)
+			.service(dashboard::rest_api::get_all_of_user)
+			.service(chart::rest_api::get_by_id)
+			.service(chart::rest_api::get_chart_data_by_id)
+			.service(chart::rest_api::get_all_charts_in_dashboard)
+			.service(chart::rest_api::post)
 			.service(currency::rest_api::get_all)
 			.service(currency::rest_api::get_by_id)
 			.service(currency::rest_api::post)

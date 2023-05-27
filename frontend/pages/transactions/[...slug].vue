@@ -135,7 +135,7 @@ export default {
 						new Date(x.timestamp).toISOString().substring(0, 10),
 						`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
 						x.comment,
-						this.tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
+						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
 				};
 			});
@@ -213,7 +213,22 @@ export default {
 
 		async updateTable() {
 			this.transactions = await $fetch("/api/v1/transactions/all");
-			this.updateTransactions();
+			const transactionsForDisplay = this.transactions.map(x => {
+				x.account = this.accounts.filter(a => a.id == x.account_id)[0];
+				x.currency = this.currencies.filter(c => c.id == x.currency_id)[0];
+				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
+				return x;
+			});
+			this.tableData.rows = transactionsForDisplay.map(x => ([
+				x.id,
+				x.account?.name,
+				x.recipient?.name,
+				x.asset ? x.asset.name : "",
+				new Date(x.timestamp).toISOString().substring(0, 10),
+				`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+				x.comment,
+				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+			]));
 		}
 	}
 }

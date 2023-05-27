@@ -9,8 +9,11 @@ services:
   frontend:
     image: ghcr.io/t-x-t/txts-treasury/frontend:main
     restart: always
+    environment:
+      NITRO_PORT: 5000
+      API_HOST: http://backend:4000
     ports:
-      - "127.0.0.1:80:3000"
+      - "127.0.0.1:80:5000"
   backend:
     image: ghcr.io/t-x-t/txts-treasury/backend:main
     restart: always

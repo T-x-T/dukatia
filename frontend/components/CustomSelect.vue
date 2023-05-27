@@ -97,7 +97,6 @@ export default {
 		toggleOption(id: number) {
 			let optionStates = this.optionStates;
 			optionStates[id] = !optionStates[id];
-			//this.optionStates = null;
 			this.optionStates = optionStates;
 			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();

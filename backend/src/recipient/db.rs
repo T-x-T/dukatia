@@ -28,7 +28,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT r.id, r.name, r.user_id, array_agg(t.tag_id) as tags FROM public.recipients r LEFT JOIN public.recipient_tags t ON r.id = t.recipient_id GROUP BY r.id;",
+			"SELECT * FROM public.recipient_data;",
 			&[]
 		)
 		.await?;
@@ -49,7 +49,7 @@ pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT r.id, r.name, r.user_id, array_agg(t.tag_id) as tags FROM public.recipients r LEFT JOIN public.recipient_tags t ON r.id = t.recipient_id WHERE r.id=$1 GROUP BY r.id;",
+			"SELECT * FROM public.recipient_data WHERE id=$1;",
 			&[&(recipient_id as i32)]
 		)
 		.await?;
