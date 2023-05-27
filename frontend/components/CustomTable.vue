@@ -162,23 +162,34 @@ export default {
 	},
 	
 	created() {
-		this.rows = this.tableData.rows;
-		this.rowsForDisplay = this.rows;
-		
-		this.tableData.columns.forEach(c => {
-			this.filters.push({
-				type: c.type,
-				option: c.type == "choice" ? "is" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
-				empty: c.type == "string" ? "anything" : ""
-			});
-		});
-		this.applyDefaultSort();
-		this.fillSelectedRows();
-		
-		if(this.tableData.displaySum) this.getSum();
+		this.update(true);
 	},
 
 	methods: {
+		update(reset: boolean) {
+			this.rows = this.tableData.rows;
+			
+			if(reset) {
+				this.rowsForDisplay = this.rows;
+
+				this.tableData.columns.forEach(c => {
+					this.filters.push({
+						type: c.type,
+						option: c.type == "choice" ? "is" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
+						empty: c.type == "string" ? "anything" : ""
+					});
+				});
+			
+				this.applyDefaultSort();
+				this.fillSelectedRows();
+			} else {
+				this.filter();
+				this.sort();
+			}
+			
+			if(this.tableData.displaySum) this.getSum();
+		},
+
 		fillSelectedRows() {
 			this.selectedRows = [];
 			this.rowsForDisplay.forEach(() => this.selectedRows.push(false));
@@ -376,6 +387,12 @@ export default {
 					if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
 				});
 				this.$emit("rowSelect", selectedRowContents);
+			},
+			deep: true,
+		},
+		tableData: {
+			handler() {
+				this.update(false);
 			},
 			deep: true,
 		}
