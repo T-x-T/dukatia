@@ -1,0 +1,1 @@
+INSERT INTO public.dashboards VALUES (DEFAULT, 0, 'Default', 'The default Dashboard');
