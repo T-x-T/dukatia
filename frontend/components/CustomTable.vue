@@ -345,6 +345,7 @@ export default {
 					}
 				}
 			}
+			if(this.tableData.displaySum) this.getSum();
 		},
 
 		async getSum() {
