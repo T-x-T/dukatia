@@ -103,8 +103,7 @@ async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet, chart.date_period.unwrap_or(String::from("monthly")));
-	let accumulated_raw_output = accumulate(raw_output);
-	let output = sum_currencies(accumulated_raw_output, currencies.clone());
+	let output = sum_currencies(raw_output, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::EarningSpendingNet);
 
 	return Ok(Vec::from_iter(named_output));

@@ -172,5 +172,8 @@ declare global {
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",
 		asset_id: number | undefined,
+		filter_collection: string,
+		max_items: number,
+		date_range: number,
 	}
 }

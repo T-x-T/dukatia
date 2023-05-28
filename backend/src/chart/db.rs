@@ -47,17 +47,46 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
     Some(x) => Some(x as i32),
     None => None,
 	};
+	let date_range: Option<i32> = match chart.date_range {
+    Some(x) => Some(x as i32),
+    None => None,
+	};
 
 	pool.get()
 		.await
 		.unwrap()
 		.query(
 			"INSERT INTO public.charts 
-				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period, max_items)
-				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);", 
-			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items]
+				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period, max_items, date_range)
+				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);", 
+			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range]
 		).await?;
 
+	return Ok(());
+}
+
+pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+	if chart.id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("chart") }));
+	}
+
+	let max_items: Option<i32> = match chart.max_items {
+    Some(x) => Some(x as i32),
+    None => None,
+	};
+	let date_range: Option<i32> = match chart.date_range {
+    Some(x) => Some(x as i32),
+    None => None,
+	};
+
+	pool.get()
+		.await
+		.unwrap()
+		.query(
+			"UPDATE public.charts SET grid_size=$1, chart_type=$2, title=$3, text_template=$4, filter_from=$5, filter_to=$6, filter_collection=$7, date_period=$8, max_items=$9, date_range=$10 WHERE id=$11", 
+			&[&chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &(chart.id.unwrap() as i32)]
+		).await?;
+	
 	return Ok(());
 }
 
@@ -73,6 +102,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let filter_collection: Option<String> = row.get(8);
 	let date_period: Option<String> = row.get(9);
 	let max_items: Option<i32> = row.get(10);
+	let date_range: Option<i32> = row.get(11);
 
 	return Chart {
 		id: Some(id as u32),
@@ -87,5 +117,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		date_period,
 		asset_id: None,
 		max_items: max_items.map(|x| x as u32),
+		date_range: date_range.map(|x| x as u32),
 	};
 }

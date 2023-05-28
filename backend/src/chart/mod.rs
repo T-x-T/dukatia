@@ -25,6 +25,7 @@ pub struct Chart {
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
 	pub max_items: Option<u32>,
+	pub date_range: Option<u32>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -35,6 +36,7 @@ pub struct ChartOptions {
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
 	pub max_items: Option<u32>,
+	pub date_range: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -54,6 +56,10 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 
 pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return db::add(pool, chart).await;
+}
+
+pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+	return db::update(pool, chart).await;
 }
 
 pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {

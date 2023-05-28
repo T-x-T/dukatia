@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
 use crate::webserver::{AppState, is_authorized};
@@ -55,6 +55,7 @@ struct ChartPost {
 	filter_collection: Option<String>,
 	date_period: Option<String>,
 	max_items: Option<u32>,
+	date_range: Option<u32>,
 }
 
 #[post("/api/v1/charts")]
@@ -77,9 +78,39 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		date_period: body.date_period,
 		asset_id: None,
 		max_items: body.max_items,
+		date_range: body.date_range,
 	};
 
 	match super::add(&data.pool, &chart).await {
+		Ok(_) => return HttpResponse::Ok().body(""),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+	}
+}
+
+#[put("/api/v1/charts/{chart_id}")]
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>, chart_id: web::Path<u32>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+	};
+	let body = body.into_inner();
+	let chart = super::Chart {
+		id: Some(chart_id.into_inner()),
+		user_id: Some(user_id),
+		grid_size: body.grid_size,
+		chart_type: body.chart_type,
+		title: body.title,
+		text_template: body.text_template,
+		filter_from: body.filter_from,
+		filter_to: body.filter_to,
+		filter_collection: body.filter_collection,
+		date_period: body.date_period,
+		asset_id: None,
+		max_items: body.max_items,
+		date_range: body.date_range,
+	};
+
+	match super::update(&data.pool, &chart).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}

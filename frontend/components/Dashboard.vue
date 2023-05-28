@@ -4,9 +4,11 @@
 		<p v-if="dashboard_data.description">{{ dashboard_data.description }}</p>
 		<div id="grid">
 			<div v-for="(chart, index) in charts" :class="`gridItem ${chart.grid_size}`">
-				<Chart 
-					:chart_options="chart"
-				/>
+				<div id="chart_wrapper">
+					<Chart 
+						:chart_options="chart"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -53,5 +55,8 @@ div.medium
 div.large
 	grid-column: span 4
 	grid-row: span 2
+
+div#chart_wrapper
+	height: 100%
 	
 </style>
