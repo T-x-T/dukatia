@@ -14,7 +14,6 @@
 
 <script lang="ts" setup>
 const charts: ChartOptions[] = (await useFetch("/api/v1/dashboards/0/charts")).data.value;
-console.log(charts)
 </script>
 
 <script lang="ts">

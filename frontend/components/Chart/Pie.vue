@@ -53,12 +53,12 @@ export default {
 	methods: {
 		update() {
 			Object.keys(this.pie).forEach(x => {
-				this.chart_data.datasets[0].data.push(this.pie[x][1]);
-				this.chart_data.labels.push(x);
+				this.chart_data.datasets[0].data.push(this.pie[x][1][1]);
+				this.chart_data.labels.push(this.pie[x][0]);
 			});
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-				return " " + this.pie[context.label][0];
+				return " " + this.pie.filter((x: any) => x[0] === context.label)[0][1][0];
 			}
 		},
 	}

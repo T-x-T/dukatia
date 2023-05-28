@@ -81,18 +81,21 @@ export default {
 		update() {
 			for (const dataset in this.line) {
 				this.chart_data.datasets.push({
-					label: dataset,
-					data: Object.keys(this.line[dataset]).map(item => (
+					label: this.line[dataset][0],
+					data: Object.keys(this.line[dataset][1]).map(item => (
 						{
-							x: this.line[dataset][item].timestamp, 
-							y: this.line[dataset][item].value
+							x: this.line[dataset][1][item].timestamp, 
+							y: this.line[dataset][1][item].value
 						}
 					)),
 				})
 			}
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-				return ` ${context.dataset.label}: ` + this.line[context.dataset.label].filter((x: any) => {
+				let line = {} as any;
+				Object.keys(this.line).forEach(x => line[this.line[x][0]] = this.line[x][1])
+
+				return ` ${context.dataset.label}: ` + line[context.dataset.label].filter((x: any) => {
 					return new Date(context.label.replaceAll(".", "")).toISOString() == new Date(x.timestamp).toISOString();
 				})[0].label;
 			}

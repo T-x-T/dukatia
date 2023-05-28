@@ -43,15 +43,19 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
     Some(x) => Some(x as i32),
     None => None,
 	};
+	let max_items: Option<i32> = match chart.max_items {
+    Some(x) => Some(x as i32),
+    None => None,
+	};
 
 	pool.get()
 		.await
 		.unwrap()
 		.query(
 			"INSERT INTO public.charts 
-				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period)
-				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9);", 
-			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period]
+				(id, user_id, grid_size, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period, max_items)
+				VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);", 
+			&[&user_id, &chart.grid_size, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items]
 		).await?;
 
 	return Ok(());
@@ -68,6 +72,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let filter_to: Option<DateTime<Utc>> = row.get(7);
 	let filter_collection: Option<String> = row.get(8);
 	let date_period: Option<String> = row.get(9);
+	let max_items: Option<i32> = row.get(10);
 
 	return Chart {
 		id: Some(id as u32),
@@ -81,5 +86,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		filter_collection,
 		date_period,
 		asset_id: None,
+		max_items: max_items.map(|x| x as u32),
 	};
 }

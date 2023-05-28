@@ -9,7 +9,6 @@ use crate::CustomError;
 use serde::{Serialize, Deserialize};
 use std::error::Error;
 use deadpool_postgres::Pool;
-use std::collections::BTreeMap;
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Serialize)]
@@ -25,6 +24,7 @@ pub struct Chart {
 	pub filter_collection: Option<String>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
+	pub max_items: Option<u32>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -34,13 +34,14 @@ pub struct ChartOptions {
 	pub only_parents: Option<bool>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
+	pub max_items: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ChartData {
 	pub text: Option<String>,
-	pub pie: Option<BTreeMap<String, (String, f64)>>,
-	pub line: Option<BTreeMap<String, Vec<line::Point>>>,
+	pub pie: Option<Vec<(String, (String, f64))>>,
+	pub line: Option<Vec<(std::string::String, Vec<line::Point>)>>,
 }
 
 pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {

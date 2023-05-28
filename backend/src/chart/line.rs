@@ -51,7 +51,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 	return Ok(ChartData { text: None, pie: None, line: Some(output) });
 }
 
-async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 	let recipients = recipient::get_all(&pool).await?;
@@ -61,10 +61,13 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	let output = sum_currencies(accumulated_raw_output, currencies);
 	let named_output = add_names_to_output(output, NamedTypes::Recipient(recipients));
 
-	return Ok(named_output);
+	let sorted_output = sort_output(named_output);
+	let limited_output = limit_output(sorted_output, chart.max_items);
+
+	return Ok(limited_output);
 }
 
-async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 	let accounts = account::get_all(&pool).await?;
@@ -74,10 +77,13 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, 
 	let output = sum_currencies(accumulated_raw_output, currencies);
 	let named_output = add_names_to_output(output, NamedTypes::Account(accounts));
 
-	return Ok(named_output);
+	let sorted_output = sort_output(named_output);
+	let limited_output = limit_output(sorted_output, chart.max_items);
+
+	return Ok(limited_output);
 }
 
-async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 
@@ -86,10 +92,13 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 	let output = sum_currencies(accumulated_raw_output, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::Currency(currencies));
 
-	return Ok(named_output);
+	let sorted_output = sort_output(named_output);
+	let limited_output = limit_output(sorted_output, chart.max_items);
+
+	return Ok(limited_output);
 }
 
-async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
 
@@ -98,7 +107,7 @@ async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<BTree
 	let output = sum_currencies(accumulated_raw_output, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::EarningSpendingNet);
 
-	return Ok(named_output);
+	return Ok(Vec::from_iter(named_output));
 }
 
 enum RawOutputProperties {
@@ -294,7 +303,31 @@ fn add_maps(a: BTreeMap<u32, i32>, b: BTreeMap<u32, i32>) -> BTreeMap<u32, i32> 
 	return a;
 }
 
-async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+fn sort_output(input: BTreeMap<String, Vec<Point>>) -> Vec<(std::string::String, Vec<Point>)> {
+	let mut output = Vec::from_iter(input);
+	output.sort_by(|a, b| b.1.last().unwrap().value.total_cmp(&a.1.last().unwrap().value));
+	return output;
+}
+
+//TODO: add testing for limiting output
+fn limit_output(input: Vec<(std::string::String, Vec<Point>)>, limit: Option<u32>) -> Vec<(std::string::String, Vec<Point>)> {
+	let mut input = input;
+	let mut output: Vec<(std::string::String, Vec<Point>)>;
+	
+	if limit.is_some() && input.len() > limit.unwrap() as usize {
+		let top_limited_output: Vec<(std::string::String, Vec<Point>)> = input.clone().into_iter().take(limit.unwrap() as usize / 2).collect();
+		input.reverse();
+		let mut bottom_limited_output: Vec<(std::string::String, Vec<Point>)> = input.into_iter().take(limit.unwrap() as usize / 2).collect();
+		output = top_limited_output;
+		output.append(&mut bottom_limited_output);
+	} else {
+		output = input;
+	}
+
+	return output;
+}
+
+async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	if chart.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -308,7 +341,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<BTreeMap
 	output.insert(asset.name.clone(), Vec::new());
 
 	if value_history.len() == 0 || amount_history.len() == 0 {
-		return Ok(output);
+		return Ok(Vec::from_iter(output));
 	}
 
 	let first_day = get_first_day_of_asset_valuations(&value_history, &amount_history);
@@ -334,10 +367,10 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<BTreeMap
 		current_day = current_day + Duration::days(1);
 	}
 
-	return Ok(output);
+	return Ok(Vec::from_iter(output));
 }
 
-async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	if chart.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -350,7 +383,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<BTreeMa
 	output.insert(asset.name.clone(), Vec::new());
 	
 	if value_history.len() == 0 {
-		return Ok(output);
+		return Ok(Vec::from_iter(output));
 	}
 	
 	let first_day = get_first_day_of_asset_valuations(&value_history, &BTreeMap::new());
@@ -375,10 +408,10 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<BTreeMa
 		current_day = current_day + Duration::days(1);
 	}
 
-	return Ok(output);
+	return Ok(Vec::from_iter(output));
 }
 
-async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, Vec<Point>>, Box<dyn Error>> {
+async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	if chart.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -390,7 +423,7 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<BTreeMap<Stri
 	output.insert(asset.name.clone(), Vec::new());
 
 	if amount_history.len() == 0 {
-		return Ok(output);
+		return Ok(Vec::from_iter(output));
 	}
 
 	let first_day = get_first_day_of_asset_valuations(&BTreeMap::new(), &amount_history);
@@ -415,7 +448,7 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<BTreeMap<Stri
 		current_day = current_day + Duration::days(1);
 	}
 
-	return Ok(output);
+	return Ok(Vec::from_iter(output));
 }
 
 fn get_first_day_of_asset_valuations(value_history: &BTreeMap<DateTime<Utc>, u32>, amount_history: &BTreeMap<DateTime<Utc>, f64>) -> Date<Utc> {

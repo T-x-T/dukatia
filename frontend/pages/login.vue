@@ -37,7 +37,7 @@ export default {
 				await useRouter().replace("/");
 				location.reload();
 			} catch(e: any) {
-				this.error = e?.data?.data?.error
+				this.error = e?.data?.error
 			}
 		}
 	}

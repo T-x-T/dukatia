@@ -54,6 +54,7 @@ struct ChartPost {
 	filter_to: Option<DateTime<Utc>>,
 	filter_collection: Option<String>,
 	date_period: Option<String>,
+	max_items: Option<u32>,
 }
 
 #[post("/api/v1/charts")]
@@ -75,6 +76,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
 		asset_id: None,
+		max_items: body.max_items,
 	};
 
 	match super::add(&data.pool, &chart).await {
