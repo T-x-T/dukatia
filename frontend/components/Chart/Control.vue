@@ -54,7 +54,8 @@ export default {
 		updateDate() {
 			this.$emit("update", {
 				from_date: this.from_date,
-				to_date: this.to_date
+				to_date: this.to_date,
+				date_period: this.date_period
 			});
 		},
 

@@ -53,7 +53,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, false).await?;
 	let recipients = recipient::get_all(&pool).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Recipient, chart.date_period.unwrap_or(String::from("daily")));
@@ -69,12 +69,12 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 
 async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, true).await?;
 	let accounts = account::get_all(&pool).await?;
-
-	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, chart.date_period.unwrap_or(String::from("daily")));
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, chart.clone().date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
-	let output = sum_currencies(accumulated_raw_output, currencies);
+	let raw_output_only_relevant_dates = limit_raw_output_dates(accumulated_raw_output, &chart);
+	let output = sum_currencies(raw_output_only_relevant_dates, currencies);
 	let named_output = add_names_to_output(output, NamedTypes::Account(accounts));
 
 	let sorted_output = sort_output(named_output);
@@ -85,11 +85,12 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string:
 
 async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, true).await?;
 
-	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency, chart.date_period.unwrap_or(String::from("daily")));
+	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency, chart.clone().date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
-	let output = sum_currencies(accumulated_raw_output, currencies.clone());
+	let raw_output_only_relevant_dates = limit_raw_output_dates(accumulated_raw_output, &chart);
+	let output = sum_currencies(raw_output_only_relevant_dates, currencies.clone());
 	let named_output = add_names_to_output(output, NamedTypes::Currency(currencies));
 
 	let sorted_output = sort_output(named_output);
@@ -100,7 +101,7 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 
 async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart).await?;
+	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, false).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet, chart.date_period.unwrap_or(String::from("monthly")));
 	let output = sum_currencies(raw_output, currencies.clone());
@@ -150,6 +151,15 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 			.or_insert(0) += transaction.amount;
 	});
 
+	return output;
+}
+
+fn limit_raw_output_dates(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>, chart: &Chart) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
+	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
+	input.into_iter().for_each(|mut x| {
+		x.1.retain(|k, _| &chart.filter_from.unwrap_or(MIN_DATETIME).date().signed_duration_since(*k).num_seconds() <= &0 && &chart.filter_to.unwrap_or(MAX_DATETIME).date().signed_duration_since(*k).num_seconds() >= &0);
+		output.insert(x.0, x.1);
+	});
 	return output;
 }
 
@@ -279,9 +289,17 @@ fn add_names_to_output(input: BTreeMap<u32, Vec<Point>>, named_types: NamedTypes
 	return output;
 }
 
-async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
-	let from_date = chart.filter_from.unwrap_or(MIN_DATETIME);
-	let to_date = chart.filter_to.unwrap_or(MAX_DATETIME);
+async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_all: bool) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
+	let from_date = if get_all {
+		MIN_DATETIME
+	} else {
+		chart.filter_from.unwrap_or(MIN_DATETIME)
+	};
+	let to_date = if get_all {
+		MAX_DATETIME
+	} else {
+		chart.filter_to.unwrap_or(MAX_DATETIME)
+	};
 
 	let mut transactions = transaction::get_all(&pool).await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
