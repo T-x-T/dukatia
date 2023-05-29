@@ -1,7 +1,7 @@
 <template>
 	<div class="wrapper">
-		<div v-if="!showOptions" class="wrapper" id="chart_wrapper">
-			<button id="edit_button" @click="showOptions = true">Edit</button>
+		<div v-if="!show_options" class="wrapper" id="chart_wrapper">
+			<button id="edit_button" @click="show_options = true">Edit</button>
 			<h5>{{ options.title }}</h5>
 			<div v-if="options.chart_type == 'text'">
 				<ChartText
@@ -34,11 +34,12 @@
 			</div>
 		</div>
 
-		<div v-if="showOptions" class="wrapper">
+		<div v-if="show_options" class="wrapper">
 			<ChartOptions 
 				:chart_options="options"
 				v-on:back="reload"
 				v-on:change_size="$emit('change_size')"
+				v-on:deleted="(show_options = false) || $emit('deleted')"
 			/>
 		</div>
 	</div>
@@ -50,7 +51,7 @@ export default {
 		chart_data: {} as any,
 		options: {} as ChartOptions,
 		key: 0,
-		showOptions: false,
+		show_options: false,
 	}),
 
 	props: {
@@ -78,7 +79,7 @@ export default {
 
 		async reload() {
 			this.options = await $fetch(`/api/v1/charts/${this.options.id}`);
-			this.showOptions = false
+			this.show_options = false
 		},
 	},
 }

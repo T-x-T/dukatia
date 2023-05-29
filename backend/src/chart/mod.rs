@@ -55,8 +55,12 @@ pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return db::update(pool, chart).await;
 }
 
+pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
+	return db::delete(pool, chart_id).await;
+}
+
 pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
-	let mut chart = get_by_id(pool, chart_id).await.unwrap();
+	let mut chart = get_by_id(pool, chart_id).await?;
 	
 	if options.from_date.is_some() {
 		chart.filter_from = options.from_date;

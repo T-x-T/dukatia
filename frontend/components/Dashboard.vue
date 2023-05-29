@@ -7,6 +7,7 @@
 					<Chart 
 						:chart_options="chart"
 						v-on:change_size="update"
+						v-on:deleted="update"
 					/>
 				</div>
 			</div>

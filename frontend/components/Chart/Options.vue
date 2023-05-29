@@ -1,6 +1,6 @@
 <template>
 	<div id="wrapper">
-		<button id="back_button" @click="save_and_go_back">Back</button>
+		<button id="back_button" class="green" @click="save_and_go_back">Back</button>
 		<h5>Options</h5>
 
 		<label for="title">Title:</label>
@@ -58,6 +58,9 @@
 		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
 		<label for="bottom_right_y">Bottom right Y:</label>
 		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
+		<br>
+		
+		<button class="red" @click="delete_this">Delete chart</button>
 	</div>
 </template>
 
@@ -108,7 +111,12 @@ export default {
 					date_range: Number(this.options.date_range),
 				}
 			});
-		}
+		},
+
+		async delete_this() {
+			await $fetch(`/api/v1/charts/${this.options.id}`, {method: "DELETE"});
+			this.$emit('deleted');
+		},
 	},
 }
 </script>

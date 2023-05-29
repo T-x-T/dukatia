@@ -72,6 +72,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(chart::rest_api::get_all_charts_in_dashboard)
 			.service(chart::rest_api::post)
 			.service(chart::rest_api::put)
+			.service(chart::rest_api::delete)
 			.service(currency::rest_api::get_all)
 			.service(currency::rest_api::get_by_id)
 			.service(currency::rest_api::post)

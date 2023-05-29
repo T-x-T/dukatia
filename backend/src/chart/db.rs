@@ -122,6 +122,16 @@ pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return Ok(());
 }
 
+pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
+	pool.get()
+		.await
+		.unwrap()
+		.query("DELETE FROM public.charts WHERE id=$1", &[&(chart_id as i32)])
+		.await?;
+
+	return Ok(());
+}
+
 fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let id: i32 = row.get(0);
 	let user_id: Option<i32> = row.get(1);
