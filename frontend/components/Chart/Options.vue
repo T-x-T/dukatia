@@ -1,6 +1,6 @@
 <template>
 	<div id="wrapper">
-		<button id="back_button" @click="saveAndGoBack">Back</button>
+		<button id="back_button" @click="save_and_go_back">Back</button>
 		<h5>Options</h5>
 
 		<label for="title">Title:</label>
@@ -47,6 +47,17 @@
 			<option value="6">Last 365 days</option>
 			<option value="7">Total</option>
 		</select>
+		<br>
+
+		<label for="top_left_x">Top left X:</label>
+		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
+		<label for="top_left_y">Top left Y:</label>
+		<input type="number" v-model="options.top_left_y" @change="change_size" name="top_left_y" />
+		<br>
+		<label for="bottom_right_x">Bottom right X:</label>
+		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
+		<label for="bottom_right_y">Bottom right Y:</label>
+		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
 	</div>
 </template>
 
@@ -80,16 +91,24 @@ export default {
 	},
 
 	methods: {
-		async saveAndGoBack() {
+		async save_and_go_back() {
+			await this.save();
+			this.$emit('back');
+		},
+
+		async change_size() {
+			await this.save();
+			this.$emit('change_size');
+		},
+
+		async save() {
 			await $fetch(`/api/v1/charts/${this.options.id}`, {
 				method: "PUT", body: {
 					...this.options,
 					date_range: Number(this.options.date_range),
 				}
 			});
-
-			this.$emit('back');
-		},
+		}
 	},
 }
 </script>

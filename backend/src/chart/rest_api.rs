@@ -31,8 +31,20 @@ async fn get_all_charts_in_dashboard(data: web::Data<AppState>, req: HttpRequest
 	}
 }
 
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChartOptions {
+	pub from_date: Option<DateTime<Utc>>,
+	pub to_date: Option<DateTime<Utc>>,
+	pub only_parents: Option<bool>,
+	pub date_period: Option<String>,
+	pub asset_id: Option<u32>,
+	pub max_items: Option<u32>,
+	pub date_range: Option<u32>,
+}
+
 #[get("/api/v1/charts/{chart_id}/data")]
-async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<super::ChartOptions>) -> impl Responder {
+async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<ChartOptions>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
@@ -56,6 +68,10 @@ struct ChartPost {
 	date_period: Option<String>,
 	max_items: Option<u32>,
 	date_range: Option<u32>,
+	top_left_x: Option<u32>,
+	top_left_y: Option<u32>,
+	bottom_right_x: Option<u32>,
+	bottom_right_y: Option<u32>,
 }
 
 #[post("/api/v1/charts")]
@@ -79,6 +95,10 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		asset_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
+		top_left_x: body.top_left_x,
+		top_left_y: body.top_left_y,
+		bottom_right_x: body.bottom_right_x,
+		bottom_right_y: body.bottom_right_y,
 	};
 
 	match super::add(&data.pool, &chart).await {
@@ -108,6 +128,10 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 		asset_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
+		top_left_x: body.top_left_x,
+		top_left_y: body.top_left_y,
+		bottom_right_x: body.bottom_right_x,
+		bottom_right_y: body.bottom_right_y,
 	};
 
 	match super::update(&data.pool, &chart).await {

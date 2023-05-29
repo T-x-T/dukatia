@@ -175,5 +175,9 @@ declare global {
 		filter_collection: string,
 		max_items: number,
 		date_range: number,
+		top_left_x: number,
+		top_left_y: number,
+		bottom_right_x: number,
+		bottom_right_y: number,
 	}
 }

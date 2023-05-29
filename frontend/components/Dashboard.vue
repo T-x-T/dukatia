@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<h2>{{ dashboard_data.name }}</h2>
-		<p v-if="dashboard_data.description">{{ dashboard_data.description }}</p>
+		<h3>{{ dashboard_data.name }}</h3>
 		<div id="grid">
-			<div v-for="(chart, index) in charts" :class="`gridItem ${chart.grid_size}`">
+			<div v-for="(chart, index) in charts" class="gridItem" :style="`grid-column: ${chart.top_left_x + 1} / ${chart.bottom_right_x + 1}; grid-row: ${chart.top_left_y + 1} / ${chart.bottom_right_y + 1}`">
 				<div id="chart_wrapper">
 					<Chart 
 						:chart_options="chart"
+						v-on:change_size="update"
 					/>
 				</div>
 			</div>
@@ -14,16 +14,26 @@
 	</div>
 </template>
 
-<script lang="ts" setup>
-const charts: ChartOptions[] = (await useFetch("/api/v1/dashboards/0/charts")).data.value;
-</script>
-
 <script lang="ts">
 export default {
+	data: () => ({
+		charts: [] as ChartOptions[],
+	}),
+
 	props: {
 		dashboard_data: {
 			type: Object as PropType<Dashboard>,
 			required: true,
+		}
+	},
+
+	async created() {
+		await this.update();
+	},
+
+	methods: {
+		async update() {
+			this.charts = await $fetch("/api/v1/dashboards/0/charts");
 		}
 	}
 }

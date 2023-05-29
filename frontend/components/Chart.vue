@@ -38,6 +38,7 @@
 			<ChartOptions 
 				:chart_options="options"
 				v-on:back="reload"
+				v-on:change_size="$emit('change_size')"
 			/>
 		</div>
 	</div>

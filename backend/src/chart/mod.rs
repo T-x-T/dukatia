@@ -6,7 +6,7 @@ pub mod rest_api;
 
 use crate::CustomError;
 
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use chrono::{DateTime, Utc};
@@ -26,17 +26,10 @@ pub struct Chart {
 	pub asset_id: Option<u32>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct ChartOptions {
-	pub from_date: Option<DateTime<Utc>>,
-	pub to_date: Option<DateTime<Utc>>,
-	pub only_parents: Option<bool>,
-	pub date_period: Option<String>,
-	pub asset_id: Option<u32>,
-	pub max_items: Option<u32>,
-	pub date_range: Option<u32>,
+	pub top_left_x: Option<u32>,
+	pub top_left_y: Option<u32>,
+	pub bottom_right_x: Option<u32>,
+	pub bottom_right_y: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -62,7 +55,7 @@ pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return db::update(pool, chart).await;
 }
 
-pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let mut chart = get_by_id(pool, chart_id).await.unwrap();
 	
 	if options.from_date.is_some() {
