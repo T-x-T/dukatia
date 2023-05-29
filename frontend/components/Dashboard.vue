@@ -1,6 +1,14 @@
 <template>
 	<div>
 		<h3>{{ dashboard_data.name }}</h3>
+		
+		<button v-if="!add_chart_open" id="add_chart" @click="add_chart_open = true">Add Chart</button>
+		<div v-if="add_chart_open" id="add_chart_box">
+			<ChartOptions 
+				v-on:back="(add_chart_open = false) || update()"
+			/>
+		</div>
+
 		<div id="grid">
 			<div v-for="(chart, index) in charts" class="gridItem" :style="`grid-column: ${chart.top_left_x + 1} / ${chart.bottom_right_x + 1}; grid-row: ${chart.top_left_y + 1} / ${chart.bottom_right_y + 1}`">
 				<div id="chart_wrapper">
@@ -19,6 +27,7 @@
 export default {
 	data: () => ({
 		charts: [] as ChartOptions[],
+		add_chart_open: false,
 	}),
 
 	props: {
@@ -55,19 +64,12 @@ div.gridItem
 	padding: 10px
 	overflow: scroll
 
-div.small
-	grid-column: span 1
-	grid-row: span 1
-
-div.medium
-	grid-column: span 2
-	grid-row: span 2
-
-div.large
-	grid-column: span 4
-	grid-row: span 2
-
 div#chart_wrapper
 	height: 100%
+
+button#add_chart
+	position: absolute
+	bottom: 0
+	right: 0
 	
 </style>

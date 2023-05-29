@@ -15,7 +15,6 @@ use chrono::{DateTime, Utc};
 pub struct Chart {
 	pub id: Option<u32>,
 	pub user_id: Option<u32>,
-	pub grid_size: String,
 	pub chart_type: String,
 	pub title: String,
 	pub text_template: Option<String>,

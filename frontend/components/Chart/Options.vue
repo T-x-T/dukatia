@@ -60,7 +60,7 @@
 		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
 		<br>
 		
-		<button class="red" @click="delete_this">Delete chart</button>
+		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete chart</button>
 	</div>
 </template>
 
@@ -85,12 +85,26 @@ export default {
 	props: {
 		chart_options: {
 			type: Object as PropType<ChartOptions>,
-			required: true,
 		}
 	},
 
 	created() {
-		this.options = {...this.chart_options};
+		if(this.chart_options) {
+			this.options = {...this.chart_options};
+		} else {
+			this.options = {
+				chart_type: "line",
+				title: "Your new chart",
+				date_period: "daily",
+				date_range: 1,
+				filter_collection: "earning_spending_net",
+				max_items: 10,
+				top_left_x: 0,
+				top_left_y: 0,
+				bottom_right_x: 5,
+				bottom_right_y: 2,
+			};
+		}
 	},
 
 	methods: {
@@ -105,12 +119,21 @@ export default {
 		},
 
 		async save() {
-			await $fetch(`/api/v1/charts/${this.options.id}`, {
-				method: "PUT", body: {
-					...this.options,
-					date_range: Number(this.options.date_range),
-				}
-			});
+			if(Number.isInteger(this.options.id)) {
+				await $fetch(`/api/v1/charts/${this.options.id}`, {
+					method: "PUT", body: {
+						...this.options,
+						date_range: Number(this.options.date_range),
+					}
+				});
+			} else {
+				await $fetch("/api/v1/charts", {
+					method: "POST", body: {
+						...this.options,
+						date_range: Number(this.options.date_range),
+					}
+				});
+			}
 		},
 
 		async delete_this() {

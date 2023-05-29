@@ -58,7 +58,6 @@ async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart
 
 #[derive(Deserialize)]
 struct ChartPost {
-	grid_size: String,
 	chart_type: String,
 	title: String,
 	text_template: Option<String>,
@@ -84,7 +83,6 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	let chart = super::Chart {
 		id: None,
 		user_id: Some(user_id),
-		grid_size: body.grid_size,
 		chart_type: body.chart_type,
 		title: body.title,
 		text_template: body.text_template,
@@ -118,7 +116,6 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 	let chart = super::Chart {
 		id: Some(chart_id.into_inner()),
 		user_id: Some(user_id),
-		grid_size: body.grid_size,
 		chart_type: body.chart_type,
 		title: body.title,
 		text_template: body.text_template,
