@@ -73,6 +73,12 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_
 	if options.asset_id.is_some() {
 		chart.asset_id = options.asset_id;
 	}
+	if options.max_items.is_some() {
+		chart.max_items = options.max_items;
+	}
+	if options.date_range.is_some() {
+		chart.date_range = options.date_range;
+	}
 
 	if chart.chart_type == "text" {
 		return text::get_chart_data(pool, chart).await;

@@ -326,7 +326,6 @@ fn sort_output(input: BTreeMap<String, Vec<Point>>) -> Vec<(std::string::String,
 	return output;
 }
 
-//TODO: add testing for limiting output
 fn limit_output(input: Vec<(std::string::String, Vec<Point>)>, limit: Option<u32>) -> Vec<(std::string::String, Vec<Point>)> {
 	let mut input = input;
 	let mut output: Vec<(std::string::String, Vec<Point>)>;

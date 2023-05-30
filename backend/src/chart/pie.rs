@@ -48,7 +48,6 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 
 	let mut sorted_output = Vec::from_iter(output);
 	sorted_output.sort_by(|a, b| a.1.1.total_cmp(&b.1.1));
-	//TODO: add testing for limiting output
 	let limited_output: Vec<(String, (String, f64))> = sorted_output.into_iter().take(chart.max_items.unwrap_or(u32::MAX) as usize).collect();
 
 	return Ok(limited_output);
@@ -76,7 +75,6 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 
 	let mut sorted_output = Vec::from_iter(output);
 	sorted_output.sort_by(|a, b| a.1.1.total_cmp(&b.1.1));
-	//TODO: add testing for limiting output
 	let limited_output: Vec<(String, (String, f64))> = sorted_output.into_iter().take(chart.max_items.unwrap_or(u32::MAX) as usize).collect();
 
 	return Ok(limited_output);

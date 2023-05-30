@@ -105,7 +105,6 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	}
 }
 
-//TODO: Add testing
 #[put("/api/v1/charts/{chart_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>, chart_id: web::Path<u32>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
@@ -138,7 +137,6 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 	}
 }
 
-//TODO: Add testing
 #[delete("/api/v1/charts/{chart_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {

@@ -1201,7 +1201,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "small",
 						"chart_type": "text",
 						"title": "Current Balance",
 						"text_template": "%foreach_currency{$name: $current_balance$symbol*}%"
@@ -1216,7 +1215,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"grid_size":"small","chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null,"max_items":null}
+						"body_equals": {"id":10,"user_id":0,"chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1224,7 +1223,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "medium",
 						"chart_type": "pie",
 						"title": "Spending per recipient in date range",
 						"filter_collection": "recipients"
@@ -1239,7 +1237,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":11,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null,"max_items":null}
+						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1247,7 +1245,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "medium",
 						"chart_type": "pie",
 						"title": "Spending per tag in date range",
 						"filter_collection": "tags"
@@ -1262,7 +1259,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":12,"user_id":0,"grid_size":"medium","chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null,"max_items":null}
+						"body_equals": {"id":12,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1270,7 +1267,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per recipient over time",
 						"filter_collection": "recipients",
@@ -1286,7 +1282,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":13,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1294,7 +1290,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per account over time",
 						"filter_collection": "accounts",
@@ -1310,7 +1305,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":14,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1318,7 +1313,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Spending per currency over time",
 						"filter_collection": "currencies",
@@ -1334,7 +1328,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":15,"user_id":0,"grid_size":"large","chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1342,7 +1336,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Earning and spending over time",
 						"filter_collection": "earning_spending_net",
@@ -1358,7 +1351,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":16,"user_id":0,"grid_size":"large","chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period": "monthly","asset_id":null,"max_items":null}
+						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period":"monthly","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1366,7 +1359,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Total value over time",
 						"filter_collection": "asset_total_value",
@@ -1382,7 +1374,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":17,"user_id":0,"grid_size":"large","chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1390,7 +1382,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Value over time per single unit",
 						"filter_collection": "asset_single_value",
@@ -1406,7 +1397,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":18,"user_id":0,"grid_size":"large","chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -1414,7 +1405,6 @@
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
-						"grid_size": "large",
 						"chart_type": "line",
 						"title": "Amount over time",
 						"filter_collection": "asset_amount",
@@ -1430,7 +1420,89 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":19,"user_id":0,"grid_size":"large","chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period": "daily","asset_id":null,"max_items":null}
+						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+					}
+				},
+
+
+
+				{
+					"name": "adding chart with all options returns 200",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"body": {
+						"chart_type": "line",
+						"title": "test",
+						"filter_from": "2022-03-25T11:22:00.000Z",
+						"filter_to": "2023-03-25T11:22:00.000Z",
+						"filter_collection": "asset_amount",
+						"date_period": "daily",
+						"max_items": 12,
+						"date_range": 3,
+						"top_left_x": 1,
+						"top_left_y": 2,
+						"bottom_right_x": 3,
+						"bottom_right_y": 4
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "chart with all options got created correctly",
+					"endpoint": "/api/v1/charts/20",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":20,"user_id":0,"chart_type":"line","title":"test","text_template":null,"filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"asset_amount","date_period":"daily","asset_id":null,"max_items":12,"date_range":3,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
+					}
+				},
+				{
+					"name": "modifying chart with all options returns 200",
+					"endpoint": "/api/v1/charts/20",
+					"method": "PUT",
+					"body": {
+						"chart_type": "pie",
+						"title": "test2",
+						"filter_from": "2021-03-25T11:22:00.000Z",
+						"filter_to": "2022-03-25T11:22:00.000Z",
+						"filter_collection": "tags",
+						"date_period": "monthly",
+						"max_items": 2,
+						"date_range": 1,
+						"top_left_x": 4,
+						"top_left_y": 5,
+						"bottom_right_x": 6,
+						"bottom_right_y": 7
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "chart with all options got created correctly",
+					"endpoint": "/api/v1/charts/20",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":20,"user_id":0,"chart_type":"pie","title":"test2","text_template":null,"filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"tags","date_period":"monthly","asset_id":null,"max_items":2,"date_range":1,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
+					}
+				},
+				{
+					"name": "deleting chart returns 200",
+					"endpoint": "/api/v1/charts/20",
+					"method": "DELETE",
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "deleted chart isnt there anymore",
+					"endpoint": "/api/v1/charts/20",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"specified item of type chart not found with filter id=20"}
 					}
 				},
 
@@ -1782,7 +1854,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":139.45,"label":"126.45€ 13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":145.45,"label":"129.45€ 16$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":139.0,"label":"126€ 13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":145.0,"label":"129€ 16$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
 					}
 				},
 
@@ -1821,7 +1893,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "}]]]}
 					}
 				},
 				{
@@ -1830,7 +1902,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]]]}
 					}
 				},
 				{
@@ -1959,10 +2031,38 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
 					}
 				},
 
+
+				{
+					"name": "retrieval of pie chart tags using option max_items returns correct output",
+					"endpoint": "/api/v1/charts/2/data?max_items=1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":[["tag2",["3.1€ 26$ ",29.1]]],"line":null}
+					}
+				},
+				{
+					"name": "retrieval of pie chart recipients using option max_items returns correct output",
+					"endpoint": "/api/v1/charts/1/data?max_items=1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":[["test",["3.1€ 26$ ",29.1]]],"line":null}
+					}
+				},
+				{
+					"name": "retrieval of line chart using option max_items returns correct output",
+					"endpoint": "/api/v1/charts/4/data?max_items=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.1,"label":"1.1€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.1,"label":"3.1€ "}]]]}
+					}
+				},
 
 
 				{
@@ -1971,7 +2071,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":272.0,"label":"249€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":278.0,"label":"252€ 26$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
 					}
 				},
 				{
@@ -1980,7 +2080,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},{"timestamp":"2123-03-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}]],["Net",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},{"timestamp":"2123-03-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}]],["Spending",[{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
 					}
 				},
 				{
@@ -1989,7 +2089,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
 					}
 				},
 				{
@@ -1998,7 +2098,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":272.9,"label":"249.9€ 23$ "},{"timestamp":"2123-01-01T00:00:00Z","value":278.9,"label":"252.9€ 26$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":272.0,"label":"249€ 23$ "},{"timestamp":"2123-01-01T00:00:00Z","value":278.0,"label":"252€ 26$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
 					}
 				},
 
