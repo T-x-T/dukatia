@@ -165,12 +165,18 @@ declare global {
 	}
 
 	type ChartOptions = {
-		id: number,
-		grid_size: "small" | "medium" | "large",
+		id?: number,
 		chart_type: "text" | "pie" | "line",
 		title: string,
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",
-		asset_id: number | undefined,
+		asset_id?: number,
+		filter_collection: string,
+		max_items?: number,
+		date_range: number,
+		top_left_x: number,
+		top_left_y: number,
+		bottom_right_x: number,
+		bottom_right_y: number,
 	}
 }

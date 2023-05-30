@@ -6,17 +6,15 @@ pub mod rest_api;
 
 use crate::CustomError;
 
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
-use std::collections::BTreeMap;
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Chart {
 	pub id: Option<u32>,
 	pub user_id: Option<u32>,
-	pub grid_size: String,
 	pub chart_type: String,
 	pub title: String,
 	pub text_template: Option<String>,
@@ -25,22 +23,19 @@ pub struct Chart {
 	pub filter_collection: Option<String>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct ChartOptions {
-	pub from_date: Option<DateTime<Utc>>,
-	pub to_date: Option<DateTime<Utc>>,
-	pub only_parents: Option<bool>,
-	pub date_period: Option<String>,
-	pub asset_id: Option<u32>,
+	pub max_items: Option<u32>,
+	pub date_range: Option<u32>,
+	pub top_left_x: Option<u32>,
+	pub top_left_y: Option<u32>,
+	pub bottom_right_x: Option<u32>,
+	pub bottom_right_y: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ChartData {
 	pub text: Option<String>,
-	pub pie: Option<BTreeMap<String, (String, f64)>>,
-	pub line: Option<BTreeMap<String, Vec<line::Point>>>,
+	pub pie: Option<Vec<(String, (String, f64))>>,
+	pub line: Option<Vec<(std::string::String, Vec<line::Point>)>>,
 }
 
 pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
@@ -55,8 +50,16 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return db::add(pool, chart).await;
 }
 
-pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
-	let mut chart = get_by_id(pool, chart_id).await.unwrap();
+pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+	return db::update(pool, chart).await;
+}
+
+pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
+	return db::delete(pool, chart_id).await;
+}
+
+pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+	let mut chart = get_by_id(pool, chart_id).await?;
 	
 	if options.from_date.is_some() {
 		chart.filter_from = options.from_date;
@@ -69,6 +72,12 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: Chart
 	}
 	if options.asset_id.is_some() {
 		chart.asset_id = options.asset_id;
+	}
+	if options.max_items.is_some() {
+		chart.max_items = options.max_items;
+	}
+	if options.date_range.is_some() {
+		chart.date_range = options.date_range;
 	}
 
 	if chart.chart_type == "text" {

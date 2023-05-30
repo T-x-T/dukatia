@@ -25,7 +25,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 	return Ok(ChartData { text: None, pie: Some(output), line: None });
 }
 
-async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, f64)>, Box<dyn Error>> {
+async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_transactions(&pool, &chart).await?;
@@ -46,10 +46,14 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<BTreeMap<String
 
 	output.retain(|_, v| v.1 != 0.0);
 
-	return Ok(output)
+	let mut sorted_output = Vec::from_iter(output);
+	sorted_output.sort_by(|a, b| a.1.1.total_cmp(&b.1.1));
+	let limited_output: Vec<(String, (String, f64))> = sorted_output.into_iter().take(chart.max_items.unwrap_or(u32::MAX) as usize).collect();
+
+	return Ok(limited_output);
 }
 
-async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (String, f64)>, Box<dyn Error>> {
+async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(&pool).await?;
 	let transactions = get_relevant_transactions(&pool, &chart).await?;
@@ -69,7 +73,11 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<BTreeMap<String, (Str
 
 	output.retain(|_, v| v.1 != 0.0);
 
-	return Ok(output);
+	let mut sorted_output = Vec::from_iter(output);
+	sorted_output.sort_by(|a, b| a.1.1.total_cmp(&b.1.1));
+	let limited_output: Vec<(String, (String, f64))> = sorted_output.into_iter().take(chart.max_items.unwrap_or(u32::MAX) as usize).collect();
+
+	return Ok(limited_output);
 }
 
 async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
