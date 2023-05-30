@@ -1,0 +1,12 @@
+{
+  "name": "TxTs Treasury",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/logo_800.png",
+      "type": "image/png",
+      "sizes": "800x800"
+    }
+  ]
+}
