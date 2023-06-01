@@ -143,8 +143,7 @@ export default {
 @import "assets/_vars.sass"
 
 #wrapper
-	width: fit-content
-	display: inline-block	
+	width: 102%
 
 #input
 	svg

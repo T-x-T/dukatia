@@ -143,7 +143,7 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 div#wrapper
 	height: 100%
 	width: 100%

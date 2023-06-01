@@ -35,7 +35,8 @@
 						/>	
 					</div>
 
-					<button class="green" @click="applyBatchEdit()">Edit selected rows</button>
+					<button class="green" @click="applyBatchEdit()">Edit selected</button>
+					<button class="red" @click="deleteBatchEdit()">Delete selected</button>
 				</div>		
 			</div>
 			<CustomTable
@@ -203,6 +204,25 @@ export default {
 			this.updateAndLoadTable();
 		},
 
+		async deleteBatchEdit() {
+			if(!this.selectedRows) return;
+
+			await Promise.all(this.selectedRows.map(async row => {
+				try {
+					await $fetch(`/api/v1/transactions/${row[0]}`, {
+						method: "DELETE",
+					});
+				} catch(e: any) {
+					console.error(e?.data?.data);
+					window.alert(e?.data?.data?.error);
+					return;
+				}
+			}));
+			this.batchaccount_id = null;
+			this.batchrecipient_id = null;
+			this.updateAndLoadTable();
+		},
+
 		async updateAndLoadTable() {
 			this.transactions = await $fetch("/api/v1/transactions/all");
 			this.updateTransactions();
@@ -252,4 +272,13 @@ div#detailBar
 
 div#batchEdit
 	display: flex
+	align-items: stretch
+	select
+		max-width: 10em
+	button
+		margin: 0
+		margin-left: 1em
+		height: 100%
+		
+
 </style>
