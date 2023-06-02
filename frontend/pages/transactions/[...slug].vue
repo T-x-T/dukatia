@@ -224,8 +224,7 @@ export default {
 		},
 
 		async updateAndLoadTable() {
-			this.transactions = await $fetch("/api/v1/transactions/all");
-			this.updateTransactions();
+			await this.updateTable();
 			this.detailsOpen = false;
 			this.selectedRow = {} as Transaction;
 			history.pushState({}, "", "/transactions");

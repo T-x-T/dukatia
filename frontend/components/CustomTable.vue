@@ -411,10 +411,10 @@ td
 
 tr
 	cursor: pointer
-	&:hover td
-		transition-duration: 0s
 
 th
+	position: sticky
+	top: 0
 	padding-bottom: 4px
 	input, select
 		max-width: 100px
