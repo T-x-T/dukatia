@@ -45,8 +45,9 @@ export default {
 		async updateSelectData() {
 			this.sortedSelectData = Object.keys(this.filteredSelectData).length > 0 ? this.filteredSelectData : this.selectData;
 			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
-
+			
 			if(this.selectData.selected) {
+				this.optionStates = [];
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
 			}
 			this.updateDisplayText();
@@ -95,9 +96,7 @@ export default {
 		},
 
 		toggleOption(id: number) {
-			let optionStates = this.optionStates;
-			optionStates[id] = !optionStates[id];
-			this.optionStates = optionStates;
+			this.optionStates[id] = !this.optionStates[id];
 			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
 			this.updateDisplayText();
 		},
@@ -129,8 +128,11 @@ export default {
 	},
 
 	watch: {
-		async selectData() {
-			await this.updateSelectData();
+		selectData: {
+			async handler() {
+				await this.updateSelectData();
+			},
+			deep: true,
 		},
 		searchTerm() {
 			this.applyFilter();
