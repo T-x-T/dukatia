@@ -2,6 +2,7 @@
 	<div>
 		<p>Count: {{rowsForDisplay?.length}}</p>
 		<p v-if="sum">{{sum}}</p>
+		<input type="number" v-model="currentPage">
 		<table>
 			<colgroup>
 					<col v-if="tableData.multiSelect" class="multiselect">
@@ -132,7 +133,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
+				<tr v-for="(row, index) in rowsCurrentPage" :key="index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
@@ -144,14 +145,18 @@
 <script lang="ts">
 export default {
 	data: () => ({
+		currencies: [] as Currency[],
 		rows: [] as Row[],
 		currentSort: [] as {index: number, direction: "asc" | "desc"}[],
 		filters: [] as TableFilter[],
 		rowsForDisplay: [] as Row[],
+		rowsCurrentPage: [] as Row[],
 		selectedRows: [] as boolean[],
 		openFilter: null as number | null,
 		allRowsSelected: false,
-		sum: ""
+		sum: "",
+		pageSize: 50,
+		currentPage: 0,
 	}),
 
 	props: {
@@ -161,8 +166,9 @@ export default {
 		},
 	},
 	
-	created() {
+	async created() {
 		this.update(true);
+		this.currencies = await $fetch("/api/v1/currencies/all");
 	},
 
 	methods: {
@@ -364,10 +370,10 @@ export default {
 				console.error("CustomTable#getSum got called with missing this.tableData.sumColumn: ", this.tableData);
 				return;
 			}
-			const currencies: Currency[] = await $fetch("/api/v1/currencies/all");
+			
 
 			let output = "Sum:";
-			currencies.forEach(currency => {
+			this.currencies.forEach(currency => {
 				output += " ";
 				let total = 0;
 				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn as number].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn as number].replace(currency.symbol, "")) : null);
@@ -377,7 +383,14 @@ export default {
 				}
 			});
 			this.sum = output;
-		}
+		},
+
+		updateRowsCurrentPage() {
+			if(this.currentPage < 0) this.currentPage = 0;
+			const startingIndex = this.currentPage * this.pageSize;
+			this.rowsCurrentPage = this.rowsForDisplay.slice(startingIndex, startingIndex + this.pageSize);
+			if(this.rowsCurrentPage.length === 0) this.currentPage--;
+		},
 	},
 	watch: {
 		selectedRows: {
@@ -395,7 +408,16 @@ export default {
 				this.update(false);
 			},
 			deep: true,
-		}
+		},
+		rowsForDisplay: {
+			handler() {
+				this.updateRowsCurrentPage();
+			},
+			deep: true
+		},
+		currentPage() {
+			this.updateRowsCurrentPage();
+		},
 	}
 }
 </script>
@@ -415,7 +437,7 @@ tr
 th
 	position: sticky
 	top: 0
-	padding-bottom: 4px
+	padding: 4px 0 4px
 	input, select
 		max-width: 100px
 
