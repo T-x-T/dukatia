@@ -13,7 +13,7 @@
 
 		<div v-if="config?.tableData" id="table">
 			<CustomTable
-				:tableData="config.tableData"
+				:tableDataProp="config.tableData"
 			/>
 		</div>
 	</div>

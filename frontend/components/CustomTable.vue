@@ -1,8 +1,5 @@
 <template>
 	<div>
-		<p>Count: {{rowsForDisplay?.length}}</p>
-		<p v-if="sum">{{sum}}</p>
-		<input type="number" v-model="currentPage">
 		<table>
 			<colgroup>
 					<col v-if="tableData.multiSelect" class="multiselect">
@@ -139,6 +136,22 @@
 				</tr>
 			</tbody>
 		</table>
+		<div id="bottom_bar" class="background_color_darkest">
+			<div>
+				<p>Count: {{rowsForDisplay?.length}}</p>
+				<p v-if="sum">{{sum}}</p>
+			</div>
+			<div>
+				<label for="page_size">Rows per Page: </label>
+				<input type="number" name="page_size" v-model="pageSize">
+				<button @click="currentPage=0">First</button>
+				<button @click="currentPage--">Previous</button>
+				<label for="current_page">Page</label>
+				<input type="number" name="current_page" v-model="currentPage">
+				<button @click="currentPage++">Next</button>
+				<button @click="currentPage=Math.ceil(rowsForDisplay.length / pageSize) - 1">Last</button>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -157,27 +170,28 @@ export default {
 		sum: "",
 		pageSize: 50,
 		currentPage: 0,
+		tableData: {} as TableData,
 	}),
 
 	props: {
-		tableData: {
+		tableDataProp: {
 			type: Object as PropType<TableData>,
 			required: true,
 		},
 	},
 	
-	async created() {
-		this.update(true);
-		this.currencies = await $fetch("/api/v1/currencies/all");
+	async beforeMount() {
+		await this.update(true);
 	},
-
+	
 	methods: {
-		update(reset: boolean) {
+		async update(initial: boolean) {
+			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
 			
-			if(reset) {
+			if(initial) {
 				this.rowsForDisplay = this.rows;
-
+				
 				this.tableData.columns.forEach(c => {
 					this.filters.push({
 						type: c.type,
@@ -185,15 +199,15 @@ export default {
 						empty: c.type == "string" ? "anything" : ""
 					});
 				});
-			
+				
+				this.currencies = await $fetch("/api/v1/currencies/all");
 				this.applyDefaultSort();
 				this.fillSelectedRows();
 			} else {
-				this.filter();
 				this.sort();
 			}
-			
-			if(this.tableData.displaySum) this.getSum();
+
+			this.filter();
 		},
 
 		fillSelectedRows() {
@@ -362,6 +376,7 @@ export default {
 					}
 				}
 			}
+
 			if(this.tableData.displaySum) this.getSum();
 		},
 
@@ -371,7 +386,6 @@ export default {
 				return;
 			}
 			
-
 			let output = "Sum:";
 			this.currencies.forEach(currency => {
 				output += " ";
@@ -386,10 +400,13 @@ export default {
 		},
 
 		updateRowsCurrentPage() {
+			this.fillSelectedRows();
 			if(this.currentPage < 0) this.currentPage = 0;
 			const startingIndex = this.currentPage * this.pageSize;
 			this.rowsCurrentPage = this.rowsForDisplay.slice(startingIndex, startingIndex + this.pageSize);
-			if(this.rowsCurrentPage.length === 0) this.currentPage--;
+			if(this.currentPage > Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1) {
+				this.currentPage = Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1;
+			}
 		},
 	},
 	watch: {
@@ -397,13 +414,13 @@ export default {
 			handler() {
 				let selectedRowContents: Row = [];
 				this.selectedRows.forEach((selected, i) => {
-					if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
+					if(selected) selectedRowContents.push({...this.rowsForDisplay[i]});
 				});
 				this.$emit("rowSelect", selectedRowContents);
 			},
 			deep: true,
 		},
-		tableData: {
+		tableDataProp: {
 			handler() {
 				this.update(false);
 			},
@@ -418,6 +435,9 @@ export default {
 		currentPage() {
 			this.updateRowsCurrentPage();
 		},
+		pageSize() {
+			this.updateRowsCurrentPage();
+		}
 	}
 }
 </script>
@@ -425,6 +445,16 @@ export default {
 <style lang="sass" scoped>
 table
 	table-layout: fixed
+	width: 100%
+	border-collapse: separate
+	border-spacing: 0px
+	white-space: nowrap
+	text-align: center
+	select
+		height: 100%
+		right: 0
+		margin: 0
+		width: 100%
 
 td
 	white-space: break-spaces
@@ -483,4 +513,15 @@ col.choice
 	width: 10em
 col.date
 	width: 20em
+
+div#bottom_bar
+	position: sticky
+	bottom: 0
+	display: flex
+	justify-content: space-between
+	align-items: center
+	div
+		padding: 0 0.5em 0 0.5em
+	input[type="number"]
+		width: 4em
 </style>

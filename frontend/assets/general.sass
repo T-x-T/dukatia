@@ -79,6 +79,9 @@ html.dark-mode
       color: $dark-brightest
       &:hover
         color: $dark-heavy
+  .background_color_darkest
+    background: $dark-darkest
+    border-top: 2px solid $dark-heavydark
 
 html.light-mode
   scrollbar-color: $light-dark $light-bright
@@ -144,6 +147,9 @@ html.light-mode
       color: $light-brightest
       &:hover
         color: $light-heavy
+  .background_color_darkest
+    background: $light-darkest
+    border-top: 2px solid $light-heavydark
 
 html.monochrome-mode
   scrollbar-color: $monochrome-dark $monochrome-bright
@@ -213,6 +219,9 @@ html.monochrome-mode
       color: $monochrome-brightest
       &:hover
         color: $monochrome-heavy
+  .background_color_darkest
+    background: $monochrome-darkest
+    border-top: 2px solid $monochrome-heavydark
 
 html.black-mode
   scrollbar-color: $black-dark $black-bright
@@ -282,7 +291,9 @@ html.black-mode
       color: $black-brightest
       &:hover
         color: $black-heavy
-
+  .background_color_darkest
+    background: $black-darkest
+    border-top: 2px solid $black-heavydark
 
 ::selection
   background: rgba(0,0,0,.5)
@@ -363,18 +374,6 @@ h4
 
 h5
   font-size: 20px
-
-table
-  width: 100%
-  border-collapse: separate
-  border-spacing: 0px
-  white-space: nowrap
-  text-align: center
-  select
-    height: 100%
-    right: 0
-    margin: 0
-    width: 100%
   
 th
   @extend .semibold
@@ -385,16 +384,3 @@ tbody
     
 label
   @extend .semibold
-
-div#batchEditContainer
-  position: fixed
-  display: flex
-  justify-content: center
-  align-items: center
-  bottom: 0px
-  left: 0px
-  width: 100vw
-  padding: 10px
-  background: rgba(0, 0, 0, 0.5)
-  backdrop-filter: blur(5px) saturate(20%)
-  box-shadow: 0px 0px 15px black

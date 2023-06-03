@@ -2,7 +2,7 @@
 	<div>
 		<button class="green" @click="newTag()">Add</button>
 		<CustomTable
-			:tableData="tableData"
+			:tableDataProp="tableData"
 			v-on:rowClick="rowClick"
 		/>
 	</div>

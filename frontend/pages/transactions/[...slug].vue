@@ -4,7 +4,15 @@
 			<div>
 				<button class="green" @click="newTransaction">Add</button>
 			</div>
-			<div v-if="selectedRows && selectedRows.length > 0" id="batchEditContainer">
+			<CustomTable
+				v-if="Object.keys(tableData).length > 0"
+				:tableDataProp="tableData"
+				v-on:rowClick="rowClick"
+				v-on:rowSelect="rowSelect"
+			/>
+		</div>
+
+		<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
 				<div id="batchEdit">
 					<div>
 						<label for="account">Account:</label>
@@ -39,15 +47,8 @@
 					<button class="red" @click="deleteBatchEdit()">Delete selected</button>
 				</div>		
 			</div>
-			<CustomTable
-				v-if="Object.keys(tableData).length > 0"
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-				v-on:rowSelect="rowSelect"
-			/>
-		</div>
 
-		<div v-if="detailsOpen" id="detailBar">
+		<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
 			<TransactionDetails 
 				v-if="Object.keys(selectedRow).length > 0"
 				:transaction="selectedRow"
@@ -261,17 +262,13 @@ div#main
 	height: 100vh
 
 div#table
-	flex-grow: 1
 	overflow: auto
-	padding-bottom: 20px
 
-div#detailBar
+div.detailBar
 	padding-left: 8px
 	flex-shrink: 0
 
 div#batchEdit
-	display: flex
-	align-items: stretch
 	select
 		max-width: 10em
 	button
