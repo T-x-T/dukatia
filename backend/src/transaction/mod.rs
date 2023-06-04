@@ -32,6 +32,21 @@ pub struct Transaction {
 	pub asset: Option<Asset>
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct DeepTransaction {
+	pub id: u32,
+	pub user: crate::user::User,
+	pub currency: crate::currency::Currency,
+	pub account: crate::account::Account,
+	pub recipient: crate::recipient::Recipient,
+	pub status: TransactionStatus,
+	pub timestamp: DateTime<Utc>,
+	pub amount: i32,
+	pub comment: Option<String>,
+	pub tags: Vec<crate::tag::Tag>,
+	pub asset: Option<Asset>,
+}
+
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let mut transaction = transaction.clone();
 
@@ -48,7 +63,7 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 	}
 
 
-	return db::add(&pool, &transaction).await;
+	return Ok(db::add(&pool, &transaction).await?);
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {

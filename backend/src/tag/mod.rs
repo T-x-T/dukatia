@@ -14,15 +14,27 @@ pub struct Tag {
 	pub parent_id: Option<u32>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct DeepTag {
+	pub id: u32,
+	pub name: String,
+	pub user: crate::user::User,
+	pub parent: Option<Tag>,
+}
+
 pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
 		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
-	return db::add(&pool, &tag).await;
+	return Ok(db::add(&pool, &tag).await?);
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
+	return db::get_all(pool).await;
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTag>, Box<dyn Error>> {
+	return db::get_all_deep(pool).await;
 }
 
 pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> {
@@ -33,17 +45,17 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), tag.id).await {
 		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
-	return db::update(&pool, &tag).await;
+	return Ok(db::update(pool, tag).await?);
 }
 
 pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete(&pool, tag_id).await;
+	return db::delete(pool, tag_id).await;
 }
 
 //If tag_id is supplied check if parent_id can be parent of tag (checks cyclic dependency)
 async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bool {
 	println!("parent_id: {}, tag_id: {:?}", parent_id, tag_id);
-	if db::get_by_id(&pool, parent_id).await.is_err() {
+	if db::get_by_id(pool, parent_id).await.is_err() {
 		return false;
 	}
 
@@ -58,7 +70,7 @@ async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bo
 		if next_parent_id_to_check == tag_id.unwrap() {
 			return false;
 		}
-		let next_tag = db::get_by_id(&pool, next_parent_id_to_check).await;
+		let next_tag = db::get_by_id(pool, next_parent_id_to_check).await;
 		if next_tag.is_err() {
 			break;
 		}

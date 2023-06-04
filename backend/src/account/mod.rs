@@ -14,12 +14,25 @@ pub struct Account {
 	pub tag_ids: Option<Vec<u32>>
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct DeepAccount {
+	pub id: u32,
+	pub name: String,
+	pub default_currency: crate::currency::Currency,
+	pub user: Option<crate::user::User>,
+	pub tags: Vec<crate::tag::DeepTag>,
+}
+
 pub async fn add(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>> {
 	return db::add(pool, account).await;
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Account>, Box<dyn Error>> {
 	return db::get_all(pool).await;
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAccount>, Box<dyn Error>> {
+	return db::get_all_deep(pool).await;
 }
 
 pub async fn get_by_id(pool: &Pool, account_id: u32) -> Result<Account, Box<dyn Error>> {

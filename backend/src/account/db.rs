@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::Account;
+use super::{Account, DeepAccount};
 
 pub async fn add(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>> {
 	let client = pool.get().await?;
@@ -22,22 +22,29 @@ pub async fn add(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>> {
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Account>, Box<dyn Error>> {
-	let rows = pool.get()
+	return Ok(
+		pool.get()
 		.await?
 		.query(
 			"SELECT * FROM public.account_data;",
 			&[]
-		)
-		.await?;
-	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound{item_type: String::from("account")}));
-	}
+		).await?
+		.iter()
+		.map(|x| turn_row_into_account(&x))
+		.collect()
+	);
+}
 
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAccount>, Box<dyn Error>> {
 	return Ok(
-		rows
+		pool.get()
+			.await?
+			.query(
+				"SELECT * FROM deep_accounts;",
+				&[]
+			).await?
 			.iter()
-			.map(|x| turn_row_into_account(&x))
+			.map(|x| turn_row_into_deep_account(x))
 			.collect()
 	);
 }
@@ -110,4 +117,88 @@ fn turn_row_into_account(row: &tokio_postgres::Row) -> Account {
 		user_id: user_id as u32,
 		tag_ids: Some(tag_ids)
 	};
+}
+
+fn turn_row_into_deep_account(row: &tokio_postgres::Row) -> DeepAccount {
+	let id: i32 = row.get(0);
+	let name: String = row.get(1);
+	let default_currency_id: i32 = row.get(2);
+	let default_currency_minor_in_mayor: i32 = row.get(3);
+	let default_currency_name: String = row.get(4);
+	let default_currency_symbol: String = row.get(5);
+	let user_id: Option<i32> = row.get(6);
+	let user_name: Option<String> = row.get(7);
+	let user_superuser: Option<bool> = row.get(8);
+	let tag_ids: Vec<Option<i32>> = row.get(9);
+	let tag_names: Vec<Option<String>> = row.get(10);
+	let tag_parent_ids: Vec<Option<i32>> = row.get(11);
+	let tag_parent_names: Vec<Option<String>> = row.get(12);
+	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(13);
+	let tag_parent_user_ids: Vec<Option<i32>> = row.get(14);
+	let tag_user_ids: Vec<Option<i32>> = row.get(15);
+	let tag_user_names: Vec<Option<String>> = row.get(16);
+	let tag_user_superusers: Vec<Option<bool>> = row.get(17);
+
+	let default_currency = crate::currency::Currency {
+		id: Some(default_currency_id as u32),
+		name: default_currency_name,
+		minor_in_mayor: default_currency_minor_in_mayor as u32,
+		symbol: default_currency_symbol
+	};
+
+	let user = match user_id {
+		Some(_) => {
+			Some( crate::user::User {
+				id: Some(user_id.unwrap() as u32),
+				name: user_name.unwrap(),
+				secret: None,
+				superuser: user_superuser.unwrap()
+			} )
+		},
+		None => None,
+	};
+	
+	let tags: Vec<crate::tag::DeepTag> = tag_ids
+		.into_iter()
+		.filter(|x| x.is_some())
+		.enumerate()
+		.map(|(i, tag_id)| {
+			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
+				Some(x) => {
+					match x {
+						Some(_) => {
+							Some(crate::tag::Tag {
+								id: tag_parent_ids[i].map(|x| x as u32),
+								name: tag_parent_names[i].clone().unwrap(),
+								user_id: tag_parent_user_ids[i].unwrap() as u32,
+								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+							})
+						},
+						None => None,
+					}
+				},
+				None => None,
+			};
+			
+			crate::tag::DeepTag {
+				id: tag_id.unwrap() as u32,
+				name: tag_names[i].clone().unwrap(),
+				user: crate::user::User {
+					id: tag_user_ids[i].map(|x| x as u32),
+					name: tag_user_names[i].clone().unwrap(),
+					secret: None,
+					superuser: tag_user_superusers[i].unwrap(),
+				},
+				parent,
+			}
+		}).collect();
+		
+
+	return DeepAccount {
+		id: id as u32,
+		name,
+		default_currency,
+		user,
+		tags,
+	}
 }

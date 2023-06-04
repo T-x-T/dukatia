@@ -13,12 +13,24 @@ pub struct Recipient {
 	pub tag_ids: Option<Vec<u32>>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct DeepRecipient {
+	pub id: u32,
+	pub name: String,
+	pub user: Option<crate::user::User>,
+	pub tags: Vec<crate::tag::DeepTag>,
+}
+
 pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::add(&pool, &recipient).await;
+	return db::add(pool, recipient).await;
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
+	return db::get_all(pool).await;
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepRecipient>, Box<dyn Error>> {
+	return db::get_all_deep(pool).await;
 }
 
 pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<dyn Error>> {
@@ -26,7 +38,7 @@ pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<
 }
 
 pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::update(&pool, &recipient).await;
+	return db::update(pool, recipient).await;
 }
 
 #[cfg(test)]

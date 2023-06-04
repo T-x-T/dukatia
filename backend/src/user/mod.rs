@@ -2,13 +2,14 @@ mod db;
 pub mod rest_api;
 
 use std::error::Error;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Sha512, Digest};
 use deadpool_postgres::Pool;
 use super::Config;
 use super::access_token;
 use super::CustomError;
 
+#[derive(Serialize, Debug, Clone)]
 pub struct User {
 	pub id: Option<u32>,
 	pub name: String,
