@@ -39,7 +39,6 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 	}
 }
 
-//TODO: add testing
 #[get("/api/v1/assets/all/deep")]
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
