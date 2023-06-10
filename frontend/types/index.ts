@@ -9,6 +9,21 @@ declare global {
 		tag_ids?: number[],
 		default_currency?: Currency,
 	}
+	
+	type DeepAccount = {
+		id: number,
+		name: string,
+		default_currency: Currency,
+		user: User,
+		tags: DeepTag[],
+	}
+
+	type User = {
+		id?: number,
+		name: string,
+		secret?: string,
+		superuser: boolean,
+	}
 
 	type Asset = {
 		id?: number,
@@ -20,6 +35,17 @@ declare global {
 		amount?: number,
 		tag_ids?: number[],
 		currency?: Currency,
+	}
+
+	type DeepAsset = {
+		id: number,
+		name: string,
+		description?: string,
+		value_per_unit: number,
+		amount: number,
+		user: User,
+		currency: Currency,
+		tags: DeepTag[],
 	}
 
 	type Currency = {
@@ -36,11 +62,25 @@ declare global {
 		tag_ids?: number[],
 	}
 
+	type DeepRecipient = {
+		id: number,
+		name: string,
+		user?: User,
+		tags: DeepTag[],
+	}
+
 	type Tag = {
 		id?: number,
 		name: string,
 		user_id?: number,
 		parent_id?: number,
+	}
+
+	type DeepTag = {
+		id: number,
+		name: string,
+		user: User,
+		parent?: Tag,
 	}
 
 	type Transaction = {
@@ -59,6 +99,20 @@ declare global {
 		currency?: Currency,
 		recipient?: Recipient,
 		asset_id?: number,
+	}
+
+	type DeepTransaction = {
+		id: number,
+		status: TransactionStatus,
+		timestamp: string,
+		amount: number,
+		comment?: string,
+		currency: Currency,
+		user: User,
+		account: DeepAccount,
+		recipient: DeepRecipient,
+		tags: DeepTag[],
+		asset?: DeepAsset,
 	}
 
 	enum TransactionStatus {
