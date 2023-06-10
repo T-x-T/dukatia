@@ -4,7 +4,15 @@
 			<div>
 				<button class="green" @click="newTransaction">Add</button>
 			</div>
-			<div v-if="selectedRows && selectedRows.length > 0" id="batchEditContainer">
+			<CustomTable
+				v-if="Object.keys(tableData).length > 0"
+				:tableDataProp="tableData"
+				v-on:rowClick="rowClick"
+				v-on:rowSelect="rowSelect"
+			/>
+		</div>
+
+		<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
 				<div id="batchEdit">
 					<div>
 						<label for="account">Account:</label>
@@ -35,18 +43,12 @@
 						/>	
 					</div>
 
-					<button class="green" @click="applyBatchEdit()">Edit selected rows</button>
+					<button class="green" @click="applyBatchEdit()">Edit selected</button>
+					<button class="red" @click="deleteBatchEdit()">Delete selected</button>
 				</div>		
 			</div>
-			<CustomTable
-				v-if="Object.keys(tableData).length > 0"
-				:tableData="tableData"
-				v-on:rowClick="rowClick"
-				v-on:rowSelect="rowSelect"
-			/>
-		</div>
 
-		<div v-if="detailsOpen" id="detailBar">
+		<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
 			<TransactionDetails 
 				v-if="Object.keys(selectedRow).length > 0"
 				:transaction="selectedRow"
@@ -203,9 +205,27 @@ export default {
 			this.updateAndLoadTable();
 		},
 
+		async deleteBatchEdit() {
+			if(!this.selectedRows) return;
+
+			await Promise.all(this.selectedRows.map(async row => {
+				try {
+					await $fetch(`/api/v1/transactions/${row[0]}`, {
+						method: "DELETE",
+					});
+				} catch(e: any) {
+					console.error(e?.data?.data);
+					window.alert(e?.data?.data?.error);
+					return;
+				}
+			}));
+			this.batchaccount_id = null;
+			this.batchrecipient_id = null;
+			this.updateAndLoadTable();
+		},
+
 		async updateAndLoadTable() {
-			this.transactions = await $fetch("/api/v1/transactions/all");
-			this.updateTransactions();
+			await this.updateTable();
 			this.detailsOpen = false;
 			this.selectedRow = {} as Transaction;
 			history.pushState({}, "", "/transactions");
@@ -242,14 +262,19 @@ div#main
 	height: 100vh
 
 div#table
-	flex-grow: 1
 	overflow: auto
-	padding-bottom: 20px
 
-div#detailBar
+div.detailBar
 	padding-left: 8px
 	flex-shrink: 0
 
 div#batchEdit
-	display: flex
+	select
+		max-width: 10em
+	button
+		margin: 0
+		margin-left: 1em
+		height: 100%
+		
+
 </style>

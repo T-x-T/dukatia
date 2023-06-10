@@ -15,6 +15,19 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 	}
 }
 
+#[get("/api/v1/tags/all/deep")]
+async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+	};
+
+	match super::get_all_deep(&data.pool).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+	}
+}
+
 #[get("/api/v1/tags/{tag_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {

@@ -19,6 +19,18 @@ pub struct Asset {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct DeepAsset {
+	pub id: u32,
+	pub name: String,
+	pub description: Option<String>,
+	pub value_per_unit: u32,
+	pub amount: f64,
+	pub user: crate::user::User,
+	pub currency: crate::currency::Currency,
+	pub tags: Vec<crate::tag::DeepTag>,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct AssetValuation {
 	pub value_per_unit: u32,
 	pub amount: f64,
@@ -26,7 +38,7 @@ pub struct AssetValuation {
 }
 
 pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
-	return db::add(&pool, &asset).await;
+	return db::add(pool, asset).await;
 }
 
 pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
@@ -69,7 +81,11 @@ pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetVa
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
+	return db::get_all(pool).await;
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
+	return db::get_all_deep(pool).await;
 }
 
 #[allow(unused)]
@@ -78,11 +94,11 @@ pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, 
 }
 
 pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
-	return db::get_by_id(&pool, asset_id).await;
+	return db::get_by_id(pool, asset_id).await;
 }
 
 pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
-	return db::update(&pool, &asset).await;
+	return db::update(pool, asset).await;
 }
 
 #[allow(unused)]

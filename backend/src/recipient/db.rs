@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::Recipient;
+use super::{Recipient, DeepRecipient};
 
 pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
 	let client = pool.get().await.unwrap();
@@ -25,22 +25,31 @@ pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-		.query(
-			"SELECT * FROM public.recipient_data;",
-			&[]
-		)
-		.await?;
-	
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::NoItemFound{item_type: String::from("recipient")}));
-	}
-	
 	return Ok(
-		rows
-			.into_iter()
-			.map(|x| turn_row_into_recipient(&x))
+		pool.get()
+			.await?
+			.query(
+				"SELECT * FROM public.recipient_data;",
+				&[]
+			)
+			.await?
+			.iter()
+			.map(|x| turn_row_into_recipient(x))
+			.collect()
+	);
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepRecipient>, Box<dyn Error>> {
+	return Ok(
+		pool.get()
+			.await?
+			.query(
+				"SELECT * FROM public.deep_recipients;",
+				&[]
+			)
+			.await?
+			.iter()
+			.map(|x| turn_row_into_deep_recipient(x))
 			.collect()
 	);
 }
@@ -109,4 +118,75 @@ fn turn_row_into_recipient(row: &tokio_postgres::Row) -> Recipient {
 		user_id: user_id.map(|x| x as u32),
 		tag_ids: Some(tag_ids),
 	};
+}
+
+fn turn_row_into_deep_recipient(row: &tokio_postgres::Row) -> DeepRecipient {
+	let id: i32 = row.get(0);
+	let name: String = row.get(1);
+	let user_id: Option<i32> = row.get(2);
+	let user_name: Option<String> = row.get(3);
+	let user_superuser: Option<bool> = row.get(4);
+	let tag_ids: Vec<Option<i32>> = row.get(5);
+	let tag_names: Vec<Option<String>> = row.get(6);
+	let tag_parent_ids: Vec<Option<i32>> = row.get(7);
+	let tag_parent_names: Vec<Option<String>> = row.get(8);
+	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(9);
+	let tag_parent_user_ids: Vec<Option<i32>> = row.get(10);
+	let tag_user_ids: Vec<Option<i32>> = row.get(11);
+	let tag_user_names: Vec<Option<String>> = row.get(12);
+	let tag_user_superusers: Vec<Option<bool>> = row.get(13);
+
+	let user = match user_id {
+		Some(_) => {
+			Some( crate::user::User {
+				id: Some(user_id.unwrap() as u32),
+				name: user_name.unwrap(),
+				secret: None,
+				superuser: user_superuser.unwrap()
+			} )
+		},
+		None => None,
+	};
+
+	let tags: Vec<crate::tag::DeepTag> = tag_ids
+		.into_iter()
+		.filter(|x| x.is_some())
+		.enumerate()
+		.map(|(i, tag_id)| {
+			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
+				Some(x) => {
+					match x {
+						Some(_) => {
+							Some(crate::tag::Tag {
+								id: tag_parent_ids[i].map(|x| x as u32),
+								name: tag_parent_names[i].clone().unwrap(),
+								user_id: tag_parent_user_ids[i].unwrap() as u32,
+								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+							})
+						},
+						None => None,
+					}
+				},
+				None => None,
+			};
+			
+			crate::tag::DeepTag {
+				id: tag_id.unwrap() as u32,
+				name: tag_names[i].clone().unwrap(),
+				user: crate::user::User {
+					id: tag_user_ids[i].map(|x| x as u32),
+					name: tag_user_names[i].clone().unwrap(),
+					secret: None,
+					superuser: tag_user_superusers[i].unwrap(),
+				},
+				parent,
+			}
+		}).collect();
+
+		return DeepRecipient {
+			id: id as u32,
+			name,
+			user,
+			tags,
+		};
 }

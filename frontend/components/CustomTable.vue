@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<p>Count: {{rowsForDisplay?.length}}</p>
-		<p v-if="sum">{{sum}}</p>
 		<table>
 			<colgroup>
 					<col v-if="tableData.multiSelect" class="multiselect">
@@ -132,46 +130,68 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
+				<tr v-for="(row, index) in rowsCurrentPage" :key="index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
 			</tbody>
 		</table>
+		<div id="bottom_bar" class="background_color_darkest">
+			<div>
+				<p>Count: {{rowsForDisplay?.length}}</p>
+				<p v-if="sum">{{sum}}</p>
+			</div>
+			<div>
+				<label for="page_size">Rows per Page: </label>
+				<input type="number" name="page_size" v-model="pageSize">
+				<button @click="currentPage=0">First</button>
+				<button @click="currentPage--">Previous</button>
+				<label for="current_page">Page</label>
+				<input type="number" name="current_page" v-model="currentPage">
+				<button @click="currentPage++">Next</button>
+				<button @click="currentPage=Math.ceil(rowsForDisplay.length / pageSize) - 1">Last</button>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
 export default {
 	data: () => ({
+		currencies: [] as Currency[],
 		rows: [] as Row[],
 		currentSort: [] as {index: number, direction: "asc" | "desc"}[],
 		filters: [] as TableFilter[],
 		rowsForDisplay: [] as Row[],
+		rowsCurrentPage: [] as Row[],
 		selectedRows: [] as boolean[],
 		openFilter: null as number | null,
 		allRowsSelected: false,
-		sum: ""
+		sum: "",
+		pageSize: 50,
+		currentPage: 0,
+		tableData: {} as TableData,
 	}),
 
 	props: {
-		tableData: {
+		tableDataProp: {
 			type: Object as PropType<TableData>,
 			required: true,
 		},
 	},
 	
-	created() {
-		this.update(true);
+	async beforeMount() {
+		await this.update(true);
 	},
-
+	
 	methods: {
-		update(reset: boolean) {
+		async update(initial: boolean) {
+			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
 			
-			if(reset) {
+			if(initial) {
 				this.rowsForDisplay = this.rows;
-
+				
 				this.tableData.columns.forEach(c => {
 					this.filters.push({
 						type: c.type,
@@ -179,15 +199,15 @@ export default {
 						empty: c.type == "string" ? "anything" : ""
 					});
 				});
-			
+				
+				this.currencies = await $fetch("/api/v1/currencies/all");
 				this.applyDefaultSort();
 				this.fillSelectedRows();
 			} else {
-				this.filter();
 				this.sort();
 			}
-			
-			if(this.tableData.displaySum) this.getSum();
+
+			this.filter();
 		},
 
 		fillSelectedRows() {
@@ -356,6 +376,7 @@ export default {
 					}
 				}
 			}
+
 			if(this.tableData.displaySum) this.getSum();
 		},
 
@@ -364,10 +385,9 @@ export default {
 				console.error("CustomTable#getSum got called with missing this.tableData.sumColumn: ", this.tableData);
 				return;
 			}
-			const currencies: Currency[] = await $fetch("/api/v1/currencies/all");
-
+			
 			let output = "Sum:";
-			currencies.forEach(currency => {
+			this.currencies.forEach(currency => {
 				output += " ";
 				let total = 0;
 				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn as number].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn as number].replace(currency.symbol, "")) : null);
@@ -377,24 +397,46 @@ export default {
 				}
 			});
 			this.sum = output;
-		}
+		},
+
+		updateRowsCurrentPage() {
+			this.fillSelectedRows();
+			if(this.currentPage < 0) this.currentPage = 0;
+			const startingIndex = this.currentPage * this.pageSize;
+			this.rowsCurrentPage = this.rowsForDisplay.slice(startingIndex, startingIndex + this.pageSize);
+			if(this.currentPage > Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1) {
+				this.currentPage = Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1;
+			}
+		},
 	},
 	watch: {
 		selectedRows: {
 			handler() {
 				let selectedRowContents: Row = [];
 				this.selectedRows.forEach((selected, i) => {
-					if(selected) selectedRowContents.push(this.rowsForDisplay[i]);
+					if(selected) selectedRowContents.push({...this.rowsForDisplay[i]});
 				});
 				this.$emit("rowSelect", selectedRowContents);
 			},
 			deep: true,
 		},
-		tableData: {
+		tableDataProp: {
 			handler() {
 				this.update(false);
 			},
 			deep: true,
+		},
+		rowsForDisplay: {
+			handler() {
+				this.updateRowsCurrentPage();
+			},
+			deep: true
+		},
+		currentPage() {
+			this.updateRowsCurrentPage();
+		},
+		pageSize() {
+			this.updateRowsCurrentPage();
 		}
 	}
 }
@@ -403,6 +445,16 @@ export default {
 <style lang="sass" scoped>
 table
 	table-layout: fixed
+	width: 100%
+	border-collapse: separate
+	border-spacing: 0px
+	white-space: nowrap
+	text-align: center
+	select
+		height: 100%
+		right: 0
+		margin: 0
+		width: 100%
 
 td
 	white-space: break-spaces
@@ -411,11 +463,11 @@ td
 
 tr
 	cursor: pointer
-	&:hover td
-		transition-duration: 0s
 
 th
-	padding-bottom: 4px
+	position: sticky
+	top: 0
+	padding: 4px 0 4px
 	input, select
 		max-width: 100px
 
@@ -461,4 +513,15 @@ col.choice
 	width: 10em
 col.date
 	width: 20em
+
+div#bottom_bar
+	position: sticky
+	bottom: 0
+	display: flex
+	justify-content: space-between
+	align-items: center
+	div
+		padding: 0 0.5em 0 0.5em
+	input[type="number"]
+		width: 4em
 </style>

@@ -3,7 +3,7 @@ use chrono::{Utc, Date};
 use std::collections::BTreeMap;
 use std::error::Error;
 use super::super::CustomError;
-use super::{Asset, AssetValuation};
+use super::{Asset, AssetValuation, DeepAsset};
 
 pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 	let client = pool.get().await?;
@@ -34,6 +34,18 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 		.await?;
 	
 	return Ok(rows.into_iter().map(|x| turn_row_into_asset(&x)).collect());
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
+	return Ok(
+		pool.get()
+			.await?
+			.query("SELECT * FROM deep_assets", &[])
+			.await?
+			.iter()
+			.map(|x| turn_row_into_deep_asset(x))
+			.collect()
+	);
 }
 
 pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
@@ -258,4 +270,89 @@ fn turn_row_into_asset_valuation(row: &tokio_postgres::Row) -> AssetValuation {
 		amount,
 		timestamp
 	}
+}
+
+fn turn_row_into_deep_asset(row: &tokio_postgres::Row) -> DeepAsset {
+	let id: i32 = row.get(0);
+	let name: String = row.get(1);
+	let description: Option<String> = row.get(2);
+	let value_per_unit: i32 = row.try_get(3).unwrap_or(0);
+	let amount: f64 = row.try_get(4).unwrap_or(0.0);
+	let currency_id: i32 = row.get(5);
+	let currency_minor_in_mayor: i32 = row.get(6);
+	let currency_name: String = row.get(7);
+	let currency_symbol: String = row.get(8);
+	let user_id: i32 = row.get(9);
+	let user_name: String = row.get(10);
+	let user_superuser: bool = row.get(11);
+	let tag_ids: Vec<Option<i32>> = row.get(12);
+	let tag_names: Vec<Option<String>> = row.get(13);
+	let tag_parent_ids: Vec<Option<i32>> = row.get(14);
+	let tag_parent_names: Vec<Option<String>> = row.get(15);
+	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(16);
+	let tag_parent_user_ids: Vec<Option<i32>> = row.get(17);
+	let tag_user_ids: Vec<Option<i32>> = row.get(18);
+	let tag_user_names: Vec<Option<String>> = row.get(19);
+	let tag_user_superusers: Vec<Option<bool>> = row.get(20);
+
+	let currency = crate::currency::Currency {
+		id: Some(currency_id as u32),
+		name: currency_name,
+		minor_in_mayor: currency_minor_in_mayor as u32,
+		symbol: currency_symbol
+	};
+
+	let user = crate::user::User {
+		id: Some(user_id as u32),
+		name: user_name,
+		secret: None,
+		superuser: user_superuser
+	};
+
+	let tags: Vec<crate::tag::DeepTag> = tag_ids
+		.into_iter()
+		.filter(|x| x.is_some())
+		.enumerate()
+		.map(|(i, tag_id)| {
+			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
+				Some(x) => {
+					match x {
+						Some(_) => {
+							Some(crate::tag::Tag {
+								id: tag_parent_ids[i].map(|x| x as u32),
+								name: tag_parent_names[i].clone().unwrap(),
+								user_id: tag_parent_user_ids[i].unwrap() as u32,
+								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+							})
+						},
+						None => None,
+					}
+				},
+				None => None,
+			};
+			
+			crate::tag::DeepTag {
+				id: tag_id.unwrap() as u32,
+				name: tag_names[i].clone().unwrap(),
+				user: crate::user::User {
+					id: tag_user_ids[i].map(|x| x as u32),
+					name: tag_user_names[i].clone().unwrap(),
+					secret: None,
+					superuser: tag_user_superusers[i].unwrap(),
+				},
+				parent,
+			}
+		}).collect();
+
+	return DeepAsset {
+		id: id as u32,
+		name,
+		description,
+		value_per_unit: value_per_unit as u32,
+		amount,
+		user,
+		currency,
+		tags,
+	}
+
 }

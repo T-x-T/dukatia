@@ -49,15 +49,14 @@
 		</select>
 		<br>
 
-		<label for="top_left_x">Top left X:</label>
-		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
-		<label for="top_left_y">Top left Y:</label>
+		<label for="top_left_y">Top:</label>
 		<input type="number" v-model="options.top_left_y" @change="change_size" name="top_left_y" />
-		<br>
-		<label for="bottom_right_x">Bottom right X:</label>
-		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
-		<label for="bottom_right_y">Bottom right Y:</label>
+		<label for="top_left_x">Left:</label>
+		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
+		<label for="bottom_right_y">Bottom:</label>
 		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
+		<label for="bottom_right_x">Right:</label>
+		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
 		<br>
 		
 		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete chart</button>
@@ -144,10 +143,11 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 div#wrapper
 	height: 100%
 	width: 100%
+	position: relative
 
 h5
 	text-align: center
@@ -155,4 +155,11 @@ h5
 #back_button
 	position: absolute
 	width: fit-content
+
+input
+	width: 4em
+input[type="text"]
+	max-width: 40em
+	width: 80%
+
 </style>

@@ -8,5 +8,14 @@ export default defineNuxtConfig ({
     "@nuxtjs/color-mode"
   ],
   css: ["assets/general.sass", "assets/_vars.sass"],
-  telemetry: false
+  telemetry: false,
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      link: [
+        {rel: "manifest", href: "/manifest.json"}
+      ]
+    }
+  }
 })

@@ -3,9 +3,8 @@
   clippy::needless_borrow,
   clippy::or_fun_call,
   clippy::redundant_field_names,
+  deprecated,
 )]
-#![feature(btree_drain_filter)]
-#![feature(drain_filter)]
 
 mod webserver;
 mod access_token;

@@ -88,6 +88,7 @@ export default {
 <style lang="sass" scoped>
 div.wrapper
 	height: 100%
+	position: relative
 
 div#chart_wrapper
 	display: flex

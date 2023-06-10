@@ -41,24 +41,29 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(user::rest_api::post_login)
 			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
+			.service(account::rest_api::get_all_deep)
 			.service(account::rest_api::get_by_id)
 			.service(account::rest_api::post)
 			.service(account::rest_api::put)
 			.service(tag::rest_api::get_all)
+			.service(tag::rest_api::get_all_deep)
 			.service(tag::rest_api::get_by_id)
 			.service(tag::rest_api::post)
 			.service(tag::rest_api::put)
 			.service(tag::rest_api::delete)
 			.service(recipient::rest_api::get_all)
+			.service(recipient::rest_api::get_all_deep)
 			.service(recipient::rest_api::get_by_id)
 			.service(recipient::rest_api::post)
 			.service(recipient::rest_api::put)
 			.service(transaction::rest_api::get_all)
+			.service(transaction::rest_api::get_all_deep)
 			.service(transaction::rest_api::get_by_id)
 			.service(transaction::rest_api::post)
 			.service(transaction::rest_api::put)
 			.service(transaction::rest_api::delete)
 			.service(asset::rest_api::get_all)
+			.service(asset::rest_api::get_all_deep)
 			.service(asset::rest_api::get_by_id)
 			.service(asset::rest_api::post)
 			.service(asset::rest_api::put)
@@ -88,5 +93,5 @@ pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dy
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }
 
-	return get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await;
+	return Ok(get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await?);
 }

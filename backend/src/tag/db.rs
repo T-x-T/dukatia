@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::Tag;
+use super::{DeepTag, Tag};
 
 pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 	pool.get()
@@ -20,8 +20,20 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 		.query("SELECT * FROM public.tags;", &[])
 		.await?
 		.iter()
-		.map(|x| turn_row_into_tag(&x))
+		.map(|x| turn_row_into_tag(x))
 		.collect()
+	)
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTag>, Box<dyn Error>> {
+	return Ok(
+		pool.get()
+			.await?
+			.query("SELECT * FROM deep_tags", &[])
+			.await?
+			.iter()
+			.map(|x| turn_row_into_deep_tag(x))
+			.collect()
 	)
 }
 
@@ -76,5 +88,41 @@ fn turn_row_into_tag(row: &tokio_postgres::Row) -> Tag {
 		name: row.get(1),
 		user_id: user_id.map_or(0, |x| x as u32),
 		parent_id: parent_id.map(|x| x as u32),
+	}
+}
+
+fn turn_row_into_deep_tag(row: &tokio_postgres::Row) -> DeepTag {
+	let id: i32 = row.get(0);
+	let name: String = row.get(1);
+	let user_id: i32 = row.get(2);
+	let user_name: String = row.get(3);
+	let user_superuser: bool = row.get(4);
+	let parent_id: Option<i32> = row.get(5);
+	let parent_name: Option<String> = row.get(6);
+	let parent_user_id: Option<i32> = row.get(7);
+	let parent_parent_id: Option<i32> = row.get(8);
+
+	let parent: Option<Tag> = match parent_id {
+		Some(_) => {
+			Some(Tag {
+				id: parent_id.map(|x| x as u32),
+				name: parent_name.unwrap(),
+				user_id: parent_user_id.unwrap() as u32,
+				parent_id: parent_parent_id.map(|x| x as u32),
+			})
+		},
+		None => None,
+	};
+
+	return DeepTag {
+		id: id as u32,
+		name,
+		user: crate::user::User {
+			id: Some(user_id as u32),
+			name: user_name,
+			secret: None,
+			superuser: user_superuser,
+		},
+		parent,
 	}
 }
