@@ -35,16 +35,16 @@ pub struct Transaction {
 #[derive(Debug, Clone, Serialize)]
 pub struct DeepTransaction {
 	pub id: u32,
-	pub user: crate::user::User,
-	pub currency: crate::currency::Currency,
-	pub account: crate::account::Account,
-	pub recipient: crate::recipient::Recipient,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
 	pub amount: i32,
 	pub comment: Option<String>,
-	pub tags: Vec<crate::tag::Tag>,
-	pub asset: Option<Asset>,
+	pub currency: crate::currency::Currency,
+	pub user: crate::user::User,
+	pub account: crate::account::DeepAccount,
+	pub recipient: crate::recipient::DeepRecipient,
+	pub tags: Vec<crate::tag::DeepTag>,
+	pub asset: Option<crate::asset::DeepAsset>,
 }
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
@@ -68,6 +68,10 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	return db::get_all(&pool).await;
+}
+
+pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
+	return db::get_all_deep(pool).await;
 }
 
 pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {

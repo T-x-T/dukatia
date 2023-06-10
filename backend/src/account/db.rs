@@ -152,7 +152,7 @@ fn turn_row_into_deep_account(row: &tokio_postgres::Row) -> DeepAccount {
 				id: Some(user_id.unwrap() as u32),
 				name: user_name.unwrap(),
 				secret: None,
-				superuser: user_superuser.unwrap()
+				superuser: user_superuser.unwrap(),
 			} )
 		},
 		None => None,
