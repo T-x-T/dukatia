@@ -1,7 +1,7 @@
 mod db;
 pub mod rest_api;
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use serde_repr::*;
 use chrono::prelude::*;
 use deadpool_postgres::Pool;
@@ -26,10 +26,11 @@ pub struct Transaction {
 	pub recipient_id: u32,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
-	pub amount: i32,
+	pub total_amount: Option<i32>,
 	pub comment: Option<String>,
 	pub tag_ids: Option<Vec<u32>>,
-	pub asset: Option<Asset>
+	pub asset: Option<Asset>,
+	pub positions: Vec<Position>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -37,7 +38,7 @@ pub struct DeepTransaction {
 	pub id: u32,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
-	pub amount: i32,
+	pub total_amount: Option<i32>,
 	pub comment: Option<String>,
 	pub currency: crate::currency::Currency,
 	pub user: crate::user::User,
@@ -45,6 +46,15 @@ pub struct DeepTransaction {
 	pub recipient: crate::recipient::DeepRecipient,
 	pub tags: Vec<crate::tag::DeepTag>,
 	pub asset: Option<crate::asset::DeepAsset>,
+	pub positions: Vec<Position>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Position {
+	pub id: Option<u32>,
+	pub amount: i32,
+	pub comment: Option<String>,
+	pub tag_id: Option<u32>,
 }
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
@@ -111,10 +121,11 @@ mod tests {
 			recipient_id: 0,
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
-			amount: 12345,
+			total_amount: Some(12345),
 			comment: Some(String::from("this is a comment")),
 			tag_ids: None,
-			asset: None
+			asset: None,
+			positions: Vec::new(),
 		};
 	}
 

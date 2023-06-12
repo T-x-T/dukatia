@@ -244,11 +244,17 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		recipient_id: 0,
 		status: transaction::TransactionStatus::Completed,
 		timestamp: body.timestamp,
-		amount,
+		total_amount: None,
 		comment: Some(comment),
 		asset: Some(asset),
 		user_id,
 		tag_ids: None,
+		positions: vec![transaction::Position {
+			id: None,
+			amount: amount,
+			comment: None,
+			tag_id: None,
+		}],
 	};
 	transaction::add(&pool, &transaction).await?;
 

@@ -91,7 +91,7 @@ declare global {
 		recipient_id: number,
 		status: TransactionStatus,
 		timestamp: string,
-		amount: number,
+		total_amount: number,
 		comment?: string,
 		tag_ids?: number[],
 		asset?: Asset,
@@ -99,13 +99,14 @@ declare global {
 		currency?: Currency,
 		recipient?: Recipient,
 		asset_id?: number,
+		positions: Position[],
 	}
 
 	type DeepTransaction = {
 		id: number,
 		status: TransactionStatus,
 		timestamp: string,
-		amount: number,
+		total_amount: number,
 		comment?: string,
 		currency: Currency,
 		user: User,
@@ -113,6 +114,14 @@ declare global {
 		recipient: DeepRecipient,
 		tags: DeepTag[],
 		asset?: DeepAsset,
+		positions: Position[],
+	}
+
+	type Position = {
+		id?: number,
+		amount: number,
+		comment?: string,
+		tag_id?: number,
 	}
 
 	enum TransactionStatus {
@@ -189,7 +198,7 @@ declare global {
 	type DetailFormField = {
 		label: string,
 		property: string,
-		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset",
+		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions",
 		disabled?: boolean,
 		step?: string,
 		initial?: number,

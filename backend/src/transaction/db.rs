@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::{Transaction, TransactionStatus, Asset, DeepTransaction};
+use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let id: i32 = pool.get()
@@ -15,7 +15,7 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 				&(transaction.recipient_id as i32),
 				&(transaction.status as i32),
 				&transaction.timestamp,
-				&transaction.amount,
+				&transaction.total_amount,
 				&transaction.comment
 			])
 			.await?
@@ -97,7 +97,7 @@ pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dy
 			&(transaction.recipient_id as i32),
 			&(transaction.status as i32),
 			&transaction.timestamp,
-			&transaction.amount,
+			&transaction.total_amount,
 			&transaction.comment,
 			&(transaction.id.unwrap() as i32)
 		]
@@ -154,18 +154,27 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 	let recipient_id: i32 = row.get(3);
 	let status: i32 = row.get(4);
 	let user_id: i32 = row.get(5);
-	let tag_ids: Vec<u32> = row.try_get(9)
+	let timestamp: chrono::DateTime<chrono::Utc> = row.get(6);
+	let comment: Option<String> = row.get(7);
+	let tag_ids: Vec<u32> = row.try_get(8)
 		.unwrap_or(Vec::new())
 		.into_iter()
 		.map(|x: i32| x as u32)
 		.collect();
-	let asset_id: Option<i32> = row.get(10);
+	let asset_id: Option<i32> = row.get(9);
+	let asset_name: Option<String> = row.get(10);
+	let asset_description: Option<String> = row.get(11);
+	let transaction_position_ids: Vec<Option<i32>> = row.get(12);
+	let transaction_position_amounts: Vec<Option<i32>> = row.get(13);
+	let transaction_position_comments: Vec<Option<String>> = row.get(14);
+	let transaction_position_tag_ids: Vec<Option<i32>> = row.get(15);
+
 	let mut asset: Option<Asset> = None;
 	if asset_id.is_some() {
 		asset = Some(Asset {
 			id: Some(asset_id.unwrap() as u32),
-			name: row.get(11),
-			description: row.get(12),
+			name: asset_name.unwrap(),
+			description: asset_description,
 			user_id: user_id as u32,
 			currency_id: currency_id as u32,
 			value_per_unit: None,
@@ -173,6 +182,25 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 			tag_ids: None,
 		});
 	}
+
+	let positions: Vec<Position> = transaction_position_ids
+		.into_iter()
+		.filter(|x| x.is_some())
+		.enumerate()
+		.map(|(i, transaction_position_id)| {
+			Position {
+				id: Some(transaction_position_id.unwrap() as u32),
+				amount: transaction_position_amounts[i].unwrap(),
+				comment: transaction_position_comments[i].clone(),
+				tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
+			}
+		}).collect();
+
+	let mut total_amount: i32 = 0;
+	transaction_position_amounts
+		.into_iter()
+		.filter(|x| x.is_some())
+		.for_each(|x| total_amount = total_amount + x.unwrap());
 
 	return Transaction {
 		id: Some(id as u32),
@@ -185,11 +213,12 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 			1 => TransactionStatus::Completed,
 			_ => panic!("invalid transaction status found in row from database")
 		},
-		timestamp: row.get(6),
-		amount: row.get(7),
-		comment: row.get(8),
+		timestamp,
+		total_amount: Some(total_amount),
+		comment,
 		tag_ids: Some(tag_ids),
 		asset,
+		positions,
 	};
 }
 
@@ -197,77 +226,80 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 	let id: i32 = row.get(0);
 	let status: i32 = row.get(1);
 	let timestamp: chrono::DateTime<chrono::Utc> = row.get(2);
-	let amount: i32 = row.get(3);
-	let comment: Option<String> = row.get(4);
-	let currency_id: i32 = row.get(5);
-	let currency_minor_in_mayor: i32 = row.get(6);
-	let currency_name: String = row.get(7);
-	let currency_symbol: String = row.get(8);
-	let user_id: i32 = row.get(9);
-	let user_name: String = row.get(10);
-	let user_superuser: bool = row.get(11);
-	let account_id: i32 = row.get(12);
-	let account_name: String = row.get(13);
-	let account_default_currency_id: i32 = row.get(14);
-	let account_default_currency_name: String = row.get(15);
-	let account_default_currency_minor_in_mayor: i32 = row.get(16);
-	let account_default_currency_symbol: String = row.get(17);
-	let account_user_id: Option<i32> = row.get(18);
-	let account_user_name: Option<String> = row.get(19);
-	let account_user_superuser: Option<bool> = row.get(20);
-	let account_tag_ids: Vec<Option<i32>> = row.get(21);
-	let account_tag_names: Vec<Option<String>> = row.get(22);
-	let account_tag_parent_ids: Vec<Option<i32>> = row.get(23);
-	let account_tag_parent_names: Vec<Option<String>> = row.get(24);
-	let account_tag_parent_parent_ids: Vec<Option<i32>> = row.get(25);
-	let account_tag_parent_user_ids: Vec<Option<i32>> = row.get(26);
-	let account_tag_user_ids: Vec<Option<i32>> = row.get(27);
-	let account_tag_user_names: Vec<Option<String>> = row.get(28);
-	let account_tag_user_superusers: Vec<Option<bool>> = row.get(29);
-	let recipient_id: i32 = row.get(30);
-	let recipient_name: String = row.get(31);
-	let recipient_user_id: Option<i32> = row.get(32);
-	let recipient_user_name: Option<String> = row.get(33);
-	let recipient_user_superuser: Option<bool> = row.get(34);
-	let recipient_tag_ids: Vec<Option<i32>> = row.get(35);
-	let recipient_tag_names: Vec<Option<String>> = row.get(36);
-	let recipient_tag_parent_ids: Vec<Option<i32>> = row.get(37);
-	let recipient_tag_parent_names: Vec<Option<String>> = row.get(38);
-	let recipient_tag_parent_parent_ids: Vec<Option<i32>> = row.get(39);
-	let recipient_tag_parent_user_ids: Vec<Option<i32>> = row.get(40);
-	let recipient_tag_user_ids: Vec<Option<i32>> = row.get(41);
-	let recipient_tag_user_names: Vec<Option<String>> = row.get(42);
-	let recipient_tag_user_superusers: Vec<Option<bool>> = row.get(43);
-	let tag_ids: Vec<Option<i32>> = row.get(44);
-	let tag_names: Vec<Option<String>> = row.get(45);
-	let tag_parent_ids: Vec<Option<i32>> = row.get(46);
-	let tag_parent_names: Vec<Option<String>> = row.get(47);
-	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(48);
-	let tag_parent_user_ids: Vec<Option<i32>> = row.get(49);
-	let tag_user_ids: Vec<Option<i32>> = row.get(50);
-	let tag_user_names: Vec<Option<String>> = row.get(51);
-	let tag_user_superusers: Vec<Option<bool>> = row.get(52);
-	let asset_id: Option<i32> = row.get(53);
-	let asset_name: Option<String> = row.get(54);
-	let asset_description: Option<String> = row.get(55);
-	let asset_value_per_unit: i32 = row.try_get(56).unwrap_or(0);
-	let asset_amount: f64 = row.try_get(57).unwrap_or(0.0);
-	let asset_currency_id: Option<i32> = row.get(58);
-	let asset_currency_minor_in_mayor: Option<i32> = row.get(59);
-	let asset_currency_name: Option<String> = row.get(60);
-	let asset_currency_symbol: Option<String> = row.get(61);
-	let asset_user_id: Option<i32> = row.get(62);
-	let asset_user_name: Option<String> = row.get(63);
-	let asset_user_superuser: Option<bool> = row.get(64);
-	let asset_tag_ids: Option<Vec<Option<i32>>> = row.get(65);
-	let asset_tag_names: Option<Vec<Option<String>>> = row.get(66);
-	let asset_tag_parent_ids: Option<Vec<Option<i32>>> = row.get(67);
-	let asset_tag_parent_names: Option<Vec<Option<String>>> = row.get(68);
-	let asset_tag_parent_parent_ids: Option<Vec<Option<i32>>> = row.get(69);
-	let asset_tag_parent_user_ids: Option<Vec<Option<i32>>> = row.get(70);
-	let asset_tag_user_ids: Option<Vec<Option<i32>>> = row.get(71);
-	let asset_tag_user_names: Option<Vec<Option<String>>> = row.get(72);
-	let asset_tag_user_superusers: Option<Vec<Option<bool>>> = row.get(73);
+	let comment: Option<String> = row.get(3);
+	let currency_id: i32 = row.get(4);
+	let currency_minor_in_mayor: i32 = row.get(5);
+	let currency_name: String = row.get(6);
+	let currency_symbol: String = row.get(7);
+	let user_id: i32 = row.get(8);
+	let user_name: String = row.get(9);
+	let user_superuser: bool = row.get(10);
+	let account_id: i32 = row.get(11);
+	let account_name: String = row.get(12);
+	let account_default_currency_id: i32 = row.get(13);
+	let account_default_currency_name: String = row.get(14);
+	let account_default_currency_minor_in_mayor: i32 = row.get(15);
+	let account_default_currency_symbol: String = row.get(16);
+	let account_user_id: Option<i32> = row.get(17);
+	let account_user_name: Option<String> = row.get(18);
+	let account_user_superuser: Option<bool> = row.get(19);
+	let account_tag_ids: Vec<Option<i32>> = row.get(20);
+	let account_tag_names: Vec<Option<String>> = row.get(21);
+	let account_tag_parent_ids: Vec<Option<i32>> = row.get(22);
+	let account_tag_parent_names: Vec<Option<String>> = row.get(23);
+	let account_tag_parent_parent_ids: Vec<Option<i32>> = row.get(24);
+	let account_tag_parent_user_ids: Vec<Option<i32>> = row.get(25);
+	let account_tag_user_ids: Vec<Option<i32>> = row.get(26);
+	let account_tag_user_names: Vec<Option<String>> = row.get(27);
+	let account_tag_user_superusers: Vec<Option<bool>> = row.get(28);
+	let recipient_id: i32 = row.get(29);
+	let recipient_name: String = row.get(30);
+	let recipient_user_id: Option<i32> = row.get(31);
+	let recipient_user_name: Option<String> = row.get(32);
+	let recipient_user_superuser: Option<bool> = row.get(33);
+	let recipient_tag_ids: Vec<Option<i32>> = row.get(34);
+	let recipient_tag_names: Vec<Option<String>> = row.get(35);
+	let recipient_tag_parent_ids: Vec<Option<i32>> = row.get(36);
+	let recipient_tag_parent_names: Vec<Option<String>> = row.get(37);
+	let recipient_tag_parent_parent_ids: Vec<Option<i32>> = row.get(38);
+	let recipient_tag_parent_user_ids: Vec<Option<i32>> = row.get(39);
+	let recipient_tag_user_ids: Vec<Option<i32>> = row.get(40);
+	let recipient_tag_user_names: Vec<Option<String>> = row.get(41);
+	let recipient_tag_user_superusers: Vec<Option<bool>> = row.get(42);
+	let tag_ids: Vec<Option<i32>> = row.get(43);
+	let tag_names: Vec<Option<String>> = row.get(44);
+	let tag_parent_ids: Vec<Option<i32>> = row.get(45);
+	let tag_parent_names: Vec<Option<String>> = row.get(46);
+	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(47);
+	let tag_parent_user_ids: Vec<Option<i32>> = row.get(48);
+	let tag_user_ids: Vec<Option<i32>> = row.get(49);
+	let tag_user_names: Vec<Option<String>> = row.get(50);
+	let tag_user_superusers: Vec<Option<bool>> = row.get(51);
+	let asset_id: Option<i32> = row.get(52);
+	let asset_name: Option<String> = row.get(53);
+	let asset_description: Option<String> = row.get(54);
+	let asset_value_per_unit: i32 = row.try_get(55).unwrap_or(0);
+	let asset_amount: f64 = row.try_get(56).unwrap_or(0.0);
+	let asset_currency_id: Option<i32> = row.get(57);
+	let asset_currency_minor_in_mayor: Option<i32> = row.get(58);
+	let asset_currency_name: Option<String> = row.get(59);
+	let asset_currency_symbol: Option<String> = row.get(60);
+	let asset_user_id: Option<i32> = row.get(61);
+	let asset_user_name: Option<String> = row.get(62);
+	let asset_user_superuser: Option<bool> = row.get(63);
+	let asset_tag_ids: Option<Vec<Option<i32>>> = row.get(64);
+	let asset_tag_names: Option<Vec<Option<String>>> = row.get(65);
+	let asset_tag_parent_ids: Option<Vec<Option<i32>>> = row.get(66);
+	let asset_tag_parent_names: Option<Vec<Option<String>>> = row.get(67);
+	let asset_tag_parent_parent_ids: Option<Vec<Option<i32>>> = row.get(68);
+	let asset_tag_parent_user_ids: Option<Vec<Option<i32>>> = row.get(69);
+	let asset_tag_user_ids: Option<Vec<Option<i32>>> = row.get(70);
+	let asset_tag_user_names: Option<Vec<Option<String>>> = row.get(71);
+	let asset_tag_user_superusers: Option<Vec<Option<bool>>> = row.get(72);
+	let transaction_position_ids: Vec<Option<i32>> = row.get(73);
+	let transaction_position_amounts: Vec<Option<i32>> = row.get(74);
+	let transaction_position_comments: Vec<Option<String>> = row.get(75);
+	let transaction_position_tag_ids: Vec<Option<i32>> = row.get(76);
 
 	let currency = crate::currency::Currency {
 		id: Some(currency_id as u32),
@@ -523,6 +555,25 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 		None => None
 	};
 
+	let positions: Vec<Position> = transaction_position_ids
+		.into_iter()
+		.filter(|x| x.is_some())
+		.enumerate()
+		.map(|(i, transaction_position_id)| {
+			Position {
+				id: Some(transaction_position_id.unwrap() as u32),
+				amount: transaction_position_amounts[i].unwrap(),
+				comment: transaction_position_comments[i].clone(),
+				tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
+			}
+		}).collect();
+
+	let mut total_amount: i32 = 0;
+	transaction_position_amounts
+		.into_iter()
+		.filter(|x| x.is_some())
+		.for_each(|x| total_amount = total_amount + x.unwrap());
+
 	return DeepTransaction {
 		id: id as u32,
 		status: match status {
@@ -531,7 +582,7 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 			_ => panic!("invalid transaction status found in row from database")
 		},
 		timestamp,
-		amount,
+		total_amount: Some(total_amount),
 		comment,
 		currency,
 		user,
@@ -539,5 +590,6 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 		recipient,
 		tags,
 		asset,
+		positions,
 	}
 }

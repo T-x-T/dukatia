@@ -55,10 +55,10 @@ struct TransactionPost {
 	recipient_id: u32,
 	status: u8,
 	timestamp: DateTime<Utc>,
-	amount: i32,
 	comment: Option<String>,
 	tag_ids: Option<Vec<u32>>,
 	asset_id: Option<u32>,
+	positions: Vec<super::Position>,
 }
 
 #[post("/api/v1/transactions")]
@@ -85,7 +85,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 	let transaction = super::Transaction {
 		id: None,
 		currency_id: None,
-		user_id: user_id,
+		user_id,
 		account_id: body.account_id,
 		recipient_id: body.recipient_id,
 		status: match body.status {
@@ -94,10 +94,11 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 			_ => return HttpResponse::BadRequest().body("{{\"error\":\"Invalid status\"}}"),
 		},
 		timestamp: body.timestamp,
-		amount: body.amount,
+		total_amount: None,
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
 		asset,
+		positions: Vec::new(),
 	};
 
 	match super::add(&data.pool, &transaction).await {
@@ -139,10 +140,11 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 			_ => return HttpResponse::BadRequest().body("{{\"error\":\"Invalid status\"}}"),
 		},
 		timestamp: body.timestamp,
-		amount: body.amount,
+		total_amount: None,
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
 		asset,
+		positions: Vec::new(),
 	};
 
 	match super::update(&data.pool, &transaction).await {

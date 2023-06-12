@@ -48,7 +48,7 @@ async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn
 	let function_body = body_chars.as_str();
 	
 	match function_name {
-		"foreach_currency" => return compute_function_foreach_currency(pool, function_body).await,
+		"foreach_currency" => return Ok(compute_function_foreach_currency(pool, function_body).await?),
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("function name {:?} is not recognized", function_name) })),
 	}
 }
@@ -109,7 +109,7 @@ async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i3
 
 	transactions.iter().for_each(|transaction| {
 		if transaction.currency_id.unwrap() == currency_id {
-			output += transaction.amount;
+			output += transaction.total_amount.unwrap_or(0);
 		}
 	});
 

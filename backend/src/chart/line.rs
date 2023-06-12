@@ -130,9 +130,9 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 						value: BTreeMap::new(),
 					})
 					.value.entry(transaction.currency_id.unwrap())
-					.or_insert(0) += transaction.amount;
+					.or_insert(0) += transaction.total_amount.unwrap_or(0);
 				
-				if transaction.amount > 0 {
+				if transaction.total_amount.unwrap_or(0) > 0 {
 					0
 				} else { 
 					1
@@ -148,7 +148,7 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 				value: BTreeMap::new(),
 			})
 			.value.entry(transaction.currency_id.unwrap())
-			.or_insert(0) += transaction.amount;
+			.or_insert(0) += transaction.total_amount.unwrap_or(0);
 	});
 
 	return output;

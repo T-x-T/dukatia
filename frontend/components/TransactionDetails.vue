@@ -56,13 +56,13 @@ export default {
 					property: "timestamp",
 					type: "timestamp"
 				},
-				{
+/* 				{
 					label: "Amount",
 					property: "amount",
 					type: "number",
 					step: "0.01",
 					suffix: "currencyOfAccountSymbol"
-				},
+				}, */
 				{
 					label: "Comment",
 					property: "comment",
@@ -73,6 +73,11 @@ export default {
 					property: "tag_ids",
 					type: "tags",
 					addNew: true
+				},
+				{
+					label: "Positions",
+					property: "positions",
+					type: "positions",
 				}
 			],
 			data: this.transaction,
@@ -88,9 +93,9 @@ export default {
 					currency_id: x.currency_id,
 					status: x.status,
 					timestamp: new Date(x.timestamp),
-					amount: Math.round(x.amount * minor_in_mayor),
 					comment: x.comment,
-					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined
+					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
+					positions: x.positions,
 				};
 			},
 			defaultData: {
@@ -103,7 +108,13 @@ export default {
 				amount: 0,
 				comment: "",
 				currency: (await $fetch("/api/v1/currencies/0") as Currency),
-				tag_ids: []
+				tag_ids: [],
+				positions: [
+					{
+						amount: 0,
+						comment: "",
+					}
+				],
 			},
 			deletable: true
 		}
