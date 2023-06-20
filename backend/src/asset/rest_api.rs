@@ -87,6 +87,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		total_cost_of_ownership: None,
 	};
 
 	match super::add(&data.pool, &asset).await {
@@ -111,6 +112,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		total_cost_of_ownership: None,
 	};
 
 	match super::update(&data.pool, &asset).await {

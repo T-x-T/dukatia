@@ -89,6 +89,21 @@ pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, 
 	return Ok(turn_row_into_transaction(&rows[0]));
 }
 
+pub async fn get_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<Transaction>, Box<dyn Error>> {
+	return Ok( 
+		pool.get()
+			.await?
+			.query(
+				"SELECT * FROM public.transaction_data WHERE asset_id=$1;", 
+				&[&(asset_id as i32)]
+			)
+			.await?
+			.iter()
+			.map(|x| turn_row_into_transaction(x))
+			.collect()
+		);
+}
+
 pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	if transaction.id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
@@ -206,6 +221,7 @@ fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
 			value_per_unit: None,
 			amount: None,
 			tag_ids: None,
+			total_cost_of_ownership: None,
 		});
 	}
 
@@ -575,6 +591,7 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 					user: asset_user.unwrap(),
 					currency: asset_currency.unwrap(),
 					tags: asset_tags.unwrap(),
+					total_cost_of_ownership: None,
 				}
 			)
 		},

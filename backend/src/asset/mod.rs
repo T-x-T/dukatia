@@ -5,6 +5,7 @@ use deadpool_postgres::Pool;
 use serde::Serialize;
 use std::{error::Error, collections::BTreeMap};
 use chrono::{DateTime, Utc, Date};
+use crate::transaction;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Asset {
@@ -15,7 +16,8 @@ pub struct Asset {
 	pub currency_id: u32,
 	pub value_per_unit: Option<u32>,
 	pub amount: Option<f64>,
-	pub tag_ids: Option<Vec<u32>>
+	pub tag_ids: Option<Vec<u32>>,
+	pub total_cost_of_ownership: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -28,6 +30,7 @@ pub struct DeepAsset {
 	pub user: crate::user::User,
 	pub currency: crate::currency::Currency,
 	pub tags: Vec<crate::tag::DeepTag>,
+	pub total_cost_of_ownership: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -81,11 +84,19 @@ pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetVa
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
-	return db::get_all(pool).await;
+	let mut output: Vec<Asset> = Vec::new();
+	for asset in db::get_all(pool).await?.into_iter() {
+		output.push(get_total_cost_of_ownership(pool, asset).await?);
+	}
+	return Ok(output);
 }
 
 pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
+	let mut output: Vec<DeepAsset> = Vec::new();
+	for asset in db::get_all_deep(pool).await?.into_iter() {
+		output.push(get_total_cost_of_ownership_deep(pool, asset).await?);
+	}
+	return Ok(output);
 }
 
 #[allow(unused)]
@@ -94,7 +105,7 @@ pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, 
 }
 
 pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
-	return db::get_by_id(pool, asset_id).await;
+	return get_total_cost_of_ownership(pool, db::get_by_id(pool, asset_id).await?).await;
 }
 
 pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
@@ -126,4 +137,30 @@ pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BT
 
 pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
 	return db::get_amount_history(&pool, asset_id).await;
+}
+
+pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
+	return Ok(Asset {
+		total_cost_of_ownership: Some(
+			transaction::get_by_asset_id(pool, asset.id.unwrap())
+				.await?
+				.iter()
+				.map(|x| x.total_amount.unwrap())
+				.sum()
+			),
+		..asset
+	});
+}
+
+pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> Result<DeepAsset, Box<dyn Error>> {
+	return Ok(DeepAsset {
+		total_cost_of_ownership: Some(
+			transaction::get_by_asset_id(pool, asset.id)
+				.await?
+				.iter()
+				.map(|x| x.total_amount.unwrap())
+				.sum()
+			),
+		..asset
+	});
 }

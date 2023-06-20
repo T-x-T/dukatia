@@ -87,6 +87,10 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn E
 pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
 	return db::get_by_id(pool, transaction_id).await;
 }
+
+pub async fn get_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<Transaction>, Box<dyn Error>> {
+	return db::get_by_asset_id(pool, asset_id).await;
+}
  
 pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let mut transaction = transaction.clone();

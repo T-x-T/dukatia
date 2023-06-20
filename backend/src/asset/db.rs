@@ -257,6 +257,7 @@ fn turn_row_into_asset(row: &tokio_postgres::Row) -> Asset {
 		tag_ids: Some(tag_ids),
 		value_per_unit: Some(value_per_unit as u32),
 		amount: Some(amount),
+		total_cost_of_ownership: None,
 	}
 }
 
@@ -353,6 +354,7 @@ fn turn_row_into_deep_asset(row: &tokio_postgres::Row) -> DeepAsset {
 		user,
 		currency,
 		tags,
+		total_cost_of_ownership: None,
 	}
 
 }

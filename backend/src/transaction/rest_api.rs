@@ -79,6 +79,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 			value_per_unit: None,
 			description: None,
 			tag_ids: None,
+			total_cost_of_ownership: None,
 		})
 	}
 
@@ -125,6 +126,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 			value_per_unit: None,
 			description: None,
 			tag_ids: None,
+			total_cost_of_ownership: None,
 		})
 	}
 

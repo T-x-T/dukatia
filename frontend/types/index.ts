@@ -35,6 +35,7 @@ declare global {
 		amount?: number,
 		tag_ids?: number[],
 		currency?: Currency,
+		total_cost_of_ownership?: number,
 	}
 
 	type DeepAsset = {
@@ -46,6 +47,7 @@ declare global {
 		user: User,
 		currency: Currency,
 		tags: DeepTag[],
+		total_cost_of_ownership?: number,
 	}
 
 	type Currency = {
