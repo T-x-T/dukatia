@@ -86,6 +86,10 @@ CREATE INDEX IF NOT EXISTS transaction_positions_index_transaction_id
 INSERT INTO public.transaction_positions (transaction_id, amount)
 SELECT id, amount FROM public.transactions ORDER BY id ASC;
 
+DROP VIEW public.transaction_data;
+DROP VIEW public.deep_transactions;
+ALTER TABLE IF EXISTS public.transactions DROP COLUMN IF EXISTS amount;
+
 CREATE OR REPLACE VIEW public.transaction_data
  AS
  SELECT tr.id,
@@ -121,12 +125,6 @@ CREATE OR REPLACE VIEW public.transaction_data
 
 ALTER TABLE public.transaction_data
     OWNER TO postgres;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
-
-ALTER TABLE IF EXISTS public.transactions DROP COLUMN IF EXISTS amount;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
 
 CREATE OR REPLACE VIEW public.deep_transactions
  AS

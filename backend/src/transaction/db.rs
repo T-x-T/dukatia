@@ -4,10 +4,10 @@ use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
-	let id: i32 = pool.get()
+	let transaction_id: i32 = pool.get()
 		.await?
 		.query(
-			"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, amount, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
+			"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7) RETURNING id;",
 			&[
 				&(transaction.user_id as i32),
 				&(transaction.account_id as i32),
@@ -15,7 +15,6 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 				&(transaction.recipient_id as i32),
 				&(transaction.status as i32),
 				&transaction.timestamp,
-				&transaction.total_amount,
 				&transaction.comment
 			])
 			.await?
@@ -27,7 +26,7 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 				.await?
 				.query(
 					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-					&[&id, &(tag_id as i32)]
+					&[&transaction_id, &(tag_id as i32)]
 				).await?;
 		}
 	}
@@ -37,8 +36,17 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 			.await?
 			.query(
 				"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-			&[&(id as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
+			&[&(transaction_id as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
 		).await?;
+	}
+
+	for position in transaction.positions.iter() {
+		pool.get()
+			.await?
+			.query(
+				"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
+				&[&transaction_id, &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
+			).await?;
 	}
 
 	return Ok(());
@@ -91,13 +99,12 @@ pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dy
 	let client = pool.get().await?;
 
 	client.query(
-		"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, amount=$6, comment=$7 WHERE id=$8;", 
+		"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
 		&[&(transaction.account_id as i32),
 			&(transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
 			&(transaction.recipient_id as i32),
 			&(transaction.status as i32),
 			&transaction.timestamp,
-			&transaction.total_amount,
 			&transaction.comment,
 			&(transaction.id.unwrap() as i32)
 		]
@@ -121,7 +128,7 @@ pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dy
 	}
 
 	client.query(
-		"DELETE FROM public.asset_transactions WHERE transaction_id=$1",
+		"DELETE FROM public.asset_transactions WHERE transaction_id=$1;",
 		&[&(transaction.id.unwrap() as i32)]
 	).await?;
 
@@ -130,6 +137,18 @@ pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dy
 				"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
 			&[&(transaction.id.unwrap() as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
 		).await?;
+	}
+
+	client.query(
+		"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
+		&[&(transaction.id.unwrap() as i32)]
+	).await?;
+
+	for position in transaction.positions.iter() {
+		client.query(
+				"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
+				&[&(transaction.id.unwrap() as i32), &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
+			).await?;
 	}
 
 	return Ok(());
@@ -143,6 +162,13 @@ pub async fn delete_by_id(pool: &Pool, transaction_id: u32) -> Result<(), Box<dy
 			&[&(transaction_id as i32)]
 		)
 		.await?;
+
+		pool.get()
+			.await?
+			.query(
+			"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
+			&[&(transaction_id as i32)]
+		).await?;
 	
 	return Ok(());
 }

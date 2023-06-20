@@ -98,7 +98,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
 		asset,
-		positions: Vec::new(),
+		positions: body.positions.clone(),
 	};
 
 	match super::add(&data.pool, &transaction).await {
@@ -144,7 +144,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		comment: body.comment.clone(),
 		tag_ids: body.tag_ids.clone(),
 		asset,
-		positions: Vec::new(),
+		positions: body.positions.clone(),
 	};
 
 	match super::update(&data.pool, &transaction).await {

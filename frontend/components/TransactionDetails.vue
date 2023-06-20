@@ -23,8 +23,12 @@ export default {
 	},
 
 	async created() {
+		const account: Account = await $fetch(`/api/v1/accounts/${this.transaction.account_id}`);
+		const minor_in_mayor = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_mayor;
+		
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
 		this.transaction.asset_id = this.transaction.asset?.id;
+		this.transaction.positions = this.transaction.positions.map(p => ({...p, amount: p.amount / minor_in_mayor}));
 		
 		this.config = {
 			fields: [
@@ -56,13 +60,6 @@ export default {
 					property: "timestamp",
 					type: "timestamp"
 				},
-/* 				{
-					label: "Amount",
-					property: "amount",
-					type: "number",
-					step: "0.01",
-					suffix: "currencyOfAccountSymbol"
-				}, */
 				{
 					label: "Comment",
 					property: "comment",
@@ -84,8 +81,6 @@ export default {
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
 			prepareForApi: async (x: Transaction) => {
-				const account: Account = await $fetch(`/api/v1/accounts/${x.account_id}`);
-				const minor_in_mayor = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_mayor;
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,
@@ -95,7 +90,7 @@ export default {
 					timestamp: new Date(x.timestamp),
 					comment: x.comment,
 					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
-					positions: x.positions,
+					positions: x.positions.map(p => ({...p, amount: p.amount * minor_in_mayor})),
 				};
 			},
 			defaultData: {
