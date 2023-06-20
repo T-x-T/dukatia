@@ -121,11 +121,11 @@ mod tests {
 			recipient_id: 0,
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
-			total_amount: Some(12345),
+			total_amount: None,
 			comment: Some(String::from("this is a comment")),
 			tag_ids: None,
 			asset: None,
-			positions: Vec::new(),
+			positions: vec![Position {id: None, amount: 12345, comment: None, tag_id: None}],
 		};
 	}
 
