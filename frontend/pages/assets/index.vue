@@ -33,7 +33,9 @@ const tableData: TableData = {
 		{name: "Amount", type: "number"},
 		{name: "Value per Unit", type: "number"},
 		{name: "Total value", type: "number"},
-		{name: "TCO", type: "number"},
+		{name: "total TCO", type: "number"},
+		{name: "monthly TCO", type: "number"},
+		{name: "yearly TCO", type: "number"},
 		{name: "Tags", type: "choice", options: [...new Set(tags.map(x => x.name))]}
 	],
 	rows: assetsForDisplay.map(x => {
@@ -48,7 +50,9 @@ const tableData: TableData = {
 			Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
 			`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
 			`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
-			`${(x.total_cost_of_ownership ? x.total_cost_of_ownership : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
+			`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
+			`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
+			`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
 			tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
 		];
 	})

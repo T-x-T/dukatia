@@ -17,7 +17,7 @@ pub struct Asset {
 	pub value_per_unit: Option<u32>,
 	pub amount: Option<f64>,
 	pub tag_ids: Option<Vec<u32>>,
-	pub total_cost_of_ownership: Option<i32>,
+	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -30,7 +30,14 @@ pub struct DeepAsset {
 	pub user: crate::user::User,
 	pub currency: crate::currency::Currency,
 	pub tags: Vec<crate::tag::DeepTag>,
-	pub total_cost_of_ownership: Option<i32>,
+	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TotalCostOfOwnership {
+	pub total: i32,
+	pub monthly: i32,
+	pub yearly: i32,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -140,27 +147,48 @@ pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<c
 }
 
 pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
+	let transactions = transaction::get_by_asset_id(pool, asset.id.unwrap()).await?;
+	
 	return Ok(Asset {
-		total_cost_of_ownership: Some(
-			transaction::get_by_asset_id(pool, asset.id.unwrap())
-				.await?
-				.iter()
-				.map(|x| x.total_amount.unwrap())
-				.sum()
-			),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions)),
 		..asset
 	});
 }
 
 pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> Result<DeepAsset, Box<dyn Error>> {
+	let transactions = transaction::get_by_asset_id(pool, asset.id).await?;
+
 	return Ok(DeepAsset {
-		total_cost_of_ownership: Some(
-			transaction::get_by_asset_id(pool, asset.id)
-				.await?
-				.iter()
-				.map(|x| x.total_amount.unwrap())
-				.sum()
-			),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions)),
 		..asset
 	});
+}
+
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Transaction>) -> TotalCostOfOwnership {
+	let total_cost_of_ownership: i32 = transactions
+		.iter()
+		.map(|x| x.total_amount.unwrap())
+		.sum();
+
+	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+	let first_timestamp = transactions.pop().unwrap().timestamp;
+	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+	let last_timestamp = if !transactions.is_empty() {
+		transactions.pop().unwrap().timestamp
+	} else {
+		Utc::now()
+	};
+
+	
+	let days_since_first_transaction = if first_timestamp.signed_duration_since(last_timestamp).num_days() > 0 {
+		first_timestamp.signed_duration_since(last_timestamp).num_days()
+	} else {
+		1
+	};
+
+	return TotalCostOfOwnership {
+		total: total_cost_of_ownership,
+		monthly: (total_cost_of_ownership / days_since_first_transaction as i32) * 30,
+		yearly: (total_cost_of_ownership / days_since_first_transaction as i32) * 365,
+	};
 }
