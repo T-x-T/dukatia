@@ -33,7 +33,7 @@ pub struct DeepAsset {
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct TotalCostOfOwnership {
 	pub total: i32,
 	pub monthly: i32,
@@ -150,7 +150,7 @@ pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<As
 	let transactions = transaction::get_by_asset_id(pool, asset.id.unwrap()).await?;
 	
 	return Ok(Asset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions)),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount.unwrap_or(0.0) == 0.0 { true } else { false } )),
 		..asset
 	});
 }
@@ -159,12 +159,16 @@ pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> 
 	let transactions = transaction::get_by_asset_id(pool, asset.id).await?;
 
 	return Ok(DeepAsset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions)),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount == 0.0 { true } else { false } )),
 		..asset
 	});
 }
 
-fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Transaction>) -> TotalCostOfOwnership {
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {
+	if transactions.is_empty() {
+		return TotalCostOfOwnership::default();
+	}
+	
 	let total_cost_of_ownership: i32 = transactions
 		.iter()
 		.map(|x| x.total_amount.unwrap())
@@ -172,13 +176,18 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Trans
 
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
 	let first_timestamp = transactions.pop().unwrap().timestamp;
+	
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
 	let last_timestamp = if !transactions.is_empty() {
-		transactions.pop().unwrap().timestamp
+		if current_amount_is_zero {
+			transactions.pop().unwrap().timestamp
+		} else {
+			Utc::now()
+		}
 	} else {
 		Utc::now()
 	};
-
 	
 	let days_since_first_transaction = if first_timestamp.signed_duration_since(last_timestamp).num_days() > 0 {
 		first_timestamp.signed_duration_since(last_timestamp).num_days()
