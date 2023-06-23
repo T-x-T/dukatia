@@ -65,6 +65,28 @@
 						<option v-for="(item, tindex) in tags" :key="tindex" :value="item.id">{{item.name}}</option>
 					</select>
 				</div>
+
+				<div v-else-if="field.type == 'positions'">
+					<label>{{`${field.label}: `}}</label>
+					<div v-for="(position_data, position_index) in config.data[field.property]">
+						<label>Amount: </label>
+						<input type="number" v-model="config.data[field.property][position_index].amount">
+						<span>{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
+						<br>
+						<label>Comment: </label>
+						<input type="text" v-model="config.data[field.property][position_index].comment">
+						<br>
+						<label>Tag: </label>
+						<select v-model="config.data[field.property][position_index].tag_id">
+							<option value=""></option>
+							<option v-for="(item, tindex) in tags" :key="tindex" :value="item.id">{{item.name}}</option>
+						</select>
+						<br>
+						<button class="red" @click="config.data[field.property].splice(position_index, 1)">Delete Position</button>
+						<hr>
+					</div>
+					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
+				</div>
 			</div>
 			<button class="green" @click="send(true)">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>

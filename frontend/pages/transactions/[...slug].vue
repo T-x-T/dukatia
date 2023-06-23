@@ -135,7 +135,7 @@ export default {
 						x.recipient?.name,
 						x.asset ? x.asset.name : "",
 						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+						`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
 						x.comment,
 						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
@@ -151,7 +151,7 @@ export default {
 
 		openDetailPage(transaction_id: number) {
 			const transaction = this.transactions.filter(x => x.id == transaction_id)[0];
-			this.selectedRow = {...transaction, amount: transaction.amount / 100, timestamp: transaction.timestamp.slice(0, -1)};			
+			this.selectedRow = {...transaction, total_amount: transaction.total_amount / 100, timestamp: transaction.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
@@ -167,9 +167,10 @@ export default {
 				recipient_id: 0,
 				status: 1,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				amount: 0,
+				total_amount: 0,
 				comment: "",
-				currency: this.currencies.filter(x => x.id == 0)[0]
+				currency: this.currencies.filter(x => x.id == 0)[0],
+				positions: [],
 			}
 
 			this.detailsOpen = false;
@@ -245,7 +246,7 @@ export default {
 				x.recipient?.name,
 				x.asset ? x.asset.name : "",
 				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+				`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));

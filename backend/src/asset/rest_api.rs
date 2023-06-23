@@ -87,6 +87,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		total_cost_of_ownership: None,
 	};
 
 	match super::add(&data.pool, &asset).await {
@@ -111,6 +112,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		amount: None,
 		tag_ids: body.tag_ids.clone(),
 		user_id,
+		total_cost_of_ownership: None,
 	};
 
 	match super::update(&data.pool, &asset).await {
@@ -244,11 +246,17 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		recipient_id: 0,
 		status: transaction::TransactionStatus::Completed,
 		timestamp: body.timestamp,
-		amount,
+		total_amount: None,
 		comment: Some(comment),
 		asset: Some(asset),
 		user_id,
 		tag_ids: None,
+		positions: vec![transaction::Position {
+			id: None,
+			amount: amount,
+			comment: None,
+			tag_id: None,
+		}],
 	};
 	transaction::add(&pool, &transaction).await?;
 
