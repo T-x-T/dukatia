@@ -1,5 +1,5 @@
 <template>
-	<nav v-if="loggedIn" :class="hidden ? 'smol_nav' : ''">
+	<nav v-if="loggedIn" :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
 			<h1 v-if="!collapsed">TxTs Treasury</h1>
 		</div>
@@ -99,6 +99,7 @@ export default {
 		this.$nextTick(() => {
       window.addEventListener('resize', this.on_resize);
     });
+		this.on_resize();
 	},
 
 	methods: {
@@ -124,7 +125,7 @@ export default {
 
 nav
 	width: fit-content
-	min-height: 100vh
+	min-height: 100dvh
 	display: grid
 	grid-template-columns: 1fr
 	grid-template-rows: 5em 1fr 5em
@@ -147,18 +148,18 @@ nav
 		position: fixed
 		top: 0
 		left: 0
-		height: 100vh
-		width: 100vw
+		height: 100dvh
+		width: 100dvw
 		z-index: 100
 		border-right: none !important
 
-.smol_nav
+.mobile
 	@media screen and (max-width: 800px)
 		position: inherit
 		display: block
 		min-height: 4em
 		height: 4em
-		width: 100vw
+		width: 100dvw
 
 @media screen and (max-width: 800px)
 	html.dark-mode 

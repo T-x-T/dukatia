@@ -41,8 +41,8 @@ registerServiceWorker();
 <style lang="sass" scoped>
 main
 	display: flex
-	height: 100vh
-	width: 100vw
+	height: 100svh
+	width: 100svw
 	overflow: hidden
 	@media screen and (max-width: 800px)
 		flex-direction: column
