@@ -34,7 +34,7 @@ const tableData: TableData = {
 		tags.filter(t => x.tag_ids?.includes(t.id ? t.id : -1)).map(t => t.name).join(", "),
 		transactions
 			.filter(t => t.account_id == x.id)
-			.reduce((a, b) => a + b.amount, 0) 
+			.reduce((a, b) => a + b.total_amount, 0) 
 			/ currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor 
 			+ currencies.filter(c => c.id == x.default_currency_id)[0].symbol
 	]))

@@ -10,12 +10,6 @@
 				v-on:updateData="$emit('updateData')"
 			/>
 		</div>
-
-		<div v-if="config?.tableData" id="table">
-			<CustomTable
-				:tableDataProp="config.tableData"
-			/>
-		</div>
 	</div>
 </template>
 
@@ -33,8 +27,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="sass" scoped>
-div#table
-	margin-top: 20px
-</style>

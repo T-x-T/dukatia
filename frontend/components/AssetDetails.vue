@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<button @click="$emit('back')">Back</button>
-		<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
+		<button @click="showAssetValuationEditor = true" class="mobile_hidden">Edit Asset Valuations</button>
 		<div id="grid">
 			<div class="gridItem form">
 				<div id="inner">
