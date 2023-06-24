@@ -81,7 +81,7 @@ export default {
 	data: () => ({
 		currentRoute: useRoute().path.split("/")[1] ? useRoute().path.split("/")[1] : "dashboard",
 		collapsed: false,
-		hidden: false,
+		hidden: true,
 		small_device: false,
 	}),
 
@@ -152,6 +152,9 @@ nav
 		width: 100dvw
 		z-index: 100
 		border-right: none !important
+		h1
+			&:hover
+				transform: scale(1) rotate(0deg)
 
 .mobile
 	@media screen and (max-width: 800px)

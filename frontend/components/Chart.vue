@@ -34,7 +34,7 @@
 			</div>
 		</div>
 
-		<div v-if="show_options" class="wrapper">
+		<div v-if="show_options" class="wrapper mobile_hidden">
 			<ChartOptions 
 				:chart_options="options"
 				v-on:back="reload"

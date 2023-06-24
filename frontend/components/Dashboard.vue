@@ -2,7 +2,7 @@
 	<div>
 		<h3>{{ dashboard_data.name }}</h3>
 		
-		<button v-if="!add_chart_open" id="add_chart" @click="add_chart_open = true">Add Chart</button>
+		<button v-if="!add_chart_open" id="add_chart" class="mobile_hidden" @click="add_chart_open = true">Add Chart</button>
 		<div v-if="add_chart_open" id="add_chart_box">
 			<ChartOptions 
 				v-on:back="(add_chart_open = false) || update()"
@@ -59,6 +59,11 @@ div#grid
 	align-items: stretch
 	justify-items: stretch
 	grid-gap: 10px
+	@media screen and (max-width: 800px)
+		display: flex
+		flex-direction: column
+		div.gridItem
+			min-height: 50dvh
 
 div.gridItem
 	padding: 10px
