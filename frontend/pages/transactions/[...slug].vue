@@ -1,11 +1,11 @@
 <template>
-	<div id="main">
+	<div id="main">		
 		<div id="table">
-			<div>
+			<div v-if="!(small_device && detailsOpen)">
 				<button class="green" @click="newTransaction">Add</button>
 			</div>
 			<CustomTable
-				v-if="Object.keys(tableData).length > 0"
+				v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
 				:tableDataProp="tableData"
 				v-on:rowClick="rowClick"
 				v-on:rowSelect="rowSelect"
@@ -13,40 +13,40 @@
 		</div>
 
 		<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
-				<div id="batchEdit">
-					<div>
-						<label for="account">Account:</label>
-						<select id="account" v-model="batchaccount_id">
-							<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
-						</select>
-					</div>
+			<div id="batchEdit">
+				<div>
+					<label for="account">Account:</label>
+					<select id="account" v-model="batchaccount_id">
+						<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
+					</select>
+				</div>
 
-					<div>
-						<label for="recipient">Recipient:</label>
-						<select id="recipient" v-model="batchrecipient_id">
-							<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
-						</select>
-					</div>
+				<div>
+					<label for="recipient">Recipient:</label>
+					<select id="recipient" v-model="batchrecipient_id">
+						<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
+					</select>
+				</div>
 
-					<div>
-						<label for="asset">Asset:</label>
-						<select id="asset" v-model="batchasset_id">
-							<option v-for="(asset, index) in assets" :key="index" :value="asset.id">{{asset.name}}</option>
-						</select>
-					</div>
+				<div>
+					<label for="asset">Asset:</label>
+					<select id="asset" v-model="batchasset_id">
+						<option v-for="(asset, index) in assets" :key="index" :value="asset.id">{{asset.name}}</option>
+					</select>
+				</div>
 
-					<div>
-						<CustomSelect
-							v-if="Object.keys(selectData).length > 0"
-							:selectData="selectData"
-							v-on:update="tagUpdate"
-						/>	
-					</div>
+				<div>
+					<CustomSelect
+						v-if="Object.keys(selectData).length > 0"
+						:selectData="selectData"
+						v-on:update="tagUpdate"
+					/>	
+				</div>
 
-					<button class="green" @click="applyBatchEdit()">Edit selected</button>
-					<button class="red" @click="deleteBatchEdit()">Delete selected</button>
-				</div>		
-			</div>
+				<button class="green" @click="applyBatchEdit()">Edit selected</button>
+				<button class="red" @click="deleteBatchEdit()">Delete selected</button>
+			</div>		
+		</div>
 
 		<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
 			<TransactionDetails 
@@ -77,9 +77,15 @@ export default {
 		recipients: [] as Recipient[],
 		assets: [] as Asset[],
 		transactions: [] as Transaction[],
+		small_device: false,
 	}),
 	
 	async mounted() {
+		this.$nextTick(() => {
+      window.addEventListener('resize', this.on_resize);
+    });
+		this.on_resize();
+
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
@@ -250,6 +256,10 @@ export default {
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));
+		},
+
+		on_resize() {
+			this.small_device = window.innerWidth <= 800;
 		}
 	}
 }
@@ -268,6 +278,11 @@ div#table
 div.detailBar
 	padding-left: 8px
 	flex-shrink: 0
+	@media screen and (max-width: 800px)
+		position: absolute
+		width: 100%
+		height: 100%
+		margin: 0
 
 div#batchEdit
 	select
