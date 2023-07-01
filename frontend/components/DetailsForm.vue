@@ -31,7 +31,7 @@
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(account, aindex) in accounts" :key="aindex" :value="account.id">{{account.name}}</option>
 					</select>
-					<button v-if="field.addNew" class="secondary" @click="subForm = 'account'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'account'" tabindex="-1">New</button>	
 				</div>
 
 				<div v-else-if="field.type == 'recipient'">
@@ -39,7 +39,7 @@
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(recipient, rindex) in recipients" :key="rindex" :value="recipient.id">{{recipient.name}}</option>
 					</select>	
-					<button v-if="field.addNew" class="secondary" @click="subForm = 'recipient'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'recipient'" tabindex="-1">New</button>	
 				</div>
 
 				<div v-else-if="field.type == 'asset'">
@@ -55,7 +55,7 @@
 						:selectData="selectData"
 						v-on:update="tagUpdate"
 					/>
-					<button v-if="field.addNew" class="secondary" @click="subForm = 'tags'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'tags'" tabindex="-1">New</button>	
 				</div>
 
 				<div v-else-if="field.type == 'singleTag'">
