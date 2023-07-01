@@ -445,7 +445,8 @@ export default {
 <style lang="sass" scoped>
 
 div#wrapper
-	width: min-content
+	@media screen and (max-width: 800px)
+		width: min-content
 
 table
 	table-layout: fixed
