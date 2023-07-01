@@ -3,58 +3,61 @@
 		<div v-if="!(small_device && detailsOpen)" id="top_controls">
 			<button class="green" @click="newTransaction">Add</button>
 		</div>
-		<div id="table">
-			<CustomTable
-				v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
-				:tableDataProp="tableData"
-				v-on:rowClick="rowClick"
-				v-on:rowSelect="rowSelect"
-			/>
-		</div>
 
-		<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
-			<div id="batchEdit">
-				<div>
-					<label for="account">Account:</label>
-					<select id="account" v-model="batchaccount_id">
-						<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
-					</select>
-				</div>
+		<div id="table_and_details">
+			<div id="table">
+				<CustomTable
+					v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
+					:tableDataProp="tableData"
+					v-on:rowClick="rowClick"
+					v-on:rowSelect="rowSelect"
+				/>
+			</div>
 
-				<div>
-					<label for="recipient">Recipient:</label>
-					<select id="recipient" v-model="batchrecipient_id">
-						<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
-					</select>
-				</div>
+			<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
+				<div id="batchEdit">
+					<div>
+						<label for="account">Account:</label>
+						<select id="account" v-model="batchaccount_id">
+							<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
+						</select>
+					</div>
 
-				<div>
-					<label for="asset">Asset:</label>
-					<select id="asset" v-model="batchasset_id">
-						<option v-for="(asset, index) in assets" :key="index" :value="asset.id">{{asset.name}}</option>
-					</select>
-				</div>
+					<div>
+						<label for="recipient">Recipient:</label>
+						<select id="recipient" v-model="batchrecipient_id">
+							<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
+						</select>
+					</div>
 
-				<div>
-					<CustomSelect
-						v-if="Object.keys(selectData).length > 0"
-						:selectData="selectData"
-						v-on:update="tagUpdate"
-					/>	
-				</div>
+					<div>
+						<label for="asset">Asset:</label>
+						<select id="asset" v-model="batchasset_id">
+							<option v-for="(asset, index) in assets" :key="index" :value="asset.id">{{asset.name}}</option>
+						</select>
+					</div>
 
-				<button class="green" @click="applyBatchEdit()">Edit selected</button>
-				<button class="red" @click="deleteBatchEdit()">Delete selected</button>
-			</div>		
-		</div>
+					<div>
+						<CustomSelect
+							v-if="Object.keys(selectData).length > 0"
+							:selectData="selectData"
+							v-on:update="tagUpdate"
+						/>	
+					</div>
 
-		<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
-			<TransactionDetails 
-				v-if="Object.keys(selectedRow).length > 0"
-				:transaction="selectedRow"
-				v-on:back="updateAndLoadTable"
-				v-on:updateData="updateTable"
-			/>
+					<button class="green" @click="applyBatchEdit()">Edit selected</button>
+					<button class="red" @click="deleteBatchEdit()">Delete selected</button>
+				</div>		
+			</div>
+
+			<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
+				<TransactionDetails 
+					v-if="Object.keys(selectedRow).length > 0"
+					:transaction="selectedRow"
+					v-on:back="updateAndLoadTable"
+					v-on:updateData="updateTable"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -269,12 +272,14 @@ export default {
 div#main
 	height: 100svh
 
+div#table_and_details
+	display: flex
+
 div#table
 	overflow: auto
 
 div.detailBar
 	padding-left: 8px
-	flex-shrink: 0
 	@media screen and (max-width: 800px)
 		position: absolute
 		width: 100%
@@ -288,6 +293,5 @@ div#batchEdit
 		margin: 0
 		margin-left: 1em
 		height: 100%
-		
 
 </style>
