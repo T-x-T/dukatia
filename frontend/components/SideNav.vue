@@ -181,7 +181,7 @@ nav
 li
 	width: fit-content
 	&:hover
-		transform: scale(1.1)
+		letter-spacing: 0.08em
 	svg
 		height: 1.5em
 		margin-bottom: -0.4em

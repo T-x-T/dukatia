@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="wrapper">
 		<table>
 			<colgroup>
 					<col v-if="tableData.multiSelect" class="multiselect">
@@ -200,7 +200,7 @@ export default {
 					});
 				});
 				
-				this.currencies = await $fetch("/api/v1/currencies/all");
+				this.currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 				this.applyDefaultSort();
 				this.fillSelectedRows();
 			} else {
@@ -443,6 +443,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+
+div#wrapper
+	width: min-content
+
 table
 	table-layout: fixed
 	width: 100%
@@ -455,6 +459,9 @@ table
 		right: 0
 		margin: 0
 		width: 100%
+	@media screen and (max-width: 800px)
+		table-layout: auto
+		width: max-content
 
 td
 	white-space: break-spaces
@@ -520,8 +527,13 @@ div#bottom_bar
 	display: flex
 	justify-content: space-between
 	align-items: center
+	width: 100%
 	div
 		padding: 0 0.5em 0 0.5em
 	input[type="number"]
 		width: 4em
+	@media screen and (max-width: 800px)
+		justify-content: start
+		flex-direction: column
+		align-items: flex-start
 </style>
