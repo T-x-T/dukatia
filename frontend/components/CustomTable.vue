@@ -2,8 +2,8 @@
 	<div id="wrapper">
 		<table>
 			<colgroup>
-					<col v-if="tableData.multiSelect" class="multiselect">
-					<col v-for="(header, index) in tableData.columns" :key="index" :class="header.type">
+				<col v-if="tableData.multiSelect" class="multiselect">
+				<col v-for="(header, index) in tableData.columns" :key="index" :class="header.type">
 			</colgroup>
 			<thead>
 				<tr>
@@ -523,8 +523,6 @@ col.date
 	width: 20em
 
 div#bottom_bar
-	position: sticky
-	bottom: 0
 	display: flex
 	justify-content: space-between
 	align-items: center

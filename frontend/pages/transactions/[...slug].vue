@@ -1,9 +1,9 @@
 <template>
 	<div id="main">		
+		<div v-if="!(small_device && detailsOpen)" id="top_controls">
+			<button class="green" @click="newTransaction">Add</button>
+		</div>
 		<div id="table">
-			<div v-if="!(small_device && detailsOpen)">
-				<button class="green" @click="newTransaction">Add</button>
-			</div>
 			<CustomTable
 				v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
 				:tableDataProp="tableData"
@@ -267,10 +267,7 @@ export default {
 
 <style lang="sass" scoped>
 div#main
-	display: flex
-	justify-content: space-between
-	overflow: hidden
-	height: 100vh
+	height: 100svh
 
 div#table
 	overflow: auto
