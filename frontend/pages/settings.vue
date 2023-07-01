@@ -22,6 +22,12 @@
 				<option>None</option>
 			</select>
 		</div>
+
+		<div class="gridItem">
+			<p>Batch import Transactions</p>
+			<input type="file" accept=".csv" @change="start_import">
+			{{ import_file_contents }}
+		</div>
 	</div>
 </template>
 
@@ -31,7 +37,8 @@ export default {
 		oldPassword: null,
 		newPassword: null,
 		newPasswordConfirmation: null,
-		passwordUpdateMessage: ""
+		passwordUpdateMessage: "",
+		import_file_contents: null as any,
 	}),
 
 	methods: {
@@ -54,7 +61,13 @@ export default {
 			} catch(e: any) {
 				this.passwordUpdateMessage = e?.data?.data?.error;
 			}
-		}
+		},
+
+		async start_import(x: Event) {
+			const reader = new FileReader();
+			reader.addEventListener("load", () => this.import_file_contents = reader.result)
+			reader.readAsText(((x.target as HTMLInputElement).files as FileList)[0]);
+		},
 	}
 }
 </script>
