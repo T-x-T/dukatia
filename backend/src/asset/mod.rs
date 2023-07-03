@@ -174,7 +174,7 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Trans
 		.map(|x| x.total_amount.unwrap())
 		.sum();
 
-	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 	let first_timestamp = transactions.pop().unwrap().timestamp;
 	
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
@@ -188,13 +188,14 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Trans
 	} else {
 		Utc::now()
 	};
+
 	
-	let days_since_first_transaction = if first_timestamp.signed_duration_since(last_timestamp).num_days() > 0 {
-		first_timestamp.signed_duration_since(last_timestamp).num_days()
+	let days_since_first_transaction = if last_timestamp.signed_duration_since(first_timestamp).num_days() > 0 {
+		last_timestamp.signed_duration_since(first_timestamp).num_days()
 	} else {
 		1
 	};
-
+	
 	return TotalCostOfOwnership {
 		total: total_cost_of_ownership,
 		monthly: (total_cost_of_ownership / days_since_first_transaction as i32) * 30,
