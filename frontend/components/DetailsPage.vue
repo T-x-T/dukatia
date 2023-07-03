@@ -96,21 +96,21 @@
 		</div>
 
 		<div v-if="subForm == 'account'" class="form">
-			<DetailsForm
+			<DetailsPage
 				:config="{...$detailPageConfig().account, noSaveAndNew: true}"
 				v-on:back="closeSubForm"
 			/>
 		</div>
 
 		<div v-if="subForm == 'recipient'" class="form">
-			<DetailsForm
+			<DetailsPage
 				:config="{...$detailPageConfig().recipient, noSaveAndNew: true}"
 				v-on:back="closeSubForm"
 			/>
 		</div>
 
 		<div v-if="subForm == 'tags'" class="form">
-			<DetailsForm
+			<DetailsPage
 				:config="{...$detailPageConfig().tags, noSaveAndNew: true}"
 				v-on:back="closeSubForm"
 			/>

@@ -179,7 +179,12 @@ export default {
 				total_amount: 0,
 				comment: "",
 				currency: this.currencies.filter(x => x.id == 0)[0],
-				positions: [],
+				positions: [
+					{
+						amount: 0,
+						comment: "",
+					}
+				],
 			}
 
 			this.detailsOpen = false;
