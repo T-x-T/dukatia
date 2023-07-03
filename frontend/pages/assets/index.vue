@@ -53,7 +53,7 @@ const tableData: TableData = {
 			`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
 			`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
 			`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-			tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
+			tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
 		];
 	})
 };

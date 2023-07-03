@@ -31,7 +31,7 @@ const tableData: TableData = {
 		x.id,
 		x.name,
 		currencies.filter(c => c.id == x.default_currency_id)[0].name,
-		tags.filter(t => x.tag_ids?.includes(t.id ? t.id : -1)).map(t => t.name).join(", "),
+		tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
 		transactions
 			.filter(t => t.account_id == x.id)
 			.reduce((a, b) => a + b.total_amount, 0) 
