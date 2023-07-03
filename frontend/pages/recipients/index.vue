@@ -26,7 +26,7 @@ const tableData: TableData = {
 	rows: recipients.map(x => ([
 		x.id,
 		x.name,
-		tags.filter(y => x.tag_ids?.includes(y.id ? y.id : -1)).map(y => y.name).join(", ")
+		tags.filter(y => x.tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
 	]))
 };
 
