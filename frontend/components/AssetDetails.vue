@@ -6,7 +6,7 @@
 			<div class="gridItem form">
 				<div id="inner">
 					<h3>Asset data</h3>
-					<DetailsForm
+					<DetailsPage
 						v-if="Object.keys(config).length > 0"
 						:config="config"
 						v-on:back="$emit('back')"
