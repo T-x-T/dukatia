@@ -239,26 +239,17 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32
 	};
 
-	let transaction = transaction::Transaction {
-		id: None,
-		currency_id: None,
-		account_id: body.account_id.unwrap(),
-		recipient_id: 0,
-		status: transaction::TransactionStatus::Completed,
-		timestamp: body.timestamp,
-		total_amount: None,
-		comment: Some(comment),
-		asset: Some(asset),
-		user_id,
-		tag_ids: None,
-		positions: vec![transaction::Position {
-			id: None,
+	transaction::Transaction::default()
+		.set_account_id(body.account_id.unwrap())
+		.set_timestamp(body.timestamp)
+		.set_comment(comment)
+		.set_user_id(user_id)
+		.set_asset(asset)	
+		.set_positions(vec![transaction::Position {
 			amount: amount,
-			comment: None,
-			tag_id: None,
-		}],
-	};
-	transaction::add(&pool, &transaction).await?;
+			..Default::default()
+		}])
+		.save(&pool).await?;
 
 	return Ok(());
 }

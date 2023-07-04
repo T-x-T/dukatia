@@ -68,6 +68,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
 	};
 
+	//TODO: replace this once Asset implements Default and uses impl
 	let mut asset: Option<Asset> = None;
 	if body.asset_id.is_some() {
 		asset = Some(Asset {
@@ -83,26 +84,23 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		})
 	}
 
-	let transaction = super::Transaction {
-		id: None,
-		currency_id: None,
-		user_id,
-		account_id: body.account_id,
-		recipient_id: body.recipient_id,
-		status: match body.status {
+	let result = super::Transaction::default()
+		.set_user_id(user_id)
+		.set_account_id(body.account_id)
+		.set_recipient_id(body.recipient_id)
+		.set_status(match body.status {
 			0 => super::TransactionStatus::Withheld,
 			1 => super::TransactionStatus::Completed,
 			_ => return HttpResponse::BadRequest().body("{{\"error\":\"Invalid status\"}}"),
-		},
-		timestamp: body.timestamp,
-		total_amount: None,
-		comment: body.comment.clone(),
-		tag_ids: body.tag_ids.clone(),
-		asset,
-		positions: body.positions.clone(),
-	};
+		})
+		.set_timestamp(body.timestamp)
+		.set_comment_opt(body.comment.clone())
+		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_asset_opt(asset)	
+		.set_positions(body.positions.clone())
+		.save(&data.pool).await;
 
-	match super::add(&data.pool, &transaction).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}
@@ -130,26 +128,24 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		})
 	}
 
-	let transaction = super::Transaction {
-		id: Some(transaction_id.into_inner()),
-		currency_id: None,
-		user_id: user_id,
-		account_id: body.account_id,
-		recipient_id: body.recipient_id,
-		status: match body.status {
+	let result = super::Transaction::default()
+		.set_id(transaction_id.into_inner())
+		.set_user_id(user_id)
+		.set_account_id(body.account_id)
+		.set_recipient_id(body.recipient_id)
+		.set_status(match body.status {
 			0 => super::TransactionStatus::Withheld,
 			1 => super::TransactionStatus::Completed,
 			_ => return HttpResponse::BadRequest().body("{{\"error\":\"Invalid status\"}}"),
-		},
-		timestamp: body.timestamp,
-		total_amount: None,
-		comment: body.comment.clone(),
-		tag_ids: body.tag_ids.clone(),
-		asset,
-		positions: body.positions.clone(),
-	};
+		})
+		.set_timestamp(body.timestamp)
+		.set_comment_opt(body.comment.clone())
+		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_asset_opt(asset)	
+		.set_positions(body.positions.clone())
+		.save(&data.pool).await;
 
-	match super::update(&data.pool, &transaction).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	}

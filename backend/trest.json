@@ -732,7 +732,7 @@
 					},
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error":"specified item of type Account not found with filter account_id=10"}
+						"body_equals": {"error":"specified item of type account not found with filter id=10"}
 					}
 				},
 				{
@@ -1229,7 +1229,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"name":"test2","description":"description","value_per_unit":123,"amount":10.0,"user":{"id":0,"name":"admin","secret":null,"superuser":true},"currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"tags":[],"total_cost_of_ownership":{"total":-400,"monthly":-12000,"yearly":-146000}}]
+						"body_equals": [{"id":1,"name":"test2","description":"description","value_per_unit":123,"amount":10.0,"user":{"id":0,"name":"admin","secret":null,"superuser":true},"currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"tags":[],"total_cost_of_ownership":{"total":-400,"monthly":-90,"yearly":-1095}}]
 					}
 				}
 			]
