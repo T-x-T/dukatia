@@ -11,7 +11,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
 	};
 
-	match super::get_all(&data.pool).await {
+	let result = super::TransactionLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}
@@ -24,7 +26,9 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
 	};
 
-	match super::get_all_deep(&data.pool).await {
+	let result = super::TransactionLoader::new(&data.pool).all_deep().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
 	}
@@ -37,8 +41,12 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
 	};
 
-	match super::get_by_id(&data.pool, transaction_id.into_inner()).await {
-		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+	let result = super::TransactionLoader::new(&data.pool)
+		.set_filter_id(transaction_id.into_inner())
+		.get().await;
+
+	match result {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res.first().unwrap()).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("specified item of type transaction not found with filter") {
 				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
@@ -158,7 +166,11 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
 	};
 
-	return match super::delete_by_id(&data.pool, transaction_id.into_inner()).await {
+	let result = super::Transaction::default()
+		.set_id(transaction_id.into_inner())
+		.delete(&data.pool).await;
+
+	return match result {
 		Ok(_) => HttpResponse::Ok().body(""),
 		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
 	};

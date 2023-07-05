@@ -105,7 +105,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 
 async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i32, Box<dyn Error>> {
 	let mut output: i32 = 0;
-	let transactions = transaction::get_all(&pool).await?;
+	let transactions = transaction::TransactionLoader::new(&pool).get().await?;
 
 	transactions.iter().for_each(|transaction| {
 		if transaction.currency_id.unwrap() == currency_id {

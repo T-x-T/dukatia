@@ -301,7 +301,7 @@ async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_a
 		chart.filter_to.unwrap_or(MAX_DATETIME)
 	};
 
-	let mut transactions = transaction::get_all(&pool).await?;
+	let mut transactions = transaction::TransactionLoader::new(&pool).get().await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
 
 	return Ok(transactions.into_iter()

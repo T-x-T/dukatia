@@ -132,6 +132,13 @@ impl Transaction {
 			return Ok(db::add(&pool, &self).await?);
 		}
 	}
+
+	pub async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(id) => return db::delete_by_id(pool, id).await,
+			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
+		}
+	}
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -158,24 +165,56 @@ pub struct Position {
 	pub tag_id: Option<u32>,
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
+#[derive(Debug, Default)]
+struct Filters {
+	id: Option<u32>,
+	asset_id: Option<u32>,
 }
 
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
+#[derive(Debug, Default)]
+struct QueryParameters {
+	max_results: Option<u32>,
+	skip_results: Option<u32>,
+	filters: Filters,
 }
 
-pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
-	return db::get_by_id(pool, transaction_id).await;
+#[derive(Debug)]
+pub struct TransactionLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
 }
 
-pub async fn get_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	return db::get_by_asset_id(pool, asset_id).await;
-}
+impl<'a> TransactionLoader<'a> {
+	pub fn new(pool: &'a Pool) -> Self {
+		return TransactionLoader {
+			pool,
+			query_parameters: Default::default(),
+		};
+	}
 
-pub async fn delete_by_id(pool: &Pool, transaction_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete_by_id(&pool, transaction_id).await;
+	pub fn set_filter_id(mut self, id: u32) -> Self {
+		self.query_parameters.filters.id = Some(id);
+		return self;
+	}
+
+	pub fn set_filter_asset_id(mut self, asset_id: u32) -> Self {
+		self.query_parameters.filters.asset_id = Some(asset_id);
+		return self;
+	}
+
+	pub async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		if self.query_parameters.filters.id.is_some() {
+			return Ok(vec![db::get_by_id(self.pool, self.query_parameters.filters.id.unwrap()).await?]);
+		} else if self.query_parameters.filters.asset_id.is_some() {
+			return db::get_by_asset_id(self.pool, self.query_parameters.filters.asset_id.unwrap()).await;
+		} else {
+			return db::get_all(self.pool).await;
+		}
+	}
+
+	pub async fn all_deep(self) ->Result<Vec<DeepTransaction>, Box<dyn Error>> {
+		return db::get_all_deep(self.pool).await;
+	}
 }
 
 #[cfg(test)]
@@ -228,7 +267,7 @@ mod tests {
 		async fn returns_no_results_on_empty_db() {
 			let (config, pool) = setup().await;
 
-			let res = get_all(&pool).await.unwrap();
+			let res = TransactionLoader::new(&pool).get().await.unwrap();
 			assert_eq!(res.len(), 0);
 
 			teardown(&config).await;
@@ -242,7 +281,7 @@ mod tests {
 			get_transaction().save(&pool).await?;
 			get_transaction().save(&pool).await?;
 
-			let res = get_all(&pool).await?;
+			let res = TransactionLoader::new(&pool).get().await?;
 			assert_eq!(res.len(), 3);
 
 			teardown(&config).await;
@@ -259,7 +298,7 @@ mod tests {
 				.set_tag_ids(vec![0])
 				.save(&pool).await?;
 
-			let res = get_all(&pool).await?;
+			let res = TransactionLoader::new(&pool).get().await?;
 			assert_eq!(res[0].clone().tag_ids.unwrap(), vec![0]);
 
 			teardown(&config).await;
@@ -281,7 +320,7 @@ mod tests {
 				.set_tag_ids(vec![0, 1, 2])
 				.save(&pool).await?;
 
-			let res = get_all(&pool).await?;
+			let res = TransactionLoader::new(&pool).get().await?;
 			assert_eq!(res[0].clone().tag_ids.unwrap(), vec![0, 1, 2]);
 
 			teardown(&config).await;

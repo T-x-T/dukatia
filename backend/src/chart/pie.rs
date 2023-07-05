@@ -84,7 +84,7 @@ async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<tra
 	let from_date = chart.filter_from.unwrap_or(MIN_DATETIME);
 	let to_date = chart.filter_to.unwrap_or(MAX_DATETIME);
 
-	return Ok(transaction::get_all(&pool).await?.into_iter().filter(|x| {
+	return Ok(transaction::TransactionLoader::new(&pool).get().await?.into_iter().filter(|x| {
 		return &from_date.signed_duration_since(x.timestamp).num_seconds() <= &0 
 				&& &to_date.signed_duration_since(x.timestamp).num_seconds() >= &0;
 		}).collect());

@@ -147,7 +147,9 @@ pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<c
 }
 
 pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
-	let transactions = transaction::get_by_asset_id(pool, asset.id.unwrap()).await?;
+	let transactions = transaction::TransactionLoader::new(pool)
+		.set_filter_asset_id(asset.id.unwrap())
+		.get().await?;
 	
 	return Ok(Asset {
 		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount.unwrap_or(0.0) == 0.0 { true } else { false } )),
@@ -156,7 +158,9 @@ pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<As
 }
 
 pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> Result<DeepAsset, Box<dyn Error>> {
-	let transactions = transaction::get_by_asset_id(pool, asset.id).await?;
+	let transactions = transaction::TransactionLoader::new(pool)
+	.set_filter_asset_id(asset.id)
+	.get().await?;
 
 	return Ok(DeepAsset {
 		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount == 0.0 { true } else { false } )),
