@@ -172,7 +172,7 @@ struct Filters {
 }
 
 #[derive(Debug, Default)]
-struct QueryParameters {
+pub struct QueryParameters {
 	max_results: Option<u32>,
 	skip_results: Option<u32>,
 	filters: Filters,
@@ -203,12 +203,16 @@ impl<'a> TransactionLoader<'a> {
 	}
 
 	pub async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
-		if self.query_parameters.filters.id.is_some() {
-			return Ok(vec![db::get_by_id(self.pool, self.query_parameters.filters.id.unwrap()).await?]);
-		} else if self.query_parameters.filters.asset_id.is_some() {
-			return db::get_by_asset_id(self.pool, self.query_parameters.filters.asset_id.unwrap()).await;
-		} else {
-			return db::get_all(self.pool).await;
+		return db::TransactionDbSelecter::new(self.pool)
+			.set_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	pub async fn get_first(self) -> Result<Transaction, Box<dyn Error>> {
+		match self.get().await?.first() {
+			Some(x) => return Ok(x.clone()),
+			None => return Err(Box::new(crate::CustomError::NoItemFound { item_type: "Transaction".to_string() })),
 		}
 	}
 

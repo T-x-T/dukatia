@@ -1,7 +1,66 @@
 use deadpool_postgres::Pool;
+use postgres_types::ToSql;
 use std::error::Error;
 use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
+
+#[derive(Debug)]
+pub struct TransactionDbSelecter<'a> {
+	query_parameters: super::QueryParameters,
+	pool: &'a Pool,
+}
+
+impl<'a> TransactionDbSelecter<'a> {
+	pub fn new(pool: &'a Pool) -> Self {
+		return TransactionDbSelecter {
+			query_parameters: Default::default(),
+			pool,
+		}
+	}
+
+	pub fn set_parameters(mut self, query_parameters: super::QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+
+	pub async fn execute(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		let query = "SELECT * from public.transaction_data";
+		let mut i = 1;
+		let mut parameters = String::new();
+
+		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
+
+		if self.query_parameters.filters.id.is_some() {
+			parameters.push_str(format!(" WHERE id=${}", i).as_str());
+			parameter_values.push(Box::new(self.query_parameters.filters.id.unwrap() as i32));
+			i += 1;
+		} else if self.query_parameters.filters.asset_id.is_some() {
+			parameters.push_str(format!(" WHERE asset_id=${}", i).as_str());
+			parameter_values.push(Box::new(self.query_parameters.filters.asset_id.unwrap() as i32));
+			i += 1;
+		}
+
+		if self.query_parameters.max_results.is_some() {
+			parameters.push_str(format!(" LIMIT ${}", i).as_str());
+			i += 1;
+		}
+		if self.query_parameters.skip_results.is_some() {
+			parameters.push_str(format!(" OFFSET ${}", i).as_str());
+			i += 1;
+		}
+
+		let paramter_values_dyn: Vec<_> = parameter_values.iter()
+			.map(|x| &**x as &(dyn ToSql + Sync))
+			.collect();
+
+		let rows = self.pool.get()
+		.await?
+		.query(format!("{query}{parameters};").as_str(), paramter_values_dyn.as_slice())
+		.await?;
+	
+		return Ok(rows.into_iter().map(|x| turn_row_into_transaction(&x)).collect());
+	}
+}
 
 pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	let transaction_id: i32 = pool.get()
@@ -52,15 +111,6 @@ pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn E
 	return Ok(());
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-		.query("SELECT * from public.transaction_data", &[])
-		.await?;
-	
-	return Ok(rows.into_iter().map(|x| turn_row_into_transaction(&x)).collect());
-}
-
 pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
 	return Ok(
 		pool.get()
@@ -73,43 +123,12 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn E
 	);
 }
 
-pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-		.query(
-			"SELECT * FROM public.transaction_data WHERE id=$1;", 
-			&[&(transaction_id as i32)]
-		)
-		.await?;
-
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("transaction"), filter: format!("id={transaction_id}") }));
-	}
-
-	return Ok(turn_row_into_transaction(&rows[0]));
-}
-
-pub async fn get_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	return Ok( 
-		pool.get()
-			.await?
-			.query(
-				"SELECT * FROM public.transaction_data WHERE asset_id=$1;", 
-				&[&(asset_id as i32)]
-			)
-			.await?
-			.iter()
-			.map(|x| turn_row_into_transaction(x))
-			.collect()
-		);
-}
-
 pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
 	if transaction.id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 	}
 
-	get_by_id(&pool, transaction.id.unwrap()).await?;
+	super::TransactionLoader::new(pool).set_filter_id(transaction.id.unwrap()).get_first().await?;
 
 	let client = pool.get().await?;
 
