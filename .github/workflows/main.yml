@@ -17,12 +17,10 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable
       - name: Run trest on backend
         working-directory: backend
-        run: |
-          rustup default nightly
-          wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
+        run: wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
           
   backend_test:
     runs-on: ubuntu-latest
@@ -32,16 +30,14 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable
       - name: Setup PostgreSQL
         uses: Harmon758/postgresql-action@v1.0.0
         with:
           postgresql password: $POSTGRES_PASSWORD
       - name: Test backend
         working-directory: backend
-        run: |
-          rustup default nightly
-          POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
+        run: POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
           
   backend_clippy:
     runs-on: ubuntu-latest
@@ -51,12 +47,10 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable
       - name: Run clippy on backend
         working-directory: backend
-        run: |
-          rustup default nightly
-          cargo clippy
+        run: cargo clippy
 
   build_backend:
     runs-on: ubuntu-latest
