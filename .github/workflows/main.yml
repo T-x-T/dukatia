@@ -58,6 +58,7 @@ jobs:
       packages: write
     needs: 
       - backend_test
+      - backend_clippy
       - backend_api_test_trest
     steps:
       - name: Checkout code
