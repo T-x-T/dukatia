@@ -122,20 +122,28 @@ impl Transaction {
 		return self;
 	}
 
+	pub fn set_total_amount(mut self, total_amount: i32) -> Self {
+		self.total_amount = Some(total_amount);
+		return self;
+	}
+
 	pub async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		let account = account::get_by_id(&pool, self.account_id).await?;
 		self = self.set_currency_id(account.default_currency_id);
+		let id = self.id.clone();
+		
+		let db_writer = db::TransactionDbWriter::new(pool, self);
 
-		if self.id.is_some() {
-			return Ok(db::update(&pool, &self).await?);
+		if id.is_some() {
+			return db_writer.replace().await;
 		} else {
-			return Ok(db::add(&pool, &self).await?);
+			return db_writer.insert().await;
 		}
 	}
 
 	pub async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		match self.id {
-			Some(id) => return db::delete_by_id(pool, id).await,
+			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
 			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
 		}
 	}
@@ -217,7 +225,10 @@ impl<'a> TransactionLoader<'a> {
 	}
 
 	pub async fn all_deep(self) ->Result<Vec<DeepTransaction>, Box<dyn Error>> {
-		return db::get_all_deep(self.pool).await;
+		return db::TransactionDbSelecter::new(self.pool)
+			.set_parameters(self.query_parameters)
+			.execute_deep()
+			.await;
 	}
 }
 

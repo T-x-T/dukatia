@@ -12,7 +12,7 @@ pub struct TransactionDbSelecter<'a> {
 
 impl<'a> TransactionDbSelecter<'a> {
 	pub fn new(pool: &'a Pool) -> Self {
-		return TransactionDbSelecter {
+		return Self {
 			query_parameters: Default::default(),
 			pool,
 		}
@@ -23,11 +23,9 @@ impl<'a> TransactionDbSelecter<'a> {
 		return self;
 	}
 
-	pub async fn execute(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
-		let query = "SELECT * from public.transaction_data";
+	fn get_query_parameters(&self) -> (String, Vec<Box<(dyn ToSql + Sync)>>)  {
 		let mut i = 1;
 		let mut parameters = String::new();
-
 		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
 
 		if self.query_parameters.filters.id.is_some() {
@@ -46,321 +44,360 @@ impl<'a> TransactionDbSelecter<'a> {
 		}
 		if self.query_parameters.skip_results.is_some() {
 			parameters.push_str(format!(" OFFSET ${}", i).as_str());
-			i += 1;
 		}
 
-		let paramter_values_dyn: Vec<_> = parameter_values.iter()
+		return (
+			parameters,
+			parameter_values
+		);
+
+	}
+
+	pub async fn execute(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		let query = "SELECT * FROM public.transaction_data";
+		return Ok(
+			self.actually_execute(query)
+			.await?
+			.into_iter()
+			.map(|x| x.into())
+			.collect()
+		);
+	}
+
+	pub async fn execute_deep(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
+		let query = "SELECT * FROM public.deep_transactions";
+		return Ok(
+			self.actually_execute(query)
+			.await?
+			.into_iter()
+			.map(|x| x.into())
+			.collect()
+		);
+	}
+
+	async fn actually_execute(self, query: &str) -> Result<Vec<tokio_postgres::Row>, Box<dyn Error>> {
+		let parameters = self.get_query_parameters();
+		let parameter_values: Vec<_> = parameters.1.iter()
 			.map(|x| &**x as &(dyn ToSql + Sync))
 			.collect();
 
-		let rows = self.pool.get()
-		.await?
-		.query(format!("{query}{parameters};").as_str(), paramter_values_dyn.as_slice())
-		.await?;
+		let rows = (&self).pool.get()
+			.await?
+			.query(format!("{}{};", query, parameters.0).as_str(), parameter_values.as_slice())
+			.await?;
 	
-		return Ok(rows.into_iter().map(|x| turn_row_into_transaction(&x)).collect());
+		return Ok(rows);
 	}
 }
 
-pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
-	let transaction_id: i32 = pool.get()
-		.await?
-		.query(
-			"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7) RETURNING id;",
-			&[
-				&(transaction.user_id as i32),
-				&(transaction.account_id as i32),
-				&(transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
-				&(transaction.recipient_id as i32),
-				&(transaction.status as i32),
-				&transaction.timestamp,
-				&transaction.comment
-			])
+#[derive(Debug)]
+pub struct TransactionDbWriter<'a> {
+	pool: &'a Pool,
+	transaction: Transaction,
+}
+
+impl<'a> TransactionDbWriter<'a> {
+	pub fn new(pool: &'a Pool, transaction: Transaction) -> Self {
+		return Self {
+			pool,
+			transaction,
+		}
+	}
+
+	pub async fn insert(self) -> Result<(), Box<dyn Error>> {
+		let transaction_id: i32 = self.pool.get()
 			.await?
-			[0].get(0);
-	
-	if transaction.tag_ids.is_some() {
-		for tag_id in transaction.tag_ids.clone().unwrap() {
-			pool.get()
+			.query(
+				"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7) RETURNING id;",
+				&[
+					&(self.transaction.user_id as i32),
+					&(self.transaction.account_id as i32),
+					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
+					&(self.transaction.recipient_id as i32),
+					&(self.transaction.status as i32),
+					&self.transaction.timestamp,
+					&self.transaction.comment
+				])
+				.await?
+				[0].get(0);
+		
+		if self.transaction.tag_ids.is_some() {
+			for tag_id in self.transaction.tag_ids.clone().unwrap() {
+				self.pool.get()
+					.await?
+					.query(
+						"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
+						&[&transaction_id, &(tag_id as i32)]
+					).await?;
+			}
+		}
+
+		if self.transaction.asset.is_some() && self.transaction.asset.clone().unwrap().id.is_some() {
+			self.pool.get()
 				.await?
 				.query(
-					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-					&[&transaction_id, &(tag_id as i32)]
+					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
+				&[&(transaction_id as i32), &(self.transaction.asset.clone().unwrap().id.unwrap() as i32)]
+			).await?;
+		}
+
+		for position in self.transaction.positions.iter() {
+			self.pool.get()
+				.await?
+				.query(
+					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
+					&[&transaction_id, &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
+
+		return Ok(());
 	}
 
-	if transaction.asset.is_some() && transaction.asset.clone().unwrap().id.is_some() {
-		pool.get()
-			.await?
-			.query(
-				"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-			&[&(transaction_id as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
-		).await?;
-	}
-
-	for position in transaction.positions.iter() {
-		pool.get()
-			.await?
-			.query(
-				"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-				&[&transaction_id, &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
-			).await?;
-	}
-
-	return Ok(());
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
-	return Ok(
-		pool.get()
-			.await?
-			.query("SELECT * FROM deep_transactions", &[])
-			.await?
-			.iter()
-			.map(|x| turn_row_into_deep_transaction(x))
-			.collect()
-	);
-}
-
-pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
-	if transaction.id.is_none() {
-		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
-	}
-
-	super::TransactionLoader::new(pool).set_filter_id(transaction.id.unwrap()).get_first().await?;
-
-	let client = pool.get().await?;
-
-	client.query(
-		"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
-		&[&(transaction.account_id as i32),
-			&(transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
-			&(transaction.recipient_id as i32),
-			&(transaction.status as i32),
-			&transaction.timestamp,
-			&transaction.comment,
-			&(transaction.id.unwrap() as i32)
-		]
-	)
-	.await?;
-	
-	client.query(
-		"DELETE FROM public.transaction_tags WHERE transaction_id=$1;",
-		&[&(transaction.id.unwrap() as i32)]
-	)
-	.await?;
-
-	if transaction.tag_ids.is_some() {
-		for tag_id in transaction.tag_ids.clone().unwrap() {
-			client.query(
-				"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-				&[&(transaction.id.unwrap() as i32), &(tag_id as i32)]
-			)
-			.await?;
+	pub async fn replace(self) -> Result<(), Box<dyn Error>> {
+		if self.transaction.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 		}
-	}
-
-	client.query(
-		"DELETE FROM public.asset_transactions WHERE transaction_id=$1;",
-		&[&(transaction.id.unwrap() as i32)]
-	).await?;
-
-	if transaction.asset.is_some() && transaction.asset.clone().unwrap().id.is_some() {
+	
+		super::TransactionLoader::new(self.pool).set_filter_id(self.transaction.id.unwrap()).get_first().await?;
+	
+		let client = self.pool.get().await?;
+	
 		client.query(
-				"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-			&[&(transaction.id.unwrap() as i32), &(transaction.asset.clone().unwrap().id.unwrap() as i32)]
-		).await?;
-	}
-
-	client.query(
-		"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
-		&[&(transaction.id.unwrap() as i32)]
-	).await?;
-
-	for position in transaction.positions.iter() {
-		client.query(
-				"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-				&[&(transaction.id.unwrap() as i32), &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
-			).await?;
-	}
-
-	return Ok(());
-}
-
-pub async fn delete_by_id(pool: &Pool, transaction_id: u32) -> Result<(), Box<dyn Error>> {
-	pool.get()
-		.await?
-		.query(
-			"DELETE FROM public.transactions WHERE id=$1;", 
-			&[&(transaction_id as i32)]
+			"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
+			&[&(self.transaction.account_id as i32),
+				&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
+				&(self.transaction.recipient_id as i32),
+				&(self.transaction.status as i32),
+				&self.transaction.timestamp,
+				&self.transaction.comment,
+				&(self.transaction.id.unwrap() as i32)
+			]
 		)
 		.await?;
-
-		pool.get()
-			.await?
-			.query(
-			"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
-			&[&(transaction_id as i32)]
+		
+		client.query(
+			"DELETE FROM public.transaction_tags WHERE transaction_id=$1;",
+			&[&(self.transaction.id.unwrap() as i32)]
+		)
+		.await?;
+	
+		if self.transaction.tag_ids.is_some() {
+			for tag_id in self.transaction.tag_ids.clone().unwrap() {
+				client.query(
+					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
+					&[&(self.transaction.id.unwrap() as i32), &(tag_id as i32)]
+				)
+				.await?;
+			}
+		}
+	
+		client.query(
+			"DELETE FROM public.asset_transactions WHERE transaction_id=$1;",
+			&[&(self.transaction.id.unwrap() as i32)]
 		).await?;
 	
-	return Ok(());
-}
-
-fn turn_row_into_transaction(row: &tokio_postgres::Row) -> Transaction {
-	let id: i32 = row.get(0);
-	let account_id: i32 = row.get(1);
-	let currency_id: i32 = row.get(2);
-	let recipient_id: i32 = row.get(3);
-	let status: i32 = row.get(4);
-	let user_id: i32 = row.get(5);
-	let timestamp: chrono::DateTime<chrono::Utc> = row.get(6);
-	let comment: Option<String> = row.get(7);
-	let tag_ids: Vec<u32> = row.try_get(8)
-		.unwrap_or(Vec::new())
-		.into_iter()
-		.map(|x: i32| x as u32)
-		.collect();
-	let asset_id: Option<i32> = row.get(9);
-	let asset_name: Option<String> = row.get(10);
-	let asset_description: Option<String> = row.get(11);
-	let transaction_position_ids: Vec<Option<i32>> = row.get(12);
-	let transaction_position_amounts: Vec<Option<i32>> = row.get(13);
-	let transaction_position_comments: Vec<Option<String>> = row.get(14);
-	let transaction_position_tag_ids: Vec<Option<i32>> = row.get(15);
-
-	let mut asset: Option<Asset> = None;
-	if asset_id.is_some() {
-		asset = Some(Asset {
-			id: Some(asset_id.unwrap() as u32),
-			name: asset_name.unwrap(),
-			description: asset_description,
-			user_id: user_id as u32,
-			currency_id: currency_id as u32,
-			value_per_unit: None,
-			amount: None,
-			tag_ids: None,
-			total_cost_of_ownership: None,
-		});
+		if self.transaction.asset.is_some() && self.transaction.asset.clone().unwrap().id.is_some() {
+			client.query(
+					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
+				&[&(self.transaction.id.unwrap() as i32), &(self.transaction.asset.clone().unwrap().id.unwrap() as i32)]
+			).await?;
+		}
+	
+		client.query(
+			"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
+			&[&(self.transaction.id.unwrap() as i32)]
+		).await?;
+	
+		for position in self.transaction.positions.iter() {
+			client.query(
+					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
+					&[&(self.transaction.id.unwrap() as i32), &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
+				).await?;
+		}
+	
+		return Ok(());
 	}
 
-	let positions: Vec<Position> = transaction_position_ids
-		.into_iter()
-		.filter(|x| x.is_some())
-		.enumerate()
-		.map(|(i, transaction_position_id)| {
-			Position {
-				id: Some(transaction_position_id.unwrap() as u32),
-				amount: transaction_position_amounts[i].unwrap(),
-				comment: transaction_position_comments[i].clone(),
-				tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
-			}
-		}).collect();
+	pub async fn delete(self) -> Result<(), Box<dyn Error>> {
+		if self.transaction.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
+		}
 
-	let mut total_amount: i32 = 0;
-	transaction_position_amounts
-		.into_iter()
-		.filter(|x| x.is_some())
-		.for_each(|x| total_amount = total_amount + x.unwrap());
+		self.pool.get()
+			.await?
+			.query(
+				"DELETE FROM public.transactions WHERE id=$1;", 
+				&[&(self.transaction.id.unwrap() as i32)]
+			)
+			.await?;
 
-	return Transaction {
-		id: Some(id as u32),
-		user_id: user_id as u32,
-		account_id: account_id as u32,
-		currency_id: Some(currency_id as u32),
-		recipient_id: recipient_id as u32,
-		status: match status {
-			0 => TransactionStatus::Withheld,
-			1 => TransactionStatus::Completed,
-			_ => panic!("invalid transaction status found in row from database")
-		},
-		timestamp,
-		total_amount: Some(total_amount),
-		comment,
-		tag_ids: Some(tag_ids),
-		asset,
-		positions,
-	};
+			self.pool.get()
+				.await?
+				.query(
+				"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
+				&[&(self.transaction.id.unwrap() as i32)]
+			).await?;
+
+		return Ok(());
+	}
 }
 
-fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction {
-	let id: i32 = row.get(0);
-	let status: i32 = row.get(1);
-	let timestamp: chrono::DateTime<chrono::Utc> = row.get(2);
-	let comment: Option<String> = row.get(3);
-	let currency_id: i32 = row.get(4);
-	let currency_minor_in_mayor: i32 = row.get(5);
-	let currency_name: String = row.get(6);
-	let currency_symbol: String = row.get(7);
-	let user_id: i32 = row.get(8);
-	let user_name: String = row.get(9);
-	let user_superuser: bool = row.get(10);
-	let account_id: i32 = row.get(11);
-	let account_name: String = row.get(12);
-	let account_default_currency_id: i32 = row.get(13);
-	let account_default_currency_name: String = row.get(14);
-	let account_default_currency_minor_in_mayor: i32 = row.get(15);
-	let account_default_currency_symbol: String = row.get(16);
-	let account_user_id: Option<i32> = row.get(17);
-	let account_user_name: Option<String> = row.get(18);
-	let account_user_superuser: Option<bool> = row.get(19);
-	let account_tag_ids: Vec<Option<i32>> = row.get(20);
-	let account_tag_names: Vec<Option<String>> = row.get(21);
-	let account_tag_parent_ids: Vec<Option<i32>> = row.get(22);
-	let account_tag_parent_names: Vec<Option<String>> = row.get(23);
-	let account_tag_parent_parent_ids: Vec<Option<i32>> = row.get(24);
-	let account_tag_parent_user_ids: Vec<Option<i32>> = row.get(25);
-	let account_tag_user_ids: Vec<Option<i32>> = row.get(26);
-	let account_tag_user_names: Vec<Option<String>> = row.get(27);
-	let account_tag_user_superusers: Vec<Option<bool>> = row.get(28);
-	let recipient_id: i32 = row.get(29);
-	let recipient_name: String = row.get(30);
-	let recipient_user_id: Option<i32> = row.get(31);
-	let recipient_user_name: Option<String> = row.get(32);
-	let recipient_user_superuser: Option<bool> = row.get(33);
-	let recipient_tag_ids: Vec<Option<i32>> = row.get(34);
-	let recipient_tag_names: Vec<Option<String>> = row.get(35);
-	let recipient_tag_parent_ids: Vec<Option<i32>> = row.get(36);
-	let recipient_tag_parent_names: Vec<Option<String>> = row.get(37);
-	let recipient_tag_parent_parent_ids: Vec<Option<i32>> = row.get(38);
-	let recipient_tag_parent_user_ids: Vec<Option<i32>> = row.get(39);
-	let recipient_tag_user_ids: Vec<Option<i32>> = row.get(40);
-	let recipient_tag_user_names: Vec<Option<String>> = row.get(41);
-	let recipient_tag_user_superusers: Vec<Option<bool>> = row.get(42);
-	let tag_ids: Vec<Option<i32>> = row.get(43);
-	let tag_names: Vec<Option<String>> = row.get(44);
-	let tag_parent_ids: Vec<Option<i32>> = row.get(45);
-	let tag_parent_names: Vec<Option<String>> = row.get(46);
-	let tag_parent_parent_ids: Vec<Option<i32>> = row.get(47);
-	let tag_parent_user_ids: Vec<Option<i32>> = row.get(48);
-	let tag_user_ids: Vec<Option<i32>> = row.get(49);
-	let tag_user_names: Vec<Option<String>> = row.get(50);
-	let tag_user_superusers: Vec<Option<bool>> = row.get(51);
-	let asset_id: Option<i32> = row.get(52);
-	let asset_name: Option<String> = row.get(53);
-	let asset_description: Option<String> = row.get(54);
-	let asset_value_per_unit: i32 = row.try_get(55).unwrap_or(0);
-	let asset_amount: f64 = row.try_get(56).unwrap_or(0.0);
-	let asset_currency_id: Option<i32> = row.get(57);
-	let asset_currency_minor_in_mayor: Option<i32> = row.get(58);
-	let asset_currency_name: Option<String> = row.get(59);
-	let asset_currency_symbol: Option<String> = row.get(60);
-	let asset_user_id: Option<i32> = row.get(61);
-	let asset_user_name: Option<String> = row.get(62);
-	let asset_user_superuser: Option<bool> = row.get(63);
-	let asset_tag_ids: Option<Vec<Option<i32>>> = row.get(64);
-	let asset_tag_names: Option<Vec<Option<String>>> = row.get(65);
-	let asset_tag_parent_ids: Option<Vec<Option<i32>>> = row.get(66);
-	let asset_tag_parent_names: Option<Vec<Option<String>>> = row.get(67);
-	let asset_tag_parent_parent_ids: Option<Vec<Option<i32>>> = row.get(68);
-	let asset_tag_parent_user_ids: Option<Vec<Option<i32>>> = row.get(69);
-	let asset_tag_user_ids: Option<Vec<Option<i32>>> = row.get(70);
-	let asset_tag_user_names: Option<Vec<Option<String>>> = row.get(71);
-	let asset_tag_user_superusers: Option<Vec<Option<bool>>> = row.get(72);
-	let transaction_position_ids: Vec<Option<i32>> = row.get(73);
-	let transaction_position_amounts: Vec<Option<i32>> = row.get(74);
-	let transaction_position_comments: Vec<Option<String>> = row.get(75);
-	let transaction_position_tag_ids: Vec<Option<i32>> = row.get(76);
+impl Into<Transaction> for tokio_postgres::Row {
+	fn into(self) -> Transaction {
+		let id: i32 = self.get(0);
+		let account_id: i32 = self.get(1);
+		let currency_id: i32 = self.get(2);
+		let recipient_id: i32 = self.get(3);
+		let status: i32 = self.get(4);
+		let user_id: i32 = self.get(5);
+		let timestamp: chrono::DateTime<chrono::Utc> = self.get(6);
+		let comment: Option<String> = self.get(7);
+		let tag_ids: Vec<u32> = self.try_get(8)
+			.unwrap_or(Vec::new())
+			.into_iter()
+			.map(|x: i32| x as u32)
+			.collect();
+		let asset_id: Option<i32> = self.get(9);
+		let asset_name: Option<String> = self.get(10);
+		let asset_description: Option<String> = self.get(11);
+		let transaction_position_ids: Vec<Option<i32>> = self.get(12);
+		let transaction_position_amounts: Vec<Option<i32>> = self.get(13);
+		let transaction_position_comments: Vec<Option<String>> = self.get(14);
+		let transaction_position_tag_ids: Vec<Option<i32>> = self.get(15);
+
+		let mut asset: Option<Asset> = None;
+		if asset_id.is_some() {
+			asset = Some(Asset {
+				id: Some(asset_id.unwrap() as u32),
+				name: asset_name.unwrap(),
+				description: asset_description,
+				user_id: user_id as u32,
+				currency_id: currency_id as u32,
+				value_per_unit: None,
+				amount: None,
+				tag_ids: None,
+				total_cost_of_ownership: None,
+			});
+		}
+
+		let positions: Vec<Position> = transaction_position_ids
+			.into_iter()
+			.filter(|x| x.is_some())
+			.enumerate()
+			.map(|(i, transaction_position_id)| {
+				Position {
+					id: Some(transaction_position_id.unwrap() as u32),
+					amount: transaction_position_amounts[i].unwrap(),
+					comment: transaction_position_comments[i].clone(),
+					tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
+				}
+			}).collect();
+
+		let mut total_amount: i32 = 0;
+		transaction_position_amounts
+			.into_iter()
+			.filter(|x| x.is_some())
+			.for_each(|x| total_amount = total_amount + x.unwrap());
+
+		return Transaction::default()
+			.set_id(id as u32)
+			.set_user_id(user_id as u32)
+			.set_account_id(account_id as u32)
+			.set_currency_id(currency_id as u32)
+			.set_recipient_id(recipient_id as u32)
+			.set_status(match status {
+				0 => TransactionStatus::Withheld,
+				1 => TransactionStatus::Completed,
+				_ => panic!("invalid transaction status found in row from database")
+			})
+			.set_timestamp(timestamp)
+			.set_total_amount(total_amount)
+			.set_comment_opt(comment)
+			.set_tag_ids(tag_ids)
+			.set_asset_opt(asset)
+			.set_positions(positions);
+	}
+}
+
+impl Into<DeepTransaction> for tokio_postgres::Row {
+	fn into(self) -> DeepTransaction {
+		let id: i32 = self.get(0);
+	let status: i32 = self.get(1);
+	let timestamp: chrono::DateTime<chrono::Utc> = self.get(2);
+	let comment: Option<String> = self.get(3);
+	let currency_id: i32 = self.get(4);
+	let currency_minor_in_mayor: i32 = self.get(5);
+	let currency_name: String = self.get(6);
+	let currency_symbol: String = self.get(7);
+	let user_id: i32 = self.get(8);
+	let user_name: String = self.get(9);
+	let user_superuser: bool = self.get(10);
+	let account_id: i32 = self.get(11);
+	let account_name: String = self.get(12);
+	let account_default_currency_id: i32 = self.get(13);
+	let account_default_currency_name: String = self.get(14);
+	let account_default_currency_minor_in_mayor: i32 = self.get(15);
+	let account_default_currency_symbol: String = self.get(16);
+	let account_user_id: Option<i32> = self.get(17);
+	let account_user_name: Option<String> = self.get(18);
+	let account_user_superuser: Option<bool> = self.get(19);
+	let account_tag_ids: Vec<Option<i32>> = self.get(20);
+	let account_tag_names: Vec<Option<String>> = self.get(21);
+	let account_tag_parent_ids: Vec<Option<i32>> = self.get(22);
+	let account_tag_parent_names: Vec<Option<String>> = self.get(23);
+	let account_tag_parent_parent_ids: Vec<Option<i32>> = self.get(24);
+	let account_tag_parent_user_ids: Vec<Option<i32>> = self.get(25);
+	let account_tag_user_ids: Vec<Option<i32>> = self.get(26);
+	let account_tag_user_names: Vec<Option<String>> = self.get(27);
+	let account_tag_user_superusers: Vec<Option<bool>> = self.get(28);
+	let recipient_id: i32 = self.get(29);
+	let recipient_name: String = self.get(30);
+	let recipient_user_id: Option<i32> = self.get(31);
+	let recipient_user_name: Option<String> = self.get(32);
+	let recipient_user_superuser: Option<bool> = self.get(33);
+	let recipient_tag_ids: Vec<Option<i32>> = self.get(34);
+	let recipient_tag_names: Vec<Option<String>> = self.get(35);
+	let recipient_tag_parent_ids: Vec<Option<i32>> = self.get(36);
+	let recipient_tag_parent_names: Vec<Option<String>> = self.get(37);
+	let recipient_tag_parent_parent_ids: Vec<Option<i32>> = self.get(38);
+	let recipient_tag_parent_user_ids: Vec<Option<i32>> = self.get(39);
+	let recipient_tag_user_ids: Vec<Option<i32>> = self.get(40);
+	let recipient_tag_user_names: Vec<Option<String>> = self.get(41);
+	let recipient_tag_user_superusers: Vec<Option<bool>> = self.get(42);
+	let tag_ids: Vec<Option<i32>> = self.get(43);
+	let tag_names: Vec<Option<String>> = self.get(44);
+	let tag_parent_ids: Vec<Option<i32>> = self.get(45);
+	let tag_parent_names: Vec<Option<String>> = self.get(46);
+	let tag_parent_parent_ids: Vec<Option<i32>> = self.get(47);
+	let tag_parent_user_ids: Vec<Option<i32>> = self.get(48);
+	let tag_user_ids: Vec<Option<i32>> = self.get(49);
+	let tag_user_names: Vec<Option<String>> = self.get(50);
+	let tag_user_superusers: Vec<Option<bool>> = self.get(51);
+	let asset_id: Option<i32> = self.get(52);
+	let asset_name: Option<String> = self.get(53);
+	let asset_description: Option<String> = self.get(54);
+	let asset_value_per_unit: i32 = self.try_get(55).unwrap_or(0);
+	let asset_amount: f64 = self.try_get(56).unwrap_or(0.0);
+	let asset_currency_id: Option<i32> = self.get(57);
+	let asset_currency_minor_in_mayor: Option<i32> = self.get(58);
+	let asset_currency_name: Option<String> = self.get(59);
+	let asset_currency_symbol: Option<String> = self.get(60);
+	let asset_user_id: Option<i32> = self.get(61);
+	let asset_user_name: Option<String> = self.get(62);
+	let asset_user_superuser: Option<bool> = self.get(63);
+	let asset_tag_ids: Option<Vec<Option<i32>>> = self.get(64);
+	let asset_tag_names: Option<Vec<Option<String>>> = self.get(65);
+	let asset_tag_parent_ids: Option<Vec<Option<i32>>> = self.get(66);
+	let asset_tag_parent_names: Option<Vec<Option<String>>> = self.get(67);
+	let asset_tag_parent_parent_ids: Option<Vec<Option<i32>>> = self.get(68);
+	let asset_tag_parent_user_ids: Option<Vec<Option<i32>>> = self.get(69);
+	let asset_tag_user_ids: Option<Vec<Option<i32>>> = self.get(70);
+	let asset_tag_user_names: Option<Vec<Option<String>>> = self.get(71);
+	let asset_tag_user_superusers: Option<Vec<Option<bool>>> = self.get(72);
+	let transaction_position_ids: Vec<Option<i32>> = self.get(73);
+	let transaction_position_amounts: Vec<Option<i32>> = self.get(74);
+	let transaction_position_comments: Vec<Option<String>> = self.get(75);
+	let transaction_position_tag_ids: Vec<Option<i32>> = self.get(76);
 
 	let currency = crate::currency::Currency {
 		id: Some(currency_id as u32),
@@ -653,5 +690,6 @@ fn turn_row_into_deep_transaction(row: &tokio_postgres::Row) -> DeepTransaction 
 		tags,
 		asset,
 		positions,
+	}
 	}
 }
