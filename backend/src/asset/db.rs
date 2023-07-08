@@ -43,7 +43,7 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>>
 			.query("SELECT * FROM deep_assets", &[])
 			.await?
 			.iter()
-			.map(|x| turn_row_into_deep_asset(x))
+			.map(turn_row_into_deep_asset)
 			.collect()
 	);
 }
@@ -79,7 +79,7 @@ pub async fn get_amount_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> R
 			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
 		).await?;
 
-	if res.len() == 0 {
+	if !res.is_empty() {
 		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
 	}
 
@@ -95,7 +95,7 @@ pub async fn get_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Re
 			&[&(asset_id as i32), &(date.and_time(chrono::NaiveTime::from_num_seconds_from_midnight(0, 0)))] 
 		).await?;
 
-	if res.len() == 0 {
+	if !res.is_empty() {
 		return Err(Box::new(CustomError::NoItemFound { item_type: String::from("asset") }));
 	}
 
@@ -145,7 +145,7 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
 	}
 
-	get_by_id(&pool, asset.id.unwrap()).await?;
+	get_by_id(pool, asset.id.unwrap()).await?;
 
 	let client = pool.get().await?;
 
@@ -172,7 +172,7 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 }
 
 pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
-	get_by_id(&pool, asset_id).await?;
+	get_by_id(pool, asset_id).await?;
 
 	let rows = pool.get()
 		.await?
@@ -184,7 +184,7 @@ pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Re
 }
 
 pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-	get_by_id(&pool, asset_id).await?;
+	get_by_id(pool, asset_id).await?;
 	
 	let client = pool.get().await?;
 
@@ -199,14 +199,14 @@ pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asse
 	).await?;
 
 	for asset_valuation in asset_valuations {
-		add_valuation(&pool, asset_id, &asset_valuation).await?;
+		add_valuation(pool, asset_id, &asset_valuation).await?;
 	}
 
 	return Ok(());
 }
 
 pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
-	get_by_id(&pool, asset_id).await?;
+	get_by_id(pool, asset_id).await?;
 	
 	let client = pool.get().await?;
 	
@@ -317,17 +317,12 @@ fn turn_row_into_deep_asset(row: &tokio_postgres::Row) -> DeepAsset {
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
 				Some(x) => {
-					match x {
-						Some(_) => {
-							Some(crate::tag::Tag {
-								id: tag_parent_ids[i].map(|x| x as u32),
-								name: tag_parent_names[i].clone().unwrap(),
-								user_id: tag_parent_user_ids[i].unwrap() as u32,
-								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
-							})
-						},
-						None => None,
-					}
+					x.as_ref().map(|_| crate::tag::Tag {
+						id: tag_parent_ids[i].map(|x| x as u32),
+						name: tag_parent_names[i].clone().unwrap(),
+						user_id: tag_parent_user_ids[i].unwrap() as u32,
+						parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+					})
 				},
 				None => None,
 			};

@@ -64,7 +64,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accou
 	let account = super::Account {
 		id: None,
 		name: body.name.clone(),
-		user_id: user_id,
+		user_id,
 		tag_ids: body.tag_ids.clone(),
 		default_currency_id: body.default_currency_id,
 	};
@@ -85,7 +85,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accoun
 	let account = super::Account {
 		id: Some(account_id.into_inner()),
 		name: body.name.clone(),
-		user_id: user_id,
+		user_id,
 		tag_ids: body.tag_ids.clone(),
 		default_currency_id: body.default_currency_id,
 	};

@@ -14,7 +14,7 @@ pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
 			&[&(id as i32)]
 		).await?;
 
-		if res.len() == 0 {
+		if !res.is_empty() {
 			return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("chart"), filter: format!("id={id}") }));
 		}
 
@@ -39,34 +39,13 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 }
 
 pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
-	let user_id: Option<i32> = match chart.user_id {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let max_items: Option<i32> = match chart.max_items {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let date_range: Option<i32> = match chart.date_range {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let top_left_x: Option<i32> = match chart.top_left_x {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let top_left_y: Option<i32> = match chart.top_left_y {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let bottom_right_x: Option<i32> = match chart.bottom_right_x {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let bottom_right_y: Option<i32> = match chart.bottom_right_y {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
+	let user_id: Option<i32> = chart.user_id.map(|x| x as i32);
+	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
+	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
+	let top_left_x: Option<i32> = chart.top_left_x.map(|x| x as i32);
+	let top_left_y: Option<i32> = chart.top_left_y.map(|x| x as i32);
+	let bottom_right_x: Option<i32> = chart.bottom_right_x.map(|x| x as i32);
+	let bottom_right_y: Option<i32> = chart.bottom_right_y.map(|x| x as i32);
 
 	let client = pool.get().await?;
 
@@ -87,30 +66,12 @@ pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("chart") }));
 	}
 
-	let max_items: Option<i32> = match chart.max_items {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let date_range: Option<i32> = match chart.date_range {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let top_left_x: Option<i32> = match chart.top_left_x {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let top_left_y: Option<i32> = match chart.top_left_y {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let bottom_right_x: Option<i32> = match chart.bottom_right_x {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
-	let bottom_right_y: Option<i32> = match chart.bottom_right_y {
-    Some(x) => Some(x as i32),
-    None => None,
-	};
+	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
+	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
+	let top_left_x: Option<i32> = chart.top_left_x.map(|x| x as i32);
+	let top_left_y: Option<i32> = chart.top_left_y.map(|x| x as i32);
+	let bottom_right_x: Option<i32> = chart.bottom_right_x.map(|x| x as i32);
+	let bottom_right_y: Option<i32> = chart.bottom_right_y.map(|x| x as i32);
 
 	pool.get()
 		.await

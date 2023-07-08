@@ -34,7 +34,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
 			)
 			.await?
 			.iter()
-			.map(|x| turn_row_into_recipient(x))
+			.map(turn_row_into_recipient)
 			.collect()
 	);
 }
@@ -49,7 +49,7 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepRecipient>, Box<dyn Err
 			)
 			.await?
 			.iter()
-			.map(|x| turn_row_into_deep_recipient(x))
+			.map(turn_row_into_deep_recipient)
 			.collect()
 	);
 }
@@ -75,7 +75,7 @@ pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Er
 		return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("recipient")}));
 	}
 
-	get_by_id(&pool, recipient.id.unwrap()).await?;
+	get_by_id(pool, recipient.id.unwrap()).await?;
 
 	let client = pool.get().await?;
 	
@@ -136,17 +136,12 @@ fn turn_row_into_deep_recipient(row: &tokio_postgres::Row) -> DeepRecipient {
 	let tag_user_names: Vec<Option<String>> = row.get(12);
 	let tag_user_superusers: Vec<Option<bool>> = row.get(13);
 
-	let user = match user_id {
-		Some(_) => {
-			Some( crate::user::User {
-				id: Some(user_id.unwrap() as u32),
-				name: user_name.unwrap(),
-				secret: None,
-				superuser: user_superuser.unwrap()
-			} )
-		},
-		None => None,
-	};
+	let user = user_id.map(|_| crate::user::User {
+		id: Some(user_id.unwrap() as u32),
+		name: user_name.unwrap(),
+		secret: None,
+		superuser: user_superuser.unwrap()
+	});
 
 	let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
@@ -155,17 +150,12 @@ fn turn_row_into_deep_recipient(row: &tokio_postgres::Row) -> DeepRecipient {
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
 				Some(x) => {
-					match x {
-						Some(_) => {
-							Some(crate::tag::Tag {
-								id: tag_parent_ids[i].map(|x| x as u32),
-								name: tag_parent_names[i].clone().unwrap(),
-								user_id: tag_parent_user_ids[i].unwrap() as u32,
-								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
-							})
-						},
-						None => None,
-					}
+					x.as_ref().map(|_| crate::tag::Tag {
+						id: tag_parent_ids[i].map(|x| x as u32),
+						name: tag_parent_names[i].clone().unwrap(),
+						user_id: tag_parent_user_ids[i].unwrap() as u32,
+						parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+					})
 				},
 				None => None,
 			};

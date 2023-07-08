@@ -104,7 +104,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 	};
 
 	let asset = super::Asset {
-		id: Some(asset_id.clone()),
+		id: Some(*asset_id),
 		name: body.name.clone(),
 		description: body.description.clone(),
 		currency_id: body.currency_id,
@@ -144,7 +144,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 	let mut asset_valuations: Vec<super::AssetValuation> = Vec::new();
 	for x in body.clone().into_iter() {
 		if x.amount.is_none() {
-			return HttpResponse::BadRequest().body(format!("{{\"error\":\"field amount needs to be set\"}}"));
+			return HttpResponse::BadRequest().body("{{\"error\":\"field amount needs to be set\"}}".to_string());
 		}
 		asset_valuations.push(super::AssetValuation {
 			timestamp: x.timestamp,
@@ -181,7 +181,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	};
 
 	if body.amount.is_none() && body.amount_change.is_none() {
-		return HttpResponse::BadRequest().body(format!("{{\"error\":\"field amount or amount_change needs to be set\"}}"));
+		return HttpResponse::BadRequest().body("{{\"error\":\"field amount or amount_change needs to be set\"}}".to_string());
 	}
 
 	let mut asset_valuation = body;
@@ -204,14 +204,14 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 }
 
 async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: u32, user_id: u32) -> Result<(), Box<dyn Error>> {
-	let asset = super::get_by_id(&pool, asset_id).await?;
+	let asset = super::get_by_id(pool, asset_id).await?;
 
 	let asset_valuation = super::AssetValuation {
 		value_per_unit: body.value_per_unit,
 		amount: body.amount.unwrap(),
 		timestamp: body.timestamp,
 	};
-	super::add_valuation(&pool, asset_id, &asset_valuation).await?;
+	super::add_valuation(pool, asset_id, &asset_valuation).await?;
 
 	if body.account_id.is_none() {
 		return Ok(());
@@ -219,7 +219,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
-	let currency = crate::currency::get_by_id(&pool, asset.currency_id).await.unwrap();
+	let currency = crate::currency::get_by_id(pool, asset.currency_id).await.unwrap();
 	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {
@@ -236,7 +236,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	let amount = if body.total_value.is_some() {
 		body.total_value.unwrap()
 	} else {
-		((body.value_per_unit as f64 * amount_difference) as i32 * -1) - body.cost.unwrap_or(0) as i32
+		-((body.value_per_unit as f64 * amount_difference) as i32) - body.cost.unwrap_or(0) as i32
 	};
 
 	transaction::Transaction::default()
@@ -246,10 +246,10 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		.set_user_id(user_id)
 		.set_asset(asset)	
 		.set_positions(vec![transaction::Position {
-			amount: amount,
+			amount,
 			..Default::default()
 		}])
-		.save(&pool).await?;
+		.save(pool).await?;
 
 	return Ok(());
 }

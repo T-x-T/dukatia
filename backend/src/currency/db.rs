@@ -11,7 +11,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
 	return Ok(
 		rows
 			.iter()
-			.map(|x| turn_row_into_currency(&x))
+			.map(turn_row_into_currency)
 			.collect()
 	);
 }
@@ -46,7 +46,7 @@ pub async fn update(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Erro
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("currency") }));
 	}
 
-	get_by_id(&pool, currency.id.unwrap()).await?;
+	get_by_id(pool, currency.id.unwrap()).await?;
 
 	pool.get()
 		.await

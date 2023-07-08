@@ -64,7 +64,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPo
 		id: None,
 		name: body.name.to_string(),
 		parent_id: body.parent_id,
-		user_id: user_id 
+		user_id, 
 	};
 
 	match super::add(&data.pool, &tag).await {
@@ -84,7 +84,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 		id: Some(tag_id.into_inner()),
 		name: body.name.to_string(),
 		parent_id: body.parent_id,
-		user_id: user_id 
+		user_id, 
 	};
 
 	match super::update(&data.pool, &tag).await {

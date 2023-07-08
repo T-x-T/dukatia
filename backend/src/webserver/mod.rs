@@ -93,5 +93,6 @@ pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dy
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }
 
-	return Ok(get_user_of_token(&pool, &req.cookie("accessToken").unwrap().value().to_string()).await?);
+	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
+	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string()).await?);
 }

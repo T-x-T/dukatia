@@ -23,10 +23,11 @@ pub struct DeepTag {
 }
 
 pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
+	if tag.parent_id.is_some() && !is_valid_parent(pool, tag.parent_id.unwrap(), None).await {
 		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
-	return Ok(db::add(&pool, &tag).await?);
+	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
+	return Ok(db::add(pool, tag).await?);
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
@@ -42,9 +43,10 @@ pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> 
 }
 
 pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), tag.id).await {
+	if tag.parent_id.is_some() && !is_valid_parent(pool, tag.parent_id.unwrap(), tag.id).await {
 		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 	}
+	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
 	return Ok(db::update(pool, tag).await?);
 }
 

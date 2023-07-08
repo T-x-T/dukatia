@@ -27,9 +27,9 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_transactions(&pool, &chart).await?;
-	let recipients = recipient::get_all(&pool).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_transactions(pool, &chart).await?;
+	let recipients = recipient::get_all(pool).await?;
 
 	recipients.into_iter().for_each(|recipient| {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
@@ -55,9 +55,9 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 
 async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_transactions(&pool, &chart).await?;
-	let tags = tag::get_all(&pool).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_transactions(pool, &chart).await?;
+	let tags = tag::get_all(pool).await?;
 
 	tags.into_iter().for_each(|tag| {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
@@ -84,13 +84,13 @@ async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<tra
 	let from_date = chart.filter_from.unwrap_or(MIN_DATETIME);
 	let to_date = chart.filter_to.unwrap_or(MAX_DATETIME);
 
-	return Ok(transaction::TransactionLoader::new(&pool).get().await?.into_iter().filter(|x| {
-		return &from_date.signed_duration_since(x.timestamp).num_seconds() <= &0 
-				&& &to_date.signed_duration_since(x.timestamp).num_seconds() >= &0;
+	return Ok(transaction::TransactionLoader::new(pool).get().await?.into_iter().filter(|x| {
+		return from_date.signed_duration_since(x.timestamp).num_seconds() <= 0 
+				&& to_date.signed_duration_since(x.timestamp).num_seconds() >= 0;
 		}).collect());
 }
 
-fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<currency::Currency>) -> (String, f64) {
+fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &[currency::Currency]) -> (String, f64) {
 	let mut amount_per_currency = amount_per_currency;
 
 	amount_per_currency.retain(|_, v| v != &mut 0);
@@ -99,7 +99,7 @@ fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<
 	let mut label = String::new();
 
 	amount_per_currency.into_iter().for_each(|x| {
-		let currency: currency::Currency = currencies.clone().into_iter().filter(|c| c.id.unwrap() == x.0).next().unwrap();
+		let currency: &currency::Currency = currencies.iter().find(|c| c.id.unwrap() == x.0).unwrap();
 		amount += x.1 as f64 / currency.minor_in_mayor as f64;
 		label.push_str(format!("{}{} ", x.1 as f64 / currency.minor_in_mayor as f64, currency.symbol).as_str());
 	});

@@ -31,8 +31,8 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 }
 
 async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn Error>> {
-	let function_name = function.split("{").next();
-	let function_body = function.split("{").skip(1).next();
+	let function_name = function.split('{').next();
+	let function_body = function.split('{').nth(1);
 	
 	if function_name.is_none() {
 		return Err(Box::new(CustomError::InvalidItem { reason: format!("function {function} doesnt contain a function") }));
@@ -48,6 +48,7 @@ async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn
 	let function_body = body_chars.as_str();
 	
 	match function_name {
+		#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
 		"foreach_currency" => return Ok(compute_function_foreach_currency(pool, function_body).await?),
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("function name {:?} is not recognized", function_name) })),
 	}
@@ -65,7 +66,7 @@ async fn compute_function_foreach_currency(pool: &Pool, body: &str) -> Result<St
 			if in_token_name {
 				if char == '\\' || char == ' ' || char == ':' || char == '*' || char == '$' {
 					
-					output.push_str(compute_token_currency(&pool, token_name.as_str(), &currency).await?.as_str());
+					output.push_str(compute_token_currency(pool, token_name.as_str(), &currency).await?.as_str());
 					token_name = String::new();
 					in_token_name = char == '$';
 					
@@ -79,12 +80,10 @@ async fn compute_function_foreach_currency(pool: &Pool, body: &str) -> Result<St
 				} else {
 					token_name.push(char);
 				}
+			} else if char == '$' {
+				in_token_name = true;
 			} else {
-				if char == '$' {
-					in_token_name = true;
-				} else {
-					output.push(char);
-				}
+				output.push(char);
 			}
 		}
 	}
@@ -97,7 +96,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 		"name" => currency.name.clone(),
 		"symbol" => currency.symbol.clone(),
 		"current_balance" => (current_balance_of_currency(
-				&pool, currency.id.unwrap()
+				pool, currency.id.unwrap()
 			).await? as f64 / currency.minor_in_mayor as f64).to_string(),
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("token name {:?} is not recognized in function foreach_currency", token_name) })),
 	});
@@ -105,7 +104,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 
 async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i32, Box<dyn Error>> {
 	let mut output: i32 = 0;
-	let transactions = transaction::TransactionLoader::new(&pool).get().await?;
+	let transactions = transaction::TransactionLoader::new(pool).get().await?;
 
 	transactions.iter().for_each(|transaction| {
 		if transaction.currency_id.unwrap() == currency_id {

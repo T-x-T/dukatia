@@ -52,9 +52,9 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 }
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, false).await?;
-	let recipients = recipient::get_all(&pool).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
+	let recipients = recipient::get_all(pool).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Recipient, chart.date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
@@ -68,9 +68,9 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 }
 
 async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, true).await?;
-	let accounts = account::get_all(&pool).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
+	let accounts = account::get_all(pool).await?;
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, chart.clone().date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
 	let raw_output_only_relevant_dates = limit_raw_output_dates(accumulated_raw_output, &chart);
@@ -84,8 +84,8 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string:
 }
 
 async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, true).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency, chart.clone().date_period.unwrap_or(String::from("daily")));
 	let accumulated_raw_output = accumulate(raw_output);
@@ -100,8 +100,8 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 }
 
 async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_time_sorted_transactions(&pool, &chart, false).await?;
+	let currencies = currency::get_all(pool).await?;
+	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet, chart.date_period.unwrap_or(String::from("monthly")));
 	let output = sum_currencies(raw_output, currencies.clone());
@@ -157,14 +157,14 @@ fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOu
 fn limit_raw_output_dates(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>, chart: &Chart) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
 	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
 	input.into_iter().for_each(|mut x| {
-		x.1.retain(|k, _| &chart.filter_from.unwrap_or(MIN_DATETIME).date().signed_duration_since(*k).num_seconds() <= &0 && &chart.filter_to.unwrap_or(MAX_DATETIME).date().signed_duration_since(*k).num_seconds() >= &0);
+		x.1.retain(|k, _| chart.filter_from.unwrap_or(MIN_DATETIME).date().signed_duration_since(*k).num_seconds() <= 0 && chart.filter_to.unwrap_or(MAX_DATETIME).date().signed_duration_since(*k).num_seconds() >= 0);
 		output.insert(x.0, x.1);
 	});
 	return output;
 }
 
-fn get_date_for_period(date_period: &String, timestamp: &DateTime<Utc>) -> Date<Utc> {
-	match date_period.as_str() {
+fn get_date_for_period(date_period: &str, timestamp: &DateTime<Utc>) -> Date<Utc> {
+	match date_period {
 		"daily" => {
 			timestamp.date()
 		},
@@ -203,10 +203,10 @@ fn accumulate(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>) ->
 			timestamp: chrono::MIN_DATETIME,
 			value: BTreeMap::new(),
 		};
-		input.get(&id).unwrap().iter().for_each(|dated_point| {
+		input.get(id).unwrap().iter().for_each(|dated_point| {
 			if previous.timestamp == chrono::MIN_DATETIME {
 				let mut val: BTreeMap<Date<Utc>, PointWithCurrencies> = BTreeMap::new();
-				val.insert(dated_point.0.clone(), dated_point.1.clone());
+				val.insert(*dated_point.0, dated_point.1.clone());
 				output.insert(*id, val);
 				previous = dated_point.1.clone();
 			} else {
@@ -216,7 +216,7 @@ fn accumulate(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>) ->
 				};
 				output.entry(*id)
 					.or_default()
-					.insert(dated_point.0.clone(), sum_point.clone());
+					.insert(*dated_point.0, sum_point.clone());
 				previous = sum_point;
 			}
 		});
@@ -232,7 +232,7 @@ fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>
 			let mut value: f64 = 0.0;
 			let mut label = String::new();
 			y.1.value.into_iter().for_each(|z| {
-				let currency = currencies.iter().filter(|c| c.id.unwrap() == z.0).next().unwrap();
+				let currency = currencies.iter().find(|c| c.id.unwrap() == z.0).unwrap();
 				let current_value = z.1 as f64 / currency.minor_in_mayor as f64;
 				value += current_value;
 				label.push_str(
@@ -266,15 +266,15 @@ fn add_names_to_output(input: BTreeMap<u32, Vec<Point>>, named_types: NamedTypes
 	input.iter().for_each(|x| {
 		match &named_types {
 			NamedTypes::Recipient(recipients) => {
-				let recipient = recipients.iter().filter(|r| r.id.unwrap() == *x.0).next().unwrap();
+				let recipient = recipients.iter().find(|r| r.id.unwrap() == *x.0).unwrap();
 				output.insert(recipient.name.clone(), x.1.to_vec());
 			},
 			NamedTypes::Account(accounts) => {
-				let account = accounts.iter().filter(|r| r.id.unwrap() == *x.0).next().unwrap();
+				let account = accounts.iter().find(|r| r.id.unwrap() == *x.0).unwrap();
 				output.insert(account.name.clone(), x.1.to_vec());
 			},
 			NamedTypes::Currency(currencies) => {
-				let currency = currencies.iter().filter(|c| c.id.unwrap() == *x.0).next().unwrap();
+				let currency = currencies.iter().find(|c| c.id.unwrap() == *x.0).unwrap();
 				output.insert(currency.name.clone(), x.1.to_vec());
 			},
 			NamedTypes::EarningSpendingNet => {
@@ -301,13 +301,13 @@ async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_a
 		chart.filter_to.unwrap_or(MAX_DATETIME)
 	};
 
-	let mut transactions = transaction::TransactionLoader::new(&pool).get().await?;
+	let mut transactions = transaction::TransactionLoader::new(pool).get().await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
 
 	return Ok(transactions.into_iter()
 		.filter(|x| {
-		return &from_date.signed_duration_since(x.timestamp).num_seconds() <= &0 
-				&& &to_date.signed_duration_since(x.timestamp).num_seconds() >= &0;
+		return from_date.signed_duration_since(x.timestamp).num_seconds() <= 0 
+				&& to_date.signed_duration_since(x.timestamp).num_seconds() >= 0;
 		})
 		.collect());
 }
@@ -348,15 +348,15 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
-	let currency = currency::get_by_id(&pool, asset.currency_id).await?;
-	let value_history = asset::get_value_per_unit_history(&pool, chart.asset_id.unwrap()).await?;
-	let amount_history = asset::get_amount_history(&pool, chart.asset_id.unwrap()).await?;
+	let asset = asset::get_by_id(pool, chart.asset_id.unwrap()).await?;
+	let currency = currency::get_by_id(pool, asset.currency_id).await?;
+	let value_history = asset::get_value_per_unit_history(pool, chart.asset_id.unwrap()).await?;
+	let amount_history = asset::get_amount_history(pool, chart.asset_id.unwrap()).await?;
 
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
 	output.insert(asset.name.clone(), Vec::new());
 
-	if value_history.len() == 0 || amount_history.len() == 0 {
+	if !value_history.is_empty() || !amount_history.is_empty() {
 		return Ok(Vec::from_iter(output));
 	}
 
@@ -380,7 +380,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 			output.entry(asset.name.clone()).or_default().push(point);
 		}
 		last_value = value;
-		current_day = current_day + Duration::days(1);
+		current_day += Duration::days(1);
 	}
 
 	return Ok(Vec::from_iter(output));
@@ -391,14 +391,14 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
-	let currency = currency::get_by_id(&pool, asset.currency_id).await?;
-	let value_history = asset::get_value_per_unit_history(&pool, chart.asset_id.unwrap()).await?;
+	let asset = asset::get_by_id(pool, chart.asset_id.unwrap()).await?;
+	let currency = currency::get_by_id(pool, asset.currency_id).await?;
+	let value_history = asset::get_value_per_unit_history(pool, chart.asset_id.unwrap()).await?;
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
 	output.insert(asset.name.clone(), Vec::new());
 	
-	if value_history.len() == 0 {
+	if !value_history.is_empty() {
 		return Ok(Vec::from_iter(output));
 	}
 	
@@ -421,7 +421,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 			output.entry(asset.name.clone()).or_default().push(point);
 		}
 		last_value = value;
-		current_day = current_day + Duration::days(1);
+		current_day += Duration::days(1);
 	}
 
 	return Ok(Vec::from_iter(output));
@@ -432,13 +432,13 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<Vec<(std::str
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::get_by_id(&pool, chart.asset_id.unwrap()).await?;
-	let amount_history = asset::get_amount_history(&pool, chart.asset_id.unwrap()).await?;
+	let asset = asset::get_by_id(pool, chart.asset_id.unwrap()).await?;
+	let amount_history = asset::get_amount_history(pool, chart.asset_id.unwrap()).await?;
 
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
 	output.insert(asset.name.clone(), Vec::new());
 
-	if amount_history.len() == 0 {
+	if !amount_history.is_empty() {
 		return Ok(Vec::from_iter(output));
 	}
 
@@ -461,7 +461,7 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<Vec<(std::str
 			output.entry(asset.name.clone()).or_default().push(point);
 		}
 		last_value = value;
-		current_day = current_day + Duration::days(1);
+		current_day += Duration::days(1);
 	}
 
 	return Ok(Vec::from_iter(output));
@@ -469,10 +469,10 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<Vec<(std::str
 
 fn get_first_day_of_asset_valuations(value_history: &BTreeMap<DateTime<Utc>, u32>, amount_history: &BTreeMap<DateTime<Utc>, f64>) -> Date<Utc> {
 	let mut first_day: Date<Utc> = Utc::now().date();
-	if value_history.len() > 0 && value_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
+	if !value_history.is_empty() && value_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
 		first_day = value_history.first_key_value().unwrap().0.date();	
 	}
-	if amount_history.len() > 0 && amount_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
+	if !amount_history.is_empty() && amount_history.first_key_value().unwrap().0.date().signed_duration_since(first_day).num_seconds() < 0 {
 		first_day = amount_history.first_key_value().unwrap().0.date();	
 	}
 

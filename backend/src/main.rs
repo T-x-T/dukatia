@@ -1,8 +1,6 @@
 #![allow(
   clippy::needless_return,
-  clippy::needless_borrow,
-  clippy::or_fun_call,
-  clippy::redundant_field_names,
+  clippy::unnecessary_unwrap,
   deprecated,
 )]
 
@@ -22,6 +20,8 @@ mod chart;
 
 use std::fmt;
 use std::error::Error;
+
+#[cfg(test)]
 use deadpool_postgres::Pool;
 
 use config::*;
@@ -78,7 +78,7 @@ impl Error for CustomError {
 
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
 async fn setup() -> (Config, Pool) {
   let config = initialize_config();
   postgres::delete_testing_databases(&config).await;
@@ -87,7 +87,7 @@ async fn setup() -> (Config, Pool) {
   return (config, pool);
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
 async fn teardown(config: &Config) {
   postgres::delete_database(&config).await;
 }

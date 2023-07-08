@@ -52,13 +52,13 @@ pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
 }
 
 pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
-	let valuation_history = get_valuation_history_by_asset_id(&pool, asset_id).await?;
+	let valuation_history = get_valuation_history_by_asset_id(pool, asset_id).await?;
 	let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
 		.filter(
 			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() > 0
 		).collect();
 	
-	if newer_than_input.len() > 0 {
+	if !newer_than_input.is_empty() {
 		let mut last_asset_valuation_amount: f64 = 0.0;
 		for x in &valuation_history {
 			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
@@ -79,13 +79,13 @@ pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetVa
 			return y;
 		}).collect();
 
-		let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().map(|x| x.clone()).collect();
+		let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().cloned().collect();
 		new_asset_valuations.push(asset_valuation.clone());
 		newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
 
-		return db::replace_valuation_history_of_asset(&pool, asset_id, new_asset_valuations).await;
+		return db::replace_valuation_history_of_asset(pool, asset_id, new_asset_valuations).await;
 	} else {
-		return db::add_valuation(&pool, asset_id, &asset_valuation).await;
+		return db::add_valuation(pool, asset_id, asset_valuation).await;
 	}
 
 }
@@ -127,23 +127,23 @@ pub async fn get_total_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>)
 }
 
 pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
-	return db::get_valuation_history_by_asset_id(&pool, asset_id).await;
+	return db::get_valuation_history_by_asset_id(pool, asset_id).await;
 }
 
 pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-	return db::replace_valuation_history_of_asset(&pool, asset_id, asset_valuations).await;
+	return db::replace_valuation_history_of_asset(pool, asset_id, asset_valuations).await;
 }
 
 pub async fn delete_by_id(pool: &Pool, asset_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete_by_id(&pool, asset_id).await;
+	return db::delete_by_id(pool, asset_id).await;
 }
 
 pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
-	return db::get_value_per_unit_history(&pool, asset_id).await;
+	return db::get_value_per_unit_history(pool, asset_id).await;
 }
 
 pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
-	return db::get_amount_history(&pool, asset_id).await;
+	return db::get_amount_history(pool, asset_id).await;
 }
 
 pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
@@ -152,7 +152,7 @@ pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<As
 		.get().await?;
 	
 	return Ok(Asset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount.unwrap_or(0.0) == 0.0 { true } else { false } )),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, asset.amount.unwrap_or(0.0) == 0.0)),
 		..asset
 	});
 }
@@ -163,7 +163,7 @@ pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> 
 	.get().await?;
 
 	return Ok(DeepAsset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, if asset.amount == 0.0 { true } else { false } )),
+		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, asset.amount == 0.0)),
 		..asset
 	});
 }

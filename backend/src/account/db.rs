@@ -30,7 +30,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Account>, Box<dyn Error>> {
 			&[]
 		).await?
 		.iter()
-		.map(|x| turn_row_into_account(&x))
+		.map(turn_row_into_account)
 		.collect()
 	);
 }
@@ -44,7 +44,7 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAccount>, Box<dyn Error
 				&[]
 			).await?
 			.iter()
-			.map(|x| turn_row_into_deep_account(x))
+			.map(turn_row_into_deep_account)
 			.collect()
 	);
 }
@@ -70,7 +70,7 @@ pub async fn update(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("account") }));
 	}
 
-	get_by_id(&pool, account.id.unwrap()).await?;
+	get_by_id(pool, account.id.unwrap()).await?;
 
 	let client = pool.get().await?;
 
@@ -146,17 +146,12 @@ fn turn_row_into_deep_account(row: &tokio_postgres::Row) -> DeepAccount {
 		symbol: default_currency_symbol
 	};
 
-	let user = match user_id {
-		Some(_) => {
-			Some( crate::user::User {
-				id: Some(user_id.unwrap() as u32),
-				name: user_name.unwrap(),
-				secret: None,
-				superuser: user_superuser.unwrap(),
-			} )
-		},
-		None => None,
-	};
+	let user = user_id.map(|_| crate::user::User {
+		id: Some(user_id.unwrap() as u32),
+		name: user_name.unwrap(),
+		secret: None,
+		superuser: user_superuser.unwrap(),
+	});
 	
 	let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
@@ -165,17 +160,12 @@ fn turn_row_into_deep_account(row: &tokio_postgres::Row) -> DeepAccount {
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
 				Some(x) => {
-					match x {
-						Some(_) => {
-							Some(crate::tag::Tag {
-								id: tag_parent_ids[i].map(|x| x as u32),
-								name: tag_parent_names[i].clone().unwrap(),
-								user_id: tag_parent_user_ids[i].unwrap() as u32,
-								parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
-							})
-						},
-						None => None,
-					}
+					x.as_ref().map(|_| crate::tag::Tag {
+						id: tag_parent_ids[i].map(|x| x as u32),
+						name: tag_parent_names[i].clone().unwrap(),
+						user_id: tag_parent_user_ids[i].unwrap() as u32,
+						parent_id: tag_parent_parent_ids[i].map(|x| x as u32),
+					})
 				},
 				None => None,
 			};

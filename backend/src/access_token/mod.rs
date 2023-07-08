@@ -18,12 +18,12 @@ pub async fn add(pool: &Pool, user: &User) -> Result<String, Box<dyn Error>> {
 		)
 	);
 	let access_token = format!("{:x}", hasher.finalize());
-	db::add(&pool, user.id.expect("user id is not allowed to be None here"), &access_token).await?;
+	db::add(pool, user.id.expect("user id is not allowed to be None here"), &access_token).await?;
 	return Ok(access_token);
 }
 
 pub async fn get_user_of_token(pool: &Pool, access_token: &String) -> Result<u32, Box<dyn Error>> {
-	return db::get_user_of_token(&pool, &access_token).await;
+	return db::get_user_of_token(pool, access_token).await;
 }
 
 #[cfg(test)]

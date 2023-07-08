@@ -4,25 +4,25 @@ use std::fs;
 use super::config::Config;
 
 pub async fn get_connection(config: &Config) -> Pool {	
-	if !database_exists(&config, &config.db_database).await {
-		create_database(&config).await;
+	if !database_exists(config, &config.db_database).await {
+		create_database(config).await;
 	}
 
-	upgrade_schema_if_necessary(&config).await;
+	upgrade_schema_if_necessary(config).await;
 	
-	return get_pool(&config).await;
+	return get_pool(config).await;
 }
 
 async fn upgrade_schema_if_necessary(config: &Config) {
 	println!("Checking if database schema requires an update");
 
-	let current_schema_version = get_schema_version(&config).await;
+	let current_schema_version = get_schema_version(config).await;
 	let newest_schema_version = get_newest_schema_version().await;
 	println!("Current version: {} Newest version: {}", current_schema_version, newest_schema_version);
 
 	if newest_schema_version > current_schema_version {
 		println!("Start update");
-		upgrade_schema(current_schema_version, newest_schema_version, &config).await;
+		upgrade_schema(current_schema_version, newest_schema_version, config).await;
 		println!("Finished update");
 	} else {
 		println!("Everything up to date!");
@@ -44,7 +44,7 @@ async fn database_exists(config: &Config, database_name: &String) -> bool {
 }
 
 async fn get_schema_version(config: &Config) -> u32 {
-	let pool = get_pool(&config)
+	let pool = get_pool(config)
 		.await
 		.get()
 		.await
@@ -93,7 +93,7 @@ async fn get_newest_schema_version() -> u32 {
 
 async fn upgrade_schema(current_version: u32, newest_version: u32, config: &Config) {
 	let mut next_version = current_version + 1;
-	let pool = get_pool(&config).await.get().await.unwrap();
+	let pool = get_pool(config).await.get().await.unwrap();
 	
 	while next_version <= newest_version {
 		println!("Update to version {}", next_version);
@@ -108,7 +108,7 @@ async fn upgrade_schema(current_version: u32, newest_version: u32, config: &Conf
 
 		pool.query("UPDATE public.\"Meta\" SET schema_version=$1", &[&(next_version as i32)]).await.unwrap();
 
-		next_version = next_version + 1;
+		next_version += 1;
 	}
 }
 
@@ -124,7 +124,7 @@ async fn create_database(config: &Config) {
 		.await
 		.unwrap();
 
-	get_pool(&config)
+	get_pool(config)
 		.await
 		.get()
 		.await

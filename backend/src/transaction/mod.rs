@@ -128,9 +128,9 @@ impl Transaction {
 	}
 
 	pub async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		let account = account::get_by_id(&pool, self.account_id).await?;
+		let account = account::get_by_id(pool, self.account_id).await?;
 		self = self.set_currency_id(account.default_currency_id);
-		let id = self.id.clone();
+		let id = self.id;
 		
 		let db_writer = db::TransactionDbWriter::new(pool, self);
 

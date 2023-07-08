@@ -20,7 +20,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
 		.query("SELECT * FROM public.tags;", &[])
 		.await?
 		.iter()
-		.map(|x| turn_row_into_tag(x))
+		.map(turn_row_into_tag)
 		.collect()
 	)
 }
@@ -32,7 +32,7 @@ pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTag>, Box<dyn Error>> {
 			.query("SELECT * FROM deep_tags", &[])
 			.await?
 			.iter()
-			.map(|x| turn_row_into_deep_tag(x))
+			.map(turn_row_into_deep_tag)
 			.collect()
 	)
 }
@@ -54,7 +54,7 @@ pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
 		return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
 	}
 
-	get_by_id(&pool, tag.id.unwrap()).await?;
+	get_by_id(pool, tag.id.unwrap()).await?;
 
 	pool.get()
 		.await?
@@ -102,17 +102,12 @@ fn turn_row_into_deep_tag(row: &tokio_postgres::Row) -> DeepTag {
 	let parent_user_id: Option<i32> = row.get(7);
 	let parent_parent_id: Option<i32> = row.get(8);
 
-	let parent: Option<Tag> = match parent_id {
-		Some(_) => {
-			Some(Tag {
-				id: parent_id.map(|x| x as u32),
-				name: parent_name.unwrap(),
-				user_id: parent_user_id.unwrap() as u32,
-				parent_id: parent_parent_id.map(|x| x as u32),
-			})
-		},
-		None => None,
-	};
+	let parent: Option<Tag> = parent_id.map(|_| Tag {
+		id: parent_id.map(|x| x as u32),
+		name: parent_name.unwrap(),
+		user_id: parent_user_id.unwrap() as u32,
+		parent_id: parent_parent_id.map(|x| x as u32),
+	});
 
 	return DeepTag {
 		id: id as u32,
