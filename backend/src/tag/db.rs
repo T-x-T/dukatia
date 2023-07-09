@@ -43,7 +43,7 @@ pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> 
 		.query("SELECT * FROM public.tags WHERE id=$1;", &[&(tag_id as i32)]).await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("tag"), filter: format!("id={}", tag_id)}));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("tag"), filter: format!("id={tag_id}")}));
 	}
 
 	return Ok(turn_row_into_tag(&rows[0]));

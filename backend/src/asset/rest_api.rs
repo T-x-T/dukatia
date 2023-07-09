@@ -30,12 +30,12 @@ struct AssetValuationPost {
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -43,12 +43,12 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all_deep(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -56,17 +56,17 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_by_id(&data.pool, asset_id.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("specified item of type asset not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
-			} else {
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
 			}
+			
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
 		}
 	}
 }
@@ -75,7 +75,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::P
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let asset = super::Asset {
@@ -91,8 +91,8 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 	};
 
 	match super::add(&data.pool, &asset).await {
-		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{}\"}}", id)),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -100,7 +100,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>, asset_id: web::Path<u32>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let asset = super::Asset {
@@ -117,7 +117,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 
 	match super::update(&data.pool, &asset).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -125,12 +125,12 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_valuation_history_by_asset_id(&data.pool, asset_id.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -138,11 +138,11 @@ async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpR
 async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>, body: web::Json<Vec<AssetValuationPost>>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let mut asset_valuations: Vec<super::AssetValuation> = Vec::new();
-	for x in body.clone().into_iter() {
+	for x in body.clone() {
 		if x.amount.is_none() {
 			return HttpResponse::BadRequest().body("{{\"error\":\"field amount needs to be set\"}}".to_string());
 		}
@@ -155,7 +155,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 
 	match super::replace_valuation_history_of_asset(&data.pool, asset_id.into_inner(), asset_valuations).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -163,12 +163,12 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	return match super::delete_by_id(&data.pool, asset_id.into_inner()).await {
 		Ok(_) => HttpResponse::Ok().body(""),
-		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
 
@@ -177,7 +177,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	let asset_id = asset_id.into_inner();
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	if body.amount.is_none() && body.amount_change.is_none() {
@@ -199,7 +199,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 
 	return match add_valuation(&data.pool, &asset_valuation, asset_id, user_id).await {
 		Ok(_) => HttpResponse::Ok().body(""),
-		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
 
@@ -220,23 +220,23 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
 	let currency = crate::currency::get_by_id(pool, asset.currency_id).await.unwrap();
-	let formatted_value_per_unit = format!("{}{}", body.value_per_unit as f64 / currency.minor_in_mayor as f64, currency.symbol);
+	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_mayor), currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {
 		format!("Sold {} units at {} each", amount_difference * -1.0, formatted_value_per_unit)
 	} else {
-		format!("Bought {} units at {} each", amount_difference, formatted_value_per_unit)
+		format!("Bought {amount_difference} units at {formatted_value_per_unit} each")
 	};
 
 	if body.cost.is_some() {
-		let formatted_cost = format!("{}{}", body.cost.unwrap() as f64 / currency.minor_in_mayor as f64, currency.symbol);
-		comment = format!("{} with additional cost of {}", comment, formatted_cost);
+		let formatted_cost = format!("{}{}", f64::from(body.cost.unwrap()) / f64::from(currency.minor_in_mayor), currency.symbol);
+		comment = format!("{comment} with additional cost of {formatted_cost}");
 	}
 
 	let amount = if body.total_value.is_some() {
 		body.total_value.unwrap()
 	} else {
-		-((body.value_per_unit as f64 * amount_difference) as i32) - body.cost.unwrap_or(0) as i32
+		-((f64::from(body.value_per_unit) * amount_difference) as i32) - body.cost.unwrap_or(0) as i32
 	};
 
 	transaction::Transaction::default()

@@ -112,11 +112,11 @@ pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BT
 
 		let mut output: BTreeMap<chrono::DateTime<chrono::Utc>, u32> = BTreeMap::new();
 
-		rows.into_iter().for_each(|x| {
+		for x in rows {
 			let timestamp: chrono::DateTime<chrono::Utc> = x.get(0);
 			let value_per_unit: i32 = x.get(1);
 			output.insert(timestamp, value_per_unit as u32);
-		});
+		}
 
 		return Ok(output);
 }
@@ -131,11 +131,11 @@ pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<c
 
 		let mut output: BTreeMap<chrono::DateTime<chrono::Utc>, f64> = BTreeMap::new();
 
-		rows.into_iter().for_each(|x| {
+		for x in rows {
 			let timestamp: chrono::DateTime<chrono::Utc> = x.get(0);
 			let value_per_unit: f64 = x.get(1);
 			output.insert(timestamp, value_per_unit);
-		});
+		}
 
 		return Ok(output);
 }
@@ -312,7 +312,7 @@ fn turn_row_into_deep_asset(row: &tokio_postgres::Row) -> DeepAsset {
 
 	let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
-		.filter(|x| x.is_some())
+		.filter(Option::is_some)
 		.enumerate()
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {

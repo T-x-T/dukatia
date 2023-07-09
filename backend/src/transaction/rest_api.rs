@@ -8,14 +8,14 @@ use super::Asset;
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TransactionLoader::new(&data.pool).get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -23,14 +23,14 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TransactionLoader::new(&data.pool).all_deep().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -38,7 +38,7 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
@@ -49,10 +49,10 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("specified item of type transaction not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
-			} else {
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
 			}
+			
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
 		}
 	}
 }
@@ -73,7 +73,7 @@ struct TransactionPost {
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	//TODO: replace this once Asset implements Default and uses impl
@@ -81,7 +81,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 	if body.asset_id.is_some() {
 		asset = Some(Asset {
 			id: body.asset_id,
-			name: String::from(""),
+			name: String::new(),
 			currency_id: 0,
 			user_id,
 			amount: None,
@@ -89,7 +89,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 			description: None,
 			tag_ids: None,
 			total_cost_of_ownership: None,
-		})
+		});
 	}
 
 	let result = super::Transaction::default()
@@ -110,7 +110,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 
 	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -118,14 +118,14 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<u32>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let mut asset: Option<Asset> = None;
 	if body.asset_id.is_some() {
 		asset = Some(Asset {
 			id: body.asset_id,
-			name: String::from(""),
+			name: String::new(),
 			currency_id: 0,
 			user_id,
 			amount: None,
@@ -133,7 +133,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 			description: None,
 			tag_ids: None,
 			total_cost_of_ownership: None,
-		})
+		});
 	}
 
 	let result = super::Transaction::default()
@@ -155,7 +155,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 
 	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -163,7 +163,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::Transaction::default()
@@ -172,6 +172,6 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web
 
 	return match result {
 		Ok(_) => HttpResponse::Ok().body(""),
-		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }

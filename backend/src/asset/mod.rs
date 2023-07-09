@@ -58,41 +58,40 @@ pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetVa
 			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() > 0
 		).collect();
 	
-	if !newer_than_input.is_empty() {
-		let mut last_asset_valuation_amount: f64 = 0.0;
-		for x in &valuation_history {
-			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
-				last_asset_valuation_amount = x.amount;
-			}
-		}
-		
-		let difference: f64 = asset_valuation.amount - last_asset_valuation_amount;
-
-		let older_than_input: Vec<&AssetValuation> = valuation_history.iter()
-		.filter(
-			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0
-		).collect();
-
-		let newer_than_input: Vec<AssetValuation> = newer_than_input.into_iter().map(|x| {
-			let mut y = x.clone();
-			y.amount += difference;
-			return y;
-		}).collect();
-
-		let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().cloned().collect();
-		new_asset_valuations.push(asset_valuation.clone());
-		newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
-
-		return db::replace_valuation_history_of_asset(pool, asset_id, new_asset_valuations).await;
-	} else {
+	if newer_than_input.is_empty() {
 		return db::add_valuation(pool, asset_id, asset_valuation).await;
 	}
 
+	let mut last_asset_valuation_amount: f64 = 0.0;
+	for x in &valuation_history {
+		if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
+			last_asset_valuation_amount = x.amount;
+		}
+	}
+	
+	let difference: f64 = asset_valuation.amount - last_asset_valuation_amount;
+
+	let older_than_input: Vec<&AssetValuation> = valuation_history.iter()
+	.filter(
+		|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0
+	).collect();
+
+	let newer_than_input: Vec<AssetValuation> = newer_than_input.into_iter().map(|x| {
+		let mut y = x.clone();
+		y.amount += difference;
+		return y;
+	}).collect();
+
+	let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().cloned().collect();
+	new_asset_valuations.push(asset_valuation.clone());
+	newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
+
+	return db::replace_valuation_history_of_asset(pool, asset_id, new_asset_valuations).await;
 }
 
 pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 	let mut output: Vec<Asset> = Vec::new();
-	for asset in db::get_all(pool).await?.into_iter() {
+	for asset in db::get_all(pool).await? {
 		output.push(get_total_cost_of_ownership(pool, asset).await?);
 	}
 	return Ok(output);
@@ -100,7 +99,7 @@ pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
 
 pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
 	let mut output: Vec<DeepAsset> = Vec::new();
-	for asset in db::get_all_deep(pool).await?.into_iter() {
+	for asset in db::get_all_deep(pool).await? {
 		output.push(get_total_cost_of_ownership_deep(pool, asset).await?);
 	}
 	return Ok(output);
@@ -122,7 +121,7 @@ pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
 #[allow(unused)]
 pub async fn get_total_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
 	let amount = db::get_amount_at_day(pool, asset_id, date).await?;
-	let value = db::get_value_at_day(pool, asset_id, date).await? as f64;
+	let value = f64::from(db::get_value_at_day(pool, asset_id, date).await?);
 	return Ok(amount * value);
 }
 
@@ -183,26 +182,24 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Trans
 	
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 
-	let last_timestamp = if !transactions.is_empty() {
-		if current_amount_is_zero {
-			transactions.pop().unwrap().timestamp
-		} else {
-			Utc::now()
-		}
+	let last_timestamp = if transactions.is_empty() {
+		Utc::now()
+	} else if current_amount_is_zero {
+		transactions.pop().unwrap().timestamp
 	} else {
 		Utc::now()
 	};
 
 	
-	let days_since_first_transaction = if last_timestamp.signed_duration_since(first_timestamp).num_days() > 0 {
-		last_timestamp.signed_duration_since(first_timestamp).num_days()
+	let days_since_first_transaction: i32 = if last_timestamp.signed_duration_since(first_timestamp).num_days() > 0 {
+		i32::try_from(last_timestamp.signed_duration_since(first_timestamp).num_days()).unwrap_or(1)
 	} else {
 		1
 	};
 	
 	return TotalCostOfOwnership {
 		total: total_cost_of_ownership,
-		monthly: (total_cost_of_ownership / days_since_first_transaction as i32) * 30,
-		yearly: (total_cost_of_ownership / days_since_first_transaction as i32) * 365,
+		monthly: (total_cost_of_ownership / days_since_first_transaction) * 30,
+		yearly: (total_cost_of_ownership / days_since_first_transaction) * 365,
 	};
 }

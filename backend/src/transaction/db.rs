@@ -13,7 +13,7 @@ pub struct TransactionDbSelecter<'a> {
 impl<'a> TransactionDbSelecter<'a> {
 	pub fn new(pool: &'a Pool) -> Self {
 		return Self {
-			query_parameters: Default::default(),
+			query_parameters: super::QueryParameters::default(),
 			pool,
 		}
 	}
@@ -29,21 +29,21 @@ impl<'a> TransactionDbSelecter<'a> {
 		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
 
 		if self.query_parameters.filters.id.is_some() {
-			parameters.push_str(format!(" WHERE id=${}", i).as_str());
+			parameters.push_str(format!(" WHERE id=${i}").as_str());
 			parameter_values.push(Box::new(self.query_parameters.filters.id.unwrap() as i32));
 			i += 1;
 		} else if self.query_parameters.filters.asset_id.is_some() {
-			parameters.push_str(format!(" WHERE asset_id=${}", i).as_str());
+			parameters.push_str(format!(" WHERE asset_id=${i}").as_str());
 			parameter_values.push(Box::new(self.query_parameters.filters.asset_id.unwrap() as i32));
 			i += 1;
 		}
 
 		if self.query_parameters.max_results.is_some() {
-			parameters.push_str(format!(" LIMIT ${}", i).as_str());
+			parameters.push_str(format!(" LIMIT ${i}").as_str());
 			i += 1;
 		}
 		if self.query_parameters.skip_results.is_some() {
-			parameters.push_str(format!(" OFFSET ${}", i).as_str());
+			parameters.push_str(format!(" OFFSET ${i}").as_str());
 		}
 
 		return (
@@ -59,7 +59,7 @@ impl<'a> TransactionDbSelecter<'a> {
 			self.actually_execute(query)
 			.await?
 			.into_iter()
-			.map(|x| x.into())
+			.map(Into::into)
 			.collect()
 		);
 	}
@@ -70,7 +70,7 @@ impl<'a> TransactionDbSelecter<'a> {
 			self.actually_execute(query)
 			.await?
 			.into_iter()
-			.map(|x| x.into())
+			.map(Into::into)
 			.collect()
 		);
 	}
@@ -141,7 +141,7 @@ impl<'a> TransactionDbWriter<'a> {
 			).await?;
 		}
 
-		for position in self.transaction.positions.iter() {
+		for position in self.transaction.positions {
 			self.pool.get()
 				.await?
 				.query(
@@ -208,7 +208,7 @@ impl<'a> TransactionDbWriter<'a> {
 			&[&(self.transaction.id.unwrap() as i32)]
 		).await?;
 	
-		for position in self.transaction.positions.iter() {
+		for position in self.transaction.positions {
 			client.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
 					&[&(self.transaction.id.unwrap() as i32), &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
@@ -282,7 +282,7 @@ impl From<tokio_postgres::Row> for Transaction {
 
 		let positions: Vec<Position> = transaction_position_ids
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.enumerate()
 			.map(|(i, transaction_position_id)| {
 				Position {
@@ -296,7 +296,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let mut total_amount: i32 = 0;
 		transaction_position_amounts
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.for_each(|x| total_amount += x.unwrap());
 
 		return Transaction::default()
@@ -320,6 +320,7 @@ impl From<tokio_postgres::Row> for Transaction {
 }
 
 impl From<tokio_postgres::Row> for DeepTransaction {
+	#[allow(clippy::too_many_lines)]
 	fn from(value: tokio_postgres::Row) -> DeepTransaction {
 		let id: i32 = value.get(0);
 		let status: i32 = value.get(1);
@@ -415,7 +416,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 
 		let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
-		.filter(|x| x.is_some())
+		.filter(Option::is_some)
 		.enumerate()
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {
@@ -459,7 +460,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 
 		let account_tags: Vec<crate::tag::DeepTag> = account_tag_ids
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.enumerate()
 			.map(|(i, tag_id)| {
 				let parent: Option<crate::tag::Tag> = match account_tag_parent_ids.get(i) {
@@ -504,7 +505,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 
 		let recipient_tags: Vec<crate::tag::DeepTag> = recipient_tag_ids
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.enumerate()
 			.map(|(i, tag_id)| {
 				let parent: Option<crate::tag::Tag> = match recipient_tag_parent_ids.get(i) {
@@ -556,7 +557,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 		let asset_tags: Option<Vec<crate::tag::DeepTag>> = asset_id.map(|_| asset_tag_ids
 			.unwrap()
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.enumerate()
 			.map(|(i, tag_id)| {
 				let parent: Option<crate::tag::Tag> = match asset_tag_parent_ids.clone().unwrap().get(i) {
@@ -598,7 +599,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 
 		let positions: Vec<Position> = transaction_position_ids
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.enumerate()
 			.map(|(i, transaction_position_id)| {
 				Position {
@@ -612,7 +613,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 		let mut total_amount: i32 = 0;
 		transaction_position_amounts
 			.into_iter()
-			.filter(|x| x.is_some())
+			.filter(Option::is_some)
 			.for_each(|x| total_amount += x.unwrap());
 
 		return DeepTransaction {

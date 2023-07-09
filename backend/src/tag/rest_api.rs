@@ -6,12 +6,12 @@ use super::super::webserver::{AppState, is_authorized};
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -19,12 +19,12 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all_deep(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -32,17 +32,17 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_by_id(&data.pool, tag_id.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("specified item of type tag not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
-			} else {
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
 			}
+		
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
 		}
 	}
 }
@@ -57,7 +57,7 @@ struct TagPost {
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let tag = super::Tag {
@@ -69,7 +69,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPo
 
 	match super::add(&data.pool, &tag).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -77,7 +77,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPo
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPost>, tag_id: web::Path<u32>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let tag = super::Tag {
@@ -89,7 +89,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 
 	match super::update(&data.pool, &tag).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -97,11 +97,11 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
 	let _ = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::delete(&data.pool, tag_id.into_inner()).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

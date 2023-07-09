@@ -10,15 +10,15 @@ pub async fn get_connection(config: &Config) -> Pool {
 
 	upgrade_schema_if_necessary(config).await;
 	
-	return get_pool(config).await;
+	return get_pool(config);
 }
 
 async fn upgrade_schema_if_necessary(config: &Config) {
 	println!("Checking if database schema requires an update");
 
 	let current_schema_version = get_schema_version(config).await;
-	let newest_schema_version = get_newest_schema_version().await;
-	println!("Current version: {} Newest version: {}", current_schema_version, newest_schema_version);
+	let newest_schema_version = get_newest_schema_version();
+	println!("Current version: {current_schema_version} Newest version: {newest_schema_version}");
 
 	if newest_schema_version > current_schema_version {
 		println!("Start update");
@@ -33,7 +33,6 @@ async fn database_exists(config: &Config, database_name: &String) -> bool {
 	let mut config = config.clone();
 	config.db_database = String::from("postgres");
 	return get_pool(&config)
-		.await
 		.get()
 		.await
 		.unwrap()
@@ -45,7 +44,6 @@ async fn database_exists(config: &Config, database_name: &String) -> bool {
 
 async fn get_schema_version(config: &Config) -> u32 {
 	let pool = get_pool(config)
-		.await
 		.get()
 		.await
 		.unwrap();
@@ -58,9 +56,7 @@ async fn get_schema_version(config: &Config) -> u32 {
 		.unwrap()
 		.get(0);
 
-	if !table_meta_exists {
-		return 0;
-	} else {
+	if table_meta_exists {
 		let version: i32 = pool
 			.query("SELECT schema_version FROM public.\"Meta\";", &[])
 			.await
@@ -70,9 +66,11 @@ async fn get_schema_version(config: &Config) -> u32 {
 			.get(0);
 		return version as u32;
 	}
+	
+	return 0;
 }
 
-async fn get_newest_schema_version() -> u32 {
+fn get_newest_schema_version() -> u32 {
 	let mut version = 0;
 	
 	let files = fs::read_dir("./sql").unwrap_or_else(|_| fs::read_dir("/app/sql").expect("error trying to read the sql directory"));
@@ -93,14 +91,14 @@ async fn get_newest_schema_version() -> u32 {
 
 async fn upgrade_schema(current_version: u32, newest_version: u32, config: &Config) {
 	let mut next_version = current_version + 1;
-	let pool = get_pool(config).await.get().await.unwrap();
+	let pool = get_pool(config).get().await.unwrap();
 	
 	while next_version <= newest_version {
-		println!("Update to version {}", next_version);
+		println!("Update to version {next_version}");
 		pool.simple_query(
-			&fs::read_to_string(format!("./sql/upgrade_{}.sql", next_version))
+			&fs::read_to_string(format!("./sql/upgrade_{next_version}.sql"))
 			.unwrap_or_else(|_| 
-				fs::read_to_string(format!("/app/sql/upgrade_{}.sql", next_version))
+				fs::read_to_string(format!("/app/sql/upgrade_{next_version}.sql"))
 				.expect("error trying to read upgrade sql script")
 			)
 		).await
@@ -116,7 +114,6 @@ async fn create_database(config: &Config) {
 	let mut config_with_postgres_db = config.clone();
 	config_with_postgres_db.db_database = String::from("postgres");
 	get_pool(&config_with_postgres_db)
-		.await
 		.get()
 		.await
 		.unwrap()
@@ -125,7 +122,6 @@ async fn create_database(config: &Config) {
 		.unwrap();
 
 	get_pool(config)
-		.await
 		.get()
 		.await
 		.unwrap()
@@ -140,7 +136,7 @@ async fn create_database(config: &Config) {
 		.expect("error trying to load init.sql into newly created database");
 }
 
-async fn get_pool(config: &Config) -> Pool {
+fn get_pool(config: &Config) -> Pool {
 	let mut cfg = PgConfig::new();
 	cfg.user = Some(config.db_user.clone());
 	cfg.password = Some(config.db_password.clone());
@@ -160,7 +156,7 @@ pub async fn delete_database(config: &Config) {
 	if cfg!(test) {
 		let mut config_with_postgres_db = config.clone();
 		config_with_postgres_db.db_database = String::from("postgres");
-		let pool = get_pool(&config_with_postgres_db).await;
+		let pool = get_pool(&config_with_postgres_db);
 		let client = pool.get().await.unwrap();
 		client.query(&format!("DROP DATABASE IF EXISTS {} WITH (FORCE);", config.db_database), &[]).await.expect("error trying to remove database");
 	} else {
@@ -172,7 +168,7 @@ pub async fn delete_database(config: &Config) {
 pub async fn delete_testing_databases(config: &Config) {
 	let mut config_with_postgres_db = config.clone();
 	config_with_postgres_db.db_database = String::from("postgres");
-	let pool = get_pool(&config_with_postgres_db).await;
+	let pool = get_pool(&config_with_postgres_db);
 	let client = pool.get().await.unwrap();
 	let res = client.query("SELECT datname FROM pg_database WHERE datistemplate = false AND datname LIKE 'txts_treasury_testing%';", &[]).await.expect("error trying to get testing databases");
 

@@ -31,18 +31,17 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 	let transactions = get_relevant_transactions(pool, &chart).await?;
 	let recipients = recipient::get_all(pool).await?;
 
-	recipients.into_iter().for_each(|recipient| {
+	for recipient in recipients {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
-
+	
 		transactions.iter()
 			.filter(|x| x.recipient_id == recipient.id.unwrap())
 			.for_each(|transaction| {
-				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0)
+				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
 			});
-
+	
 		output.insert(recipient.name, build_label_amount(amount_per_currency, &currencies));
-	});
-
+	}
 
 	output.retain(|_, v| v.1 != 0.0);
 
@@ -59,17 +58,17 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 	let transactions = get_relevant_transactions(pool, &chart).await?;
 	let tags = tag::get_all(pool).await?;
 
-	tags.into_iter().for_each(|tag| {
+	for tag in tags {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
-
+	
 		transactions.iter()
 		.filter(|x| x.tag_ids.as_ref().unwrap().contains(&tag.id.unwrap()))
 		.for_each(|transaction| {
-			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0)
+			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
 		});
-
+	
 		output.insert(tag.name, build_label_amount(amount_per_currency, &currencies));
-	});
+	}
 
 	output.retain(|_, v| v.1 != 0.0);
 
@@ -98,11 +97,11 @@ fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &[cur
 	let mut amount: f64 = 0.0;
 	let mut label = String::new();
 
-	amount_per_currency.into_iter().for_each(|x| {
+	for x in amount_per_currency {
 		let currency: &currency::Currency = currencies.iter().find(|c| c.id.unwrap() == x.0).unwrap();
-		amount += x.1 as f64 / currency.minor_in_mayor as f64;
-		label.push_str(format!("{}{} ", x.1 as f64 / currency.minor_in_mayor as f64, currency.symbol).as_str());
-	});
+		amount += f64::from(x.1) / f64::from(currency.minor_in_mayor);
+		label.push_str(format!("{}{} ", f64::from(x.1) / f64::from(currency.minor_in_mayor), currency.symbol).as_str());
+	}
 
 	return (label, amount);
 }

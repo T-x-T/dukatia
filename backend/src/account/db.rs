@@ -59,7 +59,7 @@ pub async fn get_by_id(pool: &Pool, account_id: u32) -> Result<Account, Box<dyn 
 		.await?;
 
 	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("account"), filter: format!("id={}", account_id) }));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("account"), filter: format!("id={account_id}") }));
 	}
 
 	return Ok(turn_row_into_account(&rows[0]));
@@ -155,7 +155,7 @@ fn turn_row_into_deep_account(row: &tokio_postgres::Row) -> DeepAccount {
 	
 	let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
-		.filter(|x| x.is_some())
+		.filter(Option::is_some)
 		.enumerate()
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {

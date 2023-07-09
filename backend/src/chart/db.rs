@@ -14,7 +14,7 @@ pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
 			&[&(id as i32)]
 		).await?;
 
-		if !res.is_empty() {
+		if res.is_empty() {
 			return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("chart"), filter: format!("id={id}") }));
 		}
 

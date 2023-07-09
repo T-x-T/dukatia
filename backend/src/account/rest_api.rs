@@ -6,12 +6,12 @@ use super::super::webserver::{AppState, is_authorized};
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -19,12 +19,12 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_all_deep(&data.pool).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -32,17 +32,17 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web::Path<u32>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_by_id(&data.pool, account_id.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("specified item of type account not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{}\"}}", e));
-			} else {
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e));
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
 			}
+			
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
 		}
 	}
 }
@@ -58,7 +58,7 @@ struct AccountPost {
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AccountPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let account = super::Account {
@@ -71,7 +71,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accou
 
 	match super::add(&data.pool, &account).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
@@ -79,7 +79,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accou
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AccountPost>, account_id: web::Path<u32>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}",e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let account = super::Account {
@@ -92,6 +92,6 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accoun
 
 	match super::update(&data.pool, &account).await {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}",e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

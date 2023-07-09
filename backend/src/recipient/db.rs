@@ -145,7 +145,7 @@ fn turn_row_into_deep_recipient(row: &tokio_postgres::Row) -> DeepRecipient {
 
 	let tags: Vec<crate::tag::DeepTag> = tag_ids
 		.into_iter()
-		.filter(|x| x.is_some())
+		.filter(Option::is_some)
 		.enumerate()
 		.map(|(i, tag_id)| {
 			let parent: Option<crate::tag::Tag> = match tag_parent_ids.get(i) {

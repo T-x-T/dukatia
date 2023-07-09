@@ -1,6 +1,17 @@
+#![deny(
+  clippy::pedantic,
+)]
+
 #![allow(
   clippy::needless_return,
   clippy::unnecessary_unwrap,
+  clippy::wildcard_imports,
+  clippy::module_name_repetitions,
+  clippy::bool_to_int_with_if,
+  clippy::cast_sign_loss,
+  clippy::cast_possible_wrap,
+  clippy::cast_possible_truncation,
+  clippy::similar_names,
   deprecated,
 )]
 
@@ -64,12 +75,12 @@ enum CustomError {
 impl fmt::Display for CustomError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     return match self {
-      CustomError::NoItemFound {item_type} => write!(f, "no item of type {} found", item_type),
-      CustomError::SpecifiedItemNotFound {item_type, filter} => write!(f, "specified item of type {} not found with filter {}", item_type, filter),
-      CustomError::InvalidItem {reason} => write!(f, "the given item is invalid, because {}", reason),
+      CustomError::NoItemFound {item_type} => write!(f, "no item of type {item_type} found"),
+      CustomError::SpecifiedItemNotFound {item_type, filter} => write!(f, "specified item of type {item_type} not found with filter {filter}"),
+      CustomError::InvalidItem {reason} => write!(f, "the given item is invalid, because {reason}"),
       CustomError::InvalidCredentials => write!(f, "the given credentials are invalid"),
-      CustomError::MissingCookie {cookie} => write!(f, "cookie {} not set", cookie),
-      CustomError::MissingProperty {property, item_type} => write!(f, "Missing property {} on type {}", property, item_type),
+      CustomError::MissingCookie {cookie} => write!(f, "cookie {cookie} not set"),
+      CustomError::MissingProperty {property, item_type} => write!(f, "Missing property {property} on type {item_type}"),
     }
   }
 }

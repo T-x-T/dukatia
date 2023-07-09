@@ -136,9 +136,9 @@ impl Transaction {
 
 		if id.is_some() {
 			return db_writer.replace().await;
-		} else {
-			return db_writer.insert().await;
 		}
+		
+		return db_writer.insert().await;
 	}
 
 	pub async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
@@ -196,7 +196,7 @@ impl<'a> TransactionLoader<'a> {
 	pub fn new(pool: &'a Pool) -> Self {
 		return TransactionLoader {
 			pool,
-			query_parameters: Default::default(),
+			query_parameters: QueryParameters::default(),
 		};
 	}
 

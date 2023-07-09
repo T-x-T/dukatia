@@ -26,17 +26,17 @@ pub fn initialize_config() -> Config {
 			pepper: 				env::var("PEPPER").unwrap_or(String::from("supersecret")),
 			api_port: 			env::var("PORT").unwrap_or(String::from("4000")).parse::<u16>().unwrap(),
 		}
-	} else {
-		return Config {
-			db_user: 				env::var("POSTGRES_USER").unwrap_or(String::from("postgres")),
-			db_password: 		env::var("POSTGRES_PASSWORD").unwrap_or(String::from("password")),
-			db_host: 				env::var("POSTGRES_HOST").unwrap_or(String::from("127.0.0.1")),
-			db_port: 				env::var("POSTGRES_PORT").unwrap_or(String::from("5432")).parse::<u16>().unwrap(),
-			db_database: 		env::var("DATABASE_NAME").unwrap_or(String::from("txts_treasury_staging")),
-			admin_username: env::var("ADMIN_USERNAME").unwrap_or(String::from("admin")),
-			admin_password: env::var("ADMIN_PASSWORD").unwrap_or(String::from("password")),
-			pepper: 				env::var("PEPPER").unwrap_or(String::from("supersecret")),
-			api_port: 			env::var("PORT").unwrap_or(String::from("4000")).parse::<u16>().unwrap(),
-		}
+	}
+	
+	return Config {
+		db_user: 				env::var("POSTGRES_USER").unwrap_or(String::from("postgres")),
+		db_password: 		env::var("POSTGRES_PASSWORD").unwrap_or(String::from("password")),
+		db_host: 				env::var("POSTGRES_HOST").unwrap_or(String::from("127.0.0.1")),
+		db_port: 				env::var("POSTGRES_PORT").unwrap_or(String::from("5432")).parse::<u16>().unwrap(),
+		db_database: 		env::var("DATABASE_NAME").unwrap_or(String::from("txts_treasury_staging")),
+		admin_username: env::var("ADMIN_USERNAME").unwrap_or(String::from("admin")),
+		admin_password: env::var("ADMIN_PASSWORD").unwrap_or(String::from("password")),
+		pepper: 				env::var("PEPPER").unwrap_or(String::from("supersecret")),
+		api_port: 			env::var("PORT").unwrap_or(String::from("4000")).parse::<u16>().unwrap(),
 	}
 }

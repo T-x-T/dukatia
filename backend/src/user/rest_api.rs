@@ -7,8 +7,8 @@ use super::super::user::LoginCredentials;
 #[post("/api/v1/login")]
 async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
-		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{}\"}}", access_token)),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{access_token}\"}}")),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
 
@@ -23,11 +23,11 @@ struct PutSecretBody {
 async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, req: HttpRequest, ) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
-		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{}\"}}", e))
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::update_secret(&data.config, &data.pool, body.old_secret.clone(), body.new_secret.clone(), user_id).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{}\"}}", e)),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

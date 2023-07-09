@@ -50,7 +50,7 @@ async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn
 	match function_name {
 		#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
 		"foreach_currency" => return Ok(compute_function_foreach_currency(pool, function_body).await?),
-		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("function name {:?} is not recognized", function_name) })),
+		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("function name {function_name:?} is not recognized") })),
 	}
 }
 
@@ -58,10 +58,10 @@ async fn compute_function_foreach_currency(pool: &Pool, body: &str) -> Result<St
 	let currencies = currency::get_all(pool).await?;
 	let mut output = String::new();
 
-	for currency in currencies.into_iter() {
+	for currency in currencies {
 		let mut in_token_name = false;
 		let mut token_name = String::new();
-
+	
 		for char in body.chars() {
 			if in_token_name {
 				if char == '\\' || char == ' ' || char == ':' || char == '*' || char == '$' {
@@ -95,10 +95,13 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 	return Ok(match token_name {
 		"name" => currency.name.clone(),
 		"symbol" => currency.symbol.clone(),
-		"current_balance" => (current_balance_of_currency(
-				pool, currency.id.unwrap()
-			).await? as f64 / currency.minor_in_mayor as f64).to_string(),
-		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("token name {:?} is not recognized in function foreach_currency", token_name) })),
+		"current_balance" => (
+			f64::from(
+				current_balance_of_currency(
+					pool, currency.id.unwrap()
+				).await?
+			) / f64::from(currency.minor_in_mayor)).to_string(),
+		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("token name {token_name:?} is not recognized in function foreach_currency") })),
 	});
 }
 
@@ -106,11 +109,11 @@ async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i3
 	let mut output: i32 = 0;
 	let transactions = transaction::TransactionLoader::new(pool).get().await?;
 
-	transactions.iter().for_each(|transaction| {
+	for transaction in transactions {
 		if transaction.currency_id.unwrap() == currency_id {
 			output += transaction.total_amount.unwrap_or(0);
 		}
-	});
+	}
 
 	return Ok(output);
 }
