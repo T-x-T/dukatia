@@ -642,7 +642,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 404,
-						"body_equals": {"error":"specified item of type transaction not found with filter id=5"}
+						"body_equals": {"error":"Couldnt find transaction with id 5"}
 					}
 				},
 				{
