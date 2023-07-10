@@ -188,10 +188,17 @@ pub struct TransactionLoader<'a> {
 	query_parameters: QueryParameters,
 }
 
-impl<'a> Loader<Transaction> for TransactionLoader<'a> {
+impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return TransactionLoader {
+			pool,
+			query_parameters: QueryParameters::default(),
+		};
+	}
+
 	async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		return db::TransactionDbSelecter::new(self.pool)
-			.set_parameters(self.query_parameters)
+			.set_query_parameters(self.query_parameters)
 			.execute()
 			.await;
 	}
@@ -206,26 +213,24 @@ impl<'a> Loader<Transaction> for TransactionLoader<'a> {
 	}
 }
 
-impl<'a> TransactionLoader<'a> {
-	pub fn new(pool: &'a Pool) -> Self {
-		return TransactionLoader {
-			pool,
-			query_parameters: QueryParameters::default(),
-		};
-	}
-}
-
 #[derive(Debug, Clone)]
 pub struct DeepTransactionLoader<'a> {
 	pool: &'a Pool,
 	query_parameters: QueryParameters,
 }
 
-impl<'a> Loader<DeepTransaction> for DeepTransactionLoader<'a> {
+impl<'a> Loader<'a, DeepTransaction> for DeepTransactionLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		};
+	}
+
 	async fn get(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
-		return db::TransactionDbSelecter::new(self.pool)
-			.set_parameters(self.query_parameters)
-			.execute_deep()
+		return db::DeepTransactionDbSelecter::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
 			.await;
 	}
 
@@ -236,14 +241,5 @@ impl<'a> Loader<DeepTransaction> for DeepTransactionLoader<'a> {
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
 		self.query_parameters = query_parameters;
 		return self;
-	}
-}
-
-impl<'a> DeepTransactionLoader<'a> {
-	pub fn new(pool: &'a Pool) -> Self {
-		return Self {
-			pool,
-			query_parameters: QueryParameters::default(),
-		};
 	}
 }

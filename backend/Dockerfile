@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly AS builder
 WORKDIR /app
 
 ADD . ./
-RUN cargo build --release
+RUN rustup default nightly-2023-06-09 && cargo build --release
 
 FROM debian:bullseye-slim
 EXPOSE 4000

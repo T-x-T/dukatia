@@ -1,5 +1,4 @@
 use deadpool_postgres::Pool;
-use postgres_types::ToSql;
 use std::error::Error;
 use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
@@ -11,50 +10,28 @@ pub struct TransactionDbSelecter<'a> {
 	pool: &'a Pool,
 }
 
-impl<'a> TransactionDbSelecter<'a> {
-	pub fn new(pool: &'a Pool) -> Self {
+impl<'a> DbSelecter<'a, Transaction> for TransactionDbSelecter<'a> {
+	fn new(pool: &'a Pool) -> Self {
 		return Self {
 			query_parameters: super::QueryParameters::default(),
 			pool,
 		}
 	}
 
-	pub fn set_parameters(mut self, query_parameters: super::QueryParameters) -> Self {
+	fn get_pool(&self) -> &Pool {
+		return self.pool;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
 		self.query_parameters = query_parameters;
 		return self;
 	}
 
-	fn get_query_parameters(&self) -> (String, Vec<Box<(dyn ToSql + Sync)>>)  {
-		let mut i = 1;
-		let mut parameters = String::new();
-		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
-
-		if self.query_parameters.filters.id.is_some() {
-			parameters.push_str(format!(" WHERE id=${i}").as_str());
-			parameter_values.push(Box::new(self.query_parameters.filters.id.unwrap() as i32));
-			i += 1;
-		} else if self.query_parameters.filters.asset_id.is_some() {
-			parameters.push_str(format!(" WHERE asset_id=${i}").as_str());
-			parameter_values.push(Box::new(self.query_parameters.filters.asset_id.unwrap() as i32));
-			i += 1;
-		}
-
-		if self.query_parameters.max_results.is_some() {
-			parameters.push_str(format!(" LIMIT ${i}").as_str());
-			i += 1;
-		}
-		if self.query_parameters.skip_results.is_some() {
-			parameters.push_str(format!(" OFFSET ${i}").as_str());
-		}
-
-		return (
-			parameters,
-			parameter_values
-		);
-
-	}
-
-	pub async fn execute(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+	async fn execute(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let query = "SELECT * FROM public.transaction_data";
 		return Ok(
 			self.actually_execute(query)
@@ -64,8 +41,36 @@ impl<'a> TransactionDbSelecter<'a> {
 			.collect()
 		);
 	}
+}
 
-	pub async fn execute_deep(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
+#[derive(Debug)]
+pub struct DeepTransactionDbSelecter<'a> {
+	query_parameters: super::QueryParameters,
+	pool: &'a Pool,
+}
+
+impl<'a> DbSelecter<'a, DeepTransaction> for DeepTransactionDbSelecter<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return Self {
+			query_parameters: super::QueryParameters::default(),
+			pool,
+		}
+	}
+
+	fn get_pool(&self) -> &Pool {
+		return self.pool;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+
+	async fn execute(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
 		let query = "SELECT * FROM public.deep_transactions";
 		return Ok(
 			self.actually_execute(query)
@@ -74,20 +79,6 @@ impl<'a> TransactionDbSelecter<'a> {
 			.map(Into::into)
 			.collect()
 		);
-	}
-
-	async fn actually_execute(self, query: &str) -> Result<Vec<tokio_postgres::Row>, Box<dyn Error>> {
-		let parameters = self.get_query_parameters();
-		let parameter_values: Vec<_> = parameters.1.iter()
-			.map(|x| &**x as &(dyn ToSql + Sync))
-			.collect();
-
-		let rows = self.pool.get()
-			.await?
-			.query(format!("{}{};", query, parameters.0).as_str(), parameter_values.as_slice())
-			.await?;
-	
-		return Ok(rows);
 	}
 }
 
