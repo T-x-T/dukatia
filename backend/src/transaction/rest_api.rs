@@ -49,7 +49,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
 			if e.to_string().starts_with("no item of type Transaction found") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"Couldnt find transaction with id {transaction_id}\"}}"));
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"Couldnt find transaction with id {}\"}}", transaction_id));
 			}
 			
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
