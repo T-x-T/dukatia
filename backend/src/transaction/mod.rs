@@ -12,10 +12,6 @@ use std::error::Error;
 use super::account;
 use super::asset::Asset;
 
-/* pub trait Saveable<T> {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>>;
-} */
-
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
 pub enum TransactionStatus {
