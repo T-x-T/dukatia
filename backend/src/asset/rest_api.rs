@@ -5,7 +5,8 @@ use deadpool_postgres::Pool;
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
-use crate::transaction::{Transaction, Position, Saveable};
+use crate::transaction::{Transaction, Position};
+use crate::traits::*;
 
 #[derive(Deserialize, Clone, Debug)]
 struct AssetPost {

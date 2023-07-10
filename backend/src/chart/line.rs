@@ -7,7 +7,8 @@ use chrono::{DateTime, Date, NaiveTime, NaiveDate, Datelike, Utc, MIN_DATETIME, 
 use super::{Chart, ChartData};
 
 use crate::CustomError;
-use crate::transaction;
+use crate::transaction::{Transaction, TransactionLoader};
+use crate::traits::*;
 use crate::currency;
 use crate::recipient;
 use crate::account;
@@ -115,7 +116,7 @@ enum RawOutputProperties {
 	Recipient, Account, Currency, EarningSpendingNet
 }
 
-fn build_raw_output(transactions: Vec<transaction::Transaction>, property: RawOutputProperties, date_period: &str) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
+fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputProperties, date_period: &str) -> BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> {
 	let mut output: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>> = BTreeMap::new();
 	for transaction in transactions {
 		let id = match property {
@@ -283,7 +284,7 @@ fn add_names_to_output(input: &BTreeMap<u32, Vec<Point>>, named_types: &NamedTyp
 	return output;
 }
 
-async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_all: bool) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
+async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_all: bool) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	let from_date = if get_all {
 		MIN_DATETIME
 	} else {
@@ -295,7 +296,7 @@ async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_a
 		chart.filter_to.unwrap_or(MAX_DATETIME)
 	};
 
-	let mut transactions = transaction::TransactionLoader::new(pool).get().await?;
+	let mut transactions = TransactionLoader::new(pool).get().await?;
 	transactions.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
 
 	return Ok(transactions.into_iter()

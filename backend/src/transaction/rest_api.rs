@@ -1,8 +1,8 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
-use chrono::prelude::*;
+use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
-use super::{Asset, Saveable};
+use super::{Asset, Save, Delete, Loader};
 
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
@@ -26,7 +26,7 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::TransactionLoader::new(&data.pool).all_deep().await;
+	let result = super::DeepTransactionLoader::new(&data.pool).get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -48,7 +48,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
-			if e.to_string().starts_with("no item of type Transaction found") {
+			if e.to_string().starts_with("no item of type unknown found") {
 				return HttpResponse::NotFound().body(format!("{{\"error\":\"Couldnt find transaction with id {transaction_id}\"}}"));
 			}
 			

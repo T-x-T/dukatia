@@ -3,6 +3,7 @@ use postgres_types::ToSql;
 use std::error::Error;
 use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
+use crate::traits::*;
 
 #[derive(Debug)]
 pub struct TransactionDbSelecter<'a> {

@@ -11,10 +11,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use super::account;
 use super::asset::Asset;
-
-pub trait Saveable {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>>;
-}
+use crate::traits::*;
 
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
@@ -29,19 +26,6 @@ pub struct Position {
 	pub amount: i32,
 	pub comment: Option<String>,
 	pub tag_id: Option<u32>,
-}
-
-#[derive(Debug, Default)]
-struct Filters {
-	id: Option<u32>,
-	asset_id: Option<u32>,
-}
-
-#[derive(Debug, Default)]
-pub struct QueryParameters {
-	max_results: Option<u32>,
-	skip_results: Option<u32>,
-	filters: Filters,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -79,7 +63,7 @@ impl Default for Transaction {
 	}
 }
 
-impl Saveable for Transaction {
+impl Save for Transaction {
 	async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		let account = account::get_by_id(pool, self.account_id).await?;
 		self = self.set_currency_id(account.default_currency_id);
@@ -92,6 +76,15 @@ impl Saveable for Transaction {
 		}
 		
 		return db_writer.insert().await;
+	}
+}
+
+impl Delete for Transaction {
+	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
+			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
+		}
 	}
 }
 
@@ -170,14 +163,8 @@ impl Transaction {
 		self.total_amount = Some(total_amount);
 		return self;
 	}
-
-	pub async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
-		}
-	}
 }
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DeepTransaction {
@@ -195,10 +182,28 @@ pub struct DeepTransaction {
 	pub positions: Vec<Position>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransactionLoader<'a> {
 	pool: &'a Pool,
 	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<Transaction> for TransactionLoader<'a> {
+	async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		return db::TransactionDbSelecter::new(self.pool)
+			.set_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
 }
 
 impl<'a> TransactionLoader<'a> {
@@ -208,35 +213,37 @@ impl<'a> TransactionLoader<'a> {
 			query_parameters: QueryParameters::default(),
 		};
 	}
+}
 
-	pub fn set_filter_id(mut self, id: u32) -> Self {
-		self.query_parameters.filters.id = Some(id);
-		return self;
-	}
+#[derive(Debug, Clone)]
+pub struct DeepTransactionLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
 
-	pub fn set_filter_asset_id(mut self, asset_id: u32) -> Self {
-		self.query_parameters.filters.asset_id = Some(asset_id);
-		return self;
-	}
-
-	pub async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
-		return db::TransactionDbSelecter::new(self.pool)
-			.set_parameters(self.query_parameters)
-			.execute()
-			.await;
-	}
-
-	pub async fn get_first(self) -> Result<Transaction, Box<dyn Error>> {
-		match self.get().await?.first() {
-			Some(x) => return Ok(x.clone()),
-			None => return Err(Box::new(crate::CustomError::NoItemFound { item_type: "Transaction".to_string() })),
-		}
-	}
-
-	pub async fn all_deep(self) ->Result<Vec<DeepTransaction>, Box<dyn Error>> {
+impl<'a> Loader<DeepTransaction> for DeepTransactionLoader<'a> {
+	async fn get(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
 		return db::TransactionDbSelecter::new(self.pool)
 			.set_parameters(self.query_parameters)
 			.execute_deep()
 			.await;
+	}
+
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+}
+
+impl<'a> DeepTransactionLoader<'a> {
+	pub fn new(pool: &'a Pool) -> Self {
+		return Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		};
 	}
 }

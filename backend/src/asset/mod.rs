@@ -5,7 +5,8 @@ use deadpool_postgres::Pool;
 use serde::Serialize;
 use std::{error::Error, collections::BTreeMap};
 use chrono::{DateTime, Utc, Date};
-use crate::transaction;
+use crate::transaction::{Transaction, TransactionLoader};
+use crate::traits::*;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Asset {
@@ -146,7 +147,7 @@ pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<c
 }
 
 pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
-	let transactions = transaction::TransactionLoader::new(pool)
+	let transactions = TransactionLoader::new(pool)
 		.set_filter_asset_id(asset.id.unwrap())
 		.get().await?;
 	
@@ -157,7 +158,7 @@ pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<As
 }
 
 pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> Result<DeepAsset, Box<dyn Error>> {
-	let transactions = transaction::TransactionLoader::new(pool)
+	let transactions = TransactionLoader::new(pool)
 	.set_filter_asset_id(asset.id)
 	.get().await?;
 
@@ -167,7 +168,7 @@ pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> 
 	});
 }
 
-fn actually_get_total_cost_of_ownership(mut transactions: Vec<transaction::Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {
 	if transactions.is_empty() {
 		return TotalCostOfOwnership::default();
 	}

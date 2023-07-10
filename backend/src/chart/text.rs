@@ -5,7 +5,8 @@ use super::{Chart, ChartData};
 
 use crate::CustomError;
 use crate::currency;
-use crate::transaction;
+use crate::transaction::TransactionLoader;
+use crate::traits::*;
 
 pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<dyn Error>> {
 	if chart.text_template.is_none() {
@@ -107,7 +108,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 
 async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i32, Box<dyn Error>> {
 	let mut output: i32 = 0;
-	let transactions = transaction::TransactionLoader::new(pool).get().await?;
+	let transactions = TransactionLoader::new(pool).get().await?;
 
 	for transaction in transactions {
 		if transaction.currency_id.unwrap() == currency_id {

@@ -6,7 +6,8 @@ use chrono::{MIN_DATETIME, MAX_DATETIME};
 use super::{Chart, ChartData};
 
 use crate::CustomError;
-use crate::transaction;
+use crate::transaction::{Transaction, TransactionLoader};
+use crate::traits::*;
 use crate::currency;
 use crate::recipient;
 use crate::tag;
@@ -79,11 +80,11 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 	return Ok(limited_output);
 }
 
-async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
+async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	let from_date = chart.filter_from.unwrap_or(MIN_DATETIME);
 	let to_date = chart.filter_to.unwrap_or(MAX_DATETIME);
 
-	return Ok(transaction::TransactionLoader::new(pool).get().await?.into_iter().filter(|x| {
+	return Ok(TransactionLoader::new(pool).get().await?.into_iter().filter(|x| {
 		return from_date.signed_duration_since(x.timestamp).num_seconds() <= 0 
 				&& to_date.signed_duration_since(x.timestamp).num_seconds() >= 0;
 		}).collect());
