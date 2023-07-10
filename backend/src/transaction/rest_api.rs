@@ -2,7 +2,7 @@ use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responde
 use serde::Deserialize;
 use chrono::prelude::*;
 use super::super::webserver::{AppState, is_authorized};
-use super::Asset;
+use super::{Asset, Saveable};
 
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {

@@ -174,9 +174,9 @@ fn get_date_for_period(date_period: &str, timestamp: &DateTime<Utc>) -> Date<Utc
 		},
 		"quarterly" => {
 			match timestamp.month() {
-				1 | 2 | 3 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc),
-				4 | 5 | 6 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(), Utc),
-				7 | 8 | 9 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(), Utc),
+				1..=3 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(), Utc),
+				4..=6 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(), Utc),
+				7..=9 => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(), Utc),
 				_ => Date::from_utc(NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(), Utc)
 			}
 		},
@@ -257,7 +257,7 @@ enum NamedTypes {
 
 fn add_names_to_output(input: &BTreeMap<u32, Vec<Point>>, named_types: &NamedTypes) -> BTreeMap<String, Vec<Point>> {
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
-	for x in input.iter() {
+	for x in input {
 		match &named_types {
 			NamedTypes::Recipient(recipients) => {
 				let recipient = recipients.iter().find(|r| r.id.unwrap() == *x.0).unwrap();
@@ -308,7 +308,7 @@ async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &Chart, get_a
 
 fn add_maps(a: BTreeMap<u32, i32>, b: &BTreeMap<u32, i32>) -> BTreeMap<u32, i32> {
 	let mut a = a;
-	for x in b.iter() {
+	for x in b {
 		*a.entry(*x.0).or_insert(0) += x.1;
 	}
 	return a;

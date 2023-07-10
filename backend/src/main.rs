@@ -15,6 +15,8 @@
   deprecated,
 )]
 
+#![feature(async_fn_in_trait)]
+
 mod webserver;
 mod access_token;
 mod user;

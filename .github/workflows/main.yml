@@ -17,7 +17,7 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
       - name: Run trest on backend
         working-directory: backend
         run: wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
       - name: Setup PostgreSQL
         uses: Harmon758/postgresql-action@v1.0.0
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
       - name: Run clippy on backend
         working-directory: backend
         run: cargo clippy
@@ -74,6 +74,7 @@ jobs:
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
         run: |
+          rustup default nightly
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
 

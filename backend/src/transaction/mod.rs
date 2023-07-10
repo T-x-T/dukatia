@@ -12,6 +12,10 @@ use std::error::Error;
 use super::account;
 use super::asset::Asset;
 
+pub trait Saveable {
+	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>>;
+}
+
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
 pub enum TransactionStatus {
@@ -72,6 +76,22 @@ impl Default for Transaction {
 			asset: None,
 			positions: Vec::new(),
 		}
+	}
+}
+
+impl Saveable for Transaction {
+	async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		let account = account::get_by_id(pool, self.account_id).await?;
+		self = self.set_currency_id(account.default_currency_id);
+		let id = self.id;
+		
+		let db_writer = db::TransactionDbWriter::new(pool, self);
+
+		if id.is_some() {
+			return db_writer.replace().await;
+		}
+		
+		return db_writer.insert().await;
 	}
 }
 
@@ -149,20 +169,6 @@ impl Transaction {
 	pub fn set_total_amount(mut self, total_amount: i32) -> Self {
 		self.total_amount = Some(total_amount);
 		return self;
-	}
-
-	pub async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		let account = account::get_by_id(pool, self.account_id).await?;
-		self = self.set_currency_id(account.default_currency_id);
-		let id = self.id;
-		
-		let db_writer = db::TransactionDbWriter::new(pool, self);
-
-		if id.is_some() {
-			return db_writer.replace().await;
-		}
-		
-		return db_writer.insert().await;
 	}
 
 	pub async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {

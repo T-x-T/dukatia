@@ -5,7 +5,7 @@ use deadpool_postgres::Pool;
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
 use super::super::webserver::{AppState, is_authorized};
-use crate::transaction;
+use crate::transaction::{Transaction, Position, Saveable};
 
 #[derive(Deserialize, Clone, Debug)]
 struct AssetPost {
@@ -239,13 +239,13 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		-((f64::from(body.value_per_unit) * amount_difference) as i32) - body.cost.unwrap_or(0) as i32
 	};
 
-	transaction::Transaction::default()
+	Transaction::default()
 		.set_account_id(body.account_id.unwrap())
 		.set_timestamp(body.timestamp)
 		.set_comment(comment)
 		.set_user_id(user_id)
 		.set_asset(asset)	
-		.set_positions(vec![transaction::Position {
+		.set_positions(vec![Position {
 			amount,
 			..Default::default()
 		}])
