@@ -9,7 +9,7 @@ deadpool-postgres = "0.10.5"
 postgres-types = { version = "0.2.5", features = ["array-impls", "with-chrono-0_4"] }
 tokio-postgres = "0.7.8"
 postgres-derive = "0.4.4"
-actix-web = "4.3.1"
+actix-web = { version = "4.3.1", default-features = false, features = ["cookies", "compress-gzip", "macros"] }
 tokio = { version = "1.28.0", features = ["net", "time", "macros", "rt-multi-thread"] }
 sha2 = "0.10.6"
 rand = "0.8.5"
