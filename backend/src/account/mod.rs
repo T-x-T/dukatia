@@ -1,13 +1,14 @@
 mod db;
 pub mod rest_api;
+#[cfg(test)]
+mod test;
 
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
-#[cfg(test)]
 use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Account {
 	pub id: Option<u32>,
 	pub name: String,
@@ -15,6 +16,79 @@ pub struct Account {
 	pub user_id: u32,
 	pub tag_ids: Option<Vec<u32>>
 }
+
+impl Save for Account {
+	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(_) => return db::AccountDbWriter::new(pool, self).replace().await,
+			None => return db::AccountDbWriter::new(pool, self).insert().await,
+		}
+	}
+}
+
+impl Account {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
+	}
+
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
+
+	pub fn set_default_currency_id(mut self, default_currency_id: u32) -> Self {
+		self.default_currency_id = default_currency_id;
+		return self;
+	}
+
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
+
+	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
+		self.tag_ids = Some(tag_ids);
+		return self;
+	}
+
+	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+		self.tag_ids = tag_ids;
+		return self;
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct AccountLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Account> for AccountLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<Account>, Box<dyn Error>> {
+		return db::AccountDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+}
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DeepAccount {
@@ -25,139 +99,33 @@ pub struct DeepAccount {
 	pub tags: Vec<crate::tag::DeepTag>,
 }
 
-pub async fn add(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>> {
-	return db::add(pool, account).await;
+#[derive(Debug, Clone)]
+pub struct DeepAccountLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Account>, Box<dyn Error>> {
-	return db::get_all(pool).await;
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAccount>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
-}
-
-pub async fn get_by_id(pool: &Pool, account_id: u32) -> Result<Account, Box<dyn Error>> {
-	return db::get_by_id(pool, account_id).await;
-}
-
-pub async fn update(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, account).await;
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
-	use crate::tag::Tag;
-
-	fn get_account() -> Account {
-		return Account {
-			id: None,
-			name: String::from("test"),
-			default_currency_id: 0,
-			user_id: 0,
-			tag_ids: None,
-		};
-	}
-
-	mod add {
-		use super::*;
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			add(&pool, &get_account()).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-
-			let mut account = get_account();
-			account.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &account).await?;
-
-			teardown(&config).await;
-			return Ok(());
+impl<'a> Loader<'a, DeepAccount> for DeepAccountLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
 	}
 
-	mod get_all {
-		use super::*;
+	async fn get(self) -> Result<Vec<DeepAccount>, Box<dyn Error>> {
+		return db::DeepAccountDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_on_default_db() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
 
-			get_all(&pool).await?;
-			
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-
-			let account = get_account();
-			add(&pool, &account).await?;
-			add(&pool, &account).await?;
-			add(&pool, &account).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res.len(), 4);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let tag = Tag::default().set_name("test_tag".to_string());
-			tag.save(&pool).await?;
-
-			let mut account = get_account();
-			account.tag_ids = Some(vec![0]);
-			add(&pool, &account).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-
-			let mut account = get_account();
-			account.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &account).await?;
-			add(&pool, &account).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0, 1, 2]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
 	}
 }

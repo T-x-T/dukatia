@@ -65,7 +65,7 @@ impl Default for Transaction {
 
 impl Save for Transaction {
 	async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		let account = account::get_by_id(pool, self.account_id).await?;
+		let account = account::AccountLoader::new(pool).set_filter_id(self.account_id).get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 		let id = self.id;
 		

@@ -71,7 +71,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::get_all(pool).await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
-	let accounts = account::get_all(pool).await?;
+	let accounts = account::AccountLoader::new(pool).get().await?;
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, &chart.clone().date_period.unwrap_or("daily".to_string()));
 	let accumulated_raw_output = accumulate(&raw_output);
 	let raw_output_only_relevant_dates = limit_raw_output_dates(accumulated_raw_output, &chart);

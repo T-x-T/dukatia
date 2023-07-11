@@ -111,7 +111,13 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 
 	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => {
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"specified item of type account not found with filter id={}\"}}", body.account_id));
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }
 

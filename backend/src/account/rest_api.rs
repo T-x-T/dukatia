@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
+use crate::traits::*;
 
 #[get("/api/v1/accounts/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
@@ -9,7 +10,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all(&data.pool).await {
+	let result = super::AccountLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -22,7 +25,9 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all_deep(&data.pool).await {
+	let result = super::DeepAccountLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -35,11 +40,13 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web:
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_by_id(&data.pool, account_id.into_inner()).await {
+	let result = super::AccountLoader::new(&data.pool).set_filter_id(*account_id).get_first().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
-			if e.to_string().starts_with("specified item of type account not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type account not found with filter id={account_id}\"}}"));
 			}
 			
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
@@ -61,15 +68,14 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accou
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let account = super::Account {
-		id: None,
-		name: body.name.clone(),
-		user_id,
-		tag_ids: body.tag_ids.clone(),
-		default_currency_id: body.default_currency_id,
-	};
+	let result = super::Account::default()
+		.set_user_id(user_id)
+		.set_name(body.name.clone())
+		.set_default_currency_id(body.default_currency_id)
+		.set_tag_ids_opt(body.tag_ids.clone())
+		.save(&data.pool).await;
 
-	match super::add(&data.pool, &account).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -82,15 +88,15 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accoun
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let account = super::Account {
-		id: Some(account_id.into_inner()),
-		name: body.name.clone(),
-		user_id,
-		tag_ids: body.tag_ids.clone(),
-		default_currency_id: body.default_currency_id,
-	};
+	let result = super::Account::default()
+		.set_id(*account_id)
+		.set_user_id(user_id)
+		.set_name(body.name.clone())
+		.set_default_currency_id(body.default_currency_id)
+		.set_tag_ids_opt(body.tag_ids.clone())
+		.save(&data.pool).await;
 
-	match super::update(&data.pool, &account).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
