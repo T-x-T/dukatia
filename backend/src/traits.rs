@@ -55,7 +55,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 	}
 }
 
-pub trait DbSelecter<'a, T: From<Row>>: Sized {
+pub trait DbReader<'a, T: From<Row>>: Sized {
 	fn new(pool: &'a Pool) -> Self;
 	fn get_pool(&self) -> &Pool;
 	fn get_query_parameters(&self) -> &QueryParameters;
@@ -105,4 +105,11 @@ pub trait DbSelecter<'a, T: From<Row>>: Sized {
 	
 		return Ok(rows);
 	}
+}
+
+pub trait DbWriter<'a, T> {
+	fn new(pool: &'a Pool, item: T) -> Self;
+	async fn insert(self) -> Result<(), Box<dyn Error>>;
+	async fn replace(self) -> Result<(), Box<dyn Error>>;
+	async fn delete(self) -> Result<(), Box<dyn Error>>;
 }

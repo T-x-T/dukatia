@@ -10,7 +10,7 @@ pub struct TransactionDbSelecter<'a> {
 	pool: &'a Pool,
 }
 
-impl<'a> DbSelecter<'a, Transaction> for TransactionDbSelecter<'a> {
+impl<'a> DbReader<'a, Transaction> for TransactionDbSelecter<'a> {
 	fn new(pool: &'a Pool) -> Self {
 		return Self {
 			query_parameters: super::QueryParameters::default(),
@@ -49,7 +49,7 @@ pub struct DeepTransactionDbSelecter<'a> {
 	pool: &'a Pool,
 }
 
-impl<'a> DbSelecter<'a, DeepTransaction> for DeepTransactionDbSelecter<'a> {
+impl<'a> DbReader<'a, DeepTransaction> for DeepTransactionDbSelecter<'a> {
 	fn new(pool: &'a Pool) -> Self {
 		return Self {
 			query_parameters: super::QueryParameters::default(),
@@ -88,15 +88,15 @@ pub struct TransactionDbWriter<'a> {
 	transaction: Transaction,
 }
 
-impl<'a> TransactionDbWriter<'a> {
-	pub fn new(pool: &'a Pool, transaction: Transaction) -> Self {
+impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
+	fn new(pool: &'a Pool, item: Transaction) -> Self {
 		return Self {
 			pool,
-			transaction,
+			transaction: item,
 		}
 	}
 
-	pub async fn insert(self) -> Result<(), Box<dyn Error>> {
+	async fn insert(self) -> Result<(), Box<dyn Error>> {
 		let transaction_id: i32 = self.pool.get()
 			.await?
 			.query(
@@ -145,7 +145,7 @@ impl<'a> TransactionDbWriter<'a> {
 		return Ok(());
 	}
 
-	pub async fn replace(self) -> Result<(), Box<dyn Error>> {
+	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		if self.transaction.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 		}
@@ -210,7 +210,7 @@ impl<'a> TransactionDbWriter<'a> {
 		return Ok(());
 	}
 
-	pub async fn delete(self) -> Result<(), Box<dyn Error>> {
+	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.transaction.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 		}
