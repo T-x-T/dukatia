@@ -138,7 +138,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 	}
 
 	let result = super::Transaction::default()
-		.set_id(transaction_id.into_inner())
+		.set_id(*transaction_id)
 		.set_user_id(user_id)
 		.set_account_id(body.account_id)
 		.set_recipient_id(body.recipient_id)

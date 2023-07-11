@@ -90,7 +90,7 @@ pub struct TransactionDbWriter<'a> {
 
 impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Transaction) -> Self {
-		return Self {
+		Self {
 			pool,
 			transaction: item,
 		}
@@ -209,7 +209,9 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	
 		return Ok(());
 	}
+}
 
+impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.transaction.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));

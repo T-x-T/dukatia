@@ -30,7 +30,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(pool).await?;
 	let transactions = get_relevant_transactions(pool, &chart).await?;
-	let recipients = recipient::get_all(pool).await?;
+	let recipients = recipient::RecipientLoader::new(pool).get().await?;
 
 	for recipient in recipients {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();

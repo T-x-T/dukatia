@@ -111,5 +111,8 @@ pub trait DbWriter<'a, T> {
 	fn new(pool: &'a Pool, item: T) -> Self;
 	async fn insert(self) -> Result<(), Box<dyn Error>>;
 	async fn replace(self) -> Result<(), Box<dyn Error>>;
+}
+
+pub trait DbDeleter<'a, T>: DbWriter<'a, T> {
 	async fn delete(self) -> Result<(), Box<dyn Error>>;
 }

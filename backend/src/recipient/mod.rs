@@ -1,20 +1,99 @@
 mod db;
 pub mod rest_api;
 
+#[cfg(test)]
+mod test;
+
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
-
-#[cfg(test)]
 use crate::traits::*;
-
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Recipient {
 	pub id: Option<u32>,
 	pub name: String,
 	pub user_id: Option<u32>,
 	pub tag_ids: Option<Vec<u32>>,
 }
+
+impl Save for Recipient {
+	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		let id = self.id;
+		let db_writer = db::RecipientDbWriter::new(pool, self);
+
+		match id {
+			Some(_) => db_writer.replace().await,
+			None => db_writer.insert().await,
+		}
+	}
+}
+
+impl Recipient {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
+	}
+
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
+
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = Some(user_id);
+		return self;
+	}
+
+	#[allow(dead_code)]
+	pub fn set_user_id_opt(mut self, user_id: Option<u32>) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
+
+	#[allow(dead_code)]
+	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
+		self.tag_ids = Some(tag_ids);
+		return self;
+	}
+
+	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+		self.tag_ids = tag_ids;
+		return self;
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct RecipientLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Recipient> for RecipientLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<Recipient>, Box<dyn Error>> {
+		return db::RecipientDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+}
+
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DeepRecipient {
@@ -24,136 +103,33 @@ pub struct DeepRecipient {
 	pub tags: Vec<crate::tag::DeepTag>,
 }
 
-pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::add(pool, recipient).await;
+#[derive(Debug, Clone)]
+pub struct DeepRecipientLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
-	return db::get_all(pool).await;
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepRecipient>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
-}
-
-pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<dyn Error>> {
-	return db::get_by_id(pool, recipient_id).await;
-}
-
-pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, recipient).await;
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
-	use crate::tag::Tag;
-
-	fn get_recipient() -> Recipient {
-		return Recipient {
-			id: None,
-			name: String::from("thisisaname"),
-			user_id: Some(0),
-			tag_ids: None,
-		};
-	}
-
-	mod add {
-		use super::*;
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			add(&pool, &get_recipient()).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &recipient).await?;
-
-			teardown(&config).await;
-			return Ok(());
+impl<'a> Loader<'a, DeepRecipient> for DeepRecipientLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
 	}
 
-	mod get_all {
-		use super::*;
+	async fn get(self) -> Result<Vec<DeepRecipient>, Box<dyn Error>> {
+		return db::DeepRecipientDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_on_default_db() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
 
-			get_all(&pool).await?;
-			
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let recipient = get_recipient();
-
-			add(&pool, &recipient).await?;
-			add(&pool, &recipient).await?;
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res.len(), 4);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let tag = Tag::default().set_name("test_tag".to_string());
-			tag.save(&pool).await?;
-
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0]);
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
-
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0, 1, 2]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
 	}
 }
