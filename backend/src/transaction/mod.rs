@@ -165,6 +165,41 @@ impl Transaction {
 	}
 }
 
+#[derive(Debug, Clone)]
+pub struct TransactionLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		return db::TransactionDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	fn get_query_parameters(self) -> QueryParameters {
+		return self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+}
+
+
+
+
+
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DeepTransaction {
@@ -183,37 +218,6 @@ pub struct DeepTransaction {
 }
 
 #[derive(Debug, Clone)]
-pub struct TransactionLoader<'a> {
-	pool: &'a Pool,
-	query_parameters: QueryParameters,
-}
-
-impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
-	fn new(pool: &'a Pool) -> Self {
-		return TransactionLoader {
-			pool,
-			query_parameters: QueryParameters::default(),
-		};
-	}
-
-	async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
-		return db::TransactionDbSelecter::new(self.pool)
-			.set_query_parameters(self.query_parameters)
-			.execute()
-			.await;
-	}
-
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
-	}
-
-	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
-		self.query_parameters = query_parameters;
-		return self;
-	}
-}
-
-#[derive(Debug, Clone)]
 pub struct DeepTransactionLoader<'a> {
 	pool: &'a Pool,
 	query_parameters: QueryParameters,
@@ -228,7 +232,7 @@ impl<'a> Loader<'a, DeepTransaction> for DeepTransactionLoader<'a> {
 	}
 
 	async fn get(self) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
-		return db::DeepTransactionDbSelecter::new(self.pool)
+		return db::DeepTransactionDbReader::new(self.pool)
 			.set_query_parameters(self.query_parameters)
 			.execute()
 			.await;

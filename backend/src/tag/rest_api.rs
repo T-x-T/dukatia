@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
+use crate::traits::*;
 
 #[get("/api/v1/tags/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
@@ -9,7 +10,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all(&data.pool).await {
+	let result = super::TagLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -22,7 +25,9 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Respo
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all_deep(&data.pool).await {
+	let result = super::DeepTagLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -35,11 +40,16 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Pat
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_by_id(&data.pool, tag_id.into_inner()).await {
+	let result = super::TagLoader::new(&data.pool)
+	.set_filter_id(*tag_id)
+	.get_first()
+	.await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
-			if e.to_string().starts_with("specified item of type tag not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type tag not found with filter id={tag_id}\"}}"));
 			}
 		
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
@@ -60,14 +70,13 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPo
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let tag = super::Tag {
-		id: None,
-		name: body.name.to_string(),
-		parent_id: body.parent_id,
-		user_id, 
-	};
+	let result = super::Tag::default()
+		.set_name(body.name.clone())
+		.set_parent_id_opt(body.parent_id)
+		.set_user_id(user_id)
+		.save(&data.pool).await;
 
-	match super::add(&data.pool, &tag).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -80,14 +89,14 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let tag = super::Tag {
-		id: Some(tag_id.into_inner()),
-		name: body.name.to_string(),
-		parent_id: body.parent_id,
-		user_id, 
-	};
+	let result = super::Tag::default()
+		.set_id(tag_id.into_inner())
+		.set_name(body.name.clone())
+		.set_parent_id_opt(body.parent_id)
+		.set_user_id(user_id)
+		.save(&data.pool).await;
 
-	match super::update(&data.pool, &tag).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -100,7 +109,11 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::delete(&data.pool, tag_id.into_inner()).await {
+	let result = super::Tag::default()
+		.set_id(tag_id.into_inner())
+		.delete(&data.pool).await;
+
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}

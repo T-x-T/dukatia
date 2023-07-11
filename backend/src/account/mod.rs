@@ -4,6 +4,8 @@ pub mod rest_api;
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
+#[cfg(test)]
+use crate::traits::*;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Account {
@@ -47,6 +49,7 @@ pub async fn update(pool: &Pool, account: &Account) -> Result<(), Box<dyn Error>
 mod tests {
 	use super::*;
 	use super::super::{setup, teardown};
+	use crate::tag::Tag;
 
 	fn get_account() -> Account {
 		return Account {
@@ -60,7 +63,6 @@ mod tests {
 
 	mod add {
 		use super::*;
-		use super::super::super::tag;
 
 		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
@@ -76,9 +78,9 @@ mod tests {
 		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 			let mut account = get_account();
 			account.tag_ids = Some(vec![0, 1, 2]);
@@ -91,7 +93,6 @@ mod tests {
 
 	mod get_all {
 		use super::*;
-		use super::super::super::tag;
 
 		#[tokio::test(flavor = "multi_thread")]
 		async fn doesnt_panic_on_default_db() -> Result<(), Box<dyn Error>> {
@@ -107,7 +108,7 @@ mod tests {
 		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 			let account = get_account();
 			add(&pool, &account).await?;
@@ -125,7 +126,8 @@ mod tests {
 		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+			let tag = Tag::default().set_name("test_tag".to_string());
+			tag.save(&pool).await?;
 
 			let mut account = get_account();
 			account.tag_ids = Some(vec![0]);
@@ -142,9 +144,9 @@ mod tests {
 		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
 			let (config, pool) = setup().await;
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+			Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 			let mut account = get_account();
 			account.tag_ids = Some(vec![0, 1, 2]);

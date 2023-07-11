@@ -5,15 +5,15 @@ use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
 use crate::traits::*;
 
 #[derive(Debug)]
-pub struct TransactionDbSelecter<'a> {
-	query_parameters: super::QueryParameters,
+pub struct TransactionDbReader<'a> {
+	query_parameters: QueryParameters,
 	pool: &'a Pool,
 }
 
-impl<'a> DbReader<'a, Transaction> for TransactionDbSelecter<'a> {
+impl<'a> DbReader<'a, Transaction> for TransactionDbReader<'a> {
 	fn new(pool: &'a Pool) -> Self {
 		return Self {
-			query_parameters: super::QueryParameters::default(),
+			query_parameters: QueryParameters::default(),
 			pool,
 		}
 	}
@@ -44,15 +44,15 @@ impl<'a> DbReader<'a, Transaction> for TransactionDbSelecter<'a> {
 }
 
 #[derive(Debug)]
-pub struct DeepTransactionDbSelecter<'a> {
-	query_parameters: super::QueryParameters,
+pub struct DeepTransactionDbReader<'a> {
+	query_parameters: QueryParameters,
 	pool: &'a Pool,
 }
 
-impl<'a> DbReader<'a, DeepTransaction> for DeepTransactionDbSelecter<'a> {
+impl<'a> DbReader<'a, DeepTransaction> for DeepTransactionDbReader<'a> {
 	fn new(pool: &'a Pool) -> Self {
 		return Self {
-			query_parameters: super::QueryParameters::default(),
+			query_parameters: QueryParameters::default(),
 			pool,
 		}
 	}

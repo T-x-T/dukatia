@@ -1,8 +1,9 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
-use super::super::webserver::{AppState, is_authorized};
-use super::{Asset, Save, Delete, Loader};
+use crate::webserver::{AppState, is_authorized};
+use crate::asset::Asset;
+use crate::traits::*;
 
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {

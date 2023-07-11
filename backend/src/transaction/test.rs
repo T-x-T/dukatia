@@ -1,5 +1,6 @@
 use super::*;
 use super::super::{setup, teardown};
+use crate::tag::Tag;
 
 fn get_transaction() -> Transaction {
 	return Transaction::default()
@@ -10,7 +11,6 @@ fn get_transaction() -> Transaction {
 
 mod add {
 	use super::*;
-	use super::super::super::tag;
 
 	#[tokio::test(flavor = "multi_thread")]
 	async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
@@ -25,9 +25,9 @@ mod add {
 	async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 		get_transaction()
 			.set_tag_ids(vec![0, 1, 2])
@@ -40,7 +40,6 @@ mod add {
 
 mod get_all {
 	use super::*;
-	use super::super::super::tag;
 
 	#[tokio::test(flavor = "multi_thread")]
 	async fn returns_no_results_on_empty_db() {
@@ -71,7 +70,7 @@ mod get_all {
 	async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 		get_transaction()
 			.set_tag_ids(vec![0])
@@ -88,9 +87,9 @@ mod get_all {
 	async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
 		let (config, pool) = setup().await;
 
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-		tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
+		Tag::default().set_name("test_tag".to_string()).save(&pool).await?;
 
 		get_transaction()
 			.set_tag_ids(vec![0, 1, 2])

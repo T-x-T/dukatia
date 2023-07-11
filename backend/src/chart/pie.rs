@@ -57,7 +57,7 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
 	let currencies = currency::get_all(pool).await?;
 	let transactions = get_relevant_transactions(pool, &chart).await?;
-	let tags = tag::get_all(pool).await?;
+	let tags = tag::TagLoader::new(pool).get().await?;
 
 	for tag in tags {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();

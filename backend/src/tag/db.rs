@@ -2,122 +2,189 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
 use super::{DeepTag, Tag};
+use crate::traits::*;
 
-pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	pool.get()
-		.await?
-		.query(
-			"INSERT INTO public.tags (id, name, parent_id, user_id) VALUES (DEFAULT, $1, $2, $3);",
-			&[&tag.name, &(tag.parent_id.map(|x| x as i32)), &(tag.user_id as i32)]
-		).await?;
-	return Ok(());
+#[derive(Debug)]
+pub struct TagDbReader<'a> {
+	query_parameters: QueryParameters,
+	pool: &'a Pool,
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
-	return Ok(
-		pool.get()
-		.await?
-		.query("SELECT * FROM public.tags;", &[])
-		.await?
-		.iter()
-		.map(turn_row_into_tag)
-		.collect()
-	)
-}
+impl<'a> DbReader<'a, Tag> for TagDbReader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return Self {
+			query_parameters: QueryParameters::default(),
+			pool,
+		}
+	}
 
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTag>, Box<dyn Error>> {
-	return Ok(
-		pool.get()
+	fn get_pool(&self) -> &Pool {
+		return self.pool;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+
+	async fn execute(self) -> Result<Vec<Tag>, Box<dyn Error>> {
+		let query = "SELECT * FROM public.tags";
+		return Ok(
+			self.actually_execute(query)
 			.await?
-			.query("SELECT * FROM deep_tags", &[])
-			.await?
-			.iter()
-			.map(turn_row_into_deep_tag)
+			.into_iter()
+			.map(Into::into)
 			.collect()
-	)
-}
-
-pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-		.query("SELECT * FROM public.tags WHERE id=$1;", &[&(tag_id as i32)]).await?;
-
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("tag"), filter: format!("id={tag_id}")}));
-	}
-
-	return Ok(turn_row_into_tag(&rows[0]));
-}
-
-pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	if tag.id.is_none() {
-		return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
-	}
-
-	get_by_id(pool, tag.id.unwrap()).await?;
-
-	pool.get()
-		.await?
-		.query(
-			"UPDATE public.tags SET name=$1, parent_id=$2 WHERE id=$3;",
-			&[&tag.name, &tag.parent_id.map(|x| x as i32), &tag.id.map(|x| x as i32)]
-		)
-		.await?;
-
-	return Ok(());
-}
-
-pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
-	pool.get()
-		.await?
-		.query("DELETE FROM public.tags WHERE id=$1;", &[&(tag_id as i32)]).await?;
-
-	pool.get().await?
-		.query("UPDATE public.tags SET parent_id=null WHERE parent_id=$1", &[&(tag_id as i32)]).await?;
-
-	return Ok(());
-}
-
-fn turn_row_into_tag(row: &tokio_postgres::Row) -> Tag {
-	let id: i32 = row.get(0);
-	let user_id: Option<i32> = row.get(3);
-	let parent_id: Option<i32> = row.get(2);
-
-	return Tag {
-		id: Some(id as u32),
-		name: row.get(1),
-		user_id: user_id.map_or(0, |x| x as u32),
-		parent_id: parent_id.map(|x| x as u32),
+		);
 	}
 }
 
-fn turn_row_into_deep_tag(row: &tokio_postgres::Row) -> DeepTag {
-	let id: i32 = row.get(0);
-	let name: String = row.get(1);
-	let user_id: i32 = row.get(2);
-	let user_name: String = row.get(3);
-	let user_superuser: bool = row.get(4);
-	let parent_id: Option<i32> = row.get(5);
-	let parent_name: Option<String> = row.get(6);
-	let parent_user_id: Option<i32> = row.get(7);
-	let parent_parent_id: Option<i32> = row.get(8);
+#[derive(Debug)]
+pub struct DeepTagDbReader<'a> {
+	query_parameters: QueryParameters,
+	pool: &'a Pool,
+}
 
-	let parent: Option<Tag> = parent_id.map(|_| Tag {
-		id: parent_id.map(|x| x as u32),
-		name: parent_name.unwrap(),
-		user_id: parent_user_id.unwrap() as u32,
-		parent_id: parent_parent_id.map(|x| x as u32),
-	});
+impl<'a> DbReader<'a, DeepTag> for DeepTagDbReader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return Self {
+			query_parameters: QueryParameters::default(),
+			pool,
+		}
+	}
 
-	return DeepTag {
-		id: id as u32,
-		name,
-		user: crate::user::User {
-			id: Some(user_id as u32),
-			name: user_name,
-			secret: None,
-			superuser: user_superuser,
-		},
-		parent,
+	fn get_pool(&self) -> &Pool {
+		return self.pool;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+
+	async fn execute(self) -> Result<Vec<DeepTag>, Box<dyn Error>> {
+		let query = "SELECT * FROM public.deep_tags";
+		return Ok(
+			self.actually_execute(query)
+			.await?
+			.into_iter()
+			.map(Into::into)
+			.collect()
+		);
+	}
+}
+
+#[derive(Debug)]
+pub struct TagDbWriter<'a> {
+	pool: &'a Pool,
+	tag: Tag,
+}
+
+impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
+	fn new(pool: &'a Pool, item: Tag) -> Self {
+		return Self {
+			pool,
+			tag: item,
+		}
+	}
+
+	async fn insert(self) -> Result<(), Box<dyn Error>> {
+		self.pool.get()
+			.await?
+			.query(
+				"INSERT INTO public.tags (id, name, parent_id, user_id) VALUES (DEFAULT, $1, $2, $3);",
+				&[&self.tag.name, &(self.tag.parent_id.map(|x| x as i32)), &(self.tag.user_id as i32)]
+			).await?;
+		return Ok(());
+	}
+
+	async fn replace(self) -> Result<(), Box<dyn Error>> {
+		if self.tag.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
+		}
+	
+		super::TagLoader::new(self.pool).set_filter_id(self.tag.id.unwrap()).get_first().await?;
+	
+		self.pool.get()
+			.await?
+			.query(
+				"UPDATE public.tags SET name=$1, parent_id=$2 WHERE id=$3;",
+				&[&self.tag.name, &self.tag.parent_id.map(|x| x as i32), &self.tag.id.map(|x| x as i32)]
+			)
+			.await?;
+	
+		return Ok(());
+	}
+
+	async fn delete(self) -> Result<(), Box<dyn Error>> {
+		if self.tag.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
+		}
+
+		self.pool.get()
+			.await?
+			.query("DELETE FROM public.tags WHERE id=$1;", &[&(self.tag.id.unwrap() as i32)]).await?;
+	
+		self.pool.get().await?
+			.query("UPDATE public.tags SET parent_id=null WHERE parent_id=$1", &[&(self.tag.id.unwrap() as i32)]).await?;
+	
+		return Ok(());
+	}
+}
+
+impl From<tokio_postgres::Row> for Tag {
+	fn from(value: tokio_postgres::Row) -> Self {
+		let id: i32 = value.get(0);
+		let name: String = value.get(1);
+		let parent_id: Option<i32> = value.get(2);
+		let user_id: Option<i32> = value.get(3);
+	
+		return Self {
+			id: Some(id as u32),
+			name,
+			user_id: user_id.map_or(0, |x| x as u32),
+			parent_id: parent_id.map(|x| x as u32),
+		}
+	}
+}
+
+impl From<tokio_postgres::Row> for DeepTag {
+	fn from(value: tokio_postgres::Row) -> Self {
+		let id: i32 = value.get(0);
+		let name: String = value.get(1);
+		let user_id: i32 = value.get(2);
+		let user_name: String = value.get(3);
+		let user_superuser: bool = value.get(4);
+		let parent_id: Option<i32> = value.get(5);
+		let parent_name: Option<String> = value.get(6);
+		let parent_user_id: Option<i32> = value.get(7);
+		let parent_parent_id: Option<i32> = value.get(8);
+	
+		let parent: Option<Tag> = parent_id.map(|_| Tag {
+			id: parent_id.map(|x| x as u32),
+			name: parent_name.unwrap(),
+			user_id: parent_user_id.unwrap() as u32,
+			parent_id: parent_parent_id.map(|x| x as u32),
+		});
+	
+		return Self {
+			id: id as u32,
+			name,
+			user: crate::user::User {
+				id: Some(user_id as u32),
+				name: user_name,
+				secret: None,
+				superuser: user_superuser,
+			},
+			parent,
+		}
 	}
 }
