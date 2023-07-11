@@ -56,7 +56,7 @@ async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn
 }
 
 async fn compute_function_foreach_currency(pool: &Pool, body: &str) -> Result<String, Box<dyn Error>> {
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let mut output = String::new();
 
 	for currency in currencies {

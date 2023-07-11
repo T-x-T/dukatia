@@ -47,6 +47,7 @@ impl Account {
 		return self;
 	}
 
+	#[allow(dead_code)]
 	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
 		self.tag_ids = Some(tag_ids);
 		return self;

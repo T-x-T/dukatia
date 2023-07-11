@@ -28,7 +28,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_transactions(pool, &chart).await?;
 	let recipients = recipient::RecipientLoader::new(pool).get().await?;
 
@@ -55,7 +55,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 
 async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_transactions(pool, &chart).await?;
 	let tags = tag::TagLoader::new(pool).get().await?;
 

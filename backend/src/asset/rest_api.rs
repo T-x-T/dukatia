@@ -4,8 +4,9 @@ use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responde
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
-use super::super::webserver::{AppState, is_authorized};
+use crate::webserver::{AppState, is_authorized};
 use crate::transaction::{Transaction, Position};
+use crate::currency::CurrencyLoader;
 use crate::traits::*;
 
 #[derive(Deserialize, Clone, Debug)]
@@ -220,7 +221,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
-	let currency = crate::currency::get_by_id(pool, asset.currency_id).await.unwrap();
+	let currency = CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
 	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_mayor), currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {

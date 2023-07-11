@@ -53,7 +53,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 }
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
 	let recipients = recipient::RecipientLoader::new(pool).get().await?;
 
@@ -69,7 +69,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 }
 
 async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
 	let accounts = account::AccountLoader::new(pool).get().await?;
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Account, &chart.clone().date_period.unwrap_or("daily".to_string()));
@@ -85,7 +85,7 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string:
 }
 
 async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::Currency, &chart.clone().date_period.unwrap_or("daily".to_string()));
@@ -101,7 +101,7 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 }
 
 async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
-	let currencies = currency::get_all(pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
 
 	let raw_output = build_raw_output(transactions, RawOutputProperties::EarningSpendingNet, &chart.date_period.unwrap_or("monthly".to_string()));
@@ -344,7 +344,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 	}
 	
 	let asset = asset::get_by_id(pool, chart.asset_id.unwrap()).await?;
-	let currency = currency::get_by_id(pool, asset.currency_id).await?;
+	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
 	let value_history = asset::get_value_per_unit_history(pool, chart.asset_id.unwrap()).await?;
 	let amount_history = asset::get_amount_history(pool, chart.asset_id.unwrap()).await?;
 
@@ -387,7 +387,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 	}
 	
 	let asset = asset::get_by_id(pool, chart.asset_id.unwrap()).await?;
-	let currency = currency::get_by_id(pool, asset.currency_id).await?;
+	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
 	let value_history = asset::get_value_per_unit_history(pool, chart.asset_id.unwrap()).await?;
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();

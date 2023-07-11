@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
-use super::super::webserver::{AppState, is_authorized};
+use crate::webserver::{AppState, is_authorized};
+use crate::traits::*;
 
 #[get("/api/v1/currencies/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
@@ -9,7 +10,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all(&data.pool).await {
+	let result = super::CurrencyLoader::new(&data.pool).get().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -22,11 +25,15 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_by_id(&data.pool, currency_id.into_inner()).await {
+	let result = super::CurrencyLoader::new(&data.pool)
+		.set_filter_id(*currency_id)
+		.get_first().await;
+
+	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => {
-			if e.to_string().starts_with("specified item of type currency not found with filter") {
-				return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}"));
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type currency not found with filter id={currency_id}\"}}"));
 			}
 			
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
@@ -48,14 +55,13 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curre
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let currency = super::Currency {
-		id: None,
-		name: body.name.clone(),
-		minor_in_mayor: body.minor_in_mayor,
-		symbol: body.symbol.clone(),
-	};
+	let result = super::Currency::default()
+		.set_name(body.name.clone())
+		.set_minor_in_mayor(body.minor_in_mayor)
+		.set_symbol(body.symbol.clone())
+		.save(&data.pool).await;
 
-	match super::add(&data.pool, &currency).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -68,14 +74,14 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curren
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let currency = super::Currency {
-		id: Some(currency_id.into_inner()),
-		name: body.name.clone(),
-		minor_in_mayor: body.minor_in_mayor,
-		symbol: body.symbol.clone(),
-	};
+	let result = super::Currency::default()
+		.set_id(*currency_id)
+		.set_name(body.name.clone())
+		.set_minor_in_mayor(body.minor_in_mayor)
+		.set_symbol(body.symbol.clone())
+		.save(&data.pool).await;
 
-	match super::update(&data.pool, &currency).await {
+	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
