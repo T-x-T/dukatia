@@ -64,15 +64,16 @@ impl Default for Transaction {
 }
 
 impl Save for Transaction {
-	async fn save(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+	async fn save(mut self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
 		let account = account::AccountLoader::new(pool).set_filter_id(self.account_id).get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
-		let id = self.id;
+		let id = self.id; //TODO: use a match instead
 		
 		let db_writer = db::TransactionDbWriter::new(pool, self);
 
 		if id.is_some() {
-			return db_writer.replace().await;
+			db_writer.replace().await?;
+			return Ok(id.unwrap());
 		}
 		
 		return db_writer.insert().await;
@@ -186,8 +187,8 @@ impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
@@ -238,8 +239,8 @@ impl<'a> Loader<'a, DeepTransaction> for DeepTransactionLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {

@@ -56,23 +56,27 @@ async fn main() -> std::io::Result<()> {
 #[derive(Debug, Clone)]
 enum CustomError {
   NoItemFound {
-    item_type: String
+    item_type: String,
   },
   SpecifiedItemNotFound {
     item_type: String,
-    filter: String
+    filter: String,
   },
   InvalidItem {
-    reason: String
+    reason: String,
   },
   InvalidCredentials,
   MissingCookie {
-    cookie: String
+    cookie: String,
   },
   MissingProperty {
     property: String,
-    item_type: String
-  }
+    item_type: String,
+  },
+  InvalidActionForItem {
+    action: String,
+    item_type: String,
+  },
 }
 
 impl fmt::Display for CustomError {
@@ -84,6 +88,7 @@ impl fmt::Display for CustomError {
       CustomError::InvalidCredentials => write!(f, "the given credentials are invalid"),
       CustomError::MissingCookie {cookie} => write!(f, "cookie {cookie} not set"),
       CustomError::MissingProperty {property, item_type} => write!(f, "Missing property {property} on type {item_type}"),
+      CustomError::InvalidActionForItem {action, item_type} => write!(f, "Cannot execute {action} on type {item_type}"),
     }
   }
 }

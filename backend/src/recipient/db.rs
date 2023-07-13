@@ -96,7 +96,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<(), Box<dyn Error>> {
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
 		let client = self.pool.get().await.unwrap();
 		let id: i32 = client
 			.query(
@@ -114,7 +114,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 				).await?;
 			}
 		}
-		return Ok(());
+		return Ok(id as u32);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {

@@ -174,7 +174,7 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web
 	};
 
 	let result = super::Transaction::default()
-		.set_id(transaction_id.into_inner())
+		.set_id(*transaction_id)
 		.delete(&data.pool).await;
 
 	return match result {

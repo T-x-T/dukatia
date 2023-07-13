@@ -3,12 +3,21 @@ pub mod rest_api;
 
 use deadpool_postgres::Pool;
 use serde::Serialize;
-use std::{error::Error, collections::BTreeMap};
-use chrono::{DateTime, Utc, Date};
+use std::error::Error;
+use chrono::{DateTime, Utc};
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct TotalCostOfOwnership {
+	pub total: i32,
+	pub monthly: i32,
+	pub yearly: i32,
+}
+
+
+
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Asset {
 	pub id: Option<u32>,
 	pub user_id: u32,
@@ -19,6 +28,131 @@ pub struct Asset {
 	pub amount: Option<f64>,
 	pub tag_ids: Option<Vec<u32>>,
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
+}
+
+impl Save for Asset {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		match self.id {
+			Some(id) => {
+				db::AssetDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
+			None => db::AssetDbWriter::new(pool, self).insert().await,
+		}
+	}
+}
+
+impl Delete for Asset {
+	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(_) => return db::AssetDbWriter::new(pool, self).delete().await,
+			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
+		}
+	}
+}
+
+impl Asset {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
+	}
+
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
+
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
+
+	#[allow(unused)]
+	pub fn set_description(mut self, description: String) -> Self {
+		self.description = Some(description);
+		return self;
+	}
+
+	pub fn set_description_opt(mut self, description: Option<String>) -> Self {
+		self.description = description;
+		return self;
+	}
+
+	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+		self.currency_id = currency_id;
+		return self;
+	}
+
+	#[allow(unused)]
+	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
+		self.tag_ids = Some(tag_ids);
+		return self;
+	}
+
+	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+		self.tag_ids = tag_ids;
+		return self;
+	}
+
+	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
+		if self.id.is_none() {
+			return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
+		}
+
+		let transactions = TransactionLoader::new(pool)
+			.set_filter_asset_id(self.id.unwrap())
+			.get().await?;
+		
+		return Ok(Self {
+			total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0)),
+			..self
+		});
+	}
+
+	pub async fn replace_valuation_history(self, pool: &Pool, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
+		if self.id.is_none() {
+			return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
+		}
+		
+		return Ok(db::replace_valuation_history_of_asset(pool, self.id.unwrap(), asset_valuations).await?);
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct AssetLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<Asset>, Box<dyn Error>> {
+		let assets: Vec<Asset> = futures_util::future::try_join_all(
+			db::AssetDbReader::new(self.pool)
+				.set_query_parameters(self.query_parameters)
+				.execute()
+				.await?
+				.into_iter()
+				.map(|x| x.get_total_cost_of_ownership(self.pool))
+		).await?;
+
+		return Ok(assets);
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -34,11 +168,54 @@ pub struct DeepAsset {
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
 }
 
-#[derive(Debug, Clone, Serialize, Default)]
-pub struct TotalCostOfOwnership {
-	pub total: i32,
-	pub monthly: i32,
-	pub yearly: i32,
+impl DeepAsset {
+	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<DeepAsset, Box<dyn Error>> {
+		let transactions = TransactionLoader::new(pool)
+		.set_filter_asset_id(self.id)
+		.get().await?;
+	
+		return Ok(DeepAsset {
+			total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, self.amount == 0.0)),
+			..self
+		});
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct DeepAssetLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, DeepAsset> for DeepAssetLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
+		let assets: Vec<DeepAsset> = futures_util::future::try_join_all(
+			db::DeepAssetDbReader::new(self.pool)
+				.set_query_parameters(self.query_parameters)
+				.execute()
+				.await?
+				.into_iter()
+				.map(|x| x.get_total_cost_of_ownership(self.pool))
+		).await?;
+
+		return Ok(assets);
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -46,126 +223,80 @@ pub struct AssetValuation {
 	pub value_per_unit: u32,
 	pub amount: f64,
 	pub timestamp: DateTime<Utc>,
+	pub asset_id: u32,
 }
 
-pub async fn add(pool: &Pool, asset: &Asset) -> Result<u32, Box<dyn Error>> {
-	return db::add(pool, asset).await;
-}
+impl Save for AssetValuation {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		let valuation_history = AssetValuationLoader::new(pool).set_filter_asset_id(self.asset_id).get().await?;
+		let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
+			.filter(
+				|x| x.timestamp.signed_duration_since(self.timestamp).num_seconds() > 0
+			).collect();
+		
+		if newer_than_input.is_empty() {
+			return db::AssetValuationDbWriter::new(pool, self).insert().await;
+		}
 
-pub async fn add_valuation(pool: &Pool, asset_id: u32, asset_valuation: &AssetValuation) -> Result<(), Box<dyn Error>> {
-	let valuation_history = get_valuation_history_by_asset_id(pool, asset_id).await?;
-	let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
+		let mut last_asset_valuation_amount: f64 = 0.0;
+		for x in &valuation_history {
+			if x.timestamp.signed_duration_since(self.timestamp).num_seconds() < 0 {
+				last_asset_valuation_amount = x.amount;
+			}
+		}
+		
+		let difference: f64 = self.amount - last_asset_valuation_amount;
+
+		let older_than_input: Vec<&AssetValuation> = valuation_history.iter()
 		.filter(
-			|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() > 0
+			|x| x.timestamp.signed_duration_since(self.timestamp).num_seconds() < 0
 		).collect();
-	
-	if newer_than_input.is_empty() {
-		return db::add_valuation(pool, asset_id, asset_valuation).await;
-	}
 
-	let mut last_asset_valuation_amount: f64 = 0.0;
-	for x in &valuation_history {
-		if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
-			last_asset_valuation_amount = x.amount;
+		let newer_than_input: Vec<AssetValuation> = newer_than_input.into_iter().map(|x| {
+			let mut y = x.clone();
+			y.amount += difference;
+			return y;
+		}).collect();
+
+		let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().cloned().collect();
+		new_asset_valuations.push(self.clone());
+		newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
+
+		db::replace_valuation_history_of_asset(pool, self.asset_id, new_asset_valuations).await?;
+
+		return Ok(0);
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct AssetValuationLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, AssetValuation> for AssetValuationLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
 	}
-	
-	let difference: f64 = asset_valuation.amount - last_asset_valuation_amount;
 
-	let older_than_input: Vec<&AssetValuation> = valuation_history.iter()
-	.filter(
-		|x| x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0
-	).collect();
-
-	let newer_than_input: Vec<AssetValuation> = newer_than_input.into_iter().map(|x| {
-		let mut y = x.clone();
-		y.amount += difference;
-		return y;
-	}).collect();
-
-	let mut new_asset_valuations: Vec<AssetValuation> = older_than_input.into_iter().cloned().collect();
-	new_asset_valuations.push(asset_valuation.clone());
-	newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
-
-	return db::replace_valuation_history_of_asset(pool, asset_id, new_asset_valuations).await;
-}
-
-pub async fn get_all(pool: &Pool) -> Result<Vec<Asset>, Box<dyn Error>> {
-	let mut output: Vec<Asset> = Vec::new();
-	for asset in db::get_all(pool).await? {
-		output.push(get_total_cost_of_ownership(pool, asset).await?);
+	async fn get(self) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
+		return db::AssetValuationDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
 	}
-	return Ok(output);
-}
 
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
-	let mut output: Vec<DeepAsset> = Vec::new();
-	for asset in db::get_all_deep(pool).await? {
-		output.push(get_total_cost_of_ownership_deep(pool, asset).await?);
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
-	return Ok(output);
-}
 
-#[allow(unused)]
-pub async fn get_all_from_user(pool: &Pool, user_id: u32) -> Result<Vec<Asset>, Box<dyn Error>> {
-	return db::get_all_from_user(pool, user_id).await;
-}
-
-pub async fn get_by_id(pool: &Pool, asset_id: u32) -> Result<Asset, Box<dyn Error>> {
-	return get_total_cost_of_ownership(pool, db::get_by_id(pool, asset_id).await?).await;
-}
-
-pub async fn update(pool: &Pool, asset: &Asset) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, asset).await;
-}
-
-#[allow(unused)]
-pub async fn get_total_value_at_day(pool: &Pool, asset_id: u32, date: Date<Utc>) -> Result<f64, Box<dyn Error>> {
-	let amount = db::get_amount_at_day(pool, asset_id, date).await?;
-	let value = f64::from(db::get_value_at_day(pool, asset_id, date).await?);
-	return Ok(amount * value);
-}
-
-pub async fn get_valuation_history_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<AssetValuation>, Box<dyn Error>> {
-	return db::get_valuation_history_by_asset_id(pool, asset_id).await;
-}
-
-pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-	return db::replace_valuation_history_of_asset(pool, asset_id, asset_valuations).await;
-}
-
-pub async fn delete_by_id(pool: &Pool, asset_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete_by_id(pool, asset_id).await;
-}
-
-pub async fn get_value_per_unit_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, u32>, Box<dyn Error>> {
-	return db::get_value_per_unit_history(pool, asset_id).await;
-}
-
-pub async fn get_amount_history(pool: &Pool, asset_id: u32) -> Result<BTreeMap<chrono::DateTime<chrono::Utc>, f64>, Box<dyn Error>> {
-	return db::get_amount_history(pool, asset_id).await;
-}
-
-pub async fn get_total_cost_of_ownership(pool: &Pool, asset: Asset) -> Result<Asset, Box<dyn Error>> {
-	let transactions = TransactionLoader::new(pool)
-		.set_filter_asset_id(asset.id.unwrap())
-		.get().await?;
-	
-	return Ok(Asset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, asset.amount.unwrap_or(0.0) == 0.0)),
-		..asset
-	});
-}
-
-pub async fn get_total_cost_of_ownership_deep(pool: &Pool, asset: DeepAsset) -> Result<DeepAsset, Box<dyn Error>> {
-	let transactions = TransactionLoader::new(pool)
-	.set_filter_asset_id(asset.id)
-	.get().await?;
-
-	return Ok(DeepAsset {
-		total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, asset.amount == 0.0)),
-		..asset
-	});
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
 }
 
 fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {

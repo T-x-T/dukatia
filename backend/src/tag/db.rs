@@ -96,14 +96,14 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<(), Box<dyn Error>> {
-		self.pool.get()
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+		let id: i32 = self.pool.get()
 			.await?
 			.query(
-				"INSERT INTO public.tags (id, name, parent_id, user_id) VALUES (DEFAULT, $1, $2, $3);",
+				"INSERT INTO public.tags (id, name, parent_id, user_id) VALUES (DEFAULT, $1, $2, $3) RETURNING id;",
 				&[&self.tag.name, &(self.tag.parent_id.map(|x| x as i32)), &(self.tag.user_id as i32)]
-			).await?;
-		return Ok(());
+			).await?[0].get(0);
+		return Ok(id as u32);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {

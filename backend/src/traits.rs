@@ -16,13 +16,14 @@ pub struct QueryParameters {
 pub struct Filters {
 	pub id: Option<u32>,
 	pub asset_id: Option<u32>,
+	pub user_id: Option<u32>,
 }
 
 
 
 
 pub trait Save {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>>;
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>>;
 }
 
 pub trait Delete {
@@ -31,19 +32,25 @@ pub trait Delete {
 
 pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn new(pool: &'a Pool) -> Self;
-	fn get_query_parameters(self) -> QueryParameters;
+	fn get_query_parameters(&self) -> &QueryParameters;
 	fn set_query_parameters(self, query_parameters: QueryParameters) -> Self;
 	async fn get(self) -> Result<Vec<T>, Box<dyn Error>>;
 	
 	fn set_filter_id(self, id: u32) -> Self {
-		let mut query_parameters = self.clone().get_query_parameters();
+		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.id = Some(id);
 		return self.set_query_parameters(query_parameters);
 	}
 
 	fn set_filter_asset_id(self, asset_id: u32) -> Self {
-		let mut query_parameters = self.clone().get_query_parameters();
+		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.asset_id = Some(asset_id);
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_user_id(self, user_id: u32) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.user_id = Some(user_id);
 		return self.set_query_parameters(query_parameters);
 	}
 
@@ -109,7 +116,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 
 pub trait DbWriter<'a, T> {
 	fn new(pool: &'a Pool, item: T) -> Self;
-	async fn insert(self) -> Result<(), Box<dyn Error>>;
+	async fn insert(self) -> Result<u32, Box<dyn Error>>;
 	async fn replace(self) -> Result<(), Box<dyn Error>>;
 }
 

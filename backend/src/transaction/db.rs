@@ -96,7 +96,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<(), Box<dyn Error>> {
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
 		let transaction_id: i32 = self.pool.get()
 			.await?
 			.query(
@@ -142,7 +142,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				).await?;
 		}
 
-		return Ok(());
+		return Ok(transaction_id as u32);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {

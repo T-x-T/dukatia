@@ -1026,7 +1026,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"}]
+						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1}]
 					}
 				},
 				{
@@ -1049,7 +1049,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"},{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z"}]
+						"body_equals": [{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1},{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":1}]
 					}
 				},
 				{
@@ -1187,13 +1187,13 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z"},
-							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z"},
-							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T11:22:00Z"},
-							{"value_per_unit":123,"amount":30.0,"timestamp":"2023-03-21T11:22:00Z"},
-							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T11:22:00Z"},
-							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-23T11:22:00Z"},
-							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-24T11:22:00Z"}
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":30.0,"timestamp":"2023-03-21T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-23T11:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-24T11:22:00Z","asset_id":1}
 						]
 					}
 				},
@@ -1217,9 +1217,9 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T12:22:00Z"},
-							{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
-							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
+							{"value_per_unit":123,"amount":20.0,"timestamp":"2023-03-20T12:22:00Z","asset_id":1},
+							{"value_per_unit":125,"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z","asset_id":1},
+							{"value_per_unit":123,"amount":10.0,"timestamp":"2023-03-22T14:22:00Z","asset_id":1}
 						]
 					}
 				},

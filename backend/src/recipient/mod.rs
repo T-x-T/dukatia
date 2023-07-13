@@ -17,13 +17,13 @@ pub struct Recipient {
 }
 
 impl Save for Recipient {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		let id = self.id;
-		let db_writer = db::RecipientDbWriter::new(pool, self);
-
-		match id {
-			Some(_) => db_writer.replace().await,
-			None => db_writer.insert().await,
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		match self.id {
+			Some(id) => {
+				db::RecipientDbWriter::new(pool, self).replace().await?;
+				return Ok(id)
+			},
+			None => return db::RecipientDbWriter::new(pool, self).insert().await,
 		}
 	}
 }
@@ -83,8 +83,8 @@ impl<'a> Loader<'a, Recipient> for RecipientLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
@@ -124,8 +124,8 @@ impl<'a> Loader<'a, DeepRecipient> for DeepRecipientLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {

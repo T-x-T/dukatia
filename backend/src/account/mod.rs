@@ -18,9 +18,12 @@ pub struct Account {
 }
 
 impl Save for Account {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
 		match self.id {
-			Some(_) => return db::AccountDbWriter::new(pool, self).replace().await,
+			Some(id) => {
+				db::AccountDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
 			None => return db::AccountDbWriter::new(pool, self).insert().await,
 		}
 	}
@@ -80,8 +83,8 @@ impl<'a> Loader<'a, Account> for AccountLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
@@ -121,8 +124,8 @@ impl<'a> Loader<'a, DeepAccount> for DeepAccountLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {

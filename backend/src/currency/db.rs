@@ -57,16 +57,16 @@ impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<(), Box<dyn Error>> {
-		self.pool.get()
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+		let id: i32 = self.pool.get()
 			.await
 			.unwrap()
 			.query(
-				"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3)", 
+				"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
 				&[&self.currency.name, &(self.currency.minor_in_mayor as i32), &self.currency.symbol])
-			.await?;
+			.await?[0].get(0);
 
-		return Ok(());
+		return Ok(id as u32);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {

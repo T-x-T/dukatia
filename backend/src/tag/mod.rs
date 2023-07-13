@@ -19,21 +19,18 @@ pub struct Tag {
 }
 
 impl Save for Tag {
-	async fn save(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
 		if self.parent_id.is_some() && !self.is_valid_parent(pool).await {
 			return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
 		}
-		let id = self.id;
 
-		let db_writer = db::TagDbWriter::new(pool, self);
-
-		if id.is_some() {
-			#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
-			return Ok(db_writer.replace().await?);
+		match self.id {
+			Some(id) => {
+				db::TagDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
+			None => return db::TagDbWriter::new(pool, self).insert().await,
 		}
-
-		#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
-		return Ok(db_writer.insert().await?);
 	}
 }
 
@@ -129,8 +126,8 @@ impl<'a> Loader<'a, Tag> for TagLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
@@ -168,8 +165,8 @@ impl<'a> Loader<'a, DeepTag> for DeepTagLoader<'a> {
 			.await;
 	}
 
-	fn get_query_parameters(self) -> QueryParameters {
-		return self.query_parameters;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
 	}
 
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {

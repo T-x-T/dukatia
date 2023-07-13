@@ -96,7 +96,7 @@ impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<(), Box<dyn Error>> {
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
 		let client = self.pool.get().await?;
 		let id: i32 = client
 			.query(
@@ -111,7 +111,7 @@ impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 				client.query("INSERT INTO public.account_tags (account_id, tag_id) VALUES ($1, $2);", &[&id, &(tag_id as i32)]).await?;
 			}
 		}
-		return Ok(());
+		return Ok(id as u32);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
