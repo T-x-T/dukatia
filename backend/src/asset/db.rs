@@ -191,6 +191,34 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 	}
 }
 
+impl<'a> AssetDbWriter<'a> {
+	pub async fn replace_valuation_history(self, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
+		if self.asset.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
+		}
+
+		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap()).get_first().await?;
+	
+		let client = self.pool.get().await?;
+	
+		client.query(
+			"DELETE FROM public.asset_amounts WHERE asset_id=$1",
+			&[&(self.asset.id.unwrap() as i32)]
+		).await?;
+	
+		client.query(
+			"DELETE FROM public.asset_valuations WHERE asset_id=$1",
+			&[&(self.asset.id.unwrap() as i32)]
+		).await?;
+	
+		for asset_valuation in asset_valuations {
+			AssetValuationDbWriter::new(self.pool, asset_valuation).insert().await?;
+		}
+	
+		return Ok(());
+	}
+}
+
 #[derive(Debug)]
 pub struct AssetValuationDbWriter<'a> {
 	pool: &'a Pool,
@@ -223,6 +251,7 @@ impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 		return Ok(0);
 	}
 
+	#[allow(clippy::unused_async)]
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		return Err(Box::new(CustomError::InvalidActionForItem { action: "replace".to_string(), item_type: "AssetValuation".to_string() }))
 	}
@@ -243,29 +272,6 @@ impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
 
 		return Ok(());
 	}
-}
-
-//TODO: do something about this being standalone?
-pub async fn replace_valuation_history_of_asset(pool: &Pool, asset_id: u32, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-	super::AssetLoader::new(pool).set_filter_id(asset_id).get_first().await?;
-	
-	let client = pool.get().await?;
-
-	client.query(
-		"DELETE FROM public.asset_amounts WHERE asset_id=$1",
-		&[&(asset_id as i32)]
-	).await?;
-
-	client.query(
-		"DELETE FROM public.asset_valuations WHERE asset_id=$1",
-		&[&(asset_id as i32)]
-	).await?;
-
-	for asset_valuation in asset_valuations {
-		AssetValuationDbWriter::new(pool, asset_valuation).insert().await?;
-	}
-
-	return Ok(());
 }
 
 impl From<tokio_postgres::Row> for Asset {

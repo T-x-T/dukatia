@@ -77,21 +77,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	//TODO: replace this once Asset implements Default and uses impl
-	let mut asset: Option<Asset> = None;
-	if body.asset_id.is_some() {
-		asset = Some(Asset {
-			id: body.asset_id,
-			name: String::new(),
-			currency_id: 0,
-			user_id,
-			amount: None,
-			value_per_unit: None,
-			description: None,
-			tag_ids: None,
-			total_cost_of_ownership: None,
-		});
-	}
+	let asset: Option<Asset> = body.asset_id.map(|id| Asset::default().set_id(id).set_user_id(user_id));
 
 	let result = super::Transaction::default()
 		.set_user_id(user_id)
@@ -128,20 +114,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let mut asset: Option<Asset> = None;
-	if body.asset_id.is_some() {
-		asset = Some(Asset {
-			id: body.asset_id,
-			name: String::new(),
-			currency_id: 0,
-			user_id,
-			amount: None,
-			value_per_unit: None,
-			description: None,
-			tag_ids: None,
-			total_cost_of_ownership: None,
-		});
-	}
+	let asset: Option<Asset> = body.asset_id.map(|id| Asset::default().set_id(id).set_user_id(user_id));
 
 	let result = super::Transaction::default()
 		.set_id(*transaction_id)

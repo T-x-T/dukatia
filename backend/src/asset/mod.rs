@@ -7,6 +7,7 @@ use std::error::Error;
 use chrono::{DateTime, Utc};
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
+use crate::CustomError;
 
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct TotalCostOfOwnership {
@@ -46,7 +47,7 @@ impl Delete for Asset {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		match self.id {
 			Some(_) => return db::AssetDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
+			None => return Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
 		}
 	}
 }
@@ -96,7 +97,7 @@ impl Asset {
 
 	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
 		if self.id.is_none() {
-			return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
+			return Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
 		}
 
 		let transactions = TransactionLoader::new(pool)
@@ -110,11 +111,10 @@ impl Asset {
 	}
 
 	pub async fn replace_valuation_history(self, pool: &Pool, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-		if self.id.is_none() {
-			return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
+		match self.id {
+			Some(_) => db::AssetDbWriter::new(pool, self).replace_valuation_history(asset_valuations).await,
+			None => Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
 		}
-		
-		return Ok(db::replace_valuation_history_of_asset(pool, self.id.unwrap(), asset_valuations).await?);
 	}
 }
 
@@ -262,7 +262,7 @@ impl Save for AssetValuation {
 		new_asset_valuations.push(self.clone());
 		newer_than_input.into_iter().for_each(|x| new_asset_valuations.push(x));
 
-		db::replace_valuation_history_of_asset(pool, self.asset_id, new_asset_valuations).await?;
+		db::AssetDbWriter::new(pool, Asset::default().set_id(self.asset_id)).replace_valuation_history(new_asset_valuations).await?;
 
 		return Ok(0);
 	}
