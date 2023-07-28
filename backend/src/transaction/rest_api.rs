@@ -5,14 +5,48 @@ use crate::webserver::{AppState, is_authorized};
 use crate::asset::Asset;
 use crate::traits::*;
 
+#[derive(Debug, Deserialize)]
+struct RequestFilter {
+	skip_results: Option<u32>,
+	max_results: Option<u32>,
+	sort_property: Option<String>,
+	sort_direction: Option<String>,
+}
+
 #[get("/api/v1/transactions/all")]
-async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestFilter>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::TransactionLoader::new(&data.pool).get().await;
+	let sort_property: Option<FilterAndSortProperties> = match &request_filter.sort_property {
+		Some(x) => {
+			match x.as_str() {
+				"account_id" => Some(FilterAndSortProperties::AccountId),
+				"comment" => Some(FilterAndSortProperties::Comment),
+				"currency_id" => Some(FilterAndSortProperties::CurrencyId),
+				"id" => Some(FilterAndSortProperties::Id),
+				"recipient_id" => Some(FilterAndSortProperties::RecipientId),
+				"status" => Some(FilterAndSortProperties::Status),
+				"timestamp" => Some(FilterAndSortProperties::Timestamp),
+				"user_id" => Some(FilterAndSortProperties::UserId),
+				"total_amount" => Some(FilterAndSortProperties::TotalAmount),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_property is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
+	};
+
+	let result = super::TransactionLoader::new(&data.pool)
+		.set_query_parameters(
+			QueryParameters::default()
+				.set_max_results_opt(request_filter.max_results)
+				.set_skip_results_opt(request_filter.skip_results)
+				.set_sort_property_opt(sort_property)
+				.set_sort_direction_opt(request_filter.sort_direction.clone())
+		)
+		.get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -21,18 +55,42 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 }
 
 #[get("/api/v1/transactions/all/deep")]
-async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestFilter>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::DeepTransactionLoader::new(&data.pool).get().await;
+	let result = super::DeepTransactionLoader::new(&data.pool)
+	.set_query_parameters(
+		QueryParameters::default()
+			.set_max_results_opt(request_filter.max_results)
+			.set_skip_results_opt(request_filter.skip_results)
+	)
+	.get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
+}
+
+//TODO: needs testing
+#[get("/api/v1/transactions/summary")]
+async fn summary(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	let result = super::TransactionLoader::new(&data.pool)
+		.summarize()
+		.await;
+
+	return match result {
+		Ok(res) => HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	};
 }
 
 #[get("/api/v1/transactions/{transaction_id}")]

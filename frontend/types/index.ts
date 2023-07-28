@@ -167,6 +167,7 @@ declare global {
 		name: string,
 		type: ColumnType,
 		options?: string[],
+		sortable?: boolean,
 	}
 
 	type TableData = {
@@ -176,6 +177,8 @@ declare global {
 		rows: Row[],
 		displaySum?: boolean,
 		sumColumn?: number,
+		row_count?: number,
+		total_amount?: number,
 	}
 
 	type TableFilterOption = 
@@ -249,5 +252,12 @@ declare global {
 		top_left_y: number,
 		bottom_right_x: number,
 		bottom_right_y: number,
+	}
+
+	type QueryParameters = {
+		max_results?: number,
+		skip_results?: number,
+		sort_property?: string,
+		sort_direction?: "ASC" | "DESC",
 	}
 }

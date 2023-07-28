@@ -29,6 +29,12 @@ pub struct Position {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct TransactionSummary {
+	pub count: u32,
+	pub total_amount: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct Transaction {
 	pub id: Option<u32>,
 	pub user_id: u32,
@@ -192,6 +198,15 @@ impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
 	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
 		self.query_parameters = query_parameters;
 		return self;
+	}
+}
+
+impl<'a> TransactionLoader<'a> {
+	pub async fn summarize(self) -> Result<TransactionSummary, Box<dyn Error>> {
+		return db::TransactionDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.summarize()
+			.await;
 	}
 }
 

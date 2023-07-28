@@ -1,15 +1,68 @@
 use deadpool_postgres::Pool;
 use postgres_types::ToSql;
 use tokio_postgres::Row;
+use serde::Deserialize;
 use std::error::Error;
 
 
+#[derive(Debug, Clone, Copy, Deserialize)]
+pub enum FilterAndSortProperties {
+	AccountId,
+	Comment,
+	CurrencyId,
+	Id,
+	RecipientId,
+	Status,
+	Timestamp,
+	UserId,
+	TotalAmount,
+}
+
+impl std::fmt::Display for FilterAndSortProperties {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		return match self {
+			FilterAndSortProperties::AccountId => write!(f, "account_id"),
+			FilterAndSortProperties::Comment => write!(f, "comment"),
+			FilterAndSortProperties::CurrencyId => write!(f, "currency_id"),
+			FilterAndSortProperties::Id => write!(f, "id"),
+			FilterAndSortProperties::RecipientId => write!(f, "recipient_id"),
+			FilterAndSortProperties::Status => write!(f, "status"),
+			FilterAndSortProperties::Timestamp => write!(f, "timestamp"),
+			FilterAndSortProperties::UserId => write!(f, "user_id"),
+			FilterAndSortProperties::TotalAmount => write!(f, "total_amount"),
+		}
+	}
+}
 
 #[derive(Debug, Default, Clone)]
 pub struct QueryParameters {
 	pub max_results: Option<u32>,
 	pub skip_results: Option<u32>,
+	pub sort_property: Option<FilterAndSortProperties>,
+	pub sort_direction: Option<String>,
 	pub filters: Filters,
+}
+
+impl QueryParameters {
+	pub fn set_max_results_opt(mut self, max_results: Option<u32>) -> QueryParameters {
+		self.max_results = max_results;
+		return self;
+	}
+
+	pub fn set_skip_results_opt(mut self, skip_results: Option<u32>) -> QueryParameters {
+		self.skip_results = skip_results;
+		return self;
+	}
+
+	pub fn set_sort_property_opt(mut self, sort_property: Option<FilterAndSortProperties>) -> QueryParameters {
+		self.sort_property = sort_property;
+		return self;
+	}
+
+	pub fn set_sort_direction_opt(mut self, sort_direction: Option<String>) -> QueryParameters {
+		self.sort_direction = sort_direction;
+		return self;
+	}
 }
 
 #[derive(Debug, Default, Clone)]
@@ -84,12 +137,26 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			i += 1;
 		}
 
-		if self.get_query_parameters().max_results.is_some() {
-			parameters.push_str(format!(" LIMIT ${i}").as_str());
-			i += 1;
+		if self.get_query_parameters().sort_property.is_some() {
+			let direction = match &self.get_query_parameters().sort_direction {
+				Some(x) => match x.as_str() {
+					"ASC" => "ASC",
+					_ => "DESC",
+				},
+				None => "DESC",
+			};
+
+			parameters.push_str(format!(" ORDER BY {} {}", self.get_query_parameters().sort_property.unwrap(), direction).as_str());
 		}
+
 		if self.get_query_parameters().skip_results.is_some() {
 			parameters.push_str(format!(" OFFSET ${i}").as_str());
+			parameter_values.push(Box::new(i64::from(self.get_query_parameters().skip_results.unwrap())));
+			i += 1;
+		}
+		if self.get_query_parameters().max_results.is_some() {
+			parameters.push_str(format!(" LIMIT ${i}").as_str());
+			parameter_values.push(Box::new(i64::from(self.get_query_parameters().max_results.unwrap())));
 		}
 
 		return (

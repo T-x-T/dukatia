@@ -58,6 +58,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(recipient::rest_api::put)
 			.service(transaction::rest_api::get_all)
 			.service(transaction::rest_api::get_all_deep)
+			.service(transaction::rest_api::summary)
 			.service(transaction::rest_api::get_by_id)
 			.service(transaction::rest_api::post)
 			.service(transaction::rest_api::put)

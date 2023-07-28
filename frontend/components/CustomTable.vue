@@ -11,10 +11,14 @@
 					<th v-for="(header, index) in tableData.columns" :key="index">
 						<div v-if="Number.isInteger(openFilter)" class="clickTarget" @click="openFilter = null"></div>
 						
-						<p @click="updateSort(index)">{{header.name}}
-							<svg v-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
-							<svg v-else-if="currentSort.filter(x => x.index === index)[0] && currentSort.filter(x => x.index === index)[0].direction == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
+						<p v-if="tableData.columns[index].sortable" @click="updateSort(index)">
+							{{header.name}}
+							<svg v-if="currentSort.column === index && currentSort.sort == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+							<svg v-else-if="currentSort.column === index && currentSort.sort == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
 							<svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+						</p>
+						<p v-else>
+							{{header.name}}
 						</p>
 
 						<div v-if="header.type == 'choice'" class="columnHeaderWrapper">
@@ -130,7 +134,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsCurrentPage" :key="index" :ref="x => x = row[0]">
+				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
@@ -138,18 +142,18 @@
 		</table>
 		<div id="bottom_bar" class="background_color_darkest">
 			<div>
-				<p>Count: {{rowsForDisplay?.length}}</p>
-				<p v-if="sum">{{sum}}</p>
+				<p>Count: {{tableData.row_count}}</p>
+				<p v-if="sum">{{tableData.total_amount}}</p>
 			</div>
 			<div>
 				<label for="page_size">Rows per Page: </label>
-				<input type="number" name="page_size" v-model="pageSize">
-				<button @click="currentPage=0">First</button>
-				<button @click="currentPage--">Previous</button>
+				<input type="number" name="page_size" v-model="pageSize" @change="updatePage()">
+				<button @click="() => {currentPage=0; updatePage()}">First</button>
+				<button @click="() => {currentPage--; updatePage()}">Previous</button>
 				<label for="current_page">Page</label>
-				<input type="number" name="current_page" v-model="currentPage">
-				<button @click="currentPage++">Next</button>
-				<button @click="currentPage=Math.ceil(rowsForDisplay.length / pageSize) - 1">Last</button>
+				<input type="number" name="current_page" v-model="currentPage" @change="updatePage()">
+				<button @click="() => {currentPage++; updatePage()}">Next</button>
+				<button @click="() => {currentPage=Math.ceil((Number.isInteger(tableData.row_count) ? Number(tableData.row_count) : 0) / pageSize) - 1; updatePage()}">Last</button>
 			</div>
 		</div>
 	</div>
@@ -160,10 +164,9 @@ export default {
 	data: () => ({
 		currencies: [] as Currency[],
 		rows: [] as Row[],
-		currentSort: [] as {index: number, direction: "asc" | "desc"}[],
+		currentSort: {} as TableSort,
 		filters: [] as TableFilter[],
 		rowsForDisplay: [] as Row[],
-		rowsCurrentPage: [] as Row[],
 		selectedRows: [] as boolean[],
 		openFilter: null as number | null,
 		allRowsSelected: false,
@@ -201,16 +204,14 @@ export default {
 				});
 				
 				this.currencies = await $fetch("/api/v1/currencies/all") as Currency[];
-				this.applyDefaultSort();
-				this.fillSelectedRows();
-			} else {
-				this.sort();
+				this.currentSort = this.tableData.defaultSort;
+				this.resetSelectedRows();
 			}
 
 			this.filter();
 		},
 
-		fillSelectedRows() {
+		resetSelectedRows() {
 			this.selectedRows = [];
 			this.rowsForDisplay.forEach(() => this.selectedRows.push(false));
 		},
@@ -220,101 +221,26 @@ export default {
 			this.selectedRows = this.selectedRows.map(() => this.allRowsSelected);
 		},
 
-		applyDefaultSort() {
-			this.currentSort[0] = {
-				index: this.tableData.defaultSort.column,
-				direction: this.tableData.defaultSort.sort
-			}
-			this.sort();
-		},
-
 		updateSort(i: number) {
-			if(this.currentSort.filter(x => x.index === i).length !== 0) { //If column i is sorted
-				const currentSortPrio = this.currentSort.findIndex(x => x.index === i);
-				if(this.currentSort[currentSortPrio].direction === "asc") {
-					this.currentSort.splice(currentSortPrio, 1);
-					this.currentSort.unshift({
-						index: i,
-						direction: "desc"
-					});
-					this.sort();
+			if(this.currentSort.column === i) {
+				if(this.currentSort.sort == "desc") {
+					this.currentSort.sort = "asc";
 				} else {
-					this.currentSort.splice(currentSortPrio, 1);
-					if(this.currentSort.length === 0) {
-						this.applyDefaultSort();
-					} else {
-						this.sort();
-					}
-					return;
+					this.currentSort = this.tableData.defaultSort;
 				}
 			} else {
-				if(
-					this.currentSort.length === 1 &&
-					this.currentSort[0].index === this.tableData.defaultSort.column &&
-					this.currentSort[0].direction === this.tableData.defaultSort.sort
-				) { //If default sort is applied
-					this.currentSort.shift();
-				}
-				this.currentSort.unshift({
-					index: i,
-					direction: "asc"
-				});
-				this.sort();
+				this.currentSort = {
+					column: i,
+					sort: "desc",
+				};
 			}
+			const property_name = this.tableData.columns[this.currentSort.column].name;
+			const direction = this.currentSort.sort;
+			this.$emit("updateSort", property_name, direction);
 		},
-
-		sort() {
-			this.fillSelectedRows();
-
-			const columnType = this.tableData.columns[this.currentSort[0].index].type;	
-			const reverseSort = this.currentSort[0].direction == "desc" ? true : false;
-
-			switch(columnType) {
-				case "string": {
-					this.sortStringColumn(this.currentSort[0].index, reverseSort);
-					break;
-				}
-				case "number": {
-					this.sortNumberColumn(this.currentSort[0].index, reverseSort);
-					break;
-				}
-				case "date": {
-					this.sortDateColumn(this.currentSort[0].index, reverseSort);
-					break;
-				}
-				case "choice": {
-					this.sortStringColumn(this.currentSort[0].index, reverseSort);
-					break;
-				}
-			}
-		},
-
-		sortNumberColumn(i: number, asc: boolean) {
-			this.rows.sort((a, b) => {
-				return asc ? parseInt(b[i]) - parseInt(a[i]) : parseInt(a[i]) - parseInt(b[i]);
-			});
-		},
-
-		sortStringColumn(i: number, asc: boolean) {
-			this.rows.sort((a, b) => {
-				if(a[i].toLowerCase() > b[i].toLowerCase()) {
-					return asc ? 1 : -1;
-				} else if(a[i].toLowerCase() < b[i].toLowerCase()) {
-					return asc ? -1 : 1;
-				} else {
-					return 0;
-				}
-			});
-		},
-
-		sortDateColumn(i: number, asc: boolean) {
-			this.rows.sort((a, b) => {
-				return asc ? Date.parse(b[i]) - Date.parse(a[i]) : Date.parse(a[i]) - Date.parse(b[i]);
-			});
-		},
-
+		
 		filter() {
-			this.fillSelectedRows();
+			this.resetSelectedRows();
 			this.rowsForDisplay = this.rows;
 			for(let i = 0; i < this.filters.length; i++) {
 				if(this.filters[i].type == "choice" && this.filters[i].value) {
@@ -400,14 +326,17 @@ export default {
 		},
 
 		updateRowsCurrentPage() {
-			this.fillSelectedRows();
+			this.resetSelectedRows();
 			if(this.currentPage < 0) this.currentPage = 0;
-			const startingIndex = this.currentPage * this.pageSize;
-			this.rowsCurrentPage = this.rowsForDisplay.slice(startingIndex, startingIndex + this.pageSize);
-			if(this.currentPage > Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1) {
-				this.currentPage = Math.ceil(this.rowsForDisplay.length / this.pageSize) - 1;
+			if(this.currentPage > Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 0) / this.pageSize) - 1) {
+				this.currentPage = Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 0) / this.pageSize) - 1;
 			}
 		},
+		
+		updatePage() {
+			this.$emit("updatePage", this.currentPage, this.pageSize);
+			this.updateRowsCurrentPage();
+		}
 	},
 	watch: {
 		selectedRows: {
@@ -431,12 +360,6 @@ export default {
 				this.updateRowsCurrentPage();
 			},
 			deep: true
-		},
-		currentPage() {
-			this.updateRowsCurrentPage();
-		},
-		pageSize() {
-			this.updateRowsCurrentPage();
 		}
 	}
 }

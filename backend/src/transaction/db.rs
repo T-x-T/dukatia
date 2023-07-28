@@ -1,10 +1,10 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
-use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position};
+use super::{Transaction, TransactionStatus, Asset, DeepTransaction, Position, TransactionSummary};
 use crate::traits::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransactionDbReader<'a> {
 	query_parameters: QueryParameters,
 	pool: &'a Pool,
@@ -35,11 +35,29 @@ impl<'a> DbReader<'a, Transaction> for TransactionDbReader<'a> {
 		let query = "SELECT * FROM public.transaction_data";
 		return Ok(
 			self.actually_execute(query)
-			.await?
-			.into_iter()
-			.map(Into::into)
-			.collect()
+				.await?
+				.into_iter()
+				.map(Into::into)
+				.collect()
 		);
+	}
+}
+
+
+impl<'a> TransactionDbReader<'a> {
+	pub async fn summarize(self) -> Result<TransactionSummary, Box<dyn Error>> {
+		let total_amount_query = "SELECT * FROM public.transaction_total_amount";
+		let count_query = "SELECT COUNT(*) FROM public.transactions";
+
+		let temp = self.clone().actually_execute(total_amount_query).await?;
+		let total_amount = temp.into_iter().fold(String::new(), |a, b| a + " " + b.get(1)).trim().to_string();
+
+		let temp = self.actually_execute(count_query).await?;
+		let count_result = temp.first().unwrap();
+
+		let count: i64 = count_result.get(0);
+
+		return Ok(TransactionSummary { count: count as u32, total_amount });
 	}
 }
 
@@ -258,6 +276,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let transaction_position_amounts: Vec<Option<i32>> = value.get(13);
 		let transaction_position_comments: Vec<Option<String>> = value.get(14);
 		let transaction_position_tag_ids: Vec<Option<i32>> = value.get(15);
+		let total_amount: i64 = value.get(16);
 
 		let mut asset: Option<Asset> = None;
 		if asset_id.is_some() {
@@ -287,12 +306,6 @@ impl From<tokio_postgres::Row> for Transaction {
 				}
 			}).collect();
 
-		let mut total_amount: i32 = 0;
-		transaction_position_amounts
-			.into_iter()
-			.filter(Option::is_some)
-			.for_each(|x| total_amount += x.unwrap());
-
 		return Transaction::default()
 			.set_id(id as u32)
 			.set_user_id(user_id as u32)
@@ -305,7 +318,7 @@ impl From<tokio_postgres::Row> for Transaction {
 				_ => panic!("invalid transaction status found in row from database")
 			})
 			.set_timestamp(timestamp)
-			.set_total_amount(total_amount)
+			.set_total_amount(total_amount.try_into().unwrap())
 			.set_comment_opt(comment)
 			.set_tag_ids(tag_ids)
 			.set_asset_opt(asset)
