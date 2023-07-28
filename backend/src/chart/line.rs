@@ -343,9 +343,9 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap()).get_first().await?;
-	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
-	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap()).get().await?;
+	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
+	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
 	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
 	let amount_history: BTreeMap<DateTime<Utc>, f64> = asset_valuation_history.iter().map(|x| (x.timestamp, x.amount)).collect();
 	
@@ -387,9 +387,9 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap()).get_first().await?;
-	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
-	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap()).get().await?;
+	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
+	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
 	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
@@ -429,8 +429,8 @@ async fn compute_asset_amount(pool: &Pool, chart: Chart) -> Result<Vec<(std::str
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
 	
-	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap()).get_first().await?;
-	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap()).get().await?;
+	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
 	let amount_history: BTreeMap<DateTime<Utc>, f64> = asset_valuation_history.iter().map(|x| (x.timestamp, x.amount)).collect();
 
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();

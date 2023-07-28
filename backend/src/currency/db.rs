@@ -74,7 +74,7 @@ impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("currency") }));
 		}
 	
-		super::CurrencyLoader::new(self.pool).set_filter_id(self.currency.id.unwrap()).get_first().await?;
+		super::CurrencyLoader::new(self.pool).set_filter_id(self.currency.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	
 		self.pool.get()
 			.await

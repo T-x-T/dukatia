@@ -63,15 +63,68 @@ impl QueryParameters {
 		self.sort_direction = sort_direction;
 		return self;
 	}
+
+	pub fn set_filters(mut self, filters: Filters) -> QueryParameters {
+		self.filters = filters;
+		return self;
+	}
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct Filters {
-	pub id: Option<u32>,
-	pub asset_id: Option<u32>,
-	pub user_id: Option<u32>,
+	pub id: Option<(u32, NumberFilterModes)>,
+	pub asset_id: Option<(u32, NumberFilterModes)>,
+	pub user_id: Option<(u32, NumberFilterModes)>,
+	pub currency_id: Option<(u32, NumberFilterModes)>,
+	pub account_id: Option<(u32, NumberFilterModes)>,
+	pub recipient_id: Option<(u32, NumberFilterModes)>,
+	pub comment: Option<(String, StringFilterModes)>,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum NumberFilterModes {
+	Exact, Not, Less, More
+}
+
+impl Default for NumberFilterModes {
+	fn default() -> Self {
+		return Self::Exact;
+	}
+}
+
+impl From<String> for NumberFilterModes {
+	fn from(value: String) -> Self {
+		return match value.as_str() {
+			"not" => NumberFilterModes::Not,
+			"more" => NumberFilterModes::More,
+			"less" => NumberFilterModes::Less,
+			_ => NumberFilterModes::Exact,
+		}
+	}
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum StringFilterModes {
+	Contains, Exact, BeginsWith, EndsWith, DoesntContain
+}
+
+impl Default for StringFilterModes {
+	fn default() -> Self {
+		return Self::Contains;
+	}
+}
+
+impl From<String> for StringFilterModes {
+	fn from(value: String) -> Self {
+		return match value.as_str() {
+			"exact" => StringFilterModes::Exact,
+			"begins_with" => StringFilterModes::BeginsWith,
+			"ends_with" => StringFilterModes::EndsWith,
+			"doesnt_contain" => StringFilterModes::DoesntContain,
+			_ => StringFilterModes::Contains,
+		}
+	}
+}
 
 
 
@@ -89,21 +142,45 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn set_query_parameters(self, query_parameters: QueryParameters) -> Self;
 	async fn get(self) -> Result<Vec<T>, Box<dyn Error>>;
 	
-	fn set_filter_id(self, id: u32) -> Self {
+	fn set_filter_id(self, id: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
-		query_parameters.filters.id = Some(id);
+		query_parameters.filters.id = Some((id, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_asset_id(self, asset_id: u32) -> Self {
+	fn set_filter_asset_id(self, asset_id: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
-		query_parameters.filters.asset_id = Some(asset_id);
+		query_parameters.filters.asset_id = Some((asset_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_user_id(self, user_id: u32) -> Self {
+	fn set_filter_user_id(self, user_id: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
-		query_parameters.filters.user_id = Some(user_id);
+		query_parameters.filters.user_id = Some((user_id, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_currency_id(self, currency_id: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.currency_id = Some((currency_id, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_account_id(self, account_id: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.account_id = Some((account_id, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_recipient_id(self, recipient_id: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.recipient_id = Some((recipient_id, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_comment(self, comment: String, filter_mode: StringFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.comment = Some((comment, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
@@ -122,20 +199,116 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 	fn set_query_parameters(self, query_parameters: QueryParameters) -> Self;
 	async fn execute(self) -> Result<Vec<T>, Box<dyn Error>>;
 
+	#[allow(clippy::too_many_lines)]
 	fn get_formatted_query_parameters(&self) -> (String, Vec<Box<(dyn ToSql + Sync)>>)  {
 		let mut i = 1;
 		let mut parameters = String::new();
 		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
 
+		
+		
+		let mut first_where_clause = true;
+
 		if self.get_query_parameters().filters.id.is_some() {
-			parameters.push_str(format!(" WHERE id=${i}").as_str());
-			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap() as i32));
-			i += 1;
-		} else if self.get_query_parameters().filters.asset_id.is_some() {
-			parameters.push_str(format!(" WHERE asset_id=${i}").as_str());
-			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap() as i32));
+			match self.get_query_parameters().filters.id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0 as i32));
 			i += 1;
 		}
+		
+		if self.get_query_parameters().filters.asset_id.is_some() {
+			match self.get_query_parameters().filters.asset_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} asset_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} asset_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} asset_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} asset_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.user_id.is_some() {
+			match self.get_query_parameters().filters.user_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} user_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} user_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} user_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} user_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.user_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.currency_id.is_some() {
+			match self.get_query_parameters().filters.currency_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} currency_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} currency_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} currency_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} currency_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.currency_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.account_id.is_some() {
+			match self.get_query_parameters().filters.account_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} account_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} account_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} account_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} account_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.account_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.recipient_id.is_some() {
+			match self.get_query_parameters().filters.recipient_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} recipient_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} recipient_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} recipient_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} recipient_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.comment.is_some() {
+			match self.get_query_parameters().filters.comment.clone().unwrap().1 {
+				StringFilterModes::Exact => {
+					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameter_values.push(Box::new(self.get_query_parameters().filters.comment.clone().unwrap().0));
+				},
+				StringFilterModes::Contains => {
+					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
+				},
+				StringFilterModes::BeginsWith => {
+					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
+				},
+				StringFilterModes::EndsWith => {
+					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.comment.clone().unwrap().0)));
+				},
+				StringFilterModes::DoesntContain => {
+					parameters.push_str(format!(" {} comment NOT LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
+				},
+			};
+			//first_where_clause = false;
+			i += 1;
+		}
+
+
 
 		if self.get_query_parameters().sort_property.is_some() {
 			let direction = match &self.get_query_parameters().sort_direction {
@@ -167,6 +340,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 
 	async fn actually_execute(self, query: &str) -> Result<Vec<Row>, Box<dyn Error>> {
 		let parameters = self.get_formatted_query_parameters();
+		println!("{parameters:?}");
 		let parameter_values: Vec<_> = parameters.1.iter()
 			.map(|x| &**x as &(dyn ToSql + Sync))
 			.collect();

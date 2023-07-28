@@ -168,7 +168,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 		}
 	
-		super::TransactionLoader::new(self.pool).set_filter_id(self.transaction.id.unwrap()).get_first().await?;
+		super::TransactionLoader::new(self.pool).set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 	

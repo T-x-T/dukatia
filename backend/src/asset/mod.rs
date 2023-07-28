@@ -101,7 +101,7 @@ impl Asset {
 		}
 
 		let transactions = TransactionLoader::new(pool)
-			.set_filter_asset_id(self.id.unwrap())
+			.set_filter_asset_id(self.id.unwrap(), NumberFilterModes::Exact)
 			.get().await?;
 		
 		return Ok(Self {
@@ -171,7 +171,7 @@ pub struct DeepAsset {
 impl DeepAsset {
 	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<DeepAsset, Box<dyn Error>> {
 		let transactions = TransactionLoader::new(pool)
-		.set_filter_asset_id(self.id)
+		.set_filter_asset_id(self.id, NumberFilterModes::Exact)
 		.get().await?;
 	
 		return Ok(DeepAsset {
@@ -228,7 +228,7 @@ pub struct AssetValuation {
 
 impl Save for AssetValuation {
 	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		let valuation_history = AssetValuationLoader::new(pool).set_filter_asset_id(self.asset_id).get().await?;
+		let valuation_history = AssetValuationLoader::new(pool).set_filter_asset_id(self.asset_id, NumberFilterModes::Exact).get().await?;
 		let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
 			.filter(
 				|x| x.timestamp.signed_duration_since(self.timestamp).num_seconds() > 0

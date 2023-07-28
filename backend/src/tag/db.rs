@@ -111,7 +111,7 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
 		}
 	
-		super::TagLoader::new(self.pool).set_filter_id(self.tag.id.unwrap()).get_first().await?;
+		super::TagLoader::new(self.pool).set_filter_id(self.tag.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	
 		self.pool.get()
 			.await?

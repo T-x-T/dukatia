@@ -47,7 +47,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::P
 	};
 
 	let result = super::AssetLoader::new(&data.pool)
-		.set_filter_id(*asset_id)
+		.set_filter_id(*asset_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {
@@ -142,7 +142,7 @@ async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpR
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::AssetValuationLoader::new(&data.pool).set_filter_asset_id(*asset_id).get().await;
+	let result = super::AssetValuationLoader::new(&data.pool).set_filter_asset_id(*asset_id, NumberFilterModes::Exact).get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -207,7 +207,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	let mut asset_valuation = body;
 
 	if asset_valuation.amount_change.is_some() {
-		let valuation_history = super::AssetValuationLoader::new(&data.pool).set_filter_asset_id(asset_id).get().await.expect("couldnt get amount history");
+		let valuation_history = super::AssetValuationLoader::new(&data.pool).set_filter_asset_id(asset_id, NumberFilterModes::Exact).get().await.expect("couldnt get amount history");
 		let mut last_asset_valuation_amount: f64 = 0.0;
 		for x in valuation_history {
 			if x.timestamp.signed_duration_since(asset_valuation.timestamp).num_seconds() < 0 {
@@ -225,7 +225,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 
 async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: u32, user_id: u32) -> Result<(), Box<dyn Error>> {
 	let asset = super::AssetLoader::new(pool)
-		.set_filter_id(asset_id)
+		.set_filter_id(asset_id, NumberFilterModes::Exact)
 		.get_first().await?;
 
 	super::AssetValuation {
@@ -241,7 +241,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
-	let currency = CurrencyLoader::new(pool).set_filter_id(asset.currency_id).get_first().await?;
+	let currency = CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
 	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_mayor), currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {

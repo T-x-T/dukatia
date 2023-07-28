@@ -26,7 +26,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web
 	};
 
 	let result = super::CurrencyLoader::new(&data.pool)
-		.set_filter_id(*currency_id)
+		.set_filter_id(*currency_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {

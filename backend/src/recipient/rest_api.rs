@@ -41,7 +41,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, recipient_id: we
 	};
 
 	let result = super::RecipientLoader::new(&data.pool)
-		.set_filter_id(*recipient_id)
+		.set_filter_id(*recipient_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {

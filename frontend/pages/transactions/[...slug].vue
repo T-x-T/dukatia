@@ -155,7 +155,7 @@ export default {
 						{name: "Asset", type: "choice", options: [...new Set(this.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
 						{name: "Timestamp", type: "date", sortable: true},
 						{name: "Amount", type: "number"},
-						{name: "Comment", type: "string"},
+						{name: "Comment", type: "string", sortable: true},
 						{name: "Tags", type: "choice", options: [...new Set(this.tags.map(x => x.name))]}
 					],
 					rows: transactionsForDisplay.map(x => ([

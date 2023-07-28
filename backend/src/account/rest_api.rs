@@ -40,7 +40,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web:
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::AccountLoader::new(&data.pool).set_filter_id(*account_id).get_first().await;
+	let result = super::AccountLoader::new(&data.pool).set_filter_id(*account_id, NumberFilterModes::Exact).get_first().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),

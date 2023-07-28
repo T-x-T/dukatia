@@ -41,7 +41,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Pat
 	};
 
 	let result = super::TagLoader::new(&data.pool)
-	.set_filter_id(*tag_id)
+	.set_filter_id(*tag_id, NumberFilterModes::Exact)
 	.get_first()
 	.await;
 

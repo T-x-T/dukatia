@@ -164,7 +164,7 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
 		}
 	
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap()).get_first().await?;
+		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 	
@@ -197,7 +197,7 @@ impl<'a> AssetDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
 		}
 
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap()).get_first().await?;
+		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 	
@@ -234,7 +234,7 @@ impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	}
 
 	async fn insert(self) -> Result<u32, Box<dyn Error>> {
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset_valuation.asset_id).get_first().await?;
+		super::AssetLoader::new(self.pool).set_filter_id(self.asset_valuation.asset_id, NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 		

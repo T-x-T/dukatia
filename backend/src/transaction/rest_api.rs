@@ -6,21 +6,35 @@ use crate::asset::Asset;
 use crate::traits::*;
 
 #[derive(Debug, Deserialize)]
-struct RequestFilter {
+struct RequestParameters {
 	skip_results: Option<u32>,
 	max_results: Option<u32>,
 	sort_property: Option<String>,
 	sort_direction: Option<String>,
+	filter_id: Option<u32>,
+	filter_mode_id: Option<String>,
+	filter_asset_id: Option<u32>,
+	filter_mode_asset_id: Option<String>,
+	filter_user_id: Option<u32>,
+	filter_mode_user_id: Option<String>,
+	filter_currency_id: Option<u32>,
+	filter_mode_currency_id: Option<String>,
+	filter_account_id: Option<u32>,
+	filter_mode_account_id: Option<String>,
+	filter_recipient_id: Option<u32>,
+	filter_mode_recipient_id: Option<String>,
+	filter_comment: Option<String>,
+	filter_mode_comment: Option<String>,
 }
 
 #[get("/api/v1/transactions/all")]
-async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestFilter>) -> impl Responder {
+async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let sort_property: Option<FilterAndSortProperties> = match &request_filter.sort_property {
+	let sort_property: Option<FilterAndSortProperties> = match &request_parameters.sort_property {
 		Some(x) => {
 			match x.as_str() {
 				"account_id" => Some(FilterAndSortProperties::AccountId),
@@ -38,13 +52,38 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_filter: we
 		None => None,
 	};
 
+	let filters = Filters { 
+		id: request_parameters.filter_id.map(|x| {
+			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+		}),
+		asset_id: request_parameters.filter_asset_id.map(|x| {
+			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
+		}),
+		user_id: request_parameters.filter_user_id.map(|x| {
+			(x, request_parameters.filter_mode_user_id.clone().unwrap_or(String::new()).into())
+		}),
+		currency_id: request_parameters.filter_currency_id.map(|x| {
+			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or(String::new()).into())
+		}),
+		account_id: request_parameters.filter_account_id.map(|x| {
+			(x, request_parameters.filter_mode_account_id.clone().unwrap_or(String::new()).into())
+		}),
+		recipient_id: request_parameters.filter_recipient_id.map(|x| {
+			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+		}),
+		comment: request_parameters.filter_comment.clone().map(|x| {
+			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
+		})
+	};
+
 	let result = super::TransactionLoader::new(&data.pool)
 		.set_query_parameters(
 			QueryParameters::default()
-				.set_max_results_opt(request_filter.max_results)
-				.set_skip_results_opt(request_filter.skip_results)
+				.set_max_results_opt(request_parameters.max_results)
+				.set_skip_results_opt(request_parameters.skip_results)
 				.set_sort_property_opt(sort_property)
-				.set_sort_direction_opt(request_filter.sort_direction.clone())
+				.set_sort_direction_opt(request_parameters.sort_direction.clone())
+				.set_filters(filters)
 		)
 		.get().await;
 
@@ -55,7 +94,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_filter: we
 }
 
 #[get("/api/v1/transactions/all/deep")]
-async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestFilter>) -> impl Responder {
+async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -101,7 +140,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
-		.set_filter_id(*transaction_id)
+		.set_filter_id(*transaction_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {
