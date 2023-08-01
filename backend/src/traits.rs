@@ -2,6 +2,7 @@ use deadpool_postgres::Pool;
 use postgres_types::ToSql;
 use tokio_postgres::Row;
 use serde::Deserialize;
+use chrono::{DateTime, Utc};
 use std::error::Error;
 
 
@@ -79,6 +80,7 @@ pub struct Filters {
 	pub account_id: Option<(u32, NumberFilterModes)>,
 	pub recipient_id: Option<(u32, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
+	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -122,6 +124,26 @@ impl From<String> for StringFilterModes {
 			"ends_with" => StringFilterModes::EndsWith,
 			"doesnt_contain" => StringFilterModes::DoesntContain,
 			_ => StringFilterModes::Contains,
+		}
+	}
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum TimeRangeFilterModes {
+	Between, Outside
+}
+
+impl Default for TimeRangeFilterModes {
+	fn default() -> Self {
+		return Self::Between;
+	}
+}
+
+impl From<String> for TimeRangeFilterModes {
+	fn from(value: String) -> Self {
+		return match value.as_str() {
+			"outside" => TimeRangeFilterModes::Outside,
+			_ => TimeRangeFilterModes::Between,
 		}
 	}
 }
@@ -184,6 +206,12 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
+	fn set_filter_time_range(self, lower_time: DateTime<Utc>, upper_time: DateTime<Utc>, filter_mode: TimeRangeFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.time_range = Some((lower_time, upper_time, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
 	async fn get_first(self) -> Result<T, Box<dyn Error>> {
 		match self.get().await?.first() {
 			Some(x) => return Ok(x.clone()),
@@ -200,7 +228,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 	async fn execute(self) -> Result<Vec<T>, Box<dyn Error>>;
 
 	#[allow(clippy::too_many_lines)]
-	fn get_formatted_query_parameters(&self) -> (String, Vec<Box<(dyn ToSql + Sync)>>)  {
+	fn get_formatted_query_parameters(&self, table_name: Option<String>) -> (String, Vec<Box<(dyn ToSql + Sync)>>)  {
 		let mut i = 1;
 		let mut parameters = String::new();
 		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
@@ -211,10 +239,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 
 		if self.get_query_parameters().filters.id.is_some() {
 			match self.get_query_parameters().filters.id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0 as i32));
@@ -223,10 +251,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.asset_id.is_some() {
 			match self.get_query_parameters().filters.asset_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} asset_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} asset_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} asset_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} asset_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}asset_id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}asset_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}asset_id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}asset_id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap().0 as i32));
@@ -235,10 +263,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.user_id.is_some() {
 			match self.get_query_parameters().filters.user_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} user_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} user_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} user_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} user_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}user_id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}user_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}user_id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}user_id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.user_id.unwrap().0 as i32));
@@ -247,10 +275,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.currency_id.is_some() {
 			match self.get_query_parameters().filters.currency_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} currency_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} currency_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} currency_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} currency_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}currency_id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}currency_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}currency_id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}currency_id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.currency_id.unwrap().0 as i32));
@@ -259,10 +287,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.account_id.is_some() {
 			match self.get_query_parameters().filters.account_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} account_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} account_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} account_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} account_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}account_id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}account_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}account_id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}account_id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.account_id.unwrap().0 as i32));
@@ -271,10 +299,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.recipient_id.is_some() {
 			match self.get_query_parameters().filters.recipient_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} recipient_id=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} recipient_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} recipient_id<${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} recipient_id>${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str()),
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}recipient_id=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}recipient_id!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}recipient_id<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}recipient_id>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0 as i32));
@@ -284,28 +312,39 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		if self.get_query_parameters().filters.comment.is_some() {
 			match self.get_query_parameters().filters.comment.clone().unwrap().1 {
 				StringFilterModes::Exact => {
-					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(self.get_query_parameters().filters.comment.clone().unwrap().0));
 				},
 				StringFilterModes::Contains => {
-					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::BeginsWith => {
-					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::EndsWith => {
-					parameters.push_str(format!(" {} comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::DoesntContain => {
-					parameters.push_str(format!(" {} comment NOT LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}).as_str());
+					parameters.push_str(format!(" {} {}comment NOT LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 			};
-			//first_where_clause = false;
+			first_where_clause = false;
 			i += 1;
+		}
+
+		if self.get_query_parameters().filters.time_range.is_some() {
+			match self.get_query_parameters().filters.time_range.unwrap().2 {
+				TimeRangeFilterModes::Between => parameters.push_str(format!(" {} {}timestamp BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+				TimeRangeFilterModes::Outside => parameters.push_str(format!(" {} {}timestamp NOT BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+			};
+			//first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.time_range.unwrap().0));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.time_range.unwrap().1));
+			i += 2;
 		}
 
 
@@ -319,7 +358,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				None => "DESC",
 			};
 
-			parameters.push_str(format!(" ORDER BY {} {}", self.get_query_parameters().sort_property.unwrap(), direction).as_str());
+			parameters.push_str(format!(" ORDER BY {}{} {}", if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, self.get_query_parameters().sort_property.unwrap(), direction).as_str());
 		}
 
 		if self.get_query_parameters().skip_results.is_some() {
@@ -339,8 +378,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 	}
 
 	async fn actually_execute(self, query: &str) -> Result<Vec<Row>, Box<dyn Error>> {
-		let parameters = self.get_formatted_query_parameters();
-		println!("{parameters:?}");
+		let parameters = self.get_formatted_query_parameters(None);
 		let parameter_values: Vec<_> = parameters.1.iter()
 			.map(|x| &**x as &(dyn ToSql + Sync))
 			.collect();

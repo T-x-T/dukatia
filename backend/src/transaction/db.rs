@@ -46,11 +46,24 @@ impl<'a> DbReader<'a, Transaction> for TransactionDbReader<'a> {
 
 impl<'a> TransactionDbReader<'a> {
 	pub async fn summarize(self) -> Result<TransactionSummary, Box<dyn Error>> {
-		let total_amount_query = "SELECT * FROM public.transaction_total_amount";
 		let count_query = "SELECT COUNT(*) FROM public.transactions";
 
-		let temp = self.clone().actually_execute(total_amount_query).await?;
-		let total_amount = temp.into_iter().fold(String::new(), |a, b| a + " " + b.get(1)).trim().to_string();
+		let parameters = self.get_formatted_query_parameters(Some("tr".to_string()));
+		let parameter_values: Vec<_> = parameters.1.iter()
+			.map(|x| &**x as &(dyn postgres_types::ToSql + Sync))
+			.collect();
+
+		let total_amount = self.get_pool()
+			.get()
+			.await?
+			.query(
+				format!("SELECT tr.currency_id, concat(trunc(sum(p.amount::numeric) / c.minor_in_mayor::numeric, 2)::text, c.symbol) AS total_amount FROM transactions tr LEFT JOIN transaction_positions p ON tr.id = p.transaction_id LEFT JOIN currencies c ON tr.currency_id = c.id {} GROUP BY tr.currency_id, c.symbol, c.minor_in_mayor;"
+				, parameters.0).as_str(), parameter_values.as_slice()
+			).await?
+		  .into_iter()
+			.fold(String::new(), |a, b| a + " " + b.get(1))
+			.trim()
+			.to_string();
 
 		let temp = self.actually_execute(count_query).await?;
 		let count_result = temp.first().unwrap();

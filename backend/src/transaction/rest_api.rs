@@ -25,6 +25,9 @@ struct RequestParameters {
 	filter_mode_recipient_id: Option<String>,
 	filter_comment: Option<String>,
 	filter_mode_comment: Option<String>,
+	filter_time_range_lower: Option<DateTime<Utc>>,
+	filter_time_range_upper: Option<DateTime<Utc>>,
+	filter_mode_time_range: Option<String>,
 }
 
 #[get("/api/v1/transactions/all")]
@@ -73,7 +76,12 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		}),
 		comment: request_parameters.filter_comment.clone().map(|x| {
 			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
-		})
+		}),
+		time_range: request_parameters.filter_time_range_lower.clone().and_then(|x| {
+			request_parameters.filter_time_range_upper.clone().map(|y| {
+				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
+			})
+		}),
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
@@ -94,7 +102,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/transactions/all/deep")]
-async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filter: web::Query<RequestParameters>) -> impl Responder {
+async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -103,8 +111,8 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filte
 	let result = super::DeepTransactionLoader::new(&data.pool)
 	.set_query_parameters(
 		QueryParameters::default()
-			.set_max_results_opt(request_filter.max_results)
-			.set_skip_results_opt(request_filter.skip_results)
+			.set_max_results_opt(request_parameters.max_results)
+			.set_skip_results_opt(request_parameters.skip_results)
 	)
 	.get().await;
 
@@ -116,13 +124,46 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_filte
 
 //TODO: needs testing
 #[get("/api/v1/transactions/summary")]
-async fn summary(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
+	let filters = Filters { 
+		id: request_parameters.filter_id.map(|x| {
+			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+		}),
+		asset_id: request_parameters.filter_asset_id.map(|x| {
+			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
+		}),
+		user_id: request_parameters.filter_user_id.map(|x| {
+			(x, request_parameters.filter_mode_user_id.clone().unwrap_or(String::new()).into())
+		}),
+		currency_id: request_parameters.filter_currency_id.map(|x| {
+			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or(String::new()).into())
+		}),
+		account_id: request_parameters.filter_account_id.map(|x| {
+			(x, request_parameters.filter_mode_account_id.clone().unwrap_or(String::new()).into())
+		}),
+		recipient_id: request_parameters.filter_recipient_id.map(|x| {
+			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+		}),
+		comment: request_parameters.filter_comment.clone().map(|x| {
+			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
+		}),
+		time_range: request_parameters.filter_time_range_lower.clone().and_then(|x| {
+			request_parameters.filter_time_range_upper.clone().map(|y| {
+				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
+			})
+		}),
+	};
+
 	let result = super::TransactionLoader::new(&data.pool)
+		.set_query_parameters(
+			QueryParameters::default()
+				.set_filters(filters)
+		)
 		.summarize()
 		.await;
 

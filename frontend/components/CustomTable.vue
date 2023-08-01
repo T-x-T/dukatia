@@ -143,7 +143,7 @@
 		<div id="bottom_bar" class="background_color_darkest">
 			<div>
 				<p>Count: {{tableData.row_count}}</p>
-				<p v-if="sum">{{tableData.total_amount}}</p>
+				<p v-if="tableData.total_amount">Sum: {{tableData.total_amount}}</p>
 			</div>
 			<div>
 				<label for="page_size">Rows per Page: </label>
@@ -170,7 +170,6 @@ export default {
 		selectedRows: [] as boolean[],
 		openFilter: null as number | null,
 		allRowsSelected: false,
-		sum: "",
 		pageSize: 50,
 		currentPage: 0,
 		tableData: {} as TableData,
@@ -191,9 +190,9 @@ export default {
 		async update(initial: boolean) {
 			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
+			this.rowsForDisplay = this.rows;
 			
 			if(initial) {
-				this.rowsForDisplay = this.rows;
 				
 				this.tableData.columns.forEach(c => {
 					this.filters.push({
@@ -207,8 +206,6 @@ export default {
 				this.currentSort = this.tableData.defaultSort;
 				this.resetSelectedRows();
 			}
-
-			this.filter();
 		},
 
 		resetSelectedRows() {
@@ -241,9 +238,8 @@ export default {
 		
 		filter() {
 			this.resetSelectedRows();
-			this.rowsForDisplay = this.rows;
 			for(let i = 0; i < this.filters.length; i++) {
-				if(this.filters[i].type == "choice" && this.filters[i].value) {
+/* 				if(this.filters[i].type == "choice" && this.filters[i].value) {
 					if(this.filters[i].option == "is") {
 						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === (this.filters[i].value as string)?.toLowerCase());
 					}
@@ -253,76 +249,34 @@ export default {
 					if(this.filters[i].option == "contains") {
 						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
 					}
-				}
+				}*/
 
-				if(this.filters[i].type == "date" && this.filters[i].start && this.filters[i].end) {
-					if(this.filters[i].option == "between") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) > Date.parse(this.filters[i].start as string) && Date.parse(x[i]) < Date.parse(this.filters[i].end as string));
-					}
-					if(this.filters[i].option == "outside") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => Date.parse(x[i]) < Date.parse(this.filters[i].start as string) || Date.parse(x[i]) > Date.parse(this.filters[i].end as string));
-					}
-				}
-
-				if(this.filters[i].type == "number" && typeof this.filters[i].value == "number") {
-					if(this.filters[i].option == "exact") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) === this.filters[i].value);
-					}
-					if(this.filters[i].option == "less") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) < (this.filters[i].value as number));
-					}
-					if(this.filters[i].option == "more") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => parseFloat(x[i]) > (this.filters[i].value as number));
+				if(this.filters[i].type == "date") {
+					if(this.filters[i].start && this.filters[i].end) {
+						this.$emit("updateFilter", this.tableData.columns[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option);
+					} else {
+						this.$emit("resetFilter", this.tableData.columns[i].name);
 					}
 				}
 
-				if(this.filters[i].type == "string" && (this.filters[i].value || this.filters[i].empty != "anything")) {
-					if(this.filters[i].empty == "empty") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => !x[i]);
+				if(this.filters[i].type == "number") {
+					if(Number.isInteger(this.filters[i].value)) {
+						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
+					} else {
+						this.$emit("resetFilter", this.tableData.columns[i].name);
 					}
-					if(this.filters[i].empty == "notempty") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i]);
-					}
-					if(this.filters[i].value) {
-						if(this.filters[i].option == "contains") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
-						}
-						if(this.filters[i].option == "exact") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === (this.filters[i].value as string)?.toLowerCase());
-						}
-						if(this.filters[i].option == "begins") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().startsWith((this.filters[i].value as string)?.toLowerCase()));
-						}
-						if(this.filters[i].option == "ends") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().endsWith((this.filters[i].value as string)?.toLowerCase()));
-						}
-						if(this.filters[i].option == "doesntcontain") {
-							this.rowsForDisplay = this.rowsForDisplay.filter(x => !x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
-						}
+				}
+
+				if(this.filters[i].type == "string") {
+					if(this.filters[i].value || this.filters[i].empty != "anything") {
+						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
+					} else {
+						this.$emit("resetFilter", this.tableData.columns[i].name);
 					}
 				}
 			}
 
-			if(this.tableData.displaySum) this.getSum();
-		},
-
-		async getSum() {
-			if(typeof this.tableData.sumColumn != "number") {
-				console.error("CustomTable#getSum got called with missing this.tableData.sumColumn: ", this.tableData);
-				return;
-			}
-			
-			let output = "Sum:";
-			this.currencies.forEach(currency => {
-				output += " ";
-				let total = 0;
-				this.rowsForDisplay.forEach(x => x[this.tableData.sumColumn as number].endsWith(currency.symbol) ? total += Number(x[this.tableData.sumColumn as number].replace(currency.symbol, "")) : null);
-				if(total !== 0) {
-					output += total.toFixed(2);
-					output += currency.symbol;
-				}
-			});
-			this.sum = output;
+			this.$emit("applyFilter");
 		},
 
 		updateRowsCurrentPage() {

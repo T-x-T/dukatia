@@ -13,6 +13,9 @@
 					v-on:rowSelect="rowSelect"
 					v-on:updatePage="updatePage"
 					v-on:updateSort="updateSort"
+					v-on:updateFilter="updateFilter"
+					v-on:resetFilter="resetFilter"
+					v-on:applyFilter="applyFilter"
 				/>
 			</div>
 
@@ -91,6 +94,7 @@ export default {
 		} as QueryParameters,
 		total_row_count: 0,
 		total_amount: 0,
+		data_revision: 0,
 	}),
 	
 	async mounted() {
@@ -104,13 +108,8 @@ export default {
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.assets = await $fetch("/api/v1/assets/all");
-		this.transactions = await $fetch(`/api/v1/transactions/all
-			?skip_results=${this.query_parameters.skip_results}
-			&max_results=${this.query_parameters.max_results}
-			&sort_property=${this.query_parameters.sort_property}
-			&sort_direction=${this.query_parameters.sort_direction}
-		`);
-		const summary = await $fetch("/api/v1/transactions/summary");
+		this.transactions = await $fetch(this.build_transaction_request_url("/api/v1/transactions/all"));
+		const summary = await $fetch(this.build_transaction_request_url("/api/v1/transactions/summary")) as any;
 		this.total_row_count = summary.count;
 		this.total_amount = summary.total_amount;
 		this.updateTransactions();
@@ -278,13 +277,61 @@ export default {
 			await this.updateTable();
 		},
 
+		async updateFilter(property_name: string, value: any, mode: string) {
+			property_name = property_name.toLowerCase();
+			switch(property_name) {
+				case "id": {
+					this.query_parameters.filter_id = value;
+					this.query_parameters.filter_mode_id = mode;
+					break;
+				}
+				case "comment": {
+					this.query_parameters.filter_comment = value;
+					this.query_parameters.filter_mode_comment = mode;
+					break;
+				}
+				case "timestamp": {
+					this.query_parameters.filter_time_range_lower = value.lower;
+					this.query_parameters.filter_time_range_upper = value.upper;
+					this.query_parameters.filter_mode_time_range = mode;
+					break;
+				}
+			}
+		},
+
+		async resetFilter(property_name: string) {
+			property_name = property_name.toLowerCase();
+			switch(property_name) {
+				case "id": {
+					this.query_parameters.filter_id = undefined;
+					this.query_parameters.filter_mode_id = undefined;
+					break;
+				}
+				case "comment": {
+					this.query_parameters.filter_comment = undefined;
+					this.query_parameters.filter_mode_comment = undefined;
+					break;
+				}
+				case "timestamp": {
+					this.query_parameters.filter_comment = undefined;
+					this.query_parameters.filter_mode_comment = undefined;
+					break;
+				}
+			}
+		},
+
+		async applyFilter() {
+			const summary = await $fetch(this.build_transaction_request_url("/api/v1/transactions/summary")) as any;
+			this.total_row_count = summary.count;
+			this.total_amount = summary.total_amount;
+			await this.updateTable();
+		},
+
 		async updateTable() {
-			this.transactions = await $fetch(`/api/v1/transactions/all
-				?skip_results=${this.query_parameters.skip_results}
-				&max_results=${this.query_parameters.max_results}
-				&sort_property=${this.query_parameters.sort_property}
-				&sort_direction=${this.query_parameters.sort_direction}
-			`);
+			this.data_revision += 1;
+			const local_data_revision = this.data_revision;
+			this.transactions = await $fetch(this.build_transaction_request_url("/api/v1/transactions/all"));
+			if(this.data_revision > local_data_revision) return;
 
 			const transactionsForDisplay = this.transactions.map(x => {
 				x.account = this.accounts.filter(a => a.id == x.account_id)[0];
@@ -302,11 +349,41 @@ export default {
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));
+			this.tableData.row_count = this.total_row_count;
+			this.tableData.total_amount = this.total_amount;
 		},
 
 		on_resize() {
 			this.small_device = window.innerWidth <= 800;
-		}
+		},
+
+		build_transaction_request_url(base_url: string) {
+			let url = `${base_url}
+				?skip_results=${this.query_parameters.skip_results}
+				&max_results=${this.query_parameters.max_results}
+				&sort_property=${this.query_parameters.sort_property}
+				&sort_direction=${this.query_parameters.sort_direction}`;
+
+			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_id}`;
+			if(Number.isInteger(this.query_parameters.filter_asset_id)) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
+			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;
+			if(Number.isInteger(this.query_parameters.filter_user_id)) url += `&filter_user_id=${this.query_parameters.filter_user_id}`;
+			if(this.query_parameters.filter_mode_user_id) url += `&filter_mode_user_id=${this.query_parameters.filter_mode_user_id}`;
+			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
+			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
+			if(Number.isInteger(this.query_parameters.filter_account_id)) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
+			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
+			if(Number.isInteger(this.query_parameters.filter_recipient_id)) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
+			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
+			if(this.query_parameters.filter_comment) url += `&filter_comment=${this.query_parameters.filter_comment}`;
+			if(this.query_parameters.filter_mode_comment) url += `&filter_mode_comment=${this.query_parameters.filter_mode_comment}`;
+			if(this.query_parameters.filter_time_range_lower) url += `&filter_time_range_lower=${new Date(this.query_parameters.filter_time_range_lower).toISOString()}`;
+			if(this.query_parameters.filter_time_range_upper) url += `&filter_time_range_upper=${new Date(this.query_parameters.filter_time_range_upper).toISOString()}`;
+			if(this.query_parameters.filter_mode_time_range) url += `&filter_mode_time_range=${this.query_parameters.filter_mode_time_range}`;
+
+			return url;
+		},
 	}
 }
 </script>

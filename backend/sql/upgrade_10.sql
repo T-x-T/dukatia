@@ -38,12 +38,3 @@ ALTER TABLE public.transaction_data
     OWNER TO postgres;
 
 GRANT ALL ON TABLE public.transaction_data TO postgres;
-
-CREATE OR REPLACE VIEW public.transaction_total_amount
-    AS
-     SELECT tr.currency_id,
-    concat(TRUNC(SUM(p.amount::decimal) / c.minor_in_mayor, 2)::text, c.symbol) AS total_amount
-   FROM transactions tr
-     LEFT JOIN transaction_positions p ON tr.id = p.transaction_id
-     LEFT JOIN currencies c ON tr.currency_id = c.id
-  GROUP BY tr.currency_id, c.symbol, c.minor_in_mayor;
