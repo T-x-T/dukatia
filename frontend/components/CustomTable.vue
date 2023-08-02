@@ -25,7 +25,7 @@
 							<div>
 								<select v-model="filters[index].value" @change="filter()">
 									<option value=""></option>
-									<option v-for="(item, index) in header.options" :key="index" :value="item">{{item}}</option>
+									<option v-for="(item, index) in header.options" :key="index" :value="item.id">{{item.name}}</option>
 								</select>
 								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
 							</div>
@@ -239,18 +239,6 @@ export default {
 		filter() {
 			this.resetSelectedRows();
 			for(let i = 0; i < this.filters.length; i++) {
-/* 				if(this.filters[i].type == "choice" && this.filters[i].value) {
-					if(this.filters[i].option == "is") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() === (this.filters[i].value as string)?.toLowerCase());
-					}
-					if(this.filters[i].option == "isnt") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase() !== (this.filters[i].value as string)?.toLowerCase());
-					}
-					if(this.filters[i].option == "contains") {
-						this.rowsForDisplay = this.rowsForDisplay.filter(x => x[i].toLowerCase().includes((this.filters[i].value as string)?.toLowerCase()));
-					}
-				}*/
-
 				if(this.filters[i].type == "date") {
 					if(this.filters[i].start && this.filters[i].end) {
 						this.$emit("updateFilter", this.tableData.columns[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option);
@@ -259,7 +247,7 @@ export default {
 					}
 				}
 
-				if(this.filters[i].type == "number") {
+				if(this.filters[i].type == "number" || this.filters[i].type == "choice") {
 					if(Number.isInteger(this.filters[i].value)) {
 						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
 					} else {

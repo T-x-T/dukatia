@@ -46,7 +46,11 @@ impl<'a> DbReader<'a, Transaction> for TransactionDbReader<'a> {
 
 impl<'a> TransactionDbReader<'a> {
 	pub async fn summarize(self) -> Result<TransactionSummary, Box<dyn Error>> {
-		let count_query = "SELECT COUNT(*) FROM public.transactions";
+		let count_query = "SELECT COUNT(*) FROM public.transaction_data";
+		let temp = self.clone().actually_execute(count_query).await?;
+		let count_result = temp.first().unwrap();
+		let count: i64 = count_result.get(0);
+
 
 		let parameters = self.get_formatted_query_parameters(Some("tr".to_string()));
 		let parameter_values: Vec<_> = parameters.1.iter()
@@ -57,18 +61,20 @@ impl<'a> TransactionDbReader<'a> {
 			.get()
 			.await?
 			.query(
-				format!("SELECT tr.currency_id, concat(trunc(sum(p.amount::numeric) / c.minor_in_mayor::numeric, 2)::text, c.symbol) AS total_amount FROM transactions tr LEFT JOIN transaction_positions p ON tr.id = p.transaction_id LEFT JOIN currencies c ON tr.currency_id = c.id {} GROUP BY tr.currency_id, c.symbol, c.minor_in_mayor;"
+				format!("
+					SELECT 
+						tr.currency_id,
+						concat(trunc(sum(tr.total_amount::numeric) / c.minor_in_mayor::numeric, 2)::text, c.symbol) AS total_amount
+					FROM transaction_data tr
+						LEFT JOIN currencies c ON tr.currency_id = c.id
+					{}
+					GROUP BY tr.currency_id, c.symbol, c.minor_in_mayor;"
 				, parameters.0).as_str(), parameter_values.as_slice()
 			).await?
 		  .into_iter()
 			.fold(String::new(), |a, b| a + " " + b.get(1))
 			.trim()
 			.to_string();
-
-		let temp = self.actually_execute(count_query).await?;
-		let count_result = temp.first().unwrap();
-
-		let count: i64 = count_result.get(0);
 
 		return Ok(TransactionSummary { count: count as u32, total_amount });
 	}

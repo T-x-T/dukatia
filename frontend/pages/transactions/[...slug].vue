@@ -149,13 +149,13 @@ export default {
 					},
 					columns: [
 						{name: "ID", type: "number", sortable: true},
-						{name: "Account", type: "choice", options: [...new Set(this.accounts.map(x => x.name))]},
-						{name: "Recipient", type: "choice", options: [...new Set(this.recipients.map(x => x.name))]},
-						{name: "Asset", type: "choice", options: [...new Set(this.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
+						{name: "Account", type: "choice", options: this.accounts.map(x => ({id: x.id, name: x.name}))},
+						{name: "Recipient", type: "choice", options: this.recipients.map(x => ({id: x.id, name: x.name}))},
+						{name: "Asset", type: "choice", options: this.assets.map(x => ({id: x.id, name: x.name}))},
 						{name: "Timestamp", type: "date", sortable: true},
 						{name: "Amount", type: "number"},
 						{name: "Comment", type: "string", sortable: true},
-						{name: "Tags", type: "choice", options: [...new Set(this.tags.map(x => x.name))]}
+						{name: "Tags", type: "choice", options: this.tags.map(x => ({id: x.id, name: x.name}))},
 					],
 					rows: transactionsForDisplay.map(x => ([
 						x.id,
@@ -296,6 +296,21 @@ export default {
 					this.query_parameters.filter_mode_time_range = mode;
 					break;
 				}
+				case "account": {
+					this.query_parameters.filter_account_id = value;
+					this.query_parameters.filter_mode_account_id = mode;
+					break;
+				}
+				case "recipient": {
+					this.query_parameters.filter_recipient_id = value;
+					this.query_parameters.filter_mode_recipient_id = mode;
+					break;
+				}
+				case "asset": {
+					this.query_parameters.filter_asset_id = value;
+					this.query_parameters.filter_mode_asset_id = mode;
+					break;
+				}
 			}
 		},
 
@@ -315,6 +330,21 @@ export default {
 				case "timestamp": {
 					this.query_parameters.filter_comment = undefined;
 					this.query_parameters.filter_mode_comment = undefined;
+					break;
+				}
+				case "account": {
+					this.query_parameters.filter_account_id = undefined;
+					this.query_parameters.filter_mode_account_id = undefined;
+					break;
+				}
+				case "recipient": {
+					this.query_parameters.filter_recipient_id = undefined;
+					this.query_parameters.filter_mode_recipient_id = undefined;
+					break;
+				}
+				case "asset": {
+					this.query_parameters.filter_asset_id = undefined;
+					this.query_parameters.filter_mode_asset_id = undefined;
 					break;
 				}
 			}

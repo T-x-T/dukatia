@@ -166,7 +166,7 @@ declare global {
 	type Column = {
 		name: string,
 		type: ColumnType,
-		options?: string[],
+		options?: {id?: number, name: string}[],
 		sortable?: boolean,
 	}
 
