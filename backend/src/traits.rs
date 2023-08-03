@@ -17,6 +17,7 @@ pub enum FilterAndSortProperties {
 	Timestamp,
 	UserId,
 	TotalAmount,
+	TagId,
 }
 
 impl std::fmt::Display for FilterAndSortProperties {
@@ -31,6 +32,7 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::Timestamp => write!(f, "timestamp"),
 			FilterAndSortProperties::UserId => write!(f, "user_id"),
 			FilterAndSortProperties::TotalAmount => write!(f, "total_amount"),
+			FilterAndSortProperties::TagId => write!(f, "tag_id"),
 		}
 	}
 }
@@ -74,13 +76,15 @@ impl QueryParameters {
 #[derive(Debug, Default, Clone)]
 pub struct Filters {
 	pub id: Option<(u32, NumberFilterModes)>,
+	pub total_amount: Option<(i32, NumberFilterModes)>,
 	pub asset_id: Option<(u32, NumberFilterModes)>,
 	pub user_id: Option<(u32, NumberFilterModes)>,
 	pub currency_id: Option<(u32, NumberFilterModes)>,
 	pub account_id: Option<(u32, NumberFilterModes)>,
 	pub recipient_id: Option<(u32, NumberFilterModes)>,
+	pub tag_id: Option<(u32, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
-	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>
+	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -169,6 +173,12 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		query_parameters.filters.id = Some((id, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
+	
+	fn set_filter_total_amount(self, total_amount: i32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.total_amount = Some((total_amount, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
 
 	fn set_filter_asset_id(self, asset_id: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
@@ -197,6 +207,12 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn set_filter_recipient_id(self, recipient_id: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.recipient_id = Some((recipient_id, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_tag_id(self, tag_id: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.tag_id = Some((tag_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
@@ -246,6 +262,18 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0 as i32));
+			i += 1;
+		}
+
+		if self.get_query_parameters().filters.total_amount.is_some() {
+			match self.get_query_parameters().filters.total_amount.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}total_amount=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}total_amount!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}total_amount<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}total_amount>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.total_amount.unwrap().0 as i64));
 			i += 1;
 		}
 		
@@ -306,6 +334,18 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			};
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0 as i32));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.tag_id.is_some() {
+			match self.get_query_parameters().filters.tag_id.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} NOT ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} ${i} > ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} ${i} < ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.tag_id.unwrap().0 as i32));
 			i += 1;
 		}
 		

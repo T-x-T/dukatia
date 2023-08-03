@@ -9,7 +9,6 @@
 				<tr>
 					<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
 					<th v-for="(header, index) in tableData.columns" :key="index">
-						<div v-if="Number.isInteger(openFilter)" class="clickTarget" @click="openFilter = null"></div>
 						
 						<p v-if="tableData.columns[index].sortable" @click="updateSort(index)">
 							{{header.name}}
@@ -32,18 +31,23 @@
 
 							<div v-if="openFilter === index" class="filterPopout">
 								<div>
-									<input type="radio" :id="`is${index}`" :name="`type${index}`" value="is" v-model="filters[index].option" @change="filter()">
-									<label :for="`is${index}`">Is</label>
+									<input type="radio" :id="`exact${index}`" :name="`type${index}`" value="exact" v-model="filters[index].option" @change="filter()">
+									<label :for="`exact${index}`">Exact</label>
 								</div>
 								<div>
-									<input type="radio" :id="`isnt${index}`" :name="`type${index}`" value="isnt" v-model="filters[index].option" @change="filter()">
-									<label :for="`isnt${index}`">Is not</label>
+									<input type="radio" :id="`not${index}`" :name="`type${index}`" value="not" v-model="filters[index].option" @change="filter()">
+									<label :for="`not${index}`">Not</label>
 								</div>
 								<div>
-									<input type="radio" :id="`contains${index}`" :name="`type${index}`" value="contains" v-model="filters[index].option" @change="filter()">
-									<label :for="`contains${index}`">Contains</label>
+									<input type="radio" :id="`less${index}`" :name="`type${index}`" value="less" v-model="filters[index].option" @change="filter()">
+									<label :for="`less${index}`">Less</label>
+								</div>
+								<div>
+									<input type="radio" :id="`more${index}`" :name="`type${index}`" value="more" v-model="filters[index].option" @change="filter()">
+									<label :for="`more${index}`">More</label>
 								</div>
 							</div>
+							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
 						<div v-if="header.type == 'date'" class="columnHeaderWrapper">
@@ -64,6 +68,7 @@
 									<label :for="`outside${index}`">Outside</label>
 								</div>
 							</div>
+							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
 						<div v-if="header.type == 'number'" class="columnHeaderWrapper">
@@ -78,6 +83,10 @@
 									<label :for="`exact${index}`">Exact</label>
 								</div>
 								<div>
+									<input type="radio" :id="`not${index}`" :name="`type${index}`" value="not" v-model="filters[index].option" @change="filter()">
+									<label :for="`not${index}`">Not</label>
+								</div>
+								<div>
 									<input type="radio" :id="`less${index}`" :name="`type${index}`" value="less" v-model="filters[index].option" @change="filter()">
 									<label :for="`less${index}`">Less</label>
 								</div>
@@ -86,6 +95,7 @@
 									<label :for="`more${index}`">More</label>
 								</div>
 							</div>
+							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
 						<div v-if="header.type == 'string'" class="columnHeaderWrapper">
@@ -104,31 +114,19 @@
 									<label :for="`exact${index}`">Exact</label>
 								</div>
 								<div>
-									<input type="radio" :id="`begins${index}`" :name="`type${index}`" value="begins" v-model="filters[index].option" @change="filter()">
+									<input type="radio" :id="`begins${index}`" :name="`type${index}`" value="begins_with" v-model="filters[index].option" @change="filter()">
 									<label :for="`begins${index}`">Begins with</label>
 								</div>
 								<div>
-									<input type="radio" :id="`ends${index}`" :name="`type${index}`" value="ends" v-model="filters[index].option" @change="filter()">
+									<input type="radio" :id="`ends${index}`" :name="`type${index}`" value="ends_with" v-model="filters[index].option" @change="filter()">
 									<label :for="`ends${index}`">Ends with</label>
 								</div>
 								<div>
-									<input type="radio" :id="`doesntcontain${index}`" :name="`type${index}`" value="doesntcontain" v-model="filters[index].option" @change="filter()">
+									<input type="radio" :id="`doesntcontain${index}`" :name="`type${index}`" value="doesnt_contain" v-model="filters[index].option" @change="filter()">
 									<label :for="`doesntcontain${index}`">Doesn't contain</label>
 								</div>
-								<hr>
-								<div>
-									<input type="radio" :id="`notempty${index}`" :name="`empty${index}`" value="notempty" v-model="filters[index].empty" @change="filter()">
-									<label :for="`notempty${index}`">Not empty</label>
-								</div>
-								<div>
-									<input type="radio" :id="`empty${index}`" :name="`empty${index}`" value="empty" v-model="filters[index].empty" @change="filter()">
-									<label :for="`empty${index}`">Empty</label>
-								</div>
-								<div>
-									<input type="radio" :id="`anything${index}`" :name="`empty${index}`" value="anything" v-model="filters[index].empty" @change="filter()">
-									<label :for="`anything${index}`">Doesn't matter</label>
-								</div>
 							</div>
+							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 					</th>
 				</tr>
@@ -197,7 +195,7 @@ export default {
 				this.tableData.columns.forEach(c => {
 					this.filters.push({
 						type: c.type,
-						option: c.type == "choice" ? "is" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
+						option: c.type == "choice" ? "exact" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
 						empty: c.type == "string" ? "anything" : ""
 					});
 				});

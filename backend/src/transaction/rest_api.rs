@@ -13,6 +13,8 @@ struct RequestParameters {
 	sort_direction: Option<String>,
 	filter_id: Option<u32>,
 	filter_mode_id: Option<String>,
+	filter_total_amount: Option<i32>,
+	filter_mode_total_amount: Option<String>,
 	filter_asset_id: Option<u32>,
 	filter_mode_asset_id: Option<String>,
 	filter_user_id: Option<u32>,
@@ -23,6 +25,8 @@ struct RequestParameters {
 	filter_mode_account_id: Option<String>,
 	filter_recipient_id: Option<u32>,
 	filter_mode_recipient_id: Option<String>,
+	filter_tag_id: Option<u32>,
+	filter_mode_tag_id: Option<String>,
 	filter_comment: Option<String>,
 	filter_mode_comment: Option<String>,
 	filter_time_range_lower: Option<DateTime<Utc>>,
@@ -59,6 +63,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
 		}),
+		total_amount: request_parameters.filter_total_amount.map(|x| {
+			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or(String::new()).into())
+		}),
 		asset_id: request_parameters.filter_asset_id.map(|x| {
 			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
 		}),
@@ -73,6 +80,9 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		}),
 		recipient_id: request_parameters.filter_recipient_id.map(|x| {
 			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+		}),
+		tag_id: request_parameters.filter_tag_id.map(|x| {
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
 		}),
 		comment: request_parameters.filter_comment.clone().map(|x| {
 			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
@@ -134,6 +144,9 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
 		}),
+		total_amount: request_parameters.filter_total_amount.map(|x| {
+			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or(String::new()).into())
+		}),
 		asset_id: request_parameters.filter_asset_id.map(|x| {
 			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
 		}),
@@ -148,6 +161,9 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		}),
 		recipient_id: request_parameters.filter_recipient_id.map(|x| {
 			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+		}),
+		tag_id: request_parameters.filter_tag_id.map(|x| {
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
 		}),
 		comment: request_parameters.filter_comment.clone().map(|x| {
 			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())

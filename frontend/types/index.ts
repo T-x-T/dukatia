@@ -271,10 +271,14 @@ declare global {
 		filter_mode_account_id?: string,
 		filter_recipient_id?: number,
 		filter_mode_recipient_id?: string,
+		filter_tag_id?: number,
+		filter_mode_tag_id?: string,
+		filter_total_amount?: number,
+		filter_mode_total_amount?: string,
 		filter_comment?: string,
 		filter_mode_comment?: string,
-		filter_time_range_lower: Date,
-		filter_time_range_upper: Date,
-		filter_mode_time_range: string,
+		filter_time_range_lower?: Date,
+		filter_time_range_upper?: Date,
+		filter_mode_time_range?: string,
 	}
 }

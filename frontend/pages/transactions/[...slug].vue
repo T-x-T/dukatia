@@ -306,9 +306,19 @@ export default {
 					this.query_parameters.filter_mode_recipient_id = mode;
 					break;
 				}
+				case "tags": {
+					this.query_parameters.filter_tag_id = value;
+					this.query_parameters.filter_mode_tag_id = mode;
+					break;
+				}
 				case "asset": {
 					this.query_parameters.filter_asset_id = value;
 					this.query_parameters.filter_mode_asset_id = mode;
+					break;
+				}
+				case "amount": {
+					this.query_parameters.filter_total_amount = value;
+					this.query_parameters.filter_mode_total_amount = mode;
 					break;
 				}
 			}
@@ -328,8 +338,9 @@ export default {
 					break;
 				}
 				case "timestamp": {
-					this.query_parameters.filter_comment = undefined;
-					this.query_parameters.filter_mode_comment = undefined;
+					this.query_parameters.filter_time_range_lower = undefined;
+					this.query_parameters.filter_time_range_upper = undefined;
+					this.query_parameters.filter_mode_time_range = undefined;
 					break;
 				}
 				case "account": {
@@ -342,9 +353,19 @@ export default {
 					this.query_parameters.filter_mode_recipient_id = undefined;
 					break;
 				}
+				case "tags": {
+					this.query_parameters.filter_tag_id = undefined;
+					this.query_parameters.filter_mode_tag_id = undefined;
+					break;
+				}
 				case "asset": {
 					this.query_parameters.filter_asset_id = undefined;
 					this.query_parameters.filter_mode_asset_id = undefined;
+					break;
+				}
+				case "amount": {
+					this.query_parameters.filter_total_amount = undefined;
+					this.query_parameters.filter_mode_total_amount = undefined;
 					break;
 				}
 			}
@@ -406,6 +427,10 @@ export default {
 			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
 			if(Number.isInteger(this.query_parameters.filter_recipient_id)) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
+			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
+			if(Number.isInteger(this.query_parameters.filter_total_amount)) url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_mayor
+			if(this.query_parameters.filter_mode_total_amount) url += `&filter_mode_total_amount=${this.query_parameters.filter_mode_total_amount}`;
 			if(this.query_parameters.filter_comment) url += `&filter_comment=${this.query_parameters.filter_comment}`;
 			if(this.query_parameters.filter_mode_comment) url += `&filter_mode_comment=${this.query_parameters.filter_mode_comment}`;
 			if(this.query_parameters.filter_time_range_lower) url += `&filter_time_range_lower=${new Date(this.query_parameters.filter_time_range_lower).toISOString()}`;
