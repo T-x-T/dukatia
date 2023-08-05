@@ -16,7 +16,6 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		currencies: [] as Currency[],
 		tableData: {} as TableData,
 		data_revision: 0,
 		query_parameters: {
@@ -26,7 +25,7 @@ export default {
 	}),
 
 	async mounted() {
-		this.currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
+		const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
 		
 		this.tableData = {
 			multiSelect: false,
@@ -40,7 +39,7 @@ export default {
 				{name: "Symbol", type: "string"},
 				{name: "Minor in Mayor", type: "number"},
 			],
-			rows: this.currencies.map(x => ([
+			rows: currencies.map(x => ([
 				x.id,
 				x.name,
 				x.symbol,
@@ -123,10 +122,10 @@ export default {
 		async updateTable() {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
-			this.currencies = await $fetch(this.build_transaction_request_url("/api/v1/currencies/all"));
+			const currencies = await $fetch(this.build_request_url("/api/v1/currencies/all")) as Currency[];
 			if(this.data_revision > local_data_revision) return;
 
-			this.tableData.rows = this.currencies.map(x => ([
+			this.tableData.rows = currencies.map(x => ([
 				x.id,
 				x.name,
 				x.symbol,
@@ -134,7 +133,7 @@ export default {
 			]));
 		},
 
-		build_transaction_request_url(base_url: string) {
+		build_request_url(base_url: string) {
 			let url = `${base_url}
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}`;

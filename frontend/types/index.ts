@@ -286,5 +286,7 @@ declare global {
 		filter_mode_symbol?: string,
 		filter_minor_in_mayor?: number,
 		filter_mode_minor_in_mayor?: string,
+		filter_parent_id?: number,
+		filter_mode_parent_id?: string,
 	}
 }

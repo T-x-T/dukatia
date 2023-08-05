@@ -108,8 +108,8 @@ export default {
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.assets = await $fetch("/api/v1/assets/all");
-		this.transactions = await $fetch(this.build_transaction_request_url("/api/v1/transactions/all"));
-		const summary = await $fetch(this.build_transaction_request_url("/api/v1/transactions/summary")) as any;
+		this.transactions = await $fetch(this.build_request_url("/api/v1/transactions/all"));
+		const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
 		this.total_row_count = summary.count;
 		this.total_amount = summary.total_amount;
 		this.updateTransactions();
@@ -372,7 +372,7 @@ export default {
 		},
 
 		async applyFilter() {
-			const summary = await $fetch(this.build_transaction_request_url("/api/v1/transactions/summary")) as any;
+			const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
 			this.total_row_count = summary.count;
 			this.total_amount = summary.total_amount;
 			await this.updateTable();
@@ -381,7 +381,7 @@ export default {
 		async updateTable() {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
-			this.transactions = await $fetch(this.build_transaction_request_url("/api/v1/transactions/all"));
+			this.transactions = await $fetch(this.build_request_url("/api/v1/transactions/all"));
 			if(this.data_revision > local_data_revision) return;
 
 			const transactionsForDisplay = this.transactions.map(x => {
@@ -408,7 +408,7 @@ export default {
 			this.small_device = window.innerWidth <= 800;
 		},
 
-		build_transaction_request_url(base_url: string) {
+		build_request_url(base_url: string) {
 			let url = `${base_url}
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}

@@ -267,10 +267,10 @@ export default {
 
 		updateRowsCurrentPage() {
 			this.resetSelectedRows();
-			if(this.currentPage < 0) this.currentPage = 0;
-			if(this.currentPage > Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 0) / this.pageSize) - 1) {
-				this.currentPage = Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 0) / this.pageSize) - 1;
+			if(this.currentPage > Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 10000) / this.pageSize) - 1) {
+				this.currentPage = Math.ceil((Number.isInteger(this.tableData.row_count) ? Number(this.tableData.row_count) : 10000) / this.pageSize) - 1;
 			}
+			if(this.currentPage < 0) this.currentPage = 0;
 		},
 		
 		updatePage() {
