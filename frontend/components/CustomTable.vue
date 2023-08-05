@@ -246,7 +246,7 @@ export default {
 				}
 
 				if(this.filters[i].type == "number" || this.filters[i].type == "choice") {
-					if(Number.isInteger(this.filters[i].value)) {
+					if(typeof this.filters[i].value == "number") {
 						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns[i].name);

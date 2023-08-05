@@ -352,23 +352,23 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		if self.get_query_parameters().filters.comment.is_some() {
 			match self.get_query_parameters().filters.comment.clone().unwrap().1 {
 				StringFilterModes::Exact => {
-					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameters.push_str(format!(" {} {}comment ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(self.get_query_parameters().filters.comment.clone().unwrap().0));
 				},
 				StringFilterModes::Contains => {
-					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameters.push_str(format!(" {} {}comment ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::BeginsWith => {
-					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameters.push_str(format!(" {} {}comment ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::EndsWith => {
-					parameters.push_str(format!(" {} {}comment LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameters.push_str(format!(" {} {}comment ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 				StringFilterModes::DoesntContain => {
-					parameters.push_str(format!(" {} {}comment NOT LIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameters.push_str(format!(" {} {}comment NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
 				},
 			};
