@@ -87,8 +87,8 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		comment: request_parameters.filter_comment.clone().map(|x| {
 			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
 		}),
-		time_range: request_parameters.filter_time_range_lower.clone().and_then(|x| {
-			request_parameters.filter_time_range_upper.clone().map(|y| {
+		time_range: request_parameters.filter_time_range_lower.and_then(|x| {
+			request_parameters.filter_time_range_upper.map(|y| {
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
 			})
 		}),
@@ -168,8 +168,8 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		comment: request_parameters.filter_comment.clone().map(|x| {
 			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
 		}),
-		time_range: request_parameters.filter_time_range_lower.clone().and_then(|x| {
-			request_parameters.filter_time_range_upper.clone().map(|y| {
+		time_range: request_parameters.filter_time_range_lower.and_then(|x| {
+			request_parameters.filter_time_range_upper.map(|y| {
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
 			})
 		}),

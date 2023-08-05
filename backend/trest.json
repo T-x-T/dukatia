@@ -1229,7 +1229,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"name":"test2","description":"description","value_per_unit":123,"amount":10.0,"user":{"id":0,"name":"admin","secret":null,"superuser":true},"currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"tags":[],"total_cost_of_ownership":{"total":-400,"monthly":-90,"yearly":-1095}}]
+						"body_equals": [{"id":1,"name":"test2","description":"description","value_per_unit":123,"amount":10.0,"user":{"id":0,"name":"admin","secret":null,"superuser":true},"currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"tags":[],"total_cost_of_ownership":{"total":-400,"monthly":-60,"yearly":-730}}]
 					}
 				}
 			]

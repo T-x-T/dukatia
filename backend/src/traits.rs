@@ -273,7 +273,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				NumberFilterModes::More => parameters.push_str(format!(" {} {}total_amount>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.total_amount.unwrap().0 as i64));
+			parameter_values.push(Box::new(i64::from(self.get_query_parameters().filters.total_amount.unwrap().0)));
 			i += 1;
 		}
 		
@@ -398,7 +398,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				None => "DESC",
 			};
 
-			parameters.push_str(format!(" ORDER BY {}{} {}", if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, self.get_query_parameters().sort_property.unwrap(), direction).as_str());
+			parameters.push_str(format!(" ORDER BY {}{} {}", if table_name.is_some() {table_name.unwrap() + "."} else {String::new()}, self.get_query_parameters().sort_property.unwrap(), direction).as_str());
 		}
 
 		if self.get_query_parameters().skip_results.is_some() {
