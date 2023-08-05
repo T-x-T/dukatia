@@ -92,6 +92,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
 			})
 		}),
+		..Default::default()
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
@@ -173,6 +174,7 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
 			})
 		}),
+		..Default::default()
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)

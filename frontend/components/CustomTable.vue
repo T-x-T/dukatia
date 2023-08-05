@@ -140,10 +140,6 @@
 		</table>
 		<div id="bottom_bar" class="background_color_darkest">
 			<div>
-				<p>Count: {{tableData.row_count}}</p>
-				<p v-if="tableData.total_amount">Sum: {{tableData.total_amount}}</p>
-			</div>
-			<div>
 				<label for="page_size">Rows per Page: </label>
 				<input type="number" name="page_size" v-model="pageSize" @change="updatePage()">
 				<button @click="() => {currentPage=0; updatePage()}">First</button>
@@ -152,6 +148,10 @@
 				<input type="number" name="current_page" v-model="currentPage" @change="updatePage()">
 				<button @click="() => {currentPage++; updatePage()}">Next</button>
 				<button @click="() => {currentPage=Math.ceil((Number.isInteger(tableData.row_count) ? Number(tableData.row_count) : 0) / pageSize) - 1; updatePage()}">Last</button>
+			</div>
+			<div v-if="(typeof tableData.row_count == 'number')">
+				<p>Count: {{tableData.row_count}}</p>
+				<p v-if="tableData.total_amount">Sum: {{tableData.total_amount}}</p>
 			</div>
 		</div>
 	</div>

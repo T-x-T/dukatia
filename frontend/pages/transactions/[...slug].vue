@@ -416,7 +416,7 @@ export default {
 				&sort_direction=${this.query_parameters.sort_direction}`;
 
 			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
-			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(Number.isInteger(this.query_parameters.filter_asset_id)) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
 			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;
 			if(Number.isInteger(this.query_parameters.filter_user_id)) url += `&filter_user_id=${this.query_parameters.filter_user_id}`;

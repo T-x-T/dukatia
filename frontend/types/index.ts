@@ -280,5 +280,11 @@ declare global {
 		filter_time_range_lower?: Date,
 		filter_time_range_upper?: Date,
 		filter_mode_time_range?: string,
+		filter_name?: string,
+		filter_mode_name?: string,
+		filter_symbol?: string,
+		filter_mode_symbol?: string,
+		filter_minor_in_mayor?: number,
+		filter_mode_minor_in_mayor?: string,
 	}
 }

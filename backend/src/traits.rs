@@ -18,6 +18,9 @@ pub enum FilterAndSortProperties {
 	UserId,
 	TotalAmount,
 	TagId,
+	Name,
+	Symbol,
+	MinorInMayor,
 }
 
 impl std::fmt::Display for FilterAndSortProperties {
@@ -33,6 +36,9 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::UserId => write!(f, "user_id"),
 			FilterAndSortProperties::TotalAmount => write!(f, "total_amount"),
 			FilterAndSortProperties::TagId => write!(f, "tag_id"),
+			FilterAndSortProperties::Name => write!(f, "name"),
+			FilterAndSortProperties::Symbol => write!(f, "symbol"),
+			FilterAndSortProperties::MinorInMayor => write!(f, "minor_in_mayor"),
 		}
 	}
 }
@@ -85,6 +91,9 @@ pub struct Filters {
 	pub tag_id: Option<(u32, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
 	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
+	pub name: Option<(String, StringFilterModes)>,
+	pub symbol: Option<(String, StringFilterModes)>,
+	pub minor_in_mayor: Option<(u32, NumberFilterModes)>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -228,6 +237,24 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
+	fn set_filter_name(self, name: String, filter_mode: StringFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.name = Some((name, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_symbol(self, symbol: String, filter_mode: StringFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.symbol = Some((symbol, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_minor_in_mayor(self, minor_in_mayor: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.minor_in_mayor = Some((minor_in_mayor, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
 	async fn get_first(self) -> Result<T, Box<dyn Error>> {
 		match self.get().await?.first() {
 			Some(x) => return Ok(x.clone()),
@@ -337,6 +364,18 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			i += 1;
 		}
 		
+		if self.get_query_parameters().filters.minor_in_mayor.is_some() {
+			match self.get_query_parameters().filters.minor_in_mayor.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}minor_in_mayor=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}minor_in_mayor!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}minor_in_mayor<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}minor_in_mayor>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.minor_in_mayor.unwrap().0 as i32));
+			i += 1;
+		}
+		
 		if self.get_query_parameters().filters.tag_id.is_some() {
 			match self.get_query_parameters().filters.tag_id.unwrap().1 {
 				NumberFilterModes::Exact => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
@@ -370,6 +409,60 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				StringFilterModes::DoesntContain => {
 					parameters.push_str(format!(" {} {}comment NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.comment.clone().unwrap().0)));
+				},
+			};
+			first_where_clause = false;
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.name.is_some() {
+			match self.get_query_parameters().filters.name.clone().unwrap().1 {
+				StringFilterModes::Exact => {
+					parameters.push_str(format!(" {} {}name ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(self.get_query_parameters().filters.name.clone().unwrap().0));
+				},
+				StringFilterModes::Contains => {
+					parameters.push_str(format!(" {} {}name ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.name.clone().unwrap().0)));
+				},
+				StringFilterModes::BeginsWith => {
+					parameters.push_str(format!(" {} {}name ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.name.clone().unwrap().0)));
+				},
+				StringFilterModes::EndsWith => {
+					parameters.push_str(format!(" {} {}name ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.name.clone().unwrap().0)));
+				},
+				StringFilterModes::DoesntContain => {
+					parameters.push_str(format!(" {} {}name NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.name.clone().unwrap().0)));
+				},
+			};
+			first_where_clause = false;
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.symbol.is_some() {
+			match self.get_query_parameters().filters.symbol.clone().unwrap().1 {
+				StringFilterModes::Exact => {
+					parameters.push_str(format!(" {} {}symbol ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(self.get_query_parameters().filters.symbol.clone().unwrap().0));
+				},
+				StringFilterModes::Contains => {
+					parameters.push_str(format!(" {} {}symbol ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.symbol.clone().unwrap().0)));
+				},
+				StringFilterModes::BeginsWith => {
+					parameters.push_str(format!(" {} {}symbol ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.symbol.clone().unwrap().0)));
+				},
+				StringFilterModes::EndsWith => {
+					parameters.push_str(format!(" {} {}symbol ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.symbol.clone().unwrap().0)));
+				},
+				StringFilterModes::DoesntContain => {
+					parameters.push_str(format!(" {} {}symbol NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.symbol.clone().unwrap().0)));
 				},
 			};
 			first_where_clause = false;
