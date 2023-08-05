@@ -25,7 +25,7 @@ export default {
 	}),
 
 	async mounted() {
-		const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
+		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 		
 		this.tableData = {
 			multiSelect: false,
