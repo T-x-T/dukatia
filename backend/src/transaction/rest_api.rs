@@ -44,15 +44,15 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	let sort_property: Option<FilterAndSortProperties> = match &request_parameters.sort_property {
 		Some(x) => {
 			match x.as_str() {
-				"account_id" => Some(FilterAndSortProperties::AccountId),
+				"account" => Some(FilterAndSortProperties::AccountId),
 				"comment" => Some(FilterAndSortProperties::Comment),
 				"currency_id" => Some(FilterAndSortProperties::CurrencyId),
 				"id" => Some(FilterAndSortProperties::Id),
-				"recipient_id" => Some(FilterAndSortProperties::RecipientId),
+				"recipient" => Some(FilterAndSortProperties::RecipientId),
 				"status" => Some(FilterAndSortProperties::Status),
 				"timestamp" => Some(FilterAndSortProperties::Timestamp),
 				"user_id" => Some(FilterAndSortProperties::UserId),
-				"total_amount" => Some(FilterAndSortProperties::TotalAmount),
+				"amount" => Some(FilterAndSortProperties::TotalAmount),
 				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_property is invalid: {x}\"}}")),
 			}
 		},
