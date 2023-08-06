@@ -161,13 +161,15 @@ impl From<tokio_postgres::Row> for Account {
 			.into_iter()
 			.map(|x: i32| x as u32)
 			.collect();
+		let balance: i64 = value.get(5);
 	
 		return Account {
 			id: Some(id as u32),
 			name,
 			default_currency_id: default_currency_id as u32,
 			user_id: user_id as u32,
-			tag_ids: Some(tag_ids)
+			tag_ids: Some(tag_ids),
+			balance: Some(balance),
 		};
 	}
 }
@@ -192,6 +194,7 @@ impl From<tokio_postgres::Row> for DeepAccount {
 		let tag_user_ids: Vec<Option<i32>> = value.get(15);
 		let tag_user_names: Vec<Option<String>> = value.get(16);
 		let tag_user_superusers: Vec<Option<bool>> = value.get(17);
+		let balance: i64 = value.get(18);
 	
 		let default_currency = crate::currency::Currency {
 			id: Some(default_currency_id as u32),
@@ -244,6 +247,7 @@ impl From<tokio_postgres::Row> for DeepAccount {
 			default_currency,
 			user,
 			tags,
+			balance: Some(balance),
 		}
 	}
 }

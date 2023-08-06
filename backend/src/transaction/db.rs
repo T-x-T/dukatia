@@ -520,6 +520,7 @@ impl From<tokio_postgres::Row> for DeepTransaction {
 			default_currency: account_default_currency,
 			user: account_user,
 			tags: account_tags,
+			balance: None,
 		};
 
 		let recipient_user = recipient_user_id.map(|_| crate::user::User {

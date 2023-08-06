@@ -14,7 +14,8 @@ pub struct Account {
 	pub name: String,
 	pub default_currency_id: u32,
 	pub user_id: u32,
-	pub tag_ids: Option<Vec<u32>>
+	pub tag_ids: Option<Vec<u32>>,
+	pub balance: Option<i64>,
 }
 
 impl Save for Account {
@@ -101,6 +102,7 @@ pub struct DeepAccount {
 	pub default_currency: crate::currency::Currency,
 	pub user: Option<crate::user::User>,
 	pub tags: Vec<crate::tag::DeepTag>,
+	pub balance: Option<i64>,
 }
 
 #[derive(Debug, Clone)]

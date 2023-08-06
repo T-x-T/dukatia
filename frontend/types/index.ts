@@ -8,6 +8,7 @@ declare global {
 		user_id?: number,
 		tag_ids?: number[],
 		default_currency?: Currency,
+		balance?: number,
 	}
 	
 	type DeepAccount = {
@@ -288,5 +289,7 @@ declare global {
 		filter_mode_minor_in_mayor?: string,
 		filter_parent_id?: number,
 		filter_mode_parent_id?: string,
+		filter_balance?: number,
+		filter_mode_balance?: string,
 	}
 }
