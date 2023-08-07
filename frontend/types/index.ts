@@ -169,6 +169,7 @@ declare global {
 		type: ColumnType,
 		options?: {id?: number, name: string}[],
 		sortable?: boolean,
+		no_filter?: boolean,
 	}
 
 	type TableData = {
@@ -291,5 +292,11 @@ declare global {
 		filter_mode_parent_id?: string,
 		filter_balance?: number,
 		filter_mode_balance?: string,
+		filter_description?: string,
+		filter_mode_description?: string,
+		filter_amount?: number,
+		filter_mode_amount?: string,
+		filter_value_per_unit?: number,
+		filter_mode_value_per_unit?: string,
 	}
 }

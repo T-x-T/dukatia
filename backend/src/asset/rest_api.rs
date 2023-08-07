@@ -9,14 +9,61 @@ use crate::transaction::{Transaction, Position};
 use crate::currency::CurrencyLoader;
 use crate::traits::*;
 
+#[derive(Debug, Deserialize)]
+struct RequestParameters {
+	skip_results: Option<u32>,
+	max_results: Option<u32>,
+	filter_id: Option<u32>,
+	filter_mode_id: Option<String>,
+	filter_name: Option<String>,
+	filter_mode_name: Option<String>,
+	filter_description: Option<String>,
+	filter_mode_description: Option<String>,
+	filter_amount: Option<f64>,
+	filter_mode_amount: Option<String>,
+	filter_value_per_unit: Option<u32>,
+	filter_mode_value_per_unit: Option<String>,
+	filter_tag_id: Option<u32>,
+	filter_mode_tag_id: Option<String>,
+}
+
 #[get("/api/v1/assets/all")]
-async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::AssetLoader::new(&data.pool).get().await;
+	let filters = Filters {
+		id: request_parameters.filter_id.map(|x| {
+			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+		}),
+		name: request_parameters.filter_name.clone().map(|x| {
+			(x, request_parameters.filter_mode_name.clone().unwrap_or(String::new()).into())
+		}),
+		description: request_parameters.filter_description.clone().map(|x| {
+			(x, request_parameters.filter_mode_description.clone().unwrap_or(String::new()).into())
+		}),
+		amount: request_parameters.filter_amount.map(|x| {
+			(x, request_parameters.filter_mode_amount.clone().unwrap_or(String::new()).into())
+		}),
+		value_per_unit: request_parameters.filter_value_per_unit.map(|x| {
+			(x, request_parameters.filter_mode_value_per_unit.clone().unwrap_or(String::new()).into())
+		}),
+		tag_id: request_parameters.filter_tag_id.map(|x| {
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+		}),
+		..Default::default()
+	};
+
+	let result = super::AssetLoader::new(&data.pool)
+	.set_query_parameters(
+		QueryParameters::default()
+			.set_max_results_opt(request_parameters.max_results)
+			.set_skip_results_opt(request_parameters.skip_results)
+			.set_filters(filters)
+	)
+	.get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -25,13 +72,42 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 }
 
 #[get("/api/v1/assets/all/deep")]
-async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::DeepAssetLoader::new(&data.pool).get().await;
+	let filters = Filters {
+		id: request_parameters.filter_id.map(|x| {
+			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+		}),
+		name: request_parameters.filter_name.clone().map(|x| {
+			(x, request_parameters.filter_mode_name.clone().unwrap_or(String::new()).into())
+		}),
+		description: request_parameters.filter_description.clone().map(|x| {
+			(x, request_parameters.filter_mode_description.clone().unwrap_or(String::new()).into())
+		}),
+		amount: request_parameters.filter_amount.map(|x| {
+			(x, request_parameters.filter_mode_amount.clone().unwrap_or(String::new()).into())
+		}),
+		value_per_unit: request_parameters.filter_value_per_unit.map(|x| {
+			(x, request_parameters.filter_mode_value_per_unit.clone().unwrap_or(String::new()).into())
+		}),
+		tag_id: request_parameters.filter_tag_id.map(|x| {
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+		}),
+		..Default::default()
+	};
+
+	let result = super::DeepAssetLoader::new(&data.pool)
+	.set_query_parameters(
+		QueryParameters::default()
+			.set_max_results_opt(request_parameters.max_results)
+			.set_skip_results_opt(request_parameters.skip_results)
+			.set_filters(filters)
+	)
+	.get().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),

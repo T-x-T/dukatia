@@ -24,6 +24,9 @@ pub enum FilterAndSortProperties {
 	ParentId,
 	Balance,
 	DefaultCurrencyId,
+	Description,
+	Amount,
+	ValuePerUnit,
 }
 
 impl std::fmt::Display for FilterAndSortProperties {
@@ -45,6 +48,9 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::ParentId => write!(f, "parent_id"),
 			FilterAndSortProperties::Balance => write!(f, "balance"),
 			FilterAndSortProperties::DefaultCurrencyId => write!(f, "default_currency_id"),
+			FilterAndSortProperties::Description => write!(f, "description"),
+			FilterAndSortProperties::Amount => write!(f, "amount"),
+			FilterAndSortProperties::ValuePerUnit => write!(f, "value_per_unit"),
 		}
 	}
 }
@@ -103,6 +109,9 @@ pub struct Filters {
 	pub parent_id: Option<(u32, NumberFilterModes)>,
 	pub balance: Option<(i64, NumberFilterModes)>,
 	pub default_currency_id: Option<(u32, NumberFilterModes)>,
+	pub description: Option<(String, StringFilterModes)>,
+	pub amount: Option<(f64, NumberFilterModes)>,
+	pub value_per_unit: Option<(u32, NumberFilterModes)>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -282,6 +291,24 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
+	fn set_filter_description(self, description: String, filter_mode: StringFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.description = Some((description, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_amount(self, amount: f64, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.amount = Some((amount, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_value_per_unit(self, value_per_unit: u32, filter_mode: NumberFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.value_per_unit = Some((value_per_unit, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
 	async fn get_first(self) -> Result<T, Box<dyn Error>> {
 		match self.get().await?.first() {
 			Some(x) => return Ok(x.clone()),
@@ -439,6 +466,30 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			i += 1;
 		}
 		
+		if self.get_query_parameters().filters.amount.is_some() {
+			match self.get_query_parameters().filters.amount.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}amount=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}amount!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}amount<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}amount>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.amount.unwrap().0));
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.value_per_unit.is_some() {
+			match self.get_query_parameters().filters.value_per_unit.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}value_per_unit=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}value_per_unit!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}value_per_unit<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}value_per_unit>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.value_per_unit.unwrap().0 as i32));
+			i += 1;
+		}
+		
 		if self.get_query_parameters().filters.tag_id.is_some() {
 			match self.get_query_parameters().filters.tag_id.unwrap().1 {
 				NumberFilterModes::Exact => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
@@ -526,6 +577,33 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				StringFilterModes::DoesntContain => {
 					parameters.push_str(format!(" {} {}symbol NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
 					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.symbol.clone().unwrap().0)));
+				},
+			};
+			first_where_clause = false;
+			i += 1;
+		}
+		
+		if self.get_query_parameters().filters.description.is_some() {
+			match self.get_query_parameters().filters.description.clone().unwrap().1 {
+				StringFilterModes::Exact => {
+					parameters.push_str(format!(" {} {}description ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(self.get_query_parameters().filters.description.clone().unwrap().0));
+				},
+				StringFilterModes::Contains => {
+					parameters.push_str(format!(" {} {}description ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.description.clone().unwrap().0)));
+				},
+				StringFilterModes::BeginsWith => {
+					parameters.push_str(format!(" {} {}description ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("{}%", self.get_query_parameters().filters.description.clone().unwrap().0)));
+				},
+				StringFilterModes::EndsWith => {
+					parameters.push_str(format!(" {} {}description ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}", self.get_query_parameters().filters.description.clone().unwrap().0)));
+				},
+				StringFilterModes::DoesntContain => {
+					parameters.push_str(format!(" {} {}description NOT ILIKE ${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str());
+					parameter_values.push(Box::new(format!("%{}%", self.get_query_parameters().filters.description.clone().unwrap().0)));
 				},
 			};
 			first_where_clause = false;
