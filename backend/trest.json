@@ -216,7 +216,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]}]
+						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}]
 					}
 				},
 				{
@@ -237,7 +237,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]},{"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[]}]
+						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},{"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}]
 					}
 				},
 				{
@@ -246,7 +246,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[]}
+						"body_equals": {"id":1,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
 					}
 				},
 				{
@@ -276,7 +276,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[]},{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[]}]
+						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[],"balance":null}]
 					}
 				},
 				{
@@ -285,7 +285,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[]},{"id":1,"name":"edited test","default_currency":{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"tags":[]}]
+						"body_equals": [{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[],"balance":null},{"id":1,"name":"edited test","default_currency":{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"tags":[],"balance":null}]
 					}
 				}
 			]
@@ -890,7 +890,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[]},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},{"id":3,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[]},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":0,"name":"tag1","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},{"id":4,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[]},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":1,"name":"tag2","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},{"id":5,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[]},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":0,"name":"tag1","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null},{"id":1,"name":"tag2","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]}]
+						"body_equals": [{"id":1,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[],"balance":null},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},{"id":3,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[],"balance":null},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":0,"name":"tag1","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},{"id":4,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[],"balance":null},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":1,"name":"tag2","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},{"id":5,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":{"id":0,"name":"admin","secret":null,"superuser":true},"account":{"id":0,"name":"Default","default_currency":{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},"user":null,"tags":[],"balance":null},"recipient":{"id":0,"name":"Default","user":null,"tags":[]},"tags":[{"id":0,"name":"tag1","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null},{"id":1,"name":"tag2","user":{"id":0,"name":"admin","secret":null,"superuser":true},"parent":null}],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]}]
 					}
 				}
 			]
