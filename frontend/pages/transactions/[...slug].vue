@@ -372,9 +372,7 @@ export default {
 		},
 
 		async applyFilter() {
-			const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
-			this.total_row_count = summary.count;
-			this.total_amount = summary.total_amount;
+			
 			await this.updateTable();
 		},
 
@@ -382,7 +380,11 @@ export default {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
 			this.transactions = await $fetch(this.build_request_url("/api/v1/transactions/all"));
+			const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
 			if(this.data_revision > local_data_revision) return;
+
+			this.total_row_count = summary.count;
+			this.total_amount = summary.total_amount;
 
 			const transactionsForDisplay = this.transactions.map(x => {
 				x.account = this.accounts.filter(a => a.id == x.account_id)[0];

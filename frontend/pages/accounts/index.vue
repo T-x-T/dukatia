@@ -25,9 +25,9 @@ export default {
 	}),
 
 	async mounted() {
-		const accounts = (await useFetch("/api/v1/accounts/all")).data.value as Account[];
-		const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
-		const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
+		const accounts = await $fetch("/api/v1/accounts/all") as Account[];
+		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
+		const tags = await $fetch("/api/v1/tags/all") as Tag[];
 
 		this.tableData = {
 			multiSelect: false,
@@ -47,7 +47,7 @@ export default {
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
 				tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
-				`${typeof x.balance == "number" ? x.balance : 0 / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
+				`${Number(x.balance) / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_mayor}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]))
 		};
 	},
