@@ -9,6 +9,7 @@
 			v-on:updateFilter="updateFilter"
 			v-on:resetFilter="resetFilter"
 			v-on:applyFilter="applyFilter"
+			v-on:updateSort="updateSort"
 		/>
 	</div>
 </template>
@@ -21,11 +22,13 @@ export default {
 		query_parameters: {
 			skip_results: 0,
 			max_results: 50,
+			sort_property: "id",
+			sort_direction: "asc",
 		} as QueryParameters,
 	}),
 
 	async mounted() {
-		const assets = await $fetch("/api/v1/assets/all") as Asset[];
+		const assets = await $fetch(this.build_request_url("/api/v1/assets/all")) as Asset[];
 		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 		const tags = await $fetch("/api/v1/tags/all") as Tag[];
 
@@ -37,17 +40,16 @@ export default {
 		this.tableData = {
 			multiSelect: false,
 			displaySum: true,
-			sumColumn: 5,
 			defaultSort: {
-				column: 5,
-				sort: "desc"
+				column: 0,
+				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
-				{name: "Name", type: "string"},
-				{name: "Description", type: "string"},
-				{name: "Amount", type: "number"},
-				{name: "Value per Unit", type: "number"},
+				{name: "ID", type: "number", sortable: true},
+				{name: "Name", type: "string", sortable: true},
+				{name: "Description", type: "string", sortable: true},
+				{name: "Amount", type: "number", sortable: true},
+				{name: "Value per Unit", type: "number", sortable: true},
 				{name: "Total value", type: "number", no_filter: true},
 				{name: "total TCO", type: "number", no_filter: true},
 				{name: "monthly TCO", type: "number", no_filter: true},
@@ -65,7 +67,7 @@ export default {
 					x.description,
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
 					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
+					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`, //TODO: not using minor_in_mayor
 					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
@@ -87,6 +89,12 @@ export default {
 		async updatePage(current_page: number, page_size: number) {
 			this.query_parameters.skip_results = current_page * page_size;
 			this.query_parameters.max_results = page_size;
+			await this.updateTable();
+		},
+
+		async updateSort(property_name: string, direction: "asc" | "desc") {
+			this.query_parameters.sort_property = property_name.toLowerCase();
+			this.query_parameters.sort_direction = direction;
 			await this.updateTable();
 		},
 
@@ -202,7 +210,9 @@ export default {
 		build_request_url(base_url: string) {
 			let url = `${base_url}
 				?skip_results=${this.query_parameters.skip_results}
-				&max_results=${this.query_parameters.max_results}`;
+				&max_results=${this.query_parameters.max_results}
+				&sort_property=${this.query_parameters.sort_property}
+				&sort_direction=${this.query_parameters.sort_direction}`;
 				
 			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;

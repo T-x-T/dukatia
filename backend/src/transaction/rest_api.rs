@@ -59,6 +59,19 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		None => None,
 	};
 
+	let sort_direction: Option<SortDirection> = match &request_parameters.sort_direction {
+		Some(x) => {
+			match x.as_str() {
+				"asc" => Some(SortDirection::ASC),
+				"ASC" => Some(SortDirection::ASC),
+				"desc" => Some(SortDirection::DESC),
+				"DESC" => Some(SortDirection::DESC),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_direction is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
+	};
+
 	let filters = Filters { 
 		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
@@ -101,7 +114,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				.set_max_results_opt(request_parameters.max_results)
 				.set_skip_results_opt(request_parameters.skip_results)
 				.set_sort_property_opt(sort_property)
-				.set_sort_direction_opt(request_parameters.sort_direction.clone())
+				.set_sort_direction_opt(sort_direction)
 				.set_filters(filters)
 		)
 		.get().await;

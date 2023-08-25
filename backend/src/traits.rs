@@ -55,12 +55,32 @@ impl std::fmt::Display for FilterAndSortProperties {
 	}
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum SortDirection {
+	ASC, DESC
+}
+
+impl From<SortDirection> for &str {
+	fn from(value: SortDirection) -> Self {
+		return match value {
+			SortDirection::ASC => "ASC",
+			SortDirection::DESC => "DESC",
+		}
+	}
+}
+
+impl From<SortDirection> for String {
+	fn from(value: SortDirection) -> Self {
+		return String::from(<&str>::from(value));
+	}
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct QueryParameters {
 	pub max_results: Option<u32>,
 	pub skip_results: Option<u32>,
 	pub sort_property: Option<FilterAndSortProperties>,
-	pub sort_direction: Option<String>,
+	pub sort_direction: Option<SortDirection>,
 	pub filters: Filters,
 }
 
@@ -80,7 +100,7 @@ impl QueryParameters {
 		return self;
 	}
 
-	pub fn set_sort_direction_opt(mut self, sort_direction: Option<String>) -> QueryParameters {
+	pub fn set_sort_direction_opt(mut self, sort_direction: Option<SortDirection>) -> QueryParameters {
 		self.sort_direction = sort_direction;
 		return self;
 	}
@@ -330,8 +350,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		let mut parameters = String::new();
 		let mut parameter_values: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
 
-		
-		
+
 		let mut first_where_clause = true;
 
 		if self.get_query_parameters().filters.id.is_some() {
@@ -624,11 +643,8 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 
 
 		if self.get_query_parameters().sort_property.is_some() {
-			let direction = match &self.get_query_parameters().sort_direction {
-				Some(x) => match x.as_str() {
-					"ASC" => "ASC",
-					_ => "DESC",
-				},
+			let direction: &str = match &self.get_query_parameters().sort_direction {
+				Some(x) => (*x).into(),
 				None => "DESC",
 			};
 

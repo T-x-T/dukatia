@@ -13,6 +13,8 @@ use crate::traits::*;
 struct RequestParameters {
 	skip_results: Option<u32>,
 	max_results: Option<u32>,
+	sort_property: Option<String>,
+	sort_direction: Option<String>,
 	filter_id: Option<u32>,
 	filter_mode_id: Option<String>,
 	filter_name: Option<String>,
@@ -32,6 +34,33 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	let sort_property: Option<FilterAndSortProperties> = match &request_parameters.sort_property {
+		Some(x) => {
+			match x.as_str() {
+				"id" => Some(FilterAndSortProperties::Id),
+				"name" => Some(FilterAndSortProperties::Name),
+				"description" => Some(FilterAndSortProperties::Description),
+				"amount" => Some(FilterAndSortProperties::Amount),
+				"value per unit" => Some(FilterAndSortProperties::ValuePerUnit),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_property is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
+	};
+
+	let sort_direction: Option<SortDirection> = match &request_parameters.sort_direction {
+		Some(x) => {
+			match x.as_str() {
+				"asc" => Some(SortDirection::ASC),
+				"ASC" => Some(SortDirection::ASC),
+				"desc" => Some(SortDirection::DESC),
+				"DESC" => Some(SortDirection::DESC),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_direction is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
 	};
 
 	let filters = Filters {
@@ -61,6 +90,8 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		QueryParameters::default()
 			.set_max_results_opt(request_parameters.max_results)
 			.set_skip_results_opt(request_parameters.skip_results)
+			.set_sort_property_opt(sort_property)
+			.set_sort_direction_opt(sort_direction)
 			.set_filters(filters)
 	)
 	.get().await;
@@ -76,6 +107,34 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_param
 	let _user_id = match is_authorized(&data.pool, &req).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	let sort_property: Option<FilterAndSortProperties> = match &request_parameters.sort_property {
+		Some(x) => {
+			match x.as_str() {
+				"id" => Some(FilterAndSortProperties::Id),
+				"name" => Some(FilterAndSortProperties::Name),
+				"description" => Some(FilterAndSortProperties::Description),
+				"amount" => Some(FilterAndSortProperties::Amount),
+				"value_per_unit" => Some(FilterAndSortProperties::ValuePerUnit),
+				"total_amount" => Some(FilterAndSortProperties::TotalAmount),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_property is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
+	};
+
+	let sort_direction: Option<SortDirection> = match &request_parameters.sort_direction {
+		Some(x) => {
+			match x.as_str() {
+				"asc" => Some(SortDirection::ASC),
+				"ASC" => Some(SortDirection::ASC),
+				"desc" => Some(SortDirection::DESC),
+				"DESC" => Some(SortDirection::DESC),
+				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_direction is invalid: {x}\"}}")),
+			}
+		},
+		None => None,
 	};
 
 	let filters = Filters {
@@ -105,6 +164,8 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_param
 		QueryParameters::default()
 			.set_max_results_opt(request_parameters.max_results)
 			.set_skip_results_opt(request_parameters.skip_results)
+			.set_sort_property_opt(sort_property)
+			.set_sort_direction_opt(sort_direction)
 			.set_filters(filters)
 	)
 	.get().await;

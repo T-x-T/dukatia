@@ -221,7 +221,11 @@ export default {
 				if(this.currentSort.sort == "desc") {
 					this.currentSort.sort = "asc";
 				} else {
-					this.currentSort = this.tableData.defaultSort;
+					if(this.currentSort.column === this.tableData.defaultSort.column && this.currentSort.sort === this.tableData.defaultSort.sort) {
+						this.currentSort.sort = "desc";
+					} else {
+						this.currentSort = this.tableData.defaultSort;
+					}
 				}
 			} else {
 				this.currentSort = {

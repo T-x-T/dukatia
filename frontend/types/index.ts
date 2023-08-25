@@ -260,7 +260,7 @@ declare global {
 		max_results?: number,
 		skip_results?: number,
 		sort_property?: string,
-		sort_direction?: "ASC" | "DESC",
+		sort_direction?: "asc" | "desc",
 		filter_id?: number,
 		filter_mode_id?: string,
 		filter_asset_id?: number,

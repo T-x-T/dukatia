@@ -90,7 +90,7 @@ export default {
 			skip_results: 0,
 			max_results: 50,
 			sort_property: "timestamp",
-			sort_direction: "DESC",
+			sort_direction: "desc",
 		} as QueryParameters,
 		total_row_count: 0,
 		total_amount: 0,
@@ -140,7 +140,6 @@ export default {
 				this.tableData = {
 					multiSelect: true,
 					displaySum: true,
-					sumColumn: 5,
 					row_count: this.total_row_count,
 					total_amount: this.total_amount,
 					defaultSort: {
@@ -273,7 +272,7 @@ export default {
 
 		async updateSort(property_name: string, direction: "asc" | "desc") {
 			this.query_parameters.sort_property = property_name.toLowerCase();
-			this.query_parameters.sort_direction = direction.toUpperCase() as "ASC" | "DESC";
+			this.query_parameters.sort_direction = direction;
 			await this.updateTable();
 		},
 
