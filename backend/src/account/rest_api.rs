@@ -19,6 +19,7 @@ struct RequestParameters {
 	filter_mode_balance: Option<String>,
 }
 
+//TODO: test max results, skip results, filters and sorting
 #[get("/api/v1/accounts/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
@@ -60,6 +61,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	}
 }
 
+//TODO: test max results, skip results, filters and sorting
 #[get("/api/v1/accounts/all/deep")]
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {

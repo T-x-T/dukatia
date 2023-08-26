@@ -57,14 +57,14 @@ impl std::fmt::Display for FilterAndSortProperties {
 
 #[derive(Debug, Clone, Copy)]
 pub enum SortDirection {
-	ASC, DESC
+	Asc, Desc
 }
 
 impl From<SortDirection> for &str {
 	fn from(value: SortDirection) -> Self {
 		return match value {
-			SortDirection::ASC => "ASC",
-			SortDirection::DESC => "DESC",
+			SortDirection::Asc => "ASC",
+			SortDirection::Desc => "DESC",
 		}
 	}
 }

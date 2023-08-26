@@ -1,11 +1,11 @@
-FROM rustlang/rust:nightly AS builder
+FROM alpine AS builder
 
 WORKDIR /app
 
 ADD . ./
-RUN rustup default nightly-2023-06-09 && cargo build --release
+RUN apk add --no-cache rustup build-base && /usr/bin/rustup-init -y --default-toolchain nightly-2023-06-09-x86_64-unknown-linux-musl --profile minimal && ~/.cargo/bin/cargo build --release
 
-FROM debian:bullseye-slim
+FROM alpine
 EXPOSE 4000
 
 COPY --from=builder /app/target/release/backend /app/backend

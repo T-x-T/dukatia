@@ -29,6 +29,7 @@ struct RequestParameters {
 	filter_mode_tag_id: Option<String>,
 }
 
+//TODO: test max results, skip results, filters and sorting
 #[get("/api/v1/assets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
@@ -53,10 +54,8 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	let sort_direction: Option<SortDirection> = match &request_parameters.sort_direction {
 		Some(x) => {
 			match x.as_str() {
-				"asc" => Some(SortDirection::ASC),
-				"ASC" => Some(SortDirection::ASC),
-				"desc" => Some(SortDirection::DESC),
-				"DESC" => Some(SortDirection::DESC),
+				"asc" | "ASC" => Some(SortDirection::Asc),
+				"desc" | "DESC" => Some(SortDirection::Desc),
 				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_direction is invalid: {x}\"}}")),
 			}
 		},
@@ -102,6 +101,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	}
 }
 
+//TODO: test max results, skip results, filters and sorting
 #[get("/api/v1/assets/all/deep")]
 async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
@@ -127,10 +127,8 @@ async fn get_all_deep(data: web::Data<AppState>, req: HttpRequest, request_param
 	let sort_direction: Option<SortDirection> = match &request_parameters.sort_direction {
 		Some(x) => {
 			match x.as_str() {
-				"asc" => Some(SortDirection::ASC),
-				"ASC" => Some(SortDirection::ASC),
-				"desc" => Some(SortDirection::DESC),
-				"DESC" => Some(SortDirection::DESC),
+				"asc" | "ASC" => Some(SortDirection::Asc),
+				"desc" | "DESC" => Some(SortDirection::Desc),
 				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_direction is invalid: {x}\"}}")),
 			}
 		},
