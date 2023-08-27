@@ -156,69 +156,6 @@ impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct DeepAsset {
-	pub id: u32,
-	pub name: String,
-	pub description: Option<String>,
-	pub value_per_unit: u32,
-	pub amount: f64,
-	pub user: crate::user::User,
-	pub currency: crate::currency::Currency,
-	pub tags: Vec<crate::tag::DeepTag>,
-	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
-}
-
-impl DeepAsset {
-	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<DeepAsset, Box<dyn Error>> {
-		let transactions = TransactionLoader::new(pool)
-		.set_filter_asset_id(self.id, NumberFilterModes::Exact)
-		.get().await?;
-	
-		return Ok(DeepAsset {
-			total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, self.amount == 0.0)),
-			..self
-		});
-	}
-}
-
-#[derive(Debug, Clone)]
-pub struct DeepAssetLoader<'a> {
-	pool: &'a Pool,
-	query_parameters: QueryParameters,
-}
-
-impl<'a> Loader<'a, DeepAsset> for DeepAssetLoader<'a> {
-	fn new(pool: &'a Pool) -> Self {
-		Self {
-			pool,
-			query_parameters: QueryParameters::default(),
-		}
-	}
-
-	async fn get(self) -> Result<Vec<DeepAsset>, Box<dyn Error>> {
-		let assets: Vec<DeepAsset> = futures_util::future::try_join_all(
-			db::DeepAssetDbReader::new(self.pool)
-				.set_query_parameters(self.query_parameters)
-				.execute()
-				.await?
-				.into_iter()
-				.map(|x| x.get_total_cost_of_ownership(self.pool))
-		).await?;
-
-		return Ok(assets);
-	}
-
-	fn get_query_parameters(&self) -> &QueryParameters {
-		return &self.query_parameters;
-	}
-
-	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
-		self.query_parameters = query_parameters;
-		return self;
-	}
-}
-
-#[derive(Debug, Clone, Serialize)]
 pub struct AssetValuation {
 	pub value_per_unit: u32,
 	pub amount: f64,
