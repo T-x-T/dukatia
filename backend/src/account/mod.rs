@@ -1,7 +1,5 @@
 mod db;
 pub mod rest_api;
-#[cfg(test)]
-mod test;
 
 use serde::Serialize;
 use std::error::Error;

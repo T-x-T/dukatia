@@ -35,9 +35,6 @@ mod traits;
 use std::fmt;
 use std::error::Error;
 
-#[cfg(test)]
-use deadpool_postgres::Pool;
-
 use config::*;
 use webserver::initialize_webserver;
 
@@ -95,18 +92,4 @@ impl fmt::Display for CustomError {
 
 impl Error for CustomError {
 
-}
-
-#[cfg(test)]
-async fn setup() -> (Config, Pool) {
-  let config = initialize_config();
-  postgres::delete_testing_databases(&config).await;
-  let pool = postgres::get_connection(&config).await;
-  user::init(&config, &pool).await;
-  return (config, pool);
-}
-
-#[cfg(test)]
-async fn teardown(config: &Config) {
-  postgres::delete_database(&config).await;
 }

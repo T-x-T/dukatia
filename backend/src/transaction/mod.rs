@@ -1,9 +1,6 @@
 mod db;
 pub mod rest_api;
 
-#[cfg(test)]
-mod test;
-
 use serde::{Serialize, Deserialize};
 use serde_repr::*;
 use chrono::prelude::*;

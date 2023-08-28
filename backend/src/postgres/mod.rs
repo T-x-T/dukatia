@@ -149,33 +149,3 @@ fn get_pool(config: &Config) -> Pool {
 
 	return cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
 }
-
-
-#[allow(dead_code)]
-pub async fn delete_database(config: &Config) {
-	if cfg!(test) {
-		let mut config_with_postgres_db = config.clone();
-		config_with_postgres_db.db_database = String::from("postgres");
-		let pool = get_pool(&config_with_postgres_db);
-		let client = pool.get().await.unwrap();
-		client.query(&format!("DROP DATABASE IF EXISTS {} WITH (FORCE);", config.db_database), &[]).await.expect("error trying to remove database");
-	} else {
-		println!("tried to delete database while not in testing mode");
-	}
-}
-
-#[allow(dead_code)]
-pub async fn delete_testing_databases(config: &Config) {
-	let mut config_with_postgres_db = config.clone();
-	config_with_postgres_db.db_database = String::from("postgres");
-	let pool = get_pool(&config_with_postgres_db);
-	let client = pool.get().await.unwrap();
-	let res = client.query("SELECT datname FROM pg_database WHERE datistemplate = false AND datname LIKE 'txts_treasury_testing%';", &[]).await.expect("error trying to get testing databases");
-
-	for db in res {
-		let db_name: String = db.get(0);
-		let mut prepared_config = config.clone();
-		prepared_config.db_database = db_name;
-		delete_database(&prepared_config).await;
-	}
-}

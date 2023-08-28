@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod test;
+
 use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
