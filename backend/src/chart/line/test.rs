@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc, NaiveDateTime};
 mod get_date_for_period {
 	use super::*;
 
-	#[tokio::test(flavor = "multi_thread")]
-	async fn daily_period() {
+	#[test]
+	fn daily_period() {
 		let date_period = "daily";
 		let timestamp: DateTime<Utc> = DateTime::from_utc(NaiveDateTime::parse_from_str("2015-09-05 23:56:04", "%Y-%m-%d %H:%M:%S").unwrap(), Utc);
 
@@ -15,8 +15,8 @@ mod get_date_for_period {
 		assert_eq!(res, expected_res);
 	}
 
-	#[tokio::test(flavor = "multi_thread")]
-	async fn monthly_period() {
+	#[test]
+	fn monthly_period() {
 		let date_period = "monthly";
 
 		for i in 1..12 {
@@ -29,8 +29,8 @@ mod get_date_for_period {
 		}
 	}
 
-	#[tokio::test(flavor = "multi_thread")]
-	async fn quarterly_period() {
+	#[test]
+	fn quarterly_period() {
 		let date_period = "quarterly";
 
 		let timestamp: DateTime<Utc> = DateTime::from_utc(NaiveDateTime::parse_from_str(format!("2015-01-05 23:56:04").as_str(), "%Y-%m-%d %H:%M:%S").unwrap(), Utc);
@@ -94,8 +94,8 @@ mod get_date_for_period {
 		assert_eq!(res, expected_res);
 	}
 
-	#[tokio::test(flavor = "multi_thread")]
-	async fn yearly_period() {
+	#[test]
+	fn yearly_period() {
 		let date_period = "yearly";
 		let timestamp: DateTime<Utc> = DateTime::from_utc(NaiveDateTime::parse_from_str("2015-09-05 23:56:04", "%Y-%m-%d %H:%M:%S").unwrap(), Utc);
 

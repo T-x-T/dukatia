@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod test;
+
 use deadpool_postgres::Pool;
 use postgres_types::ToSql;
 use tokio_postgres::Row;
@@ -336,6 +339,8 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		}
 	}
 }
+
+
 
 pub trait DbReader<'a, T: From<Row>>: Sized {
 	fn new(pool: &'a Pool) -> Self;
