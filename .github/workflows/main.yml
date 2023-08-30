@@ -98,7 +98,6 @@ jobs:
         with:
           name: backend_image
       - name: Build and push backend image
-        working-directory: backend
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
         run: |
