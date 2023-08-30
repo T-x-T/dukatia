@@ -42,7 +42,7 @@ jobs:
         working-directory: backend
         run: |
           docker load -i ../backend_image.tar
-          sed -i -e 's/build: ./image: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
+          sed -i -e 's/build: ./image: ghcr.io\/t-x-t\/txts-treasury\/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
           wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
           
   backend_test:
