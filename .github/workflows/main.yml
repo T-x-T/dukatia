@@ -9,6 +9,24 @@ on:
 
 jobs:
 
+  backend_build_docker_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build backend image
+        working-directory: backend
+        env:
+          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+        run: |
+          docker build -t $IMAGE_TAG .
+          docker save -o backend_image.tar ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+      - name: Save docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend_image
+          path: backend_image.tar
+
   backend_api_test_trest:
     runs-on: ubuntu-latest
     steps:
@@ -18,10 +36,15 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+      - name: Download backend image
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_image
       - name: Run trest on backend
         working-directory: backend
         run: |
-          rustup default nightly-2023-06-09
+          docker load -i backend_image.tar
+          sed -i -e 's/build: ./image: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
           wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
           
   backend_test:
@@ -33,10 +56,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - name: Setup PostgreSQL
-        uses: Harmon758/postgresql-action@v1.0.0
-        with:
-          postgresql password: $POSTGRES_PASSWORD
       - name: Test backend
         working-directory: backend
         run: |
@@ -59,7 +78,7 @@ jobs:
           rustup component add --toolchain nightly-2023-06-09 clippy
           cargo clippy
 
-  build_backend:
+  push_backend:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -76,19 +95,26 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download backend image
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_image
       - name: Build and push backend image
         working-directory: backend
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
         run: |
-          rustup default nightly-2023-06-09
-          docker build -t $IMAGE_TAG .
+          docker load -i backend_image.tar
           docker push $IMAGE_TAG
 
   build_frontend:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    needs:
+      - backend_test
+      - backend_clippy
+      - backend_api_test_trest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
