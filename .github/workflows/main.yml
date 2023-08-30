@@ -25,7 +25,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: backend_image
-          path: backend_image.tar
+          path: backend/backend_image.tar
 
   backend_api_test_trest:
     runs-on: ubuntu-latest
@@ -34,10 +34,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
       - name: Download backend image
         uses: actions/download-artifact@v3
         with:
