@@ -9,6 +9,24 @@ on:
 
 jobs:
 
+  build_frontend_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build frontend image
+        working-directory: frontend
+        env:
+          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+        run: |
+          docker build -t $IMAGE_TAG .
+          docker save -o frontend_image.tar ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+      - name: Save docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend_image
+          path: frontend/frontend_image.tar
+
   build_backend_docker_image:
     runs-on: ubuntu-latest
     steps:
@@ -85,8 +103,6 @@ jobs:
       - backend_clippy
       - backend_api_test_trest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Login to GitHub Packages
         uses: docker/login-action@v1
         with:
@@ -97,14 +113,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend_image
-      - name: Build and push backend image
+      - name: Push backend image
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
         run: |
           docker load -i backend_image.tar
           docker push $IMAGE_TAG
 
-  build_frontend:
+  push_frontend:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -112,19 +128,17 @@ jobs:
       - backend_test
       - backend_clippy
       - backend_api_test_trest
+      - build_frontend_docker_image
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Login to GitHub Packages
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push frontend image
-        working-directory: frontend
+      - name: Push frontend image
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
         run: |
-          docker build -t $IMAGE_TAG .
+          docker load -i frontend_image.tar
           docker push $IMAGE_TAG
