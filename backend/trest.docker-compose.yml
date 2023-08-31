@@ -7,6 +7,7 @@ services:
       POSTGRES_PASSWORD: changeme
   backend:
     build: .
+    restart: on-failure
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: changeme
