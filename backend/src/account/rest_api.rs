@@ -19,7 +19,7 @@ struct RequestParameters {
 	filter_mode_balance: Option<String>,
 }
 
-//TODO: test max results, skip results, filters and sorting
+//TODO: test filters for properties other than id
 #[get("/api/v1/accounts/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {

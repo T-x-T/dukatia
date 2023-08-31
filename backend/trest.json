@@ -107,6 +107,133 @@
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"}]
 					}
+				},
+				{
+					"name": "post of new currency returns 200",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"minor_in_mayor": 100,
+						"symbol": "*"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new currency returns 200",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"minor_in_mayor": 100,
+						"symbol": "*"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new currency returns 200",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"minor_in_mayor": 100,
+						"symbol": "*"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using skip_results",
+					"endpoint": "/api/v1/currencies/all?skip_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"},
+							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"},
+							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using skip_results and max_results",
+					"endpoint": "/api/v1/currencies/all?skip_results=2&max_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using filter_id",
+					"endpoint": "/api/v1/currencies/all?filter_id=4",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using filter_id and filter_mode_id=exact",
+					"endpoint": "/api/v1/currencies/all?filter_id=4&filter_mode_id=exact",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using filter_id and filter_mode_id=not",
+					"endpoint": "/api/v1/currencies/all?filter_id=4&filter_mode_id=not",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},
+							{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},
+							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"},
+							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using filter_id and filter_mode_id=less",
+					"endpoint": "/api/v1/currencies/all?filter_id=4&filter_mode_id=less",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},
+							{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},
+							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
+				},
+				{
+					"name": "retrieval of currencies returns expected output when using filter_id and filter_mode_id=more",
+					"endpoint": "/api/v1/currencies/all?filter_id=4&filter_mode_id=more",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+						]
+					}
 				}
 			]
 		},
@@ -186,6 +313,138 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]}, {"id":1,"name":"edited test","user_id":0,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using skip_results",
+					"endpoint": "/api/v1/recipients/all?skip_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":3,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":4,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":5,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using skip_results and max_results",
+					"endpoint": "/api/v1/recipients/all?skip_results=2&max_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":3,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using filter_id",
+					"endpoint": "/api/v1/recipients/all?filter_id=4",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using filter_id and filter_mode_id=exact",
+					"endpoint": "/api/v1/recipients/all?filter_id=4&filter_mode_id=exact",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using filter_id and filter_mode_id=not",
+					"endpoint": "/api/v1/recipients/all?filter_id=4&filter_mode_id=not",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Default","user_id":null,"tag_ids":[]},
+							{"id":1,"name":"edited test","user_id":0,"tag_ids":[]},
+							{"id":2,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":3,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":5,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using filter_id and filter_mode_id=less",
+					"endpoint": "/api/v1/recipients/all?filter_id=4&filter_mode_id=less",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Default","user_id":null,"tag_ids":[]},
+							{"id":1,"name":"edited test","user_id":0,"tag_ids":[]},
+							{"id":2,"name":"test","user_id":0,"tag_ids":[]},
+							{"id":3,"name":"test","user_id":0,"tag_ids":[]}
+						]
+					}
+				},
+				{
+					"name": "retrieval of recipients returns expected output when using filter_id and filter_mode_id=more",
+					"endpoint": "/api/v1/recipients/all?filter_id=4&filter_mode_id=more",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":5,"name":"test","user_id":0,"tag_ids":[]}
+						]
 					}
 				}
 			]
@@ -268,6 +527,127 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[],"balance":null}]
+					}
+				},
+				{
+					"name": "post of new account returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using skip_results",
+					"endpoint": "/api/v1/accounts/all?skip_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":3,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":4,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using skip_results and max_results",
+					"endpoint": "/api/v1/accounts/all?skip_results=2&max_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":2,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":3,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using filter_id",
+					"endpoint": "/api/v1/accounts/all?filter_id=4",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using filter_id and filter_mode_id=exact",
+					"endpoint": "/api/v1/accounts/all?filter_id=4&filter_mode_id=exact",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using filter_id and filter_mode_id=not",
+					"endpoint": "/api/v1/accounts/all?filter_id=4&filter_mode_id=not",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":2,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":3,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using filter_id and filter_mode_id=less",
+					"endpoint": "/api/v1/accounts/all?filter_id=3&filter_mode_id=less",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"Default","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":1,"name":"edited test","default_currency_id":1,"user_id":0,"tag_ids":[],"balance":null},
+							{"id":2,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of accounts returns expected output when using filter_id and filter_mode_id=more",
+					"endpoint": "/api/v1/accounts/all?filter_id=3&filter_mode_id=more",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
+						]
 					}
 				}
 			]
@@ -473,6 +853,119 @@
 					"expected_outcome": {
 						"status_code_equals": 400,
 						"body_equals": {"error": "the given item is invalid, because parent doesn't exist or would create a cyclic relationship"}
+					}
+				},
+				{
+					"name": "post of another tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of another tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of another tag returns 200",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using skip_results",
+					"endpoint": "/api/v1/tags/all?skip_results=2",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"parent_id":null},
+							{"id":5,"name":"test","user_id":0,"parent_id":null}]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using skip_results and max_results",
+					"endpoint": "/api/v1/tags/all?skip_results=2&max_results=1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"parent_id":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using filter_id",
+					"endpoint": "/api/v1/tags/all?filter_id=4",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"parent_id":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using filter_id and filter_mode_id=exact",
+					"endpoint": "/api/v1/tags/all?filter_id=4&filter_mode_id=exact",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":4,"name":"test","user_id":0,"parent_id":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using filter_id and filter_mode_id=not",
+					"endpoint": "/api/v1/tags/all?filter_id=4&filter_mode_id=not",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"name":"edited test","user_id":0,"parent_id":null},
+							{"id":3,"name":"test","user_id":0,"parent_id":null},
+							{"id":5,"name":"test","user_id":0,"parent_id":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using filter_id and filter_mode_id=less",
+					"endpoint": "/api/v1/tags/all?filter_id=4&filter_mode_id=less",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":1,"name":"edited test","user_id":0,"parent_id":null},
+							{"id":3,"name":"test","user_id":0,"parent_id":null}
+						]
+					}
+				},
+				{
+					"name": "retrieval of tags returns expected output when using filter_id and filter_mode_id=more",
+					"endpoint": "/api/v1/tags/all?filter_id=4&filter_mode_id=more",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":5,"name":"test","user_id":0,"parent_id":null}
+						]
 					}
 				}
 			]
