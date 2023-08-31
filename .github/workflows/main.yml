@@ -136,6 +136,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download frontend image
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend_image
       - name: Push frontend image
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
