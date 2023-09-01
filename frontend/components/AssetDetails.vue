@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<button @click="$emit('back')">Back</button>
-		<button @click="showAssetValuationEditor = true">Edit Asset Valuations</button>
+		<button @click="showAssetValuationEditor = true" class="mobile_hidden">Edit Asset Valuations</button>
 		<div id="grid">
 			<div class="gridItem form">
 				<div id="inner">
 					<h3>Asset data</h3>
-					<DetailsForm
+					<DetailsPage
 						v-if="Object.keys(config).length > 0"
 						:config="config"
 						v-on:back="$emit('back')"

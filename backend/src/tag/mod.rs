@@ -5,8 +5,9 @@ use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use super::CustomError;
+use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Tag {
 	pub id: Option<u32>,
 	pub name: String,
@@ -14,286 +15,120 @@ pub struct Tag {
 	pub parent_id: Option<u32>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct DeepTag {
-	pub id: u32,
-	pub name: String,
-	pub user: crate::user::User,
-	pub parent: Option<Tag>,
-}
+impl Save for Tag {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		if self.parent_id.is_some() && !self.is_valid_parent(pool).await {
+			return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
+		}
 
-pub async fn add(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), None).await {
-		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
+		match self.id {
+			Some(id) => {
+				db::TagDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
+			None => return db::TagDbWriter::new(pool, self).insert().await,
+		}
 	}
-	return Ok(db::add(&pool, &tag).await?);
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Tag>, Box<dyn Error>> {
-	return db::get_all(pool).await;
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTag>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
-}
-
-pub async fn get_by_id(pool: &Pool, tag_id: u32) -> Result<Tag, Box<dyn Error>> {
-	return db::get_by_id(pool, tag_id).await;
-}
-
-pub async fn update(pool: &Pool, tag: &Tag) -> Result<(), Box<dyn Error>> {
-	if tag.parent_id.is_some() && !is_valid_parent(&pool, tag.parent_id.unwrap(), tag.id).await {
-		return Err(Box::new(CustomError::InvalidItem{reason: String::from("parent doesn't exist or would create a cyclic relationship")}));
+impl Delete for Tag {
+	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(_) => return db::TagDbWriter::new(pool, self).delete().await,
+			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Tag".to_string() }))
+		}
 	}
-	return Ok(db::update(pool, tag).await?);
 }
 
-pub async fn delete(pool: &Pool, tag_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete(pool, tag_id).await;
-}
+impl Tag {
+	async fn is_valid_parent(&self, pool: &Pool) -> bool {
+		if self.parent_id.is_none() {
+			return true;
+		}
 
-//If tag_id is supplied check if parent_id can be parent of tag (checks cyclic dependency)
-async fn is_valid_parent(pool: &Pool, parent_id: u32, tag_id: Option<u32>) -> bool {
-	println!("parent_id: {}, tag_id: {:?}", parent_id, tag_id);
-	if db::get_by_id(pool, parent_id).await.is_err() {
-		return false;
-	}
+		if TagLoader::new(pool).set_filter_id(self.parent_id.unwrap(), NumberFilterModes::Exact).get_first().await.is_err() {
+			return false;
+		}
 
-	if tag_id.is_none() {
+		if self.id.is_none() {
+			return true;
+		}
+
+		//Check cyclic dependency
+		let mut next_parent_id_to_check = self.parent_id.unwrap();
+		loop {
+			if next_parent_id_to_check == self.id.unwrap() {
+				return false;
+			}
+			let next_tag = TagLoader::new(pool).set_filter_id(next_parent_id_to_check, NumberFilterModes::Exact).get_first().await;
+			if next_tag.is_err() {
+				break;
+			}
+			let next_tag_parent = next_tag.unwrap().parent_id;
+			if next_tag_parent.is_none() {
+				break;
+			}
+			
+			next_parent_id_to_check = next_tag_parent.unwrap();
+		}
+	
 		return true;
 	}
 
-	//Check cyclic dependency
-	let mut next_parent_id_to_check = parent_id;
-	loop {
-		println!("next_parent_id_to_check: {}, tag_id: {:?}", next_parent_id_to_check, tag_id);
-		if next_parent_id_to_check == tag_id.unwrap() {
-			return false;
-		}
-		let next_tag = db::get_by_id(pool, next_parent_id_to_check).await;
-		if next_tag.is_err() {
-			break;
-		}
-		let next_tag_parent = next_tag.unwrap().parent_id;
-		if next_tag_parent.is_none() {
-			break;
-		} else {
-			next_parent_id_to_check = next_tag_parent.unwrap();
-		}
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
 	}
 
-	return true;
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
+
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
+
+	#[allow(dead_code)]
+	pub fn set_parent_id(mut self, parent_id: u32) -> Self {
+		self.parent_id = Some(parent_id);
+		return self;
+	}
+
+	pub fn set_parent_id_opt(mut self, parent_id: Option<u32>) -> Self {
+		self.parent_id = parent_id;
+		return self;
+	}
 }
 
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
+#[derive(Debug, Clone)]
+pub struct TagLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
 
-	fn get_tag() -> Tag {
-		return Tag {
-			id: None,
-			name: String::from("test_tag"),
-			user_id: 0,
-			parent_id: None,
-		};
-	}
-
-	mod add {
-		use super::*;
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_without_parent() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			add(&pool, &get_tag()).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_existing_parent() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-			tag.parent_id = Some(1);
-			add(&pool, &tag).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		#[should_panic]
-		async fn panic_with_non_existing_parent() {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			tag.parent_id = Some(1);
-			add(&pool, &tag).await.unwrap();
-
-			teardown(&config).await;
+impl<'a> Loader<'a, Tag> for TagLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
 	}
 
-	mod get_all {
-		use super::*;
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_default_db() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			get_all(&pool).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let tag = get_tag();
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-
-			get_all(&pool).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-		
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_parent_id() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-
-			tag.parent_id = Some(1);
-			add(&pool, &tag).await?;
-
-			get_all(&pool).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let tag = get_tag();
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res.len(), 3);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_correct_parent_id_with_some() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			add(&pool, &tag).await?;
-
-			tag.parent_id = Some(0);
-			add(&pool, &tag).await?;
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].parent_id.unwrap(), 0);
-			
-			tag.parent_id = Some(1);
-			add(&pool, &tag).await?;
-			let res = get_all(&pool).await?;
-			assert_eq!(res[2].parent_id.unwrap(), 1);
-
-			teardown(&config).await;
-			return Ok(());
-		}
+	async fn get(self) -> Result<Vec<Tag>, Box<dyn Error>> {
+		return db::TagDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
 	}
 
-	mod update {
-		use super::*;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			add(&pool, &tag).await?;
-
-			tag.id = Some(0);
-			update(&pool, &tag).await?;
-
-			teardown(&config).await;
-			return Ok(());
-		}
-		
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_error_without_id() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let tag = get_tag();
-			add(&pool, &tag).await?;
-
-			let res = update(&pool, &tag).await;
-			
-			teardown(&config).await;
-			match res {
-				Ok(_) => panic!("this should have returned an error, but didnt"),
-				Err(_) => return Ok(())
-			};
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_error_when_specified_tag_doesnt_exist() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			add(&pool, &tag).await?;
-
-			tag.id = Some(1);
-			let res = update(&pool, &tag).await;
-			
-			teardown(&config).await;
-			match res {
-				Ok(_) => panic!("this should have returned an error, but didnt"),
-				Err(_) => return Ok(())
-			};
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_error_when_trying_to_create_cyclic_relationship() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let mut tag = get_tag();
-			add(&pool, &tag).await?;
-			add(&pool, &tag).await?;
-
-			tag.id = Some(0);
-			tag.parent_id = Some(1);
-			update(&pool, &tag).await?;
-
-			tag.id = Some(1);
-			tag.parent_id = Some(0);
-			let res = update(&pool, &tag).await;
-			
-			teardown(&config).await;
-			match res {
-				Ok(_) => panic!("this should have returned an error, but didnt"),
-				Err(_) => return Ok(())
-			};
-		}
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
 	}
 }

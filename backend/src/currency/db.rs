@@ -1,71 +1,105 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use super::Currency;
-use super::super::CustomError;
+use crate::CustomError;
+use crate::traits::*;
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
-	let rows = pool.get().await?
-		.query("SELECT * FROM public.currencies;", &[])
-		.await?;
-	
-	return Ok(
-		rows
-			.iter()
-			.map(|x| turn_row_into_currency(&x))
+#[derive(Debug)]
+pub struct CurrencyDbReader<'a> {
+	query_parameters: QueryParameters,
+	pool: &'a Pool,
+}
+
+impl<'a> DbReader<'a, Currency> for CurrencyDbReader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		return Self {
+			query_parameters: QueryParameters::default(),
+			pool,
+		}
+	}
+
+	fn get_pool(&self) -> &Pool {
+		return self.pool;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+
+	async fn execute(self) -> Result<Vec<Currency>, Box<dyn Error>> {
+		let query = "SELECT * FROM public.currencies";
+		return Ok(
+			self.actually_execute(query)
+			.await?
+			.into_iter()
+			.map(Into::into)
 			.collect()
-	);
+		);
+	}
 }
 
-pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-		.query("SELECT * FROM public.currencies WHERE id=$1;", &[&(currency_id as i32)])
-		.await?;
+#[derive(Debug)]
+pub struct CurrencyDbWriter<'a> {
+	pool: &'a Pool,
+	currency: Currency,
+}
 
-	if rows.is_empty() {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("currency"), filter: format!("id={currency_id}") } ));
+impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
+	fn new(pool: &'a Pool, item: Currency) -> Self {
+		Self {
+			pool,
+			currency: item,
+		}
 	}
 
-	return Ok(turn_row_into_currency(&rows[0]));
-}
+	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+		let id: i32 = self.pool.get()
+			.await
+			.unwrap()
+			.query(
+				"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
+				&[&self.currency.name, &(self.currency.minor_in_mayor as i32), &self.currency.symbol])
+			.await?[0].get(0);
 
-pub async fn add(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
-	pool.get()
-		.await
-		.unwrap()
-		.query(
-			"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3)", 
-			&[&currency.name, &(currency.minor_in_mayor as i32), &currency.symbol])
-		.await?;
-
-	return Ok(());
-}
-
-pub async fn update(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
-	if currency.id.is_none() {
-		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("currency") }));
+		return Ok(id as u32);
 	}
 
-	get_by_id(&pool, currency.id.unwrap()).await?;
-
-	pool.get()
-		.await
-		.unwrap()
-		.query(
-			"UPDATE public.currencies SET name=$1, minor_in_mayor=$2, symbol=$3 WHERE id=$4", 
-			&[&currency.name, &(currency.minor_in_mayor as i32), &currency.symbol, &(currency.id.unwrap() as i32)])
-		.await?;
-
-	return Ok(());
+	async fn replace(self) -> Result<(), Box<dyn Error>> {
+		if self.currency.id.is_none() {
+			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("currency") }));
+		}
+	
+		super::CurrencyLoader::new(self.pool).set_filter_id(self.currency.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	
+		self.pool.get()
+			.await
+			.unwrap()
+			.query(
+				"UPDATE public.currencies SET name=$1, minor_in_mayor=$2, symbol=$3 WHERE id=$4", 
+				&[&self.currency.name, &(self.currency.minor_in_mayor as i32), &self.currency.symbol, &(self.currency.id.unwrap() as i32)])
+			.await?;
+	
+		return Ok(());
+	}
 }
 
-fn turn_row_into_currency(row: &tokio_postgres::Row) -> Currency {
-	let id: i32 = row.get(0);
-	let minor_in_mayor: i32 = row.get(2);
-	return Currency {
-		id: Some(id as u32),
-		name: row.get(1),
-		minor_in_mayor: minor_in_mayor as u32,
-		symbol: row.get(3)
-	};
+impl From<tokio_postgres::Row> for Currency {
+	fn from(value: tokio_postgres::Row) -> Self {
+		let id: i32 = value.get(0);
+		let name: String = value.get(1);
+		let minor_in_mayor: i32 = value.get(2);
+		let symbol: String = value.get(3);
+
+		return Self {
+			id: Some(id as u32),
+			name,
+			minor_in_mayor: minor_in_mayor as u32,
+			symbol,
+		};
+	}
 }

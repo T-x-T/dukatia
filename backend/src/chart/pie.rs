@@ -6,7 +6,8 @@ use chrono::{MIN_DATETIME, MAX_DATETIME};
 use super::{Chart, ChartData};
 
 use crate::CustomError;
-use crate::transaction;
+use crate::transaction::{Transaction, TransactionLoader};
+use crate::traits::*;
 use crate::currency;
 use crate::recipient;
 use crate::tag;
@@ -27,22 +28,21 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_transactions(&pool, &chart).await?;
-	let recipients = recipient::get_all(&pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
+	let transactions = get_relevant_transactions(pool, &chart).await?;
+	let recipients = recipient::RecipientLoader::new(pool).get().await?;
 
-	recipients.into_iter().for_each(|recipient| {
+	for recipient in recipients {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
-
+	
 		transactions.iter()
 			.filter(|x| x.recipient_id == recipient.id.unwrap())
 			.for_each(|transaction| {
-				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0)
+				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
 			});
-
+	
 		output.insert(recipient.name, build_label_amount(amount_per_currency, &currencies));
-	});
-
+	}
 
 	output.retain(|_, v| v.1 != 0.0);
 
@@ -55,21 +55,21 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 
 async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
 	let mut output: BTreeMap<String, (String, f64)> = BTreeMap::new();
-	let currencies = currency::get_all(&pool).await?;
-	let transactions = get_relevant_transactions(&pool, &chart).await?;
-	let tags = tag::get_all(&pool).await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
+	let transactions = get_relevant_transactions(pool, &chart).await?;
+	let tags = tag::TagLoader::new(pool).get().await?;
 
-	tags.into_iter().for_each(|tag| {
+	for tag in tags {
 		let mut amount_per_currency: BTreeMap<u32, i32> = BTreeMap::new();
-
+	
 		transactions.iter()
 		.filter(|x| x.tag_ids.as_ref().unwrap().contains(&tag.id.unwrap()))
 		.for_each(|transaction| {
-			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0)
+			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
 		});
-
+	
 		output.insert(tag.name, build_label_amount(amount_per_currency, &currencies));
-	});
+	}
 
 	output.retain(|_, v| v.1 != 0.0);
 
@@ -80,17 +80,17 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 	return Ok(limited_output);
 }
 
-async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<transaction::Transaction>, Box<dyn Error>> {
+async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<Transaction>, Box<dyn Error>> {
 	let from_date = chart.filter_from.unwrap_or(MIN_DATETIME);
 	let to_date = chart.filter_to.unwrap_or(MAX_DATETIME);
 
-	return Ok(transaction::get_all(&pool).await?.into_iter().filter(|x| {
-		return &from_date.signed_duration_since(x.timestamp).num_seconds() <= &0 
-				&& &to_date.signed_duration_since(x.timestamp).num_seconds() >= &0;
+	return Ok(TransactionLoader::new(pool).get().await?.into_iter().filter(|x| {
+		return from_date.signed_duration_since(x.timestamp).num_seconds() <= 0 
+				&& to_date.signed_duration_since(x.timestamp).num_seconds() >= 0;
 		}).collect());
 }
 
-fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<currency::Currency>) -> (String, f64) {
+fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &[currency::Currency]) -> (String, f64) {
 	let mut amount_per_currency = amount_per_currency;
 
 	amount_per_currency.retain(|_, v| v != &mut 0);
@@ -98,11 +98,11 @@ fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &Vec<
 	let mut amount: f64 = 0.0;
 	let mut label = String::new();
 
-	amount_per_currency.into_iter().for_each(|x| {
-		let currency: currency::Currency = currencies.clone().into_iter().filter(|c| c.id.unwrap() == x.0).next().unwrap();
-		amount += x.1 as f64 / currency.minor_in_mayor as f64;
-		label.push_str(format!("{}{} ", x.1 as f64 / currency.minor_in_mayor as f64, currency.symbol).as_str());
-	});
+	for x in amount_per_currency {
+		let currency: &currency::Currency = currencies.iter().find(|c| c.id.unwrap() == x.0).unwrap();
+		amount += f64::from(x.1) / f64::from(currency.minor_in_mayor);
+		label.push_str(format!("{}{} ", f64::from(x.1) / f64::from(currency.minor_in_mayor), currency.symbol).as_str());
+	}
 
 	return (label, amount);
 }

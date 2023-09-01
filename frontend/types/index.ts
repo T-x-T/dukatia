@@ -8,6 +8,7 @@ declare global {
 		user_id?: number,
 		tag_ids?: number[],
 		default_currency?: Currency,
+		balance?: number,
 	}
 	
 	type DeepAccount = {
@@ -166,7 +167,9 @@ declare global {
 	type Column = {
 		name: string,
 		type: ColumnType,
-		options?: string[],
+		options?: {id?: number, name: string}[],
+		sortable?: boolean,
+		no_filter?: boolean,
 	}
 
 	type TableData = {
@@ -176,6 +179,8 @@ declare global {
 		rows: Row[],
 		displaySum?: boolean,
 		sumColumn?: number,
+		row_count?: number,
+		total_amount?: number,
 	}
 
 	type TableFilterOption = 
@@ -249,5 +254,49 @@ declare global {
 		top_left_y: number,
 		bottom_right_x: number,
 		bottom_right_y: number,
+	}
+
+	type QueryParameters = {
+		max_results?: number,
+		skip_results?: number,
+		sort_property?: string,
+		sort_direction?: "asc" | "desc",
+		filter_id?: number,
+		filter_mode_id?: string,
+		filter_asset_id?: number,
+		filter_mode_asset_id?: string,
+		filter_user_id?: number,
+		filter_mode_user_id?: string,
+		filter_currency_id?: number,
+		filter_mode_currency_id?: string,
+		filter_account_id?: number,
+		filter_mode_account_id?: string,
+		filter_recipient_id?: number,
+		filter_mode_recipient_id?: string,
+		filter_tag_id?: number,
+		filter_mode_tag_id?: string,
+		filter_total_amount?: number,
+		filter_mode_total_amount?: string,
+		filter_comment?: string,
+		filter_mode_comment?: string,
+		filter_time_range_lower?: Date,
+		filter_time_range_upper?: Date,
+		filter_mode_time_range?: string,
+		filter_name?: string,
+		filter_mode_name?: string,
+		filter_symbol?: string,
+		filter_mode_symbol?: string,
+		filter_minor_in_mayor?: number,
+		filter_mode_minor_in_mayor?: string,
+		filter_parent_id?: number,
+		filter_mode_parent_id?: string,
+		filter_balance?: number,
+		filter_mode_balance?: string,
+		filter_description?: string,
+		filter_mode_description?: string,
+		filter_amount?: number,
+		filter_mode_amount?: string,
+		filter_value_per_unit?: number,
+		filter_mode_value_per_unit?: string,
 	}
 }

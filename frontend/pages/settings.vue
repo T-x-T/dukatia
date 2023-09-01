@@ -22,6 +22,10 @@
 				<option>None</option>
 			</select>
 		</div>
+
+		<div class="gridItem">
+			<BatchImport />
+		</div>
 	</div>
 </template>
 
@@ -31,7 +35,7 @@ export default {
 		oldPassword: null,
 		newPassword: null,
 		newPasswordConfirmation: null,
-		passwordUpdateMessage: ""
+		passwordUpdateMessage: "",
 	}),
 
 	methods: {
@@ -54,7 +58,7 @@ export default {
 			} catch(e: any) {
 				this.passwordUpdateMessage = e?.data?.data?.error;
 			}
-		}
+		},
 	}
 }
 </script>

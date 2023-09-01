@@ -9,19 +9,58 @@ on:
 
 jobs:
 
-  backend_api_test_trest:
+  build_frontend_docker_image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Build frontend image
+        working-directory: frontend
+        env:
+          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+        run: |
+          docker build -t $IMAGE_TAG .
+          docker save -o frontend_image.tar ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+      - name: Save docker image
+        uses: actions/upload-artifact@v3
         with:
-          toolchain: nightly
+          name: frontend_image
+          path: frontend/frontend_image.tar
+
+  build_backend_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build backend image
+        working-directory: backend
+        env:
+          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+        run: |
+          docker build -t $IMAGE_TAG .
+          docker save -o backend_image.tar ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+      - name: Save docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend_image
+          path: backend/backend_image.tar
+
+  backend_api_test_trest:
+    runs-on: ubuntu-latest
+    needs: 
+      build_backend_docker_image
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download backend image
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_image
       - name: Run trest on backend
         working-directory: backend
         run: |
-          rustup default nightly
+          docker load -i ../backend_image.tar
+          sed -i -e 's/build: ./image: ghcr.io\/t-x-t\/txts-treasury\/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
           wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
           
   backend_test:
@@ -33,57 +72,77 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - name: Setup PostgreSQL
-        uses: Harmon758/postgresql-action@v1.0.0
-        with:
-          postgresql password: $POSTGRES_PASSWORD
       - name: Test backend
         working-directory: backend
         run: |
-          rustup default nightly
+          rustup default nightly-2023-06-09
           POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
+          
+  backend_clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+      - name: Run clippy on backend
+        working-directory: backend
+        run: |
+          rustup default nightly-2023-06-09
+          rustup component add --toolchain nightly-2023-06-09 clippy
+          cargo clippy
 
-  build_backend:
+  push_backend:
     runs-on: ubuntu-latest
     permissions:
       packages: write
     needs: 
       - backend_test
+      - backend_clippy
       - backend_api_test_trest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Login to GitHub Packages
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push backend image
-        working-directory: backend
+      - name: Download backend image
+        uses: actions/download-artifact@v3
+        with:
+          name: backend_image
+      - name: Push backend image
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
         run: |
-          docker build -t $IMAGE_TAG .
+          docker load -i backend_image.tar
           docker push $IMAGE_TAG
 
-  build_frontend:
+  push_frontend:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    needs:
+      - backend_test
+      - backend_clippy
+      - backend_api_test_trest
+      - build_frontend_docker_image
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Login to GitHub Packages
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push frontend image
-        working-directory: frontend
+      - name: Download frontend image
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend_image
+      - name: Push frontend image
         env:
           IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
         run: |
-          docker build -t $IMAGE_TAG .
+          docker load -i frontend_image.tar
           docker push $IMAGE_TAG

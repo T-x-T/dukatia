@@ -1,18 +1,25 @@
 <template>
-	<div id="main">
-		<div id="table">
-			<div>
-				<button class="green" @click="newTransaction">Add</button>
-			</div>
-			<CustomTable
-				v-if="Object.keys(tableData).length > 0"
-				:tableDataProp="tableData"
-				v-on:rowClick="rowClick"
-				v-on:rowSelect="rowSelect"
-			/>
+	<div id="main">		
+		<div v-if="!(small_device && detailsOpen)" id="top_controls">
+			<button class="green" @click="newTransaction">Add</button>
 		</div>
 
-		<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
+		<div id="table_and_details">
+			<div id="table">
+				<CustomTable
+					v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
+					:tableDataProp="tableData"
+					v-on:rowClick="rowClick"
+					v-on:rowSelect="rowSelect"
+					v-on:updatePage="updatePage"
+					v-on:updateSort="updateSort"
+					v-on:updateFilter="updateFilter"
+					v-on:resetFilter="resetFilter"
+					v-on:applyFilter="applyFilter"
+				/>
+			</div>
+
+			<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
 				<div id="batchEdit">
 					<div>
 						<label for="account">Account:</label>
@@ -48,13 +55,14 @@
 				</div>		
 			</div>
 
-		<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
-			<TransactionDetails 
-				v-if="Object.keys(selectedRow).length > 0"
-				:transaction="selectedRow"
-				v-on:back="updateAndLoadTable"
-				v-on:updateData="updateTable"
-			/>
+			<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
+				<TransactionDetails 
+					v-if="Object.keys(selectedRow).length > 0"
+					:transaction="selectedRow"
+					v-on:back="updateAndLoadTable"
+					v-on:updateData="updateTable"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -77,15 +85,33 @@ export default {
 		recipients: [] as Recipient[],
 		assets: [] as Asset[],
 		transactions: [] as Transaction[],
+		small_device: false,
+		query_parameters: {
+			skip_results: 0,
+			max_results: 50,
+			sort_property: "timestamp",
+			sort_direction: "desc",
+		} as QueryParameters,
+		total_row_count: 0,
+		total_amount: 0,
+		data_revision: 0,
 	}),
 	
 	async mounted() {
+		this.$nextTick(() => {
+      window.addEventListener('resize', this.on_resize);
+    });
+		this.on_resize();
+
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.assets = await $fetch("/api/v1/assets/all");
-		this.transactions = await $fetch("/api/v1/transactions/all");
+		this.transactions = await $fetch(this.build_request_url("/api/v1/transactions/all"));
+		const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
+		this.total_row_count = summary.count;
+		this.total_amount = summary.total_amount;
 		this.updateTransactions();
 	
 		this.selectData = {
@@ -114,20 +140,21 @@ export default {
 				this.tableData = {
 					multiSelect: true,
 					displaySum: true,
-					sumColumn: 5,
+					row_count: this.total_row_count,
+					total_amount: this.total_amount,
 					defaultSort: {
 						column: 4,
 						sort: "desc"
 					},
 					columns: [
-						{name: "ID", type: "number"},
-						{name: "Account", type: "choice", options: [...new Set(this.accounts.map(x => x.name))]},
-						{name: "Recipient", type: "choice", options: [...new Set(this.recipients.map(x => x.name))]},
-						{name: "Asset", type: "choice", options: [...new Set(this.assets.map(x => x.name).sort((a, b) => a > b ? 1 : -1))]},
-						{name: "Timestamp", type: "date"},
-						{name: "Amount", type: "number"},
-						{name: "Comment", type: "string"},
-						{name: "Tags", type: "choice", options: [...new Set(this.tags.map(x => x.name))]}
+						{name: "ID", type: "number", sortable: true},
+						{name: "Account", type: "choice", sortable: true, options: this.accounts.map(x => ({id: x.id, name: x.name}))},
+						{name: "Recipient", type: "choice", sortable: true, options: this.recipients.map(x => ({id: x.id, name: x.name}))},
+						{name: "Asset", type: "choice", options: this.assets.map(x => ({id: x.id, name: x.name}))},
+						{name: "Timestamp", type: "date", sortable: true},
+						{name: "Amount", type: "number", sortable: true},
+						{name: "Comment", type: "string", sortable: true},
+						{name: "Tags", type: "choice", options: this.tags.map(x => ({id: x.id, name: x.name}))},
 					],
 					rows: transactionsForDisplay.map(x => ([
 						x.id,
@@ -170,7 +197,12 @@ export default {
 				total_amount: 0,
 				comment: "",
 				currency: this.currencies.filter(x => x.id == 0)[0],
-				positions: [],
+				positions: [
+					{
+						amount: 0,
+						comment: "",
+					}
+				],
 			}
 
 			this.detailsOpen = false;
@@ -232,8 +264,127 @@ export default {
 			history.pushState({}, "", "/transactions");
 		},
 
+		async updatePage(current_page: number, page_size: number) {
+			this.query_parameters.skip_results = current_page * page_size;
+			this.query_parameters.max_results = page_size;
+			await this.updateTable();
+		},
+
+		async updateSort(property_name: string, direction: "asc" | "desc") {
+			this.query_parameters.sort_property = property_name.toLowerCase();
+			this.query_parameters.sort_direction = direction;
+			await this.updateTable();
+		},
+
+		async updateFilter(property_name: string, value: any, mode: string) {
+			property_name = property_name.toLowerCase();
+			switch(property_name) {
+				case "id": {
+					this.query_parameters.filter_id = value;
+					this.query_parameters.filter_mode_id = mode;
+					break;
+				}
+				case "comment": {
+					this.query_parameters.filter_comment = value;
+					this.query_parameters.filter_mode_comment = mode;
+					break;
+				}
+				case "timestamp": {
+					this.query_parameters.filter_time_range_lower = value.lower;
+					this.query_parameters.filter_time_range_upper = value.upper;
+					this.query_parameters.filter_mode_time_range = mode;
+					break;
+				}
+				case "account": {
+					this.query_parameters.filter_account_id = value;
+					this.query_parameters.filter_mode_account_id = mode;
+					break;
+				}
+				case "recipient": {
+					this.query_parameters.filter_recipient_id = value;
+					this.query_parameters.filter_mode_recipient_id = mode;
+					break;
+				}
+				case "tags": {
+					this.query_parameters.filter_tag_id = value;
+					this.query_parameters.filter_mode_tag_id = mode;
+					break;
+				}
+				case "asset": {
+					this.query_parameters.filter_asset_id = value;
+					this.query_parameters.filter_mode_asset_id = mode;
+					break;
+				}
+				case "amount": {
+					this.query_parameters.filter_total_amount = value;
+					this.query_parameters.filter_mode_total_amount = mode;
+					break;
+				}
+			}
+		},
+
+		async resetFilter(property_name: string) {
+			property_name = property_name.toLowerCase();
+			switch(property_name) {
+				case "id": {
+					this.query_parameters.filter_id = undefined;
+					this.query_parameters.filter_mode_id = undefined;
+					break;
+				}
+				case "comment": {
+					this.query_parameters.filter_comment = undefined;
+					this.query_parameters.filter_mode_comment = undefined;
+					break;
+				}
+				case "timestamp": {
+					this.query_parameters.filter_time_range_lower = undefined;
+					this.query_parameters.filter_time_range_upper = undefined;
+					this.query_parameters.filter_mode_time_range = undefined;
+					break;
+				}
+				case "account": {
+					this.query_parameters.filter_account_id = undefined;
+					this.query_parameters.filter_mode_account_id = undefined;
+					break;
+				}
+				case "recipient": {
+					this.query_parameters.filter_recipient_id = undefined;
+					this.query_parameters.filter_mode_recipient_id = undefined;
+					break;
+				}
+				case "tags": {
+					this.query_parameters.filter_tag_id = undefined;
+					this.query_parameters.filter_mode_tag_id = undefined;
+					break;
+				}
+				case "asset": {
+					this.query_parameters.filter_asset_id = undefined;
+					this.query_parameters.filter_mode_asset_id = undefined;
+					break;
+				}
+				case "amount": {
+					this.query_parameters.filter_total_amount = undefined;
+					this.query_parameters.filter_mode_total_amount = undefined;
+					break;
+				}
+			}
+		},
+
+		async applyFilter() {
+			
+			await this.updateTable();
+		},
+
 		async updateTable() {
-			this.transactions = await $fetch("/api/v1/transactions/all");
+			this.data_revision += 1;
+			const local_data_revision = this.data_revision;
+			this.transactions = await $fetch(this.build_request_url("/api/v1/transactions/all"));
+			const summary = await $fetch(this.build_request_url("/api/v1/transactions/summary")) as any;
+			if(this.data_revision > local_data_revision) return;
+
+			this.total_row_count = summary.count;
+			this.total_amount = summary.total_amount;
+
 			const transactionsForDisplay = this.transactions.map(x => {
 				x.account = this.accounts.filter(a => a.id == x.account_id)[0];
 				x.currency = this.currencies.filter(c => c.id == x.currency_id)[0];
@@ -250,24 +401,66 @@ export default {
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));
-		}
+			this.tableData.row_count = this.total_row_count;
+			this.tableData.total_amount = this.total_amount;
+		},
+
+		on_resize() {
+			this.small_device = window.innerWidth <= 800;
+		},
+
+		build_request_url(base_url: string) {
+			let url = `${base_url}
+				?skip_results=${this.query_parameters.skip_results}
+				&max_results=${this.query_parameters.max_results}
+				&sort_property=${this.query_parameters.sort_property}
+				&sort_direction=${this.query_parameters.sort_direction}`;
+
+			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
+			if(Number.isInteger(this.query_parameters.filter_asset_id)) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
+			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;
+			if(Number.isInteger(this.query_parameters.filter_user_id)) url += `&filter_user_id=${this.query_parameters.filter_user_id}`;
+			if(this.query_parameters.filter_mode_user_id) url += `&filter_mode_user_id=${this.query_parameters.filter_mode_user_id}`;
+			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
+			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
+			if(Number.isInteger(this.query_parameters.filter_account_id)) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
+			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
+			if(Number.isInteger(this.query_parameters.filter_recipient_id)) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
+			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
+			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
+			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_mayor
+			if(this.query_parameters.filter_mode_total_amount) url += `&filter_mode_total_amount=${this.query_parameters.filter_mode_total_amount}`;
+			if(this.query_parameters.filter_comment) url += `&filter_comment=${this.query_parameters.filter_comment}`;
+			if(this.query_parameters.filter_mode_comment) url += `&filter_mode_comment=${this.query_parameters.filter_mode_comment}`;
+			if(this.query_parameters.filter_time_range_lower) url += `&filter_time_range_lower=${new Date(this.query_parameters.filter_time_range_lower).toISOString()}`;
+			if(this.query_parameters.filter_time_range_upper) url += `&filter_time_range_upper=${new Date(this.query_parameters.filter_time_range_upper).toISOString()}`;
+			if(this.query_parameters.filter_mode_time_range) url += `&filter_mode_time_range=${this.query_parameters.filter_mode_time_range}`;
+
+			return url;
+		},
 	}
 }
 </script>
 
 <style lang="sass" scoped>
 div#main
+	height: 100svh
+
+div#table_and_details
 	display: flex
-	justify-content: space-between
-	overflow: hidden
-	height: 100vh
 
 div#table
 	overflow: auto
 
 div.detailBar
 	padding-left: 8px
-	flex-shrink: 0
+	@media screen and (max-width: 800px)
+		position: absolute
+		width: 100%
+		height: 100%
+		margin: 0
 
 div#batchEdit
 	select
@@ -276,6 +469,5 @@ div#batchEdit
 		margin: 0
 		margin-left: 1em
 		height: 100%
-		
 
 </style>

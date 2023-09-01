@@ -8,13 +8,27 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use super::account;
 use super::asset::Asset;
-use crate::CustomError;
+use crate::traits::*;
 
 #[derive(Debug, Copy, Clone, Serialize_repr)]
 #[repr(u8)]
 pub enum TransactionStatus {
 	Withheld = 0, 
 	Completed = 1,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct Position {
+	pub id: Option<u32>,
+	pub amount: i32,
+	pub comment: Option<String>,
+	pub tag_id: Option<u32>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TransactionSummary {
+	pub count: u32,
+	pub total_amount: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -33,201 +47,162 @@ pub struct Transaction {
 	pub positions: Vec<Position>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct DeepTransaction {
-	pub id: u32,
-	pub status: TransactionStatus,
-	pub timestamp: DateTime<Utc>,
-	pub total_amount: Option<i32>,
-	pub comment: Option<String>,
-	pub currency: crate::currency::Currency,
-	pub user: crate::user::User,
-	pub account: crate::account::DeepAccount,
-	pub recipient: crate::recipient::DeepRecipient,
-	pub tags: Vec<crate::tag::DeepTag>,
-	pub asset: Option<crate::asset::DeepAsset>,
-	pub positions: Vec<Position>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Position {
-	pub id: Option<u32>,
-	pub amount: i32,
-	pub comment: Option<String>,
-	pub tag_id: Option<u32>,
-}
-
-pub async fn add(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
-	let mut transaction = transaction.clone();
-
-	let account = account::get_all(&pool)
-		.await?
-		.into_iter()
-		.filter(|x| x.id.unwrap() == transaction.account_id)
-		.collect::<Vec<account::Account>>();
-
-	if account.len() != 1 {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("Account"), filter: format!("account_id={}", transaction.account_id) }));
-	} else {
-		transaction.currency_id = Some(account[0].default_currency_id);
-	}
-
-
-	return Ok(db::add(&pool, &transaction).await?);
-}
-
-pub async fn get_all(pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepTransaction>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
-}
-
-pub async fn get_by_id(pool: &Pool, transaction_id: u32) -> Result<Transaction, Box<dyn Error>> {
-	return db::get_by_id(pool, transaction_id).await;
-}
-
-pub async fn get_by_asset_id(pool: &Pool, asset_id: u32) -> Result<Vec<Transaction>, Box<dyn Error>> {
-	return db::get_by_asset_id(pool, asset_id).await;
-}
- 
-pub async fn update(pool: &Pool, transaction: &Transaction) -> Result<(), Box<dyn Error>> {
-	let mut transaction = transaction.clone();
-
-	transaction.currency_id = Some(
-		account::get_all(&pool)
-			.await?
-			.into_iter()
-			.filter(|x| x.id.unwrap() == transaction.account_id)
-			.collect::<Vec<account::Account>>()[0]
-			.default_currency_id
-		);
-
-	return db::update(&pool, &transaction).await;
-}
-
-pub async fn delete_by_id(pool: &Pool, transaction_id: u32) -> Result<(), Box<dyn Error>> {
-	return db::delete_by_id(&pool, transaction_id).await;
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
-
-	fn get_transaction() -> Transaction {
-		return Transaction {
+impl Default for Transaction {
+	fn default() -> Self {
+		Self { 
 			id: None,
 			user_id: 0,
-			currency_id: Some(0),
+			currency_id: None,
 			account_id: 0,
 			recipient_id: 0,
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
 			total_amount: None,
-			comment: Some(String::from("this is a comment")),
+			comment: None,
 			tag_ids: None,
 			asset: None,
-			positions: vec![Position {id: None, amount: 12345, comment: None, tag_id: None}],
-		};
-	}
-
-	mod add {
-		use super::*;
-		use super::super::super::tag;
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			add(&pool, &get_transaction()).await?;
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-
-			let mut transaction = get_transaction();
-			transaction.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &transaction).await?;
-
-			teardown(&config).await;
-			return Ok(());
+			positions: Vec::new(),
 		}
 	}
+}
 
-	mod get_all {
-		use super::*;
-		use super::super::super::tag;
+impl Save for Transaction {
+	async fn save(mut self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		let account = account::AccountLoader::new(pool).set_filter_id(self.account_id, NumberFilterModes::Exact).get_first().await?;
+		self = self.set_currency_id(account.default_currency_id);
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_no_results_on_empty_db() {
-			let (config, pool) = setup().await;
-
-			let res = get_all(&pool).await.unwrap();
-			assert_eq!(res.len(), 0);
-
-			teardown(&config).await;
+		match self.id {
+			Some(id) => {
+				db::TransactionDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
+			None => return db::TransactionDbWriter::new(pool, self).insert().await
 		}
+	}
+}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let transaction = get_transaction();
-			add(&pool, &transaction).await?;
-			add(&pool, &transaction).await?;
-			add(&pool, &transaction).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res.len(), 3);
-
-			teardown(&config).await;
-			return Ok(());
+impl Delete for Transaction {
+	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		match self.id {
+			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
+			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
 		}
+	}
+}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+impl Transaction {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
+	}
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
 
-			let mut transaction = get_transaction();
-			transaction.tag_ids = Some(vec![0]);
-			add(&pool, &transaction).await?;
+	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+		self.currency_id = Some(currency_id);
+		return self;
+	}
 
-			let res = get_all(&pool).await?;
-			assert_eq!(res[0].clone().tag_ids.unwrap(), vec![0]);
+	pub fn set_account_id(mut self, account_id: u32) -> Self {
+		self.account_id = account_id;
+		return self;
+	}
 
-			teardown(&config).await;
-			return Ok(());
+	pub fn set_recipient_id(mut self, recipient_id: u32) -> Self {
+		self.recipient_id = recipient_id;
+		return self;
+	}
+
+	pub fn set_status(mut self, status: TransactionStatus) -> Self {
+		self.status = status;
+		return self;
+	}
+
+	pub fn set_timestamp(mut self, timestamp: DateTime<Utc>) -> Self {
+		self.timestamp = timestamp;
+		return self;
+	}
+
+	pub fn set_comment(mut self, comment: String) -> Self {
+		self.comment = Some(comment);
+		return self;
+	}
+
+	pub fn set_comment_opt(mut self, comment: Option<String>) -> Self {
+		self.comment = comment;
+		return self;
+	}
+
+	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
+		self.tag_ids = Some(tag_ids);
+		return self;
+	}
+
+	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+		self.tag_ids = tag_ids;
+		return self;
+	}
+
+	pub fn set_asset(mut self, asset: Asset) -> Self {
+		self.asset = Some(asset);
+		return self;
+	}
+
+	pub fn set_asset_opt(mut self, asset: Option<Asset>) -> Self {
+		self.asset = asset;
+		return self;
+	}
+
+	pub fn set_positions(mut self, positions: Vec<Position>) -> Self {
+		self.positions = positions;
+		return self;
+	}
+
+	pub fn set_total_amount(mut self, total_amount: i32) -> Self {
+		self.total_amount = Some(total_amount);
+		return self;
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct TransactionLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Transaction> for TransactionLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	async fn get(self) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		return db::TransactionDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
 
-			let mut transaction = get_transaction();
-			transaction.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &transaction).await?;
-			add(&pool, &transaction).await?;
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
+	}
+}
 
-			let res = get_all(&pool).await?;
-			assert_eq!(res[0].clone().tag_ids.unwrap(), vec![0, 1, 2]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
+impl<'a> TransactionLoader<'a> {
+	pub async fn summarize(self) -> Result<TransactionSummary, Box<dyn Error>> {
+		return db::TransactionDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.summarize()
+			.await;
 	}
 }

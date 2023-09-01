@@ -1,7 +1,7 @@
 <template>
 	<div class="wrapper">
 		<div v-if="!show_options" class="wrapper" id="chart_wrapper">
-			<button id="edit_button" @click="show_options = true">Edit</button>
+			<button id="edit_button" class="mobile_hidden" @click="show_options = true">Edit</button>
 			<h5>{{ options.title }}</h5>
 			<div v-if="options.chart_type == 'text'">
 				<ChartText
@@ -34,7 +34,7 @@
 			</div>
 		</div>
 
-		<div v-if="show_options" class="wrapper">
+		<div v-if="show_options" class="wrapper mobile_hidden">
 			<ChartOptions 
 				:chart_options="options"
 				v-on:back="reload"

@@ -4,6 +4,7 @@ pub mod rest_api;
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
+use crate::traits::*;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Currency {
@@ -13,45 +14,78 @@ pub struct Currency {
 	pub symbol: String,
 }
 
-pub async fn get_all(pool: &Pool) -> Result<Vec<Currency>, Box<dyn Error>> {
-	return db::get_all(&pool).await;
+impl Default for Currency {
+	fn default() -> Self {
+		Self {
+			id: None,
+			name: String::new(),
+			minor_in_mayor: 100,
+			symbol: String::new(),
+		}
+	}
 }
 
-pub async fn get_by_id(pool: &Pool, currency_id: u32) -> Result<Currency, Box<dyn Error>> {
-	return db::get_by_id(&pool, currency_id).await;
+impl Save for Currency {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {		
+		match self.id {
+			Some(id) => {
+				db::CurrencyDbWriter::new(pool, self).replace().await?;
+				return Ok(id);
+			},
+			None => return db::CurrencyDbWriter::new(pool, self).insert().await,
+		}
+	}
 }
 
-pub async fn add(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
-	return db::add(pool, currency).await;
-}
-
-pub async fn update(pool: &Pool, currency: &Currency) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, currency).await;
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
-
-	#[tokio::test(flavor = "multi_thread")]
-	async fn doesnt_panic() -> Result<(), Box<dyn Error>> {
-		let (config, pool) = setup().await;
-
-		get_all(&pool).await?;
-
-		teardown(&config).await;
-		return Ok(());
+impl Currency {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
 	}
 
-	#[tokio::test(flavor = "multi_thread")]
-	async fn returns_two_rows() -> Result<(), Box<dyn Error>> {
-		let (config, pool) = setup().await;
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
 
-		let res = get_all(&pool).await?;
-		assert_eq!(res.len(), 2);
-		
-		teardown(&config).await;
-		return Ok(());
+	pub fn set_minor_in_mayor(mut self, minor_in_mayor: u32) -> Self {
+		self.minor_in_mayor = minor_in_mayor;
+		return self;
+	}
+
+	pub fn set_symbol(mut self, symbol: String) -> Self {
+		self.symbol = symbol;
+		return self;
+	}
+}
+
+#[derive(Debug, Clone)]
+pub struct CurrencyLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
+
+impl<'a> Loader<'a, Currency> for CurrencyLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
+		}
+	}
+
+	async fn get(self) -> Result<Vec<Currency>, Box<dyn Error>> {
+		return db::CurrencyDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
+
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
+
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
 	}
 }

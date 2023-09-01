@@ -4,8 +4,8 @@ pub mod rest_api;
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
-
-#[derive(Debug, Clone, Serialize)]
+use crate::traits::*;
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Recipient {
 	pub id: Option<u32>,
 	pub name: String,
@@ -13,144 +13,79 @@ pub struct Recipient {
 	pub tag_ids: Option<Vec<u32>>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct DeepRecipient {
-	pub id: u32,
-	pub name: String,
-	pub user: Option<crate::user::User>,
-	pub tags: Vec<crate::tag::DeepTag>,
+impl Save for Recipient {
+	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+		match self.id {
+			Some(id) => {
+				db::RecipientDbWriter::new(pool, self).replace().await?;
+				return Ok(id)
+			},
+			None => return db::RecipientDbWriter::new(pool, self).insert().await,
+		}
+	}
 }
 
-pub async fn add(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::add(pool, recipient).await;
-}
-
-pub async fn get_all(pool: &Pool) -> Result<Vec<Recipient>, Box<dyn Error>> {
-	return db::get_all(pool).await;
-}
-
-pub async fn get_all_deep(pool: &Pool) -> Result<Vec<DeepRecipient>, Box<dyn Error>> {
-	return db::get_all_deep(pool).await;
-}
-
-pub async fn get_by_id(pool: &Pool, recipient_id: u32) -> Result<Recipient, Box<dyn Error>> {
-	return db::get_by_id(pool, recipient_id).await;
-}
-
-pub async fn update(pool: &Pool, recipient: &Recipient) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, recipient).await;
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use super::super::{setup, teardown};
-
-	fn get_recipient() -> Recipient {
-		return Recipient {
-			id: None,
-			name: String::from("thisisaname"),
-			user_id: Some(0),
-			tag_ids: None,
-		};
+impl Recipient {
+	pub fn set_id(mut self, id: u32) -> Self {
+		self.id = Some(id);
+		return self;
 	}
 
-	mod add {
-		use super::*;
-		use super::super::super::tag;
+	pub fn set_name(mut self, name: String) -> Self {
+		self.name = name;
+		return self;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_without_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	pub fn set_user_id(mut self, user_id: u32) -> Self {
+		self.user_id = Some(user_id);
+		return self;
+	}
 
-			add(&pool, &get_recipient()).await?;
+	#[allow(dead_code)]
+	pub fn set_user_id_opt(mut self, user_id: Option<u32>) -> Self {
+		self.user_id = user_id;
+		return self;
+	}
 
-			teardown(&config).await;
-			return Ok(());
-		}
+	#[allow(dead_code)]
+	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
+		self.tag_ids = Some(tag_ids);
+		return self;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_with_tag_ids() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+		self.tag_ids = tag_ids;
+		return self;
+	}
+}
 
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
+#[derive(Debug, Clone)]
+pub struct RecipientLoader<'a> {
+	pool: &'a Pool,
+	query_parameters: QueryParameters,
+}
 
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &recipient).await?;
-
-			teardown(&config).await;
-			return Ok(());
+impl<'a> Loader<'a, Recipient> for RecipientLoader<'a> {
+	fn new(pool: &'a Pool) -> Self {
+		Self {
+			pool,
+			query_parameters: QueryParameters::default(),
 		}
 	}
 
-	mod get_all {
-		use super::*;
-		use super::super::super::tag;
+	async fn get(self) -> Result<Vec<Recipient>, Box<dyn Error>> {
+		return db::RecipientDbReader::new(self.pool)
+			.set_query_parameters(self.query_parameters)
+			.execute()
+			.await;
+	}
 
-		#[tokio::test(flavor = "multi_thread")]
-		async fn doesnt_panic_on_default_db() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
+	fn get_query_parameters(&self) -> &QueryParameters {
+		return &self.query_parameters;
+	}
 
-			get_all(&pool).await?;
-			
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_all_rows() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			let recipient = get_recipient();
-
-			add(&pool, &recipient).await?;
-			add(&pool, &recipient).await?;
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res.len(), 4);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_single_tag_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0]);
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
-
-		#[tokio::test(flavor = "multi_thread")]
-		async fn returns_multiple_tags_correctly() -> Result<(), Box<dyn Error>> {
-			let (config, pool) = setup().await;
-
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-			tag::add(&pool, &tag::Tag{id: None, name: String::from("test_tag"), user_id: 0, parent_id: None}).await?;
-
-			let mut recipient = get_recipient();
-			recipient.tag_ids = Some(vec![0, 1, 2]);
-			add(&pool, &recipient).await?;
-
-			let res = get_all(&pool).await?;
-			assert_eq!(res[1].clone().tag_ids.unwrap(), vec![0, 1, 2]);
-
-			teardown(&config).await;
-			return Ok(());
-		}
+	fn set_query_parameters(mut self, query_parameters: QueryParameters) -> Self {
+		self.query_parameters = query_parameters;
+		return self;
 	}
 }
