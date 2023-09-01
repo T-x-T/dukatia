@@ -90,7 +90,7 @@ export default {
 					timestamp: new Date(x.timestamp),
 					comment: x.comment,
 					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
-					positions: x.positions.map(p => ({...p, amount: p.amount * minor_in_mayor})),
+					positions: x.positions.map(p => ({...p, amount: Number(p.amount * minor_in_mayor).toFixed(0)})),
 				};
 			},
 			defaultData: {
