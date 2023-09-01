@@ -124,7 +124,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	}
 }
 
-//TODO: test max results, skip results and filters
+//TODO: test filters and sorting for properties other than id
 #[get("/api/v1/transactions/summary")]
 async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req).await {
