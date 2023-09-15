@@ -1,6 +1,6 @@
 ---
 title: 'Setup development environment'
-description: 'How to setup a development environment for TxTs Treasury'
+description: 'How to setup a development environment for dukatia'
 ---
 
 ## Setup development environment

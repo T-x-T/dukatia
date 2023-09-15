@@ -1,6 +1,6 @@
 ---
 title: 'Developer Documentation'
-description: 'How to develop for TxTs Treasury'
+description: 'How to develop for dukatia'
 ---
 
 ## Developer Documentation

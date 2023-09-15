@@ -1,7 +1,7 @@
 <template>
 	<nav v-if="loggedIn" :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
-			<h1 v-if="!collapsed">TxTs Treasury</h1>
+			<h1 v-if="!collapsed">Dukatia</h1>
 		</div>
 		<ul v-if="!hidden || !small_device">
 			<li ref="dashboard" @click="change_route('dashboard')">

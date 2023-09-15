@@ -1,6 +1,6 @@
 ---
 title: 'Installation using Docker'
-description: 'How to install TxTs Treasury using Docker'
+description: 'How to install dukatia using Docker'
 ---
 
 ## Installation using Docker

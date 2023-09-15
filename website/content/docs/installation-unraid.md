@@ -1,6 +1,6 @@
 ---
 title: 'Installation on Unraid'
-description: 'How to install TxTs Treasury on Unraid'
+description: 'How to install dukatia on Unraid'
 ---
 
 ## Installation on Unraid

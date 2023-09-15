@@ -1,9 +1,9 @@
-# TxTs Treasury
+# Dukatia
 This project was created to manage my own finances. Hopefully it is useful for you as well!
-At this time TxTs Treasury is still in very early development, despite that I am already using it myself, so it is definitely usable!
+At this time dukatia is still in very early development, despite that I am already using it myself, so it is definitely usable!
 
 # Installation
-The only supported way to install and run TxTs Treasury is Docker. For convenience I provide a docker-compose.yml file that makes it really easy to get started.
+The only supported way to install and run dukatia is Docker. For convenience I provide a docker-compose.yml file that makes it really easy to get started.
 I personally run it using [Unraids](https://unraid.net/) built in Docker feature by manually specifying the images and envoirnment variables which also works well enough.
 
 # Configuration

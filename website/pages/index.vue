@@ -7,7 +7,7 @@
     </nav>
     
     <div id="title">
-      <h1 class="hovercolor" @mouseover="hover_feature" @mouseleave="hover_feature_dismantle">TxTs Treasury</h1>
+      <h1 class="hovercolor" @mouseover="hover_feature" @mouseleave="hover_feature_dismantle">Dukatia</h1>
       <p>A way to manage your finances!</p>
     </div>
 

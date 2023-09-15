@@ -5,7 +5,7 @@
 		</nav>
 		<div id="left">
 			<NuxtLink to="/">
-				<h1>TxTs Treasury</h1>
+				<h1>Dukatia</h1>
 			</NuxtLink>
 			<ContentNavigation :navigation-tree="navigation"/>
 		</div>

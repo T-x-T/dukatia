@@ -1,11 +1,11 @@
 ---
 title: 'REST API'
-description: 'Introduction to the REST API of TxTs Treasury'
+description: 'Introduction to the REST API of dukatia'
 ---
 
 ## REST API
 
-TxTs Treasury provides a complete REST API to interface with the backend. The frontend only uses the REST API documented here to communicate with the backend. This allows you to extend the functionality of TxTs Treasury by writing your own programs and scripts that use and modify data via this API.
+Dukatia provides a complete REST API to interface with the backend. The frontend only uses the REST API documented here to communicate with the backend. This allows you to extend the functionality of dukatia by writing your own programs and scripts that use and modify data via this API.
 
 Each page contains one major API route that can contain multiple endpoints.
 
