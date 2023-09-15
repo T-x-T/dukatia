@@ -17,10 +17,10 @@ jobs:
       - name: Build frontend image
         working-directory: frontend
         env:
-          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+          IMAGE_TAG: ghcr.io/t-x-t/dukatia/frontend:${{ github.ref_name }}
         run: |
           docker build -t $IMAGE_TAG .
-          docker save -o frontend_image.tar ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+          docker save -o frontend_image.tar ghcr.io/t-x-t/dukatia/frontend:${{ github.ref_name }}
       - name: Save docker image
         uses: actions/upload-artifact@v3
         with:
@@ -35,10 +35,10 @@ jobs:
       - name: Build backend image
         working-directory: backend
         env:
-          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+          IMAGE_TAG: ghcr.io/t-x-t/dukatia/backend:${{ github.ref_name }}
         run: |
           docker build -t $IMAGE_TAG .
-          docker save -o backend_image.tar ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+          docker save -o backend_image.tar ghcr.io/t-x-t/dukatia/backend:${{ github.ref_name }}
       - name: Save docker image
         uses: actions/upload-artifact@v3
         with:
@@ -60,7 +60,7 @@ jobs:
         working-directory: backend
         run: |
           docker load -i ../backend_image.tar
-          sed -i -e 's/build: ./image: ghcr.io\/t-x-t\/txts-treasury\/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
+          sed -i -e 's/build: ./image: ghcr.io\/t-x-t\/dukatia\/backend:${{ github.ref_name }}/g' trest.docker-compose.yml
           wget bin.tre.st/latest && chmod +x latest && ./latest trest.json
           
   backend_test:
@@ -115,7 +115,7 @@ jobs:
           name: backend_image
       - name: Push backend image
         env:
-          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/backend:${{ github.ref_name }}
+          IMAGE_TAG: ghcr.io/t-x-t/dukatia/backend:${{ github.ref_name }}
         run: |
           docker load -i backend_image.tar
           docker push $IMAGE_TAG
@@ -142,7 +142,7 @@ jobs:
           name: frontend_image
       - name: Push frontend image
         env:
-          IMAGE_TAG: ghcr.io/t-x-t/txts-treasury/frontend:${{ github.ref_name }}
+          IMAGE_TAG: ghcr.io/t-x-t/dukatia/frontend:${{ github.ref_name }}
         run: |
           docker load -i frontend_image.tar
           docker push $IMAGE_TAG
