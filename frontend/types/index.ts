@@ -211,7 +211,7 @@ declare global {
 	type DetailFormField = {
 		label: string,
 		property: string,
-		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions",
+		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions" | "break",
 		disabled?: boolean,
 		step?: string,
 		initial?: number,

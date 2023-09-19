@@ -143,13 +143,12 @@ export default {
 
 <style lang="sass" scoped>
 @import "assets/_vars.sass"
-
 #wrapper
-	width: 102%
+	display: inline
 
 #input
+	display: inline
 	svg
-		display: inline
 		height: 32px
 		position: relative
 		margin-bottom: -10px

@@ -66,15 +66,15 @@ export default {
 					type: "string"
 				},
 				{
+					label: "Positions",
+					property: "positions",
+					type: "positions",
+				},
+				{
 					label: "Tags",
 					property: "tag_ids",
 					type: "tags",
 					addNew: true
-				},
-				{
-					label: "Positions",
-					property: "positions",
-					type: "positions",
 				}
 			],
 			data: this.transaction,

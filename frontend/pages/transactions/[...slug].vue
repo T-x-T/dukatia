@@ -59,7 +59,7 @@
 				<TransactionDetails 
 					v-if="Object.keys(selectedRow).length > 0"
 					:transaction="selectedRow"
-					v-on:back="updateAndLoadTable"
+					v-on:back="detailsOpen = false"
 					v-on:updateData="updateTable"
 				/>
 			</div>
@@ -458,9 +458,6 @@ div.detailBar
 	padding-left: 8px
 	@media screen and (max-width: 800px)
 		position: absolute
-		width: 100%
-		height: 100%
-		margin: 0
 
 div#batchEdit
 	select

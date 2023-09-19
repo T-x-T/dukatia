@@ -4,46 +4,46 @@
 		<div id="formWrapper">
 			<div class="formInput" v-for="(field, index) in config.fields" :key="index">
 			
-				<div v-if="field.type == 'number'">
+				<div v-if="field.type == 'number'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 				</div>
 
-				<div v-else-if="field.type == 'string'">
+				<div v-else-if="field.type == 'string'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="text" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 				</div>
 
-				<div v-else-if="field.type == 'timestamp'">
+				<div v-else-if="field.type == 'timestamp'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="datetime-local" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 				</div>
 
-				<div v-else-if="field.type == 'currency'">
+				<div v-else-if="field.type == 'currency'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(currency, cindex) in currencies" :key="cindex" :value="currency.id">{{currency.name}}</option>
 					</select>
 				</div>
 
-				<div v-else-if="field.type == 'account'">
+				<div v-else-if="field.type == 'account'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(account, aindex) in accounts" :key="aindex" :value="account.id">{{account.name}}</option>
 					</select>
-					<button v-if="field.addNew" class="green" @click="subForm = 'account'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'account'" tabindex="-1">+</button>
 				</div>
 
-				<div v-else-if="field.type == 'recipient'">
+				<div v-else-if="field.type == 'recipient'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(recipient, rindex) in recipients" :key="rindex" :value="recipient.id">{{recipient.name}}</option>
 					</select>	
-					<button v-if="field.addNew" class="green" @click="subForm = 'recipient'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'recipient'" tabindex="-1">+</button>	
 				</div>
 
-				<div v-else-if="field.type == 'asset'">
+				<div v-else-if="field.type == 'asset'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(asset, aindex) in [...assets].sort((a, b) => a.name > b.name ? 1 : -1)" :key="aindex" :value="asset.id">{{asset.name}}</option>
@@ -55,10 +55,11 @@
 						v-if="Object.keys(selectData).length > 0 && renderCustomSelect"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
+						style="margin-right: 5px;"
 					/>
-					<button v-if="field.addNew" class="green" @click="subForm = 'tags'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'tags'" tabindex="-1">+</button>
 				</div>
-
+				
 				<div v-else-if="field.type == 'singleTag'">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
@@ -68,8 +69,8 @@
 				</div>
 
 				<div v-else-if="field.type == 'positions'">
-					<label>{{`${field.label}: `}}</label>
-					<div v-for="(position_data, position_index) in config.data[field.property]">
+					<div v-if="config.data[field.property].length > 1" v-for="(position_data, position_index) in config.data[field.property]">
+						<label>{{`${field.label}: `}}</label>
 						<label>Amount: </label>
 						<input type="number" v-model="config.data[field.property][position_index].amount">
 						<span>{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
@@ -85,6 +86,10 @@
 						<br>
 						<button class="red" @click="config.data[field.property].splice(position_index, 1)">Delete Position</button>
 						<hr>
+					</div>
+					<div v-else class="field_container">
+						<label>Amount: </label>
+						<input type="number" v-model="config.data[field.property][0].amount">
 					</div>
 					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
 				</div>
@@ -179,11 +184,9 @@ export default {
 			}
 
 			if(!this.config.noGoBackOnSave && goBack) {
-				this.$emit("back");
+				this.$emit("updateData");
 			} else {
 				this.$emit("updateData", res);
-				
-				if(this.config.noGoBackOnSave) return;
 
 				this.tagsManuallyChanged = false;
 				this.config.data = {...this.config.defaultData};
@@ -247,3 +250,16 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+select
+	width: 200px
+
+div#formWrapper
+	width: 350px
+
+div.field_container
+	display: flex
+	input, select
+		flex-grow: 1
+</style>
