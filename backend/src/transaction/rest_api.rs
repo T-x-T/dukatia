@@ -206,6 +206,15 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 }
 
 #[derive(Deserialize)]
+struct PositionPost {
+	comment: Option<String>,
+	tag_id: Option<u32>,
+	amount: Option<i32>,
+	major_amount: Option<i32>,
+	minor_amount: Option<i32>,
+}
+
+#[derive(Deserialize)]
 struct TransactionPost {
 	account_id: u32,
 	recipient_id: u32,
@@ -214,7 +223,7 @@ struct TransactionPost {
 	comment: Option<String>,
 	tag_ids: Option<Vec<u32>>,
 	asset_id: Option<u32>,
-	positions: Vec<super::Position>,
+	positions: Vec<PositionPost>,
 }
 
 #[post("/api/v1/transactions")]
@@ -224,7 +233,34 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
+	let currency_id = match crate::account::AccountLoader::new(&data.pool).set_filter_id(body.account_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.default_currency_id,
+		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the account\"}}")),
+	};
+	let minor_in_mayor = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.minor_in_mayor,
+		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the currency\"}}")),
+	};
+
+	for x in body.positions.iter() {
+		if x.amount.is_none() && x.major_amount.is_none() && x.minor_amount.is_none() {
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"at least one position didnt have an amount, minor_amount or major_amount set\"}}"));
+		}
+		if x.minor_amount.unwrap_or(0) >= minor_in_mayor as i32 {
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency\"}}"));
+		}
+	}
+
 	let asset: Option<Asset> = body.asset_id.map(|id| Asset::default().set_id(id).set_user_id(user_id));
+
+	let positions: Vec<super::Position>	= body.positions.iter().map(|x| {
+		super::Position {
+			id: None,
+			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_mayor as i32) + x.minor_amount.unwrap_or(0)),
+			comment: x.comment.clone(),
+			tag_id: x.tag_id,
+		}
+	}).collect();
 
 	let result = super::Transaction::default()
 		.set_user_id(user_id)
@@ -239,7 +275,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		.set_comment_opt(body.comment.clone())
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
+		.set_positions(positions)
 		.save(&data.pool).await;
 
 	match result {
@@ -261,7 +297,34 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
+	let currency_id = match crate::account::AccountLoader::new(&data.pool).set_filter_id(body.account_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.default_currency_id,
+		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the account\"}}")),
+	};
+	let minor_in_mayor = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.minor_in_mayor,
+		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the currency\"}}")),
+	};
+
+	for x in body.positions.iter() {
+		if x.amount.is_none() && x.major_amount.is_none() && x.minor_amount.is_none() {
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"at least one position didnt have an amount, minor_amount or major_amount set\"}}"));
+		}
+		if x.minor_amount.unwrap_or(0) >= minor_in_mayor as i32 {
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency\"}}"));
+		}
+	}
+
 	let asset: Option<Asset> = body.asset_id.map(|id| Asset::default().set_id(id).set_user_id(user_id));
+
+	let positions: Vec<super::Position>	= body.positions.iter().map(|x| {
+		super::Position {
+			id: None,
+			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_mayor as i32) + x.minor_amount.unwrap_or(0)),
+			comment: x.comment.clone(),
+			tag_id: x.tag_id,
+		}
+	}).collect();
 
 	let result = super::Transaction::default()
 		.set_id(*transaction_id)
@@ -277,7 +340,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		.set_comment_opt(body.comment.clone())
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
+		.set_positions(positions)
 		.save(&data.pool).await;
 
 	match result {

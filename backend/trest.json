@@ -1207,7 +1207,7 @@
 					},
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error":"specified item of type account not found with filter id=10"}
+						"body_equals": {"error":"got an error while trying to get the account"}
 					}
 				},
 				{
@@ -1556,6 +1556,405 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"count":2,"total_amount":"123.45€ 123.45$"}
+					}
+				},
+				{
+					"name": "post of new transaction using major_amount and minor_amount returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"major_amount": 12,
+								"minor_amount": 34,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new transaction created correctly when using major_amount and minor_amount",
+					"endpoint": "/api/v1/transactions/7",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":7,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":1234,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":7,"amount":1234,"comment":"a","tag_id":null}]}
+					}
+				},
+				{
+					"name": "post of new transaction using only major_amount returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"major_amount": 12,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new transaction created correctly when using only major_amount",
+					"endpoint": "/api/v1/transactions/8",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":8,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":1200,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":8,"amount":1200,"comment":"a","tag_id":null}]}
+					}
+				},
+				{
+					"name": "post of new transaction using only minor_amount returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"minor_amount": 34,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new transaction created correctly when using only minor_amount",
+					"endpoint": "/api/v1/transactions/9",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":9,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":34,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":9,"amount":34,"comment":"a","tag_id":null}]}
+					}
+				},
+				{
+					"name": "post of new transaction using no amount, minor_amount or major amount returns 400",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"at least one position didnt have an amount, minor_amount or major_amount set"}
+					}
+				},
+				{
+					"name": "post of new transaction using no minor_amount above minor_in_major value for currency returns 400",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"minor_amount": 1000,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
+					}
+				},
+				{
+					"name": "post of new transaction using no minor_amount equal to minor_in_major value for currency returns 400",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"minor_amount": 100,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
+					}
+				},
+				{
+					"name": "post of new currency with minor_in_mayor 50 returns 200",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"minor_in_mayor": 50,
+						"symbol": "*"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new account with default_currency_id 2 returns 200",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"body": {
+						"name": "test",
+						"default_currency_id": 2
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction using major_amount and minor_amount with account_id 2 returns 200",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"major_amount": 100,
+								"minor_amount": 34,
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new transaction created correctly when using major_amount and minor_amount with account_id 2",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"currency_id":2,"account_id":2,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":5034,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":10,"amount":5034,"comment":"a","tag_id":null}]}
+					}
+				},
+				{
+					"name": "updating transaction using major_amount and minor_amount returns 200",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"major_amount": 56,
+								"minor_amount": 89,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated transaction details saved correctly when using major_amount and minor_amount",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":5689,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":11,"amount":5689,"comment":"b","tag_id":null}]}
+					}
+				},
+				{
+					"name": "updating transaction using only major_amount returns 200",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"major_amount": 56,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated transaction details saved correctly when using only major_amount",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":5600,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":12,"amount":5600,"comment":"b","tag_id":null}]}
+					}
+				},
+				{
+					"name": "updating transaction using only minor_amount returns 200",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"minor_amount": 78,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated transaction details saved correctly when using only minor_amount",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":78,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":13,"amount":78,"comment":"b","tag_id":null}]}
+					}
+				},
+				{
+					"name": "updating transaction using no amount, minor_amount or major amount returns 400",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"at least one position didnt have an amount, minor_amount or major_amount set"}
+					}
+				},
+				{
+					"name": "updating transaction using minor_amount above minor_in_major value for currency returns 400",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"minor_amount": 101,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
+					}
+				},
+				{
+					"name": "updating transaction using minor_amount equal to minor_in_major value for currency returns 400",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"minor_amount": 100,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
+					}
+				},
+				{
+					"name": "updating transaction using major_amount and minor_amount with account_id 2 returns 200",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "PUT",
+					"body": {
+						"account_id": 2,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"major_amount": 12,
+								"minor_amount": 49,
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "updated transaction saved correctly when using major_amount and minor_amount with account_id 2",
+					"endpoint": "/api/v1/transactions/10",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":10,"user_id":0,"currency_id":2,"account_id":2,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":649,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":14,"amount":649,"comment":"b","tag_id":null}]}
 					}
 				}
 			]
