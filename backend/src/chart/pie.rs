@@ -100,8 +100,8 @@ fn build_label_amount(amount_per_currency: BTreeMap<u32, i32>, currencies: &[cur
 
 	for x in amount_per_currency {
 		let currency: &currency::Currency = currencies.iter().find(|c| c.id.unwrap() == x.0).unwrap();
-		amount += f64::from(x.1) / f64::from(currency.minor_in_mayor);
-		label.push_str(format!("{}{} ", f64::from(x.1) / f64::from(currency.minor_in_mayor), currency.symbol).as_str());
+		amount += f64::from(x.1) / f64::from(currency.minor_in_major);
+		label.push_str(format!("{}{} ", f64::from(x.1) / f64::from(currency.minor_in_major), currency.symbol).as_str());
 	}
 
 	return (label, amount);

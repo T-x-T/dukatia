@@ -62,8 +62,8 @@ impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 			.await
 			.unwrap()
 			.query(
-				"INSERT INTO public.currencies (id, name, minor_in_mayor, symbol) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
-				&[&self.currency.name, &(self.currency.minor_in_mayor as i32), &self.currency.symbol])
+				"INSERT INTO public.currencies (id, name, minor_in_major, symbol) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
+				&[&self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol])
 			.await?[0].get(0);
 
 		return Ok(id as u32);
@@ -80,8 +80,8 @@ impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 			.await
 			.unwrap()
 			.query(
-				"UPDATE public.currencies SET name=$1, minor_in_mayor=$2, symbol=$3 WHERE id=$4", 
-				&[&self.currency.name, &(self.currency.minor_in_mayor as i32), &self.currency.symbol, &(self.currency.id.unwrap() as i32)])
+				"UPDATE public.currencies SET name=$1, minor_in_major=$2, symbol=$3 WHERE id=$4", 
+				&[&self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol, &(self.currency.id.unwrap() as i32)])
 			.await?;
 	
 		return Ok(());
@@ -92,13 +92,13 @@ impl From<tokio_postgres::Row> for Currency {
 	fn from(value: tokio_postgres::Row) -> Self {
 		let id: i32 = value.get(0);
 		let name: String = value.get(1);
-		let minor_in_mayor: i32 = value.get(2);
+		let minor_in_major: i32 = value.get(2);
 		let symbol: String = value.get(3);
 
 		return Self {
 			id: Some(id as u32),
 			name,
-			minor_in_mayor: minor_in_mayor as u32,
+			minor_in_major: minor_in_major as u32,
 			symbol,
 		};
 	}

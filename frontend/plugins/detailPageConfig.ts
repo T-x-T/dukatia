@@ -203,8 +203,8 @@ export default defineNuxtPlugin(_nuxtApp => {
 							type: "string",
 						},
 						{
-							label: "Minor in Mayor",
-							property: "minor_in_mayor",
+							label: "Minor in major",
+							property: "minor_in_major",
 							type: "number"
 						},
 						{
@@ -216,19 +216,19 @@ export default defineNuxtPlugin(_nuxtApp => {
 					data: {
 						id: "",
 						name: "",
-						minor_in_mayor: 100,
+						minor_in_major: 100,
 						symbol: ""
 					},
 					apiEndpoint: "/api/v1/currencies",
 					prepareForApi: (x: any) => ({
 						id: x.id,
 						name: x.name,
-						minor_in_mayor: Number(x.minor_in_mayor),
+						minor_in_major: Number(x.minor_in_major),
 						symbol: x.symbol
 					}),
 					defaultData: {
 						name: "",
-						minor_in_mayor: 100,
+						minor_in_major: 100,
 						symbol: ""
 					}
 				} as DetailFormConfig,

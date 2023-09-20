@@ -24,11 +24,11 @@ export default {
 
 	async created() {
 		const account: Account = await $fetch(`/api/v1/accounts/${this.transaction.account_id}`);
-		const minor_in_mayor = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_mayor;
+		const minor_in_major = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_major;
 		
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
 		this.transaction.asset_id = this.transaction.asset?.id;
-		this.transaction.positions = this.transaction.positions.map(p => ({...p, amount: p.amount / minor_in_mayor}));
+		this.transaction.positions = this.transaction.positions.map(p => ({...p, amount: p.amount / minor_in_major}));
 		
 		this.config = {
 			fields: [
@@ -90,7 +90,7 @@ export default {
 					timestamp: new Date(x.timestamp),
 					comment: x.comment,
 					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
-					positions: x.positions.map(p => ({...p, amount: Number(Number(p.amount * minor_in_mayor).toFixed(0))})),
+					positions: x.positions.map(p => ({...p, amount: Number(Number(p.amount * minor_in_major).toFixed(0))})),
 				};
 			},
 			defaultData: {

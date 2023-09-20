@@ -43,7 +43,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}]
+						"body_equals": [{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"}]
 					}
 				},
 				{
@@ -52,7 +52,7 @@
 					"method": "POST",
 					"body": {
 						"name": "test",
-						"minor_in_mayor": 100,
+						"minor_in_major": 100,
 						"symbol": "*"
 					},
 					"expected_outcome": {
@@ -65,7 +65,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"}
+						"body_equals": {"id":1,"name":"USD","minor_in_major":100,"symbol":"$"}
 					}
 				},
 				{
@@ -83,7 +83,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"test","minor_in_mayor":100,"symbol":"*"}]
+						"body_equals": [{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"},{"id":2,"name":"test","minor_in_major":100,"symbol":"*"}]
 					}
 				},
 				{
@@ -92,7 +92,7 @@
 					"method": "PUT",
 					"body": {
 						"name":"edited test",
-						"minor_in_mayor": 12,
+						"minor_in_major": 12,
 						"symbol": "/"
 					},
 					"expected_outcome": {
@@ -105,7 +105,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"}]
+						"body_equals": [{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"}]
 					}
 				},
 				{
@@ -114,7 +114,7 @@
 					"method": "POST",
 					"body": {
 						"name": "test",
-						"minor_in_mayor": 100,
+						"minor_in_major": 100,
 						"symbol": "*"
 					},
 					"expected_outcome": {
@@ -127,7 +127,7 @@
 					"method": "POST",
 					"body": {
 						"name": "test",
-						"minor_in_mayor": 100,
+						"minor_in_major": 100,
 						"symbol": "*"
 					},
 					"expected_outcome": {
@@ -140,7 +140,7 @@
 					"method": "POST",
 					"body": {
 						"name": "test",
-						"minor_in_mayor": 100,
+						"minor_in_major": 100,
 						"symbol": "*"
 					},
 					"expected_outcome": {
@@ -154,10 +154,10 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
-							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"},
-							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"},
-							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_major":100,"symbol":"*"},
+							{"id":4,"name":"test","minor_in_major":100,"symbol":"*"},
+							{"id":5,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -168,8 +168,8 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
-							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -180,7 +180,7 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":4,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -191,7 +191,7 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":4,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":4,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -202,11 +202,11 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},
-							{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},
-							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
-							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"},
-							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},
+							{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"},
+							{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_major":100,"symbol":"*"},
+							{"id":5,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -217,10 +217,10 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":0,"name":"Euro","minor_in_mayor":100,"symbol":"€"},
-							{"id":1,"name":"USD","minor_in_mayor":100,"symbol":"$"},
-							{"id":2,"name":"edited test","minor_in_mayor":12,"symbol":"/"},
-							{"id":3,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},
+							{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"},
+							{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"},
+							{"id":3,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				},
@@ -231,7 +231,7 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":5,"name":"test","minor_in_mayor":100,"symbol":"*"}
+							{"id":5,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
 				}
@@ -1715,12 +1715,12 @@
 					}
 				},
 				{
-					"name": "post of new currency with minor_in_mayor 50 returns 200",
+					"name": "post of new currency with minor_in_major 50 returns 200",
 					"endpoint": "/api/v1/currencies",
 					"method": "POST",
 					"body": {
 						"name": "test",
-						"minor_in_mayor": 50,
+						"minor_in_major": 50,
 						"symbol": "*"
 					},
 					"expected_outcome": {

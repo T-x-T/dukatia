@@ -43,10 +43,10 @@ export default {
 
 	async created() {
 		const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
-		const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
+		const minor_in_major: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_major;
 
 		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as AssetValuation[]).map(x => {
-			x.value_per_unit /= minor_in_mayor;
+			x.value_per_unit /= minor_in_major;
 			x.deleted = false;
 			return x;
 		});
@@ -70,7 +70,7 @@ export default {
 
 		async save() {
 			const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
-			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_mayor;
+			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_major;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`, {
@@ -79,7 +79,7 @@ export default {
 						.filter(x => !x.deleted)
 						.map(x => ({
 							amount: Number(x.amount),
-							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_mayor),
+							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_major),
 							timestamp: x.timestamp
 						}))
 				});

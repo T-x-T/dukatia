@@ -13,8 +13,8 @@ struct RequestParameters {
 	filter_mode_name: Option<String>,
 	filter_symbol: Option<String>,
 	filter_mode_symbol: Option<String>,
-	filter_minor_in_mayor: Option<u32>,
-	filter_mode_minor_in_mayor: Option<String>,
+	filter_minor_in_major: Option<u32>,
+	filter_mode_minor_in_major: Option<String>,
 }
 
 //TODO: test filters for properties other than id
@@ -35,8 +35,8 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		symbol: request_parameters.filter_symbol.clone().map(|x| {
 			(x, request_parameters.filter_mode_symbol.clone().unwrap_or(String::new()).into())
 		}),
-		minor_in_mayor: request_parameters.filter_minor_in_mayor.map(|x| {
-			(x, request_parameters.filter_mode_minor_in_mayor.clone().unwrap_or(String::new()).into())
+		minor_in_major: request_parameters.filter_minor_in_major.map(|x| {
+			(x, request_parameters.filter_mode_minor_in_major.clone().unwrap_or(String::new()).into())
 		}),
 		..Default::default()
 	};
@@ -82,7 +82,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web
 #[derive(Deserialize)]
 struct CurrencyPost {
 	name: String,
-	minor_in_mayor: u32,
+	minor_in_major: u32,
 	symbol: String,
 }
 
@@ -95,7 +95,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curre
 
 	let result = super::Currency::default()
 		.set_name(body.name.clone())
-		.set_minor_in_mayor(body.minor_in_mayor)
+		.set_minor_in_major(body.minor_in_major)
 		.set_symbol(body.symbol.clone())
 		.save(&data.pool).await;
 
@@ -115,7 +115,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curren
 	let result = super::Currency::default()
 		.set_id(*currency_id)
 		.set_name(body.name.clone())
-		.set_minor_in_mayor(body.minor_in_mayor)
+		.set_minor_in_major(body.minor_in_major)
 		.set_symbol(body.symbol.clone())
 		.save(&data.pool).await;
 

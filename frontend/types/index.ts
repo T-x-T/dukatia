@@ -60,7 +60,7 @@ declare global {
 	type Currency = {
 		id?: number,
 		name: string,
-		minor_in_mayor: number,
+		minor_in_major: number,
 		symbol: string,
 	}
 
@@ -286,8 +286,8 @@ declare global {
 		filter_mode_name?: string,
 		filter_symbol?: string,
 		filter_mode_symbol?: string,
-		filter_minor_in_mayor?: number,
-		filter_mode_minor_in_mayor?: string,
+		filter_minor_in_major?: number,
+		filter_mode_minor_in_major?: string,
 		filter_parent_id?: number,
 		filter_mode_parent_id?: string,
 		filter_balance?: number,

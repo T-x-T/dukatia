@@ -237,16 +237,16 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		Ok(x) => x.default_currency_id,
 		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the account\"}}")),
 	};
-	let minor_in_mayor = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
-		Ok(x) => x.minor_in_mayor,
+	let minor_in_major = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.minor_in_major,
 		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the currency\"}}")),
 	};
 
-	for x in body.positions.iter() {
+	for x in &body.positions {
 		if x.amount.is_none() && x.major_amount.is_none() && x.minor_amount.is_none() {
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"at least one position didnt have an amount, minor_amount or major_amount set\"}}"));
 		}
-		if x.minor_amount.unwrap_or(0) >= minor_in_mayor as i32 {
+		if x.minor_amount.unwrap_or(0) >= minor_in_major as i32 {
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency\"}}"));
 		}
 	}
@@ -256,7 +256,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 	let positions: Vec<super::Position>	= body.positions.iter().map(|x| {
 		super::Position {
 			id: None,
-			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_mayor as i32) + x.minor_amount.unwrap_or(0)),
+			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_major as i32) + x.minor_amount.unwrap_or(0)),
 			comment: x.comment.clone(),
 			tag_id: x.tag_id,
 		}
@@ -301,16 +301,16 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		Ok(x) => x.default_currency_id,
 		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the account\"}}")),
 	};
-	let minor_in_mayor = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
-		Ok(x) => x.minor_in_mayor,
+	let minor_in_major = match crate::currency::CurrencyLoader::new(&data.pool).set_filter_id(currency_id, NumberFilterModes::Exact).get_first().await {
+		Ok(x) => x.minor_in_major,
 		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"got an error while trying to get the currency\"}}")),
 	};
 
-	for x in body.positions.iter() {
+	for x in &body.positions {
 		if x.amount.is_none() && x.major_amount.is_none() && x.minor_amount.is_none() {
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"at least one position didnt have an amount, minor_amount or major_amount set\"}}"));
 		}
-		if x.minor_amount.unwrap_or(0) >= minor_in_mayor as i32 {
+		if x.minor_amount.unwrap_or(0) >= minor_in_major as i32 {
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency\"}}"));
 		}
 	}
@@ -320,7 +320,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 	let positions: Vec<super::Position>	= body.positions.iter().map(|x| {
 		super::Position {
 			id: None,
-			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_mayor as i32) + x.minor_amount.unwrap_or(0)),
+			amount: x.amount.unwrap_or((x.major_amount.unwrap_or(0) * minor_in_major as i32) + x.minor_amount.unwrap_or(0)),
 			comment: x.comment.clone(),
 			tag_id: x.tag_id,
 		}

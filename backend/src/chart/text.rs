@@ -101,7 +101,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 				current_balance_of_currency(
 					pool, currency.id.unwrap()
 				).await?
-			) / f64::from(currency.minor_in_mayor)).to_string(),
+			) / f64::from(currency.minor_in_major)).to_string(),
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("token name {token_name:?} is not recognized in function foreach_currency") })),
 	});
 }

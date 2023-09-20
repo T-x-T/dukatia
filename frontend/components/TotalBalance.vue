@@ -25,7 +25,7 @@ export default {
 	async created() {
 		const currency: Currency = await $fetch(`/api/v1/currencies/${this.currency_id}`);
 		this.symbol = currency.symbol;
-		this.amount_for_display = this.amount / currency.minor_in_mayor;
+		this.amount_for_display = this.amount / currency.minor_in_major;
 	}
 }
 </script>

@@ -235,12 +235,12 @@ mod db_reader {
 		}
 
 		#[test]
-		fn sort_property_minor_in_mayor() {
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: Some(FilterAndSortProperties::MinorInMayor), sort_direction: None, filters: Filters::default() });
+		fn sort_property_minor_in_major() {
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: Some(FilterAndSortProperties::MinorInmajor), sort_direction: None, filters: Filters::default() });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " ORDER BY minor_in_mayor DESC");
+			assert_eq!(res_string, " ORDER BY minor_in_major DESC");
 			assert_eq!(format!("{res_values:?}"), "[]");
 		}
 
@@ -641,50 +641,50 @@ mod db_reader {
 		}
 
 		#[test]
-		fn filter_minor_in_mayor_exact() {
+		fn filter_minor_in_major_exact() {
 			let mut filters = Filters::default();
-			filters.minor_in_mayor = Some((10, NumberFilterModes::Exact));
+			filters.minor_in_major = Some((10, NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE minor_in_mayor=$1");
+			assert_eq!(res_string, " WHERE minor_in_major=$1");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
 		#[test]
-		fn filter_minor_in_mayor_not() {
+		fn filter_minor_in_major_not() {
 			let mut filters = Filters::default();
-			filters.minor_in_mayor = Some((10, NumberFilterModes::Not));
+			filters.minor_in_major = Some((10, NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE minor_in_mayor!=$1");
+			assert_eq!(res_string, " WHERE minor_in_major!=$1");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
 		#[test]
-		fn filter_minor_in_mayor_less() {
+		fn filter_minor_in_major_less() {
 			let mut filters = Filters::default();
-			filters.minor_in_mayor = Some((10, NumberFilterModes::Less));
+			filters.minor_in_major = Some((10, NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE minor_in_mayor<$1");
+			assert_eq!(res_string, " WHERE minor_in_major<$1");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
 		#[test]
-		fn filter_minor_in_mayor_more() {
+		fn filter_minor_in_major_more() {
 			let mut filters = Filters::default();
-			filters.minor_in_mayor = Some((10, NumberFilterModes::More));
+			filters.minor_in_major = Some((10, NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE minor_in_mayor>$1");
+			assert_eq!(res_string, " WHERE minor_in_major>$1");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -1274,7 +1274,7 @@ mod db_reader {
 						time_range: Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Between)),
 						name: Some(("10".to_string(), StringFilterModes::Exact)),
 						symbol: Some(("11".to_string(), StringFilterModes::Exact)),
-						minor_in_mayor: Some((12, NumberFilterModes::Exact)),
+						minor_in_major: Some((12, NumberFilterModes::Exact)),
 						parent_id: Some((13, NumberFilterModes::Exact)),
 						balance: Some((14, NumberFilterModes::Exact)),
 						default_currency_id: Some((15, NumberFilterModes::Exact)),
@@ -1287,7 +1287,7 @@ mod db_reader {
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_mayor=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND value_per_unit=$13 AND $14 = ANY(tags) AND comment ILIKE $15 AND name ILIKE $16 AND symbol ILIKE $17 AND description ILIKE $18 AND timestamp BETWEEN $19 AND $20 ORDER BY id ASC OFFSET $21 LIMIT $22");
+			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND value_per_unit=$13 AND $14 = ANY(tags) AND comment ILIKE $15 AND name ILIKE $16 AND symbol ILIKE $17 AND description ILIKE $18 AND timestamp BETWEEN $19 AND $20 ORDER BY id ASC OFFSET $21 LIMIT $22");
 			assert_eq!(format!("{res_values:?}"), "[1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 14, 17.5, 18, 8, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
 		}
 	}

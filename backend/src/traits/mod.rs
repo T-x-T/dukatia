@@ -23,7 +23,7 @@ pub enum FilterAndSortProperties {
 	TagId,
 	Name,
 	Symbol,
-	MinorInMayor,
+	MinorInmajor,
 	ParentId,
 	Balance,
 	DefaultCurrencyId,
@@ -47,7 +47,7 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::TagId => write!(f, "tag_id"),
 			FilterAndSortProperties::Name => write!(f, "name"),
 			FilterAndSortProperties::Symbol => write!(f, "symbol"),
-			FilterAndSortProperties::MinorInMayor => write!(f, "minor_in_mayor"),
+			FilterAndSortProperties::MinorInmajor => write!(f, "minor_in_major"),
 			FilterAndSortProperties::ParentId => write!(f, "parent_id"),
 			FilterAndSortProperties::Balance => write!(f, "balance"),
 			FilterAndSortProperties::DefaultCurrencyId => write!(f, "default_currency_id"),
@@ -128,7 +128,7 @@ pub struct Filters {
 	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
 	pub name: Option<(String, StringFilterModes)>,
 	pub symbol: Option<(String, StringFilterModes)>,
-	pub minor_in_mayor: Option<(u32, NumberFilterModes)>,
+	pub minor_in_major: Option<(u32, NumberFilterModes)>,
 	pub parent_id: Option<(u32, NumberFilterModes)>,
 	pub balance: Option<(i64, NumberFilterModes)>,
 	pub default_currency_id: Option<(u32, NumberFilterModes)>,
@@ -290,9 +290,9 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_minor_in_mayor(self, minor_in_mayor: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_minor_in_major(self, minor_in_major: u32, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
-		query_parameters.filters.minor_in_mayor = Some((minor_in_mayor, filter_mode));
+		query_parameters.filters.minor_in_major = Some((minor_in_major, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
@@ -442,15 +442,15 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			i += 1;
 		}
 		
-		if self.get_query_parameters().filters.minor_in_mayor.is_some() {
-			match self.get_query_parameters().filters.minor_in_mayor.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}minor_in_mayor=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
-				NumberFilterModes::Not => parameters.push_str(format!(" {} {}minor_in_mayor!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
-				NumberFilterModes::Less => parameters.push_str(format!(" {} {}minor_in_mayor<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
-				NumberFilterModes::More => parameters.push_str(format!(" {} {}minor_in_mayor>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+		if self.get_query_parameters().filters.minor_in_major.is_some() {
+			match self.get_query_parameters().filters.minor_in_major.unwrap().1 {
+				NumberFilterModes::Exact => parameters.push_str(format!(" {} {}minor_in_major=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Not => parameters.push_str(format!(" {} {}minor_in_major!=${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Less => parameters.push_str(format!(" {} {}minor_in_major<${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::More => parameters.push_str(format!(" {} {}minor_in_major>${i}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.minor_in_mayor.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.minor_in_major.unwrap().0 as i32));
 			i += 1;
 		}
 		

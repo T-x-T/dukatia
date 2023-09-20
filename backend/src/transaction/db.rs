@@ -64,11 +64,11 @@ impl<'a> TransactionDbReader<'a> {
 				format!("
 					SELECT 
 						tr.currency_id,
-						concat(trunc(sum(tr.total_amount::numeric) / c.minor_in_mayor::numeric, 2)::text, c.symbol) AS total_amount
+						concat(trunc(sum(tr.total_amount::numeric) / c.minor_in_major::numeric, 2)::text, c.symbol) AS total_amount
 					FROM transaction_data tr
 						LEFT JOIN currencies c ON tr.currency_id = c.id
 					{}
-					GROUP BY tr.currency_id, c.symbol, c.minor_in_mayor;"
+					GROUP BY tr.currency_id, c.symbol, c.minor_in_major;"
 				, parameters.0).as_str(), parameter_values.as_slice()
 			).await?
 		  .into_iter()

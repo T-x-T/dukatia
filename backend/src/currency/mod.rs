@@ -10,7 +10,7 @@ use crate::traits::*;
 pub struct Currency {
 	pub id: Option<u32>,
 	pub name: String,
-	pub minor_in_mayor: u32,
+	pub minor_in_major: u32,
 	pub symbol: String,
 }
 
@@ -19,7 +19,7 @@ impl Default for Currency {
 		Self {
 			id: None,
 			name: String::new(),
-			minor_in_mayor: 100,
+			minor_in_major: 100,
 			symbol: String::new(),
 		}
 	}
@@ -48,8 +48,8 @@ impl Currency {
 		return self;
 	}
 
-	pub fn set_minor_in_mayor(mut self, minor_in_mayor: u32) -> Self {
-		self.minor_in_mayor = minor_in_mayor;
+	pub fn set_minor_in_major(mut self, minor_in_major: u32) -> Self {
+		self.minor_in_major = minor_in_major;
 		return self;
 	}
 

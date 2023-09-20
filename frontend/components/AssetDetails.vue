@@ -122,7 +122,7 @@ export default {
 			
 			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
 			
-			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
+			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
 
 			if(!this.asset) {
 				console.error("this.asset isnt defined!")
@@ -135,13 +135,13 @@ export default {
 				...this.$detailPageConfig().asset,
 				data: {
 					...this.asset,
-					value_per_unit: this.asset.value_per_unit / minor_in_mayor,
+					value_per_unit: this.asset.value_per_unit / minor_in_major,
 				},
 			};
 
 			this.transactionData = {
 				amount: 0,
-				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
+				value_per_unit: this.asset.value_per_unit / minor_in_major,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				account_id: 0,
 				cost: 0
@@ -149,7 +149,7 @@ export default {
 
 			this.updateData = {
 				amount: this.asset.amount,
-				value_per_unit: this.asset.value_per_unit / minor_in_mayor,
+				value_per_unit: this.asset.value_per_unit / minor_in_major,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
 			};
 
@@ -175,18 +175,18 @@ export default {
 		},
 
 		async saveTransaction() {
-			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
+			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
 					method: "POST",
 					body: {
 						amount_change: Number(this.transactionData.amount),
-						value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_mayor),
+						value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_major),
 						timestamp: new Date(this.transactionData.timestamp),
 						account_id: this.transactionData.account_id,
-						cost: Math.round(this.transactionData.cost * minor_in_mayor),
-						total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_mayor) : null
+						cost: Math.round(this.transactionData.cost * minor_in_major),
+						total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_major) : null
 					}
 				})
 			} catch(e: any) {
@@ -204,14 +204,14 @@ export default {
 		},
 
 		async saveUpdate() {
-			const minor_in_mayor: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_mayor;
+			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
 
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
 					method: "POST",
 					body: {
 						amount: Number(this.updateData.amount),
-						value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_mayor),
+						value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_major),
 						timestamp: new Date(this.updateData.timestamp)
 					}
 				})

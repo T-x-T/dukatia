@@ -230,7 +230,7 @@ fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>
 			let mut label = String::new();
 			y.1.value.into_iter().for_each(|z| {
 				let currency = currencies.iter().find(|c| c.id.unwrap() == z.0).unwrap();
-				let current_value = f64::from(z.1) / f64::from(currency.minor_in_mayor);
+				let current_value = f64::from(z.1) / f64::from(currency.minor_in_major);
 				value += current_value;
 				label.push_str(
 					format!("{}{} ", current_value, currency.symbol).as_str()
@@ -368,7 +368,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 
-		let value = (f64::from(**no_future_values.last_key_value().unwrap().1) * **no_future_amounts.last_key_value().unwrap().1) / f64::from(currency.minor_in_mayor);
+		let value = (f64::from(**no_future_values.last_key_value().unwrap().1) * **no_future_amounts.last_key_value().unwrap().1) / f64::from(currency.minor_in_major);
 
 		if (last_value - value).abs() > 0.0001 {
 			let point = Point {
@@ -410,7 +410,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
 		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 		
-		let value = f64::from(**no_future_values.last_key_value().unwrap().1) / f64::from(currency.minor_in_mayor);
+		let value = f64::from(**no_future_values.last_key_value().unwrap().1) / f64::from(currency.minor_in_major);
 		
 		if (last_value - value).abs() > 0.0001 {
 			let point = Point {

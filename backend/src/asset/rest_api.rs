@@ -305,7 +305,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
 	let currency = CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
-	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_mayor), currency.symbol);
+	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_major), currency.symbol);
 
 	let mut comment: String = if amount_difference < 0.0 {
 		format!("Sold {} units at {} each", amount_difference * -1.0, formatted_value_per_unit)
@@ -314,7 +314,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	};
 
 	if body.cost.is_some() {
-		let formatted_cost = format!("{}{}", f64::from(body.cost.unwrap()) / f64::from(currency.minor_in_mayor), currency.symbol);
+		let formatted_cost = format!("{}{}", f64::from(body.cost.unwrap()) / f64::from(currency.minor_in_major), currency.symbol);
 		comment = format!("{comment} with additional cost of {formatted_cost}");
 	}
 

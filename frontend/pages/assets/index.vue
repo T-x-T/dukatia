@@ -59,18 +59,18 @@ export default {
 			rows: assetsForDisplay.map(x => {
 				x.amount = x.amount ? x.amount : 0;
 				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
-				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_mayor: 100, symbol: "€"};
+				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_major: 100, symbol: "€"};
 
 				return [
 					x.id,
 					x.name,
 					x.description,
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
+					`${x.value_per_unit / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_major) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
 				];
 			})
@@ -190,18 +190,18 @@ export default {
 			this.tableData.rows = assetsForDisplay.map(x => {
 				x.amount = x.amount ? x.amount : 0;
 				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
-				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_mayor: 100, symbol: "€"};
+				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_major: 100, symbol: "€"};
 
 				return [
 					x.id,
 					x.name,
 					x.description,
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
+					`${x.value_per_unit / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_major) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
+					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
 				];
 			});
@@ -218,7 +218,7 @@ export default {
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(typeof this.query_parameters.filter_amount == "number") url += `&filter_amount=${this.query_parameters.filter_amount}`; 
 			if(this.query_parameters.filter_mode_amount) url += `&filter_mode_amount=${this.query_parameters.filter_mode_amount}`;
-			if(typeof this.query_parameters.filter_value_per_unit == "number") url += `&filter_value_per_unit=${Number(this.query_parameters.filter_value_per_unit) * 100}`; //TODO not using minor_in_mayor
+			if(typeof this.query_parameters.filter_value_per_unit == "number") url += `&filter_value_per_unit=${Number(this.query_parameters.filter_value_per_unit) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_value_per_unit) url += `&filter_mode_value_per_unit=${this.query_parameters.filter_mode_value_per_unit}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;

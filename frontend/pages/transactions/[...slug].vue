@@ -162,7 +162,7 @@ export default {
 						x.recipient?.name,
 						x.asset ? x.asset.name : "",
 						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+						`${x.total_amount / (x.currency?.minor_in_major ? x.currency?.minor_in_major : 100)}${x.currency?.symbol}`,
 						x.comment,
 						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
@@ -397,7 +397,7 @@ export default {
 				x.recipient?.name,
 				x.asset ? x.asset.name : "",
 				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
+				`${x.total_amount / (x.currency?.minor_in_major ? x.currency?.minor_in_major : 100)}${x.currency?.symbol}`,
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));
@@ -430,7 +430,7 @@ export default {
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
 			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
-			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_mayor
+			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_total_amount) url += `&filter_mode_total_amount=${this.query_parameters.filter_mode_total_amount}`;
 			if(this.query_parameters.filter_comment) url += `&filter_comment=${this.query_parameters.filter_comment}`;
 			if(this.query_parameters.filter_mode_comment) url += `&filter_mode_comment=${this.query_parameters.filter_mode_comment}`;
