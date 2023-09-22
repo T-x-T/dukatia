@@ -128,7 +128,8 @@ declare global {
 
 	type Position = {
 		id?: number,
-		amount: number,
+		major_amount: number,
+		minor_amount: number,
 		comment?: string,
 		tag_id?: number,
 	}

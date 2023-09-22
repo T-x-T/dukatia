@@ -72,7 +72,9 @@
 					<div v-if="config.data[field.property].length > 1" v-for="(position_data, position_index) in config.data[field.property]">
 						<label>{{`${field.label}: `}}</label>
 						<label>Amount: </label>
-						<input type="number" v-model="config.data[field.property][position_index].amount">
+						<input type="number" v-model="config.data[field.property][position_index].major_amount">
+						.
+						<input type="number" v-model="config.data[field.property][position_index].minor_amount">
 						<span>{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 						<br>
 						<label>Comment: </label>
@@ -89,7 +91,9 @@
 					</div>
 					<div v-else class="field_container">
 						<label>Amount: </label>
-						<input type="number" v-model="config.data[field.property][0].amount">
+						<input type="number" v-model="config.data[field.property][position_index].major_amount">
+						.
+						<input type="number" v-model="config.data[field.property][position_index].minor_amount">
 					</div>
 					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
 				</div>

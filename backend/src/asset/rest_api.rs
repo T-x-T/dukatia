@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 use crate::webserver::{AppState, is_authorized};
 use crate::transaction::{Transaction, Position};
 use crate::currency::CurrencyLoader;
+use crate::money::Money;
 use crate::traits::*;
 
 #[derive(Debug, Deserialize)]
@@ -331,7 +332,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		.set_user_id(user_id)
 		.set_asset(asset)	
 		.set_positions(vec![Position {
-			amount,
+			amount: Money::from_amount(amount, currency.minor_in_major, currency.symbol),
 			..Default::default()
 		}])
 		.save(pool).await?;

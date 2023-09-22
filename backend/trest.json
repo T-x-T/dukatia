@@ -1084,7 +1084,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1099,7 +1104,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":0,"amount":12345,"comment":"a","tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":0,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1108,7 +1113,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":0,"amount":12345,"comment":"a","tag_id":null}]}
+						"body_equals": {"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":0,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}
 					}
 				},
 				{
@@ -1132,7 +1137,12 @@
 						"comment": "this is an edited comment",
 						"positions": [
 							{
-								"amount": -12345,
+								"amount": {
+									"major": -123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "b"
 							}
 						]
@@ -1147,7 +1157,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":-12345,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":1,"amount":-12345,"comment":"b","tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":{"major":-123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":1,"amount":{"major":-123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"b","tag_id":null}]}]
 					}
 				},
 				{
@@ -1162,7 +1172,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1185,7 +1200,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]}]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1200,14 +1215,19 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
 					},
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error":"got an error while trying to get the account"}
+						"body_equals": {"error":"specified item of type account not found with filter id=10"}
 					}
 				},
 				{
@@ -1222,7 +1242,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1266,7 +1291,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1281,10 +1311,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1300,7 +1327,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a",
 								"tag_id": 0
 							}
@@ -1316,11 +1348,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]}]
 					}
 				},
 				{
@@ -1336,7 +1364,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1351,12 +1384,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1392,7 +1420,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "$"
+								},
 								"comment": "a"
 							}
 						]
@@ -1416,11 +1449,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1429,10 +1458,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1441,9 +1467,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]}
-						]
+						"body_equals": [{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]}]
 					}
 				},
 				{
@@ -1452,9 +1476,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]}
-						]
+						"body_equals": [{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]}]
 					}
 				},
 				{
@@ -1463,12 +1485,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1477,10 +1494,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1489,10 +1503,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1,0],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1501,13 +1512,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1516,13 +1521,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1531,13 +1530,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [
-							{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":12345,"comment":"a","tag_id":0}]},
-							{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":12345,"comment":"a","tag_id":null}]},
-							{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":12345,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":12345,"comment":"a","tag_id":null}]}
-						]
+						"body_equals": [{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":2,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0],"asset":null,"positions":[{"id":3,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1],"asset":null,"positions":[{"id":4,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":0}]},{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1559,7 +1552,7 @@
 					}
 				},
 				{
-					"name": "post of new transaction using major_amount and minor_amount returns 200",
+					"name": "post of new transaction using minor_amount above minor_in_major value for currency returns 200",
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
@@ -1570,8 +1563,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"major_amount": 12,
-								"minor_amount": 34,
+								"amount": {
+									"major": 123,
+									"minor": 450,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -1581,16 +1578,7 @@
 					}
 				},
 				{
-					"name": "new transaction created correctly when using major_amount and minor_amount",
-					"endpoint": "/api/v1/transactions/7",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":7,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":1234,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":7,"amount":1234,"comment":"a","tag_id":null}]}
-					}
-				},
-				{
-					"name": "post of new transaction using only major_amount returns 200",
+					"name": "post of new transaction using minor_amount equal to minor_in_major value for currency returns 200",
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
@@ -1601,117 +1589,18 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"major_amount": 12,
+								"amount": {
+									"major": 123,
+									"minor": 100,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "new transaction created correctly when using only major_amount",
-					"endpoint": "/api/v1/transactions/8",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":8,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":1200,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":8,"amount":1200,"comment":"a","tag_id":null}]}
-					}
-				},
-				{
-					"name": "post of new transaction using only minor_amount returns 200",
-					"endpoint": "/api/v1/transactions",
-					"method": "POST",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2023-03-25T11:22:00.000Z",
-						"comment": "this is a comment",
-						"positions": [
-							{
-								"minor_amount": 34,
-								"comment": "a"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "new transaction created correctly when using only minor_amount",
-					"endpoint": "/api/v1/transactions/9",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":9,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":34,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":9,"amount":34,"comment":"a","tag_id":null}]}
-					}
-				},
-				{
-					"name": "post of new transaction using no amount, minor_amount or major amount returns 400",
-					"endpoint": "/api/v1/transactions",
-					"method": "POST",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2023-03-25T11:22:00.000Z",
-						"comment": "this is a comment",
-						"positions": [
-							{
-								"comment": "a"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"at least one position didnt have an amount, minor_amount or major_amount set"}
-					}
-				},
-				{
-					"name": "post of new transaction using no minor_amount above minor_in_major value for currency returns 400",
-					"endpoint": "/api/v1/transactions",
-					"method": "POST",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2023-03-25T11:22:00.000Z",
-						"comment": "this is a comment",
-						"positions": [
-							{
-								"minor_amount": 1000,
-								"comment": "a"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
-					}
-				},
-				{
-					"name": "post of new transaction using no minor_amount equal to minor_in_major value for currency returns 400",
-					"endpoint": "/api/v1/transactions",
-					"method": "POST",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2023-03-25T11:22:00.000Z",
-						"comment": "this is a comment",
-						"positions": [
-							{
-								"minor_amount": 100,
-								"comment": "a"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
 					}
 				},
 				{
@@ -1751,8 +1640,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"major_amount": 100,
-								"minor_amount": 34,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 50,
+									"symbol": "*"
+								},
 								"comment": "a"
 							}
 						]
@@ -1763,16 +1656,16 @@
 				},
 				{
 					"name": "new transaction created correctly when using major_amount and minor_amount with account_id 2",
-					"endpoint": "/api/v1/transactions/10",
+					"endpoint": "/api/v1/transactions/9",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"currency_id":2,"account_id":2,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":5034,"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":10,"amount":5034,"comment":"a","tag_id":null}]}
+						"body_equals": {"id":9,"user_id":0,"currency_id":2,"account_id":2,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":50,"symbol":"*","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":9,"amount":{"major":123,"minor":45,"minor_in_major":50,"symbol":"*","is_negative":false},"comment":"a","tag_id":null}]}
 					}
 				},
 				{
 					"name": "updating transaction using major_amount and minor_amount returns 200",
-					"endpoint": "/api/v1/transactions/10",
+					"endpoint": "/api/v1/transactions/9",
 					"method": "PUT",
 					"body": {
 						"account_id": 0,
@@ -1782,8 +1675,12 @@
 						"comment": "this is an edited comment",
 						"positions": [
 							{
-								"major_amount": 56,
-								"minor_amount": 89,
+								"amount": {
+									"major": 56,
+									"minor": 89,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "b"
 							}
 						]
@@ -1794,167 +1691,11 @@
 				},
 				{
 					"name": "updated transaction details saved correctly when using major_amount and minor_amount",
-					"endpoint": "/api/v1/transactions/10",
+					"endpoint": "/api/v1/transactions/9",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":5689,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":11,"amount":5689,"comment":"b","tag_id":null}]}
-					}
-				},
-				{
-					"name": "updating transaction using only major_amount returns 200",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"major_amount": 56,
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "updated transaction details saved correctly when using only major_amount",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":5600,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":12,"amount":5600,"comment":"b","tag_id":null}]}
-					}
-				},
-				{
-					"name": "updating transaction using only minor_amount returns 200",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"minor_amount": 78,
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "updated transaction details saved correctly when using only minor_amount",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":78,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":13,"amount":78,"comment":"b","tag_id":null}]}
-					}
-				},
-				{
-					"name": "updating transaction using no amount, minor_amount or major amount returns 400",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"at least one position didnt have an amount, minor_amount or major_amount set"}
-					}
-				},
-				{
-					"name": "updating transaction using minor_amount above minor_in_major value for currency returns 400",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"minor_amount": 101,
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
-					}
-				},
-				{
-					"name": "updating transaction using minor_amount equal to minor_in_major value for currency returns 400",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 0,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"minor_amount": 100,
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 400,
-						"body_equals": {"error":"the minor_amount is not allowed to be larger or equal to the minor_in_major value of the currency"}
-					}
-				},
-				{
-					"name": "updating transaction using major_amount and minor_amount with account_id 2 returns 200",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "PUT",
-					"body": {
-						"account_id": 2,
-						"recipient_id": 0,
-						"status": 1,
-						"timestamp": "2024-03-25T11:22:00.000Z",
-						"comment": "this is an edited comment",
-						"positions": [
-							{
-								"major_amount": 12,
-								"minor_amount": 49,
-								"comment": "b"
-							}
-						]
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "updated transaction saved correctly when using major_amount and minor_amount with account_id 2",
-					"endpoint": "/api/v1/transactions/10",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"currency_id":2,"account_id":2,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":649,"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":14,"amount":649,"comment":"b","tag_id":null}]}
+						"body_equals": {"id":9,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":{"major":56,"minor":89,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":10,"amount":{"major":56,"minor":89,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"b","tag_id":null}]}
 					}
 				}
 			]
@@ -2145,7 +1886,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":-1230,"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
@@ -2169,7 +1910,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":-1230,"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":-1330,"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
@@ -2193,7 +1934,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":-1230,"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":-1330,"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":2360,"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
@@ -2217,7 +1958,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":-1230,"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":-1330,"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":2360,"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":-1330,"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
@@ -2241,7 +1982,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":-1230,"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":-1230,"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":-1330,"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":2360,"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":2360,"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":-1330,"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":-1330,"comment":null,"tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-24T11:22:00Z","total_amount":1130,"comment":"Sold 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":4,"amount":1130,"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-24T11:22:00Z","total_amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 10 units at 1.23€ each with additional cost of 1€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":4,"amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
@@ -2908,7 +2649,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "$"
+								},
 								"comment": "a"
 							}
 						]

@@ -1,12 +1,12 @@
 mod db;
 pub mod rest_api;
 
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::error::Error;
 use deadpool_postgres::Pool;
 use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Currency {
 	pub id: Option<u32>,
 	pub name: String,

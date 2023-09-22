@@ -2,6 +2,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, Position, TransactionSummary};
+use crate::money::Money;
 use crate::traits::*;
 
 #[derive(Debug, Clone)]
@@ -136,7 +137,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				.await?
 				.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&transaction_id, &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&transaction_id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 
@@ -201,7 +202,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		for position in self.transaction.positions {
 			client.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&(self.transaction.id.unwrap() as i32), &position.amount, &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&(self.transaction.id.unwrap() as i32), &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 	
@@ -257,6 +258,8 @@ impl From<tokio_postgres::Row> for Transaction {
 		let transaction_position_comments: Vec<Option<String>> = value.get(14);
 		let transaction_position_tag_ids: Vec<Option<i32>> = value.get(15);
 		let total_amount: i64 = value.get(16);
+		let minor_in_major: i32 = value.get(17);
+		let symbol: String = value.get(18);
 
 		let mut asset: Option<Asset> = None;
 		if asset_id.is_some() {
@@ -280,7 +283,7 @@ impl From<tokio_postgres::Row> for Transaction {
 			.map(|(i, transaction_position_id)| {
 				Position {
 					id: Some(transaction_position_id.unwrap() as u32),
-					amount: transaction_position_amounts[i].unwrap(),
+					amount: Money::from_amount(transaction_position_amounts[i].unwrap(), minor_in_major as u32, symbol.clone()),
 					comment: transaction_position_comments[i].clone(),
 					tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
 				}
@@ -298,7 +301,7 @@ impl From<tokio_postgres::Row> for Transaction {
 				_ => panic!("invalid transaction status found in row from database")
 			})
 			.set_timestamp(timestamp)
-			.set_total_amount(total_amount.try_into().unwrap())
+			.set_total_amount(Money::from_amount(total_amount.try_into().unwrap(), minor_in_major as u32, symbol))
 			.set_comment_opt(comment)
 			.set_tag_ids(tag_ids)
 			.set_asset_opt(asset)

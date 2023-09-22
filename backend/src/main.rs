@@ -32,6 +32,7 @@ mod asset;
 mod dashboard;
 mod chart;
 mod traits;
+mod money;
 
 use std::fmt;
 use std::error::Error;

@@ -2,14 +2,14 @@ mod db;
 pub mod rest_api;
 
 use deadpool_postgres::Pool;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::error::Error;
 use chrono::{DateTime, Utc};
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
 use crate::CustomError;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TotalCostOfOwnership {
 	pub total: i32,
 	pub monthly: i32,
@@ -18,7 +18,7 @@ pub struct TotalCostOfOwnership {
 
 
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize, Default, Deserialize)]
 pub struct Asset {
 	pub id: Option<u32>,
 	pub user_id: u32,
@@ -243,7 +243,7 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, curr
 	
 	let total_cost_of_ownership: i32 = transactions
 		.iter()
-		.map(|x| x.total_amount.unwrap())
+		.map(|x| x.total_amount.clone().unwrap())
 		.sum();
 
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));

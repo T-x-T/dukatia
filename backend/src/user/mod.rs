@@ -9,7 +9,7 @@ use super::Config;
 use super::access_token;
 use super::CustomError;
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, Deserialize)]
 pub struct User {
 	pub id: Option<u32>,
 	pub name: String,

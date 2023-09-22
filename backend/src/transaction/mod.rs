@@ -9,8 +9,9 @@ use std::error::Error;
 use super::account;
 use super::asset::Asset;
 use crate::traits::*;
+use crate::money::Money;
 
-#[derive(Debug, Copy, Clone, Serialize_repr)]
+#[derive(Debug, Copy, Clone, Serialize_repr, Deserialize)]
 #[repr(u8)]
 pub enum TransactionStatus {
 	Withheld = 0, 
@@ -20,7 +21,7 @@ pub enum TransactionStatus {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Position {
 	pub id: Option<u32>,
-	pub amount: i32,
+	pub amount: Money,
 	pub comment: Option<String>,
 	pub tag_id: Option<u32>,
 }
@@ -40,7 +41,7 @@ pub struct Transaction {
 	pub recipient_id: u32,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
-	pub total_amount: Option<i32>,
+	pub total_amount: Option<Money>,
 	pub comment: Option<String>,
 	pub tag_ids: Option<Vec<u32>>,
 	pub asset: Option<Asset>,
@@ -161,7 +162,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_total_amount(mut self, total_amount: i32) -> Self {
+	pub fn set_total_amount(mut self, total_amount: Money) -> Self {
 		self.total_amount = Some(total_amount);
 		return self;
 	}

@@ -112,7 +112,7 @@ async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i3
 
 	for transaction in transactions {
 		if transaction.currency_id.unwrap() == currency_id {
-			output += transaction.total_amount.unwrap_or(0);
+			output += transaction.total_amount.unwrap_or_default().to_amount();
 		}
 	}
 

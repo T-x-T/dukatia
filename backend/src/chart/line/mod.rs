@@ -135,9 +135,9 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 						value: BTreeMap::new(),
 					})
 					.value.entry(transaction.currency_id.unwrap())
-					.or_insert(0) += transaction.total_amount.unwrap_or(0);
+					.or_insert(0) += transaction.total_amount.clone().unwrap_or_default().to_amount();
 				
-				if transaction.total_amount.unwrap_or(0) > 0 {
+				if transaction.total_amount.clone().unwrap_or_default().to_amount() > 0 {
 					0
 				} else { 
 					1
@@ -153,7 +153,7 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 				value: BTreeMap::new(),
 			})
 			.value.entry(transaction.currency_id.unwrap())
-			.or_insert(0) += transaction.total_amount.unwrap_or(0);
+			.or_insert(0) += transaction.total_amount.unwrap_or_default().to_amount();
 	}
 
 	return output;

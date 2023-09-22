@@ -38,7 +38,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (S
 		transactions.iter()
 			.filter(|x| x.recipient_id == recipient.id.unwrap())
 			.for_each(|transaction| {
-				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
+				*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.clone().unwrap_or_default().to_amount();
 			});
 	
 		output.insert(recipient.name, build_label_amount(amount_per_currency, &currencies));
@@ -65,7 +65,7 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 		transactions.iter()
 		.filter(|x| x.tag_ids.as_ref().unwrap().contains(&tag.id.unwrap()))
 		.for_each(|transaction| {
-			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.unwrap_or(0);
+			*amount_per_currency.entry(transaction.currency_id.unwrap()).or_insert(0) += transaction.total_amount.clone().unwrap_or_default().to_amount();
 		});
 	
 		output.insert(tag.name, build_label_amount(amount_per_currency, &currencies));
