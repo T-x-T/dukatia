@@ -10,14 +10,6 @@ declare global {
 		default_currency?: Currency,
 		balance?: number,
 	}
-	
-	type DeepAccount = {
-		id: number,
-		name: string,
-		default_currency: Currency,
-		user: User,
-		tags: DeepTag[],
-	}
 
 	type User = {
 		id?: number,
@@ -36,18 +28,6 @@ declare global {
 		amount?: number,
 		tag_ids?: number[],
 		currency?: Currency,
-		total_cost_of_ownership?: TotalCostOfOwnership,
-	}
-
-	type DeepAsset = {
-		id: number,
-		name: string,
-		description?: string,
-		value_per_unit: number,
-		amount: number,
-		user: User,
-		currency: Currency,
-		tags: DeepTag[],
 		total_cost_of_ownership?: TotalCostOfOwnership,
 	}
 
@@ -71,27 +51,12 @@ declare global {
 		tag_ids?: number[],
 	}
 
-	type DeepRecipient = {
-		id: number,
-		name: string,
-		user?: User,
-		tags: DeepTag[],
-	}
-
 	type Tag = {
 		id?: number,
 		name: string,
 		user_id?: number,
 		parent_id?: number,
 	}
-
-	type DeepTag = {
-		id: number,
-		name: string,
-		user: User,
-		parent?: Tag,
-	}
-
 	type Transaction = {
 		id?: number,
 		user_id?: number,
@@ -100,7 +65,7 @@ declare global {
 		recipient_id: number,
 		status: TransactionStatus,
 		timestamp: string,
-		total_amount: number,
+		total_amount: Money,
 		comment?: string,
 		tag_ids?: number[],
 		asset?: Asset,
@@ -111,27 +76,19 @@ declare global {
 		positions: Position[],
 	}
 
-	type DeepTransaction = {
-		id: number,
-		status: TransactionStatus,
-		timestamp: string,
-		total_amount: number,
-		comment?: string,
-		currency: Currency,
-		user: User,
-		account: DeepAccount,
-		recipient: DeepRecipient,
-		tags: DeepTag[],
-		asset?: DeepAsset,
-		positions: Position[],
-	}
-
 	type Position = {
 		id?: number,
-		major_amount: number,
-		minor_amount: number,
+		amount: Money,
 		comment?: string,
 		tag_id?: number,
+	}
+
+	type Money = {
+		major: number,
+		minor: number,
+		minor_in_major: number,
+		symbol: String,
+		is_negative?: boolean,
 	}
 
 	enum TransactionStatus {

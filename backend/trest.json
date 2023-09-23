@@ -2675,8 +2675,14 @@
 						"timestamp": "2023-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
-							{
-								"amount": -45,
+							{		
+								"amount": {
+									"major": 0,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€",
+									"is_negative": true
+								},
 								"comment": "a"
 							}
 						]
@@ -2698,7 +2704,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 1000,
+								"amount": {
+									"major": 10,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "$"
+								},
 								"comment": "a"
 							}
 						]
@@ -2789,7 +2800,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 100,
+								"amount": {
+									"major": 1,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -2811,7 +2827,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 200,
+								"amount": {
+									"major": 2,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "$"
+								},
 								"comment": "a"
 							}
 						]
@@ -2833,7 +2854,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 300,
+								"amount": {
+									"major": 3,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -2855,7 +2881,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 100,
+								"amount": {
+									"major": 1,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -2877,7 +2908,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 200,
+								"amount": {
+									"major": 2,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "$"
+								},
 								"comment": "a"
 							}
 						]
@@ -2899,7 +2935,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 300,
+								"amount": {
+									"major": 3,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -3048,7 +3089,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 12345,
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]
@@ -3070,7 +3116,13 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": -45,
+								"amount": {
+									"major": 0,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "$",
+									"is_negative": true
+								},
 								"comment": "a"
 							}
 						]
@@ -3092,7 +3144,12 @@
 						"comment": "this is a comment",
 						"positions": [
 							{
-								"amount": 1000,
+								"amount": {
+									"major": 10,
+									"minor": 0,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
 								"comment": "a"
 							}
 						]

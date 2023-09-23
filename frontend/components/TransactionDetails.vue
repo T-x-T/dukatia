@@ -19,16 +19,16 @@ export default {
 		transaction: {
 			type: Object as PropType<Transaction>,
 			required: true,
+		},
+		default_transaction: {
+			type: Object as PropType<Transaction>,
+			required: true,
 		}
 	},
 
 	async created() {
-		const account: Account = await $fetch(`/api/v1/accounts/${this.transaction.account_id}`);
-		const minor_in_major = (await $fetch(`/api/v1/currencies/${account.default_currency_id}`) as Currency).minor_in_major;
-		
 		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
 		this.transaction.asset_id = this.transaction.asset?.id;
-		this.transaction.positions = this.transaction.positions.map(p => ({...p, amount: p.amount / minor_in_major}));
 		
 		this.config = {
 			fields: [
@@ -90,27 +90,10 @@ export default {
 					timestamp: new Date(x.timestamp),
 					comment: x.comment,
 					tag_ids: Array.isArray(x.tag_ids) && typeof x.tag_ids[0] == "number" ? x.tag_ids : undefined,
-					positions: x.positions.map(p => ({...p, amount: Number(Number(p.amount * minor_in_major).toFixed(0))})),
+					positions: x.positions.map(p => ({...p, amount: {...p.amount, is_negative: p.amount.major < 0}})),
 				};
 			},
-			defaultData: {
-				id: "",
-				account_id: 0,
-				currency_id: 0,
-				recipient_id: 0,
-				status: 1,
-				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				amount: 0,
-				comment: "",
-				currency: (await $fetch("/api/v1/currencies/0") as Currency),
-				tag_ids: [],
-				positions: [
-					{
-						amount: 0,
-						comment: "",
-					}
-				],
-			},
+			defaultData: this.default_transaction,
 			deletable: true
 		}
 	}

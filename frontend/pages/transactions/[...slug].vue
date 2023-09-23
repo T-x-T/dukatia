@@ -59,7 +59,8 @@
 				<TransactionDetails 
 					v-if="Object.keys(selectedRow).length > 0"
 					:transaction="selectedRow"
-					v-on:back="detailsOpen = false"
+					:default_transaction="default_transaction"
+					v-on:back="closeDetails"
 					v-on:updateData="updateTable"
 				/>
 			</div>
@@ -95,6 +96,7 @@ export default {
 		total_row_count: 0,
 		total_amount: 0,
 		data_revision: 0,
+		default_transaction: {} as Transaction,
 	}),
 	
 	async mounted() {
@@ -122,17 +124,44 @@ export default {
 		}
 
 		const id = Number(useRoute().path.split("/")[2]);
-		if(Number.isInteger(id)) {
+		if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(id)) {
 			this.openDetailPage(id);
 		}
+
+		this.default_transaction = {
+			account_id: 0,
+			currency_id: 0,
+			recipient_id: 0,
+			status: 1,
+			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
+			total_amount: {
+				major: 0,
+				minor: 0,
+				minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
+				symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+				is_negative: false,
+			},
+			comment: "",
+			currency: structuredClone(toRaw(this.currencies.filter(x => x.id == 0)[0])),
+			positions: [{
+				amount: {
+					major: 0,
+					minor: 0,
+					minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
+					symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+					is_negative: false,
+				},
+				comment: "",
+			}],
+		};
 	},
 
 	methods: {
 		updateTransactions() {
 			const transactionsForDisplay = this.transactions.map(x => {
-				x.account = this.accounts.filter(a => a.id == x.account_id)[0];
-				x.currency = this.currencies.filter(c => c.id == x.currency_id)[0];
-				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
+				x.account = this.accounts.filter(a => a.id === x.account_id)[0];
+				x.currency = this.currencies.filter(c => c.id === x.currency_id)[0];
+				x.recipient = this.recipients.filter(r => r.id === x.recipient_id)[0];
 				return x;
 			});
 			this.tableData = {} as TableData;
@@ -162,7 +191,7 @@ export default {
 						x.recipient?.name,
 						x.asset ? x.asset.name : "",
 						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.total_amount / (x.currency?.minor_in_major ? x.currency?.minor_in_major : 100)}${x.currency?.symbol}`,
+						`${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 						x.comment,
 						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
@@ -177,8 +206,8 @@ export default {
 		},
 
 		openDetailPage(transaction_id: number) {
-			const transaction = this.transactions.filter(x => x.id == transaction_id)[0];
-			this.selectedRow = {...transaction, total_amount: transaction.total_amount / 100, timestamp: transaction.timestamp.slice(0, -1)};			
+			const transaction = this.transactions.filter(x => x.id === transaction_id)[0];
+			this.selectedRow = {...transaction, timestamp: transaction.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
@@ -188,22 +217,7 @@ export default {
 		},
 
 		async newTransaction() {
-			this.selectedRow = {
-				account_id: 0,
-				currency_id: 0,
-				recipient_id: 0,
-				status: 1,
-				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				total_amount: 0,
-				comment: "",
-				currency: this.currencies.filter(x => x.id == 0)[0],
-				positions: [
-					{
-						amount: 0,
-						comment: "",
-					}
-				],
-			}
+			this.selectedRow = structuredClone(toRaw(this.default_transaction));
 
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
@@ -261,6 +275,11 @@ export default {
 			await this.updateTable();
 			this.detailsOpen = false;
 			this.selectedRow = {} as Transaction;
+			history.pushState({}, "", "/transactions");
+		},
+		
+		closeDetails() {
+			this.detailsOpen = false;
 			history.pushState({}, "", "/transactions");
 		},
 
@@ -397,7 +416,7 @@ export default {
 				x.recipient?.name,
 				x.asset ? x.asset.name : "",
 				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.total_amount / (x.currency?.minor_in_major ? x.currency?.minor_in_major : 100)}${x.currency?.symbol}`,
+				`${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));
