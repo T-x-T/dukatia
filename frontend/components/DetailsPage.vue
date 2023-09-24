@@ -51,7 +51,7 @@
 				</div>
 
 				<div v-else-if="field.type == 'tags'">
-					<CustomSelect
+					<InputMultiSelect
 						v-if="Object.keys(selectData).length > 0 && renderCustomSelect"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
@@ -91,9 +91,7 @@
 					</div>
 					<div v-else class="field_container">
 						<label>Amount: </label>
-						<input type="number" v-model="config.data[field.property][0].amount.major">
-						.
-						<input type="number" v-model="config.data[field.property][0].amount.minor" :max="config.data[field.property][0].amount.minor_in_major - 1">
+						<InputMoney :initial_value="config.data[field.property][0].amount" v-on:update="((new_value: Money) => config.data[field.property][0].amount = new_value)" />
 					</div>
 					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
 				</div>

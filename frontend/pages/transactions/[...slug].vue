@@ -43,7 +43,7 @@
 					</div>
 
 					<div>
-						<CustomSelect
+						<InputMultiSelect
 							v-if="Object.keys(selectData).length > 0"
 							:selectData="selectData"
 							v-on:update="tagUpdate"
@@ -123,9 +123,10 @@ export default {
 			openTop: true
 		}
 
-		const id = Number(useRoute().path.split("/")[2]);
-		if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(id)) {
-			this.openDetailPage(id);
+		if (useRoute().path.split("/")[2] == "new") {
+			this.newTransaction();
+		} else if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(Number(useRoute().path.split("/")[2]))) {
+			this.openDetailPage(Number(useRoute().path.split("/")[2]));
 		}
 
 		this.default_transaction = {
@@ -191,7 +192,7 @@ export default {
 						x.recipient?.name,
 						x.asset ? x.asset.name : "",
 						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
+						`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 						x.comment,
 						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 					]))
@@ -219,6 +220,7 @@ export default {
 		async newTransaction() {
 			this.selectedRow = structuredClone(toRaw(this.default_transaction));
 
+			history.pushState({}, "", `/transactions/new`);
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
@@ -416,7 +418,7 @@ export default {
 				x.recipient?.name,
 				x.asset ? x.asset.name : "",
 				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
+				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 				x.comment,
 				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
 			]));

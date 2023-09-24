@@ -87,7 +87,7 @@ declare global {
 		major: number,
 		minor: number,
 		minor_in_major: number,
-		symbol: String,
+		symbol: string,
 		is_negative?: boolean,
 	}
 
