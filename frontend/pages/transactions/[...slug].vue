@@ -124,9 +124,13 @@ export default {
 		}
 
 		if (useRoute().path.split("/")[2] == "new") {
-			this.newTransaction();
+			this.$nextTick(() => this.newTransaction());
 		} else if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(Number(useRoute().path.split("/")[2]))) {
-			this.openDetailPage(Number(useRoute().path.split("/")[2]));
+			const id = Number(useRoute().path.split("/")[2]);
+			if(this.transactions.filter(x => x.id === id).length === 0) {
+				this.transactions.push(await $fetch(`/api/v1/transactions/${id}`));
+			}
+			this.openDetailPage(id);
 		}
 
 		this.default_transaction = {
@@ -220,7 +224,10 @@ export default {
 		async newTransaction() {
 			this.selectedRow = structuredClone(toRaw(this.default_transaction));
 
-			history.pushState({}, "", `/transactions/new`);
+			if(useRoute().path != "/transactions/new") {
+				history.pushState({}, "", `/transactions/new`);
+			}
+
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
