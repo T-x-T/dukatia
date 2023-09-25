@@ -140,7 +140,7 @@ export default defineNuxtPlugin(_nuxtApp => {
 						{
 							label: "Value per unit",
 							property: "value_per_unit",
-							type: "number",
+							type: "money",
 							disabled: true
 						},
 						{

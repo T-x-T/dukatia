@@ -36,3 +36,50 @@ CREATE OR REPLACE VIEW public.transaction_data
 	 LEFT JOIN currencies c ON c.id = tr.currency_id
   GROUP BY tr.id, a.id, c.minor_in_major, c.symbol
   ORDER BY tr.id;
+
+
+CREATE OR REPLACE VIEW public.asset_data
+    AS
+     SELECT a.id,
+    a.name,
+    a.description,
+    a.user_id,
+    a.currency_id,
+    array_agg(t.tag_id) AS tags,
+        CASE
+            WHEN aa.amount IS NULL THEN 0::double precision
+            ELSE aa.amount
+        END AS amount,
+        CASE
+            WHEN av.value_per_unit IS NULL THEN 0
+            ELSE av.value_per_unit
+        END AS value_per_unit,
+   	c.minor_in_major,
+	c.symbol
+   FROM assets a
+     LEFT JOIN asset_amounts aa ON a.id = aa.asset_id AND aa."timestamp" = (( SELECT max(asset_amounts."timestamp") AS max
+           FROM asset_amounts
+          WHERE asset_amounts.asset_id = a.id
+          GROUP BY asset_amounts.asset_id))
+     LEFT JOIN asset_valuations av ON a.id = av.asset_id AND av."timestamp" = (( SELECT max(asset_valuations."timestamp") AS max
+           FROM asset_valuations
+          WHERE asset_valuations.asset_id = a.id
+          GROUP BY asset_valuations.asset_id))
+     LEFT JOIN asset_tags t ON a.id = t.asset_id
+	 LEFT JOIN currencies c ON a.currency_id = c.id
+  GROUP BY a.id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
+  ORDER BY a.id;
+
+  CREATE OR REPLACE VIEW public.asset_valuation_history
+    AS
+     SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
+    COALESCE(aa."timestamp", av."timestamp") AS "timestamp",
+    aa.amount,
+    av.value_per_unit,
+	c.minor_in_major,
+	c.symbol
+   FROM asset_amounts aa
+     FULL JOIN asset_valuations av ON aa.asset_id = av.asset_id AND aa."timestamp" = av."timestamp"
+	 LEFT JOIN assets a ON aa.asset_id = a.id
+	 LEFT JOIN currencies c ON a.currency_id = c.id
+  ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));

@@ -349,7 +349,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
 	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
-	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
+	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit.to_amount() as u32)).collect();
 	let amount_history: BTreeMap<DateTime<Utc>, f64> = asset_valuation_history.iter().map(|x| (x.timestamp, x.amount)).collect();
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
@@ -393,7 +393,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
 	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
-	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
+	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit.to_amount() as u32)).collect();
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
 	output.insert(asset.name.clone(), Vec::new());

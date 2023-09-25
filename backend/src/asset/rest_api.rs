@@ -6,7 +6,6 @@ use serde::Deserialize;
 use chrono::{DateTime, Utc};
 use crate::webserver::{AppState, is_authorized};
 use crate::transaction::{Transaction, Position};
-use crate::currency::CurrencyLoader;
 use crate::money::Money;
 use crate::traits::*;
 
@@ -217,12 +216,12 @@ async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpR
 
 #[derive(Deserialize, Clone, Debug)]
 struct AssetValuationPost {
-	value_per_unit: u32,
+	value_per_unit: Money,
 	amount: Option<f64>,
 	amount_change: Option<f64>,
 	timestamp: DateTime<Utc>,
-	cost: Option<u32>,
-	total_value: Option<i32>,
+	cost: Option<Money>,
+	total_value: Option<Money>,
 	account_id: Option<u32>,
 }
 
@@ -293,7 +292,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		.get_first().await?;
 
 	super::AssetValuation {
-		value_per_unit: body.value_per_unit,
+		value_per_unit: body.value_per_unit.clone(),
 		amount: body.amount.unwrap(),
 		timestamp: body.timestamp,
 		asset_id,
@@ -305,8 +304,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	
 	let last_amount: f64 = asset.amount.unwrap_or(0.0);
 	let amount_difference = body.amount.unwrap() - last_amount;
-	let currency = CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
-	let formatted_value_per_unit = format!("{}{}", f64::from(body.value_per_unit) / f64::from(currency.minor_in_major), currency.symbol);
+	let formatted_value_per_unit = body.value_per_unit.to_string();
 
 	let mut comment: String = if amount_difference < 0.0 {
 		format!("Sold {} units at {} each", amount_difference * -1.0, formatted_value_per_unit)
@@ -315,14 +313,14 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	};
 
 	if body.cost.is_some() {
-		let formatted_cost = format!("{}{}", f64::from(body.cost.unwrap()) / f64::from(currency.minor_in_major), currency.symbol);
+		let formatted_cost = body.cost.clone().unwrap().to_string();
 		comment = format!("{comment} with additional cost of {formatted_cost}");
 	}
 
-	let amount = if body.total_value.is_some() {
-		body.total_value.unwrap()
+	let amount: Money = if body.total_value.is_some() {
+		body.total_value.clone().unwrap()
 	} else {
-		-((f64::from(body.value_per_unit) * amount_difference) as i32) - body.cost.unwrap_or(0) as i32
+		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or(Money::default()).to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
 	};
 
 	Transaction::default()
@@ -332,7 +330,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		.set_user_id(user_id)
 		.set_asset(asset)	
 		.set_positions(vec![Position {
-			amount: Money::from_amount(amount, currency.minor_in_major, currency.symbol),
+			amount,
 			..Default::default()
 		}])
 		.save(pool).await?;

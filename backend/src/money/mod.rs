@@ -39,6 +39,14 @@ impl Money {
 		}
 		return self;
 	}
+
+	pub fn get_minor_in_major(&self) -> u32 {
+		return self.minor_in_major;
+	}
+
+	pub fn get_symbol(&self) -> String {
+		return self.symbol.clone();
+	}
 }
 
 impl std::fmt::Display for Money {

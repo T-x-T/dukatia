@@ -24,7 +24,7 @@ declare global {
 		name: string,
 		description?: string,
 		currency_id: number,
-		value_per_unit?: number,
+		value_per_unit?: Money,
 		amount?: number,
 		tag_ids?: number[],
 		currency?: Currency,
@@ -103,7 +103,7 @@ declare global {
 	}
 
 	type AssetValuation = {
-		value_per_unit: number,
+		value_per_unit: Money,
 		amount: number,
 		timestamp: string,
 		deleted?: boolean,
@@ -169,7 +169,7 @@ declare global {
 	type DetailFormField = {
 		label: string,
 		property: string,
-		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions" | "break",
+		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions" | "money" | "break",
 		disabled?: boolean,
 		step?: string,
 		initial?: number,

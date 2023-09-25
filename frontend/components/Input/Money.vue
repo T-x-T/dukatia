@@ -1,5 +1,5 @@
 <template>
-	<input type="text" v-model="value_for_display" @change="update_value">
+	<input type="text" v-model="value_for_display" :disabled="disabled" @change="update_value">
 </template>
 
 <script lang="ts">
@@ -13,6 +13,10 @@ export default {
 		initial_value: {
 			type: Object as PropType<Money>,
 			required: true,
+		},
+		disabled: {
+			type: Boolean,
+			required: false,
 		}
 	},
 

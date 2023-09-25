@@ -15,6 +15,8 @@
 </template>
 
 <script lang="ts">
+import { valueOrDefault } from 'chart.js/dist/helpers/helpers.core';
+
 export default {
 	data: () => ({
 		tableData: {} as TableData,
@@ -58,7 +60,7 @@ export default {
 			],
 			rows: assetsForDisplay.map(x => {
 				x.amount = x.amount ? x.amount : 0;
-				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
+				x.value_per_unit = x.value_per_unit ? x.value_per_unit : {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_major: 100, symbol: "€"};
 
 				return [
@@ -66,8 +68,8 @@ export default {
 					x.name,
 					x.description,
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_major}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_major) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
+					`${x.value_per_unit.major >= 0 && x.value_per_unit.is_negative ? "-" : ""}${x.value_per_unit.major}.${x.value_per_unit.minor.toString().padStart(x.value_per_unit.minor_in_major.toString().length - 1, "0")}${x.value_per_unit.symbol}`,
+					`${((((x.value_per_unit.major * x.value_per_unit.minor_in_major) + x.value_per_unit.minor) * x.amount) / 100).toFixed(2)}${x.value_per_unit.symbol}`,
 					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
@@ -189,7 +191,7 @@ export default {
 
 			this.tableData.rows = assetsForDisplay.map(x => {
 				x.amount = x.amount ? x.amount : 0;
-				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
+				x.value_per_unit = x.value_per_unit ? x.value_per_unit : {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_major: 100, symbol: "€"};
 
 				return [
@@ -197,8 +199,8 @@ export default {
 					x.name,
 					x.description,
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_major}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_major) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
+					`${x.value_per_unit.major >= 0 && x.value_per_unit.is_negative ? "-" : ""}${x.value_per_unit.major}.${x.value_per_unit.minor.toString().padStart(x.value_per_unit.minor_in_major.toString().length - 1, "0")}${x.value_per_unit.symbol}`,
+					`${((((x.value_per_unit.major * x.value_per_unit.minor_in_major) + x.value_per_unit.minor) * x.amount) / 100).toFixed(2)}${x.value_per_unit.symbol}`,
 					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,
 					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_major}${x.currency.symbol}`,

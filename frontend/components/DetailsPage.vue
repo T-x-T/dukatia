@@ -95,6 +95,11 @@
 					</div>
 					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
 				</div>
+
+				<div v-if="field.type == 'money'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<InputMoney :initial_value="config.data[field.property]" :disabled="field.disabled" v-on:update="((new_value: Money) => config.data[field.property] = new_value)" />
+				</div>
 			</div>
 			<button class="green" @click="send(true)">Save</button>
 			<button class="red" @click="$emit('back')">Cancel</button>

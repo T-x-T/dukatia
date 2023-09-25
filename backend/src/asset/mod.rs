@@ -8,6 +8,7 @@ use chrono::{DateTime, Utc};
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
 use crate::CustomError;
+use crate::money::Money;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TotalCostOfOwnership {
@@ -25,7 +26,7 @@ pub struct Asset {
 	pub name: String,
 	pub description: Option<String>,
 	pub currency_id: u32,
-	pub value_per_unit: Option<u32>,
+	pub value_per_unit: Option<Money>,
 	pub amount: Option<f64>,
 	pub tag_ids: Option<Vec<u32>>,
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
@@ -157,7 +158,7 @@ impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct AssetValuation {
-	pub value_per_unit: u32,
+	pub value_per_unit: Money,
 	pub amount: f64,
 	pub timestamp: DateTime<Utc>,
 	pub asset_id: u32,

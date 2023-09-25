@@ -22,11 +22,11 @@
 						<label for="transactionAmount">Amount change:</label>
 						<input type="number" id="transactionAmount" v-model="transactionData.amount" @input="updateTransactionTotal">
 						<br>
-						<label for="transactionValue">Value per unit:</label>
-						<input type="number" id="transactionValue" v-model="transactionData.value_per_unit" @input="updateTransactionTotal">
+						<label>Value per unit:</label>
+						<InputMoney :initial_value="transactionData.value_per_unit" v-on:update="((new_value: Money) => {transactionData.value_per_unit = new_value; updateTransactionTotal()})" />
 						<br>
-						<label for="transactionCost">Additional cost:</label>
-						<input type="number" id="transactionCost" v-model="transactionData.cost" @input="updateTransactionTotal">
+						<label>Additional cost:</label>
+						<InputMoney :initial_value="transactionData.cost" v-on:update="((new_value: Money) => {transactionData.cost = new_value; updateTransactionTotal()})" />
 						<br>
 						<label for="transactionAccount">Account:</label>
 						<select id="transactionAccount" v-model="transactionData.account_id">
@@ -36,8 +36,8 @@
 						<label for="transactionTimestamp">Timestamp:</label>
 						<input type="datetime-local" id="transactionTimestamp" v-model="transactionData.timestamp">
 						<br>
-						<label for="transactionTotal">Total:</label>
-						<input type="number" id="transactionTotal" v-model="transactionData.total" @change="transactionData.total_manually_changed = true">
+						<label>Total:</label>
+						<InputMoney :initial_value="transactionData.total" v-on:update="((new_value: Money) => {transactionData.total_manually_changed = true; transactionData.total = new_value; updateTransactionTotal()})" />
 						<br>
 						<button class="green" @click="saveTransaction">Save</button>
 					</div>
@@ -50,8 +50,8 @@
 						<label for="updateAmount">New amount:</label>
 						<input type="number" id="updateAmount" v-model="updateData.amount">
 						<br>
-						<label for="updateValue">Value per unit:</label>
-						<input type="number" id="updateValue" v-model="updateData.value_per_unit">
+						<label>Value per unit:</label>
+						<InputMoney :initial_value="updateData.value_per_unit" v-on:update="((new_value: Money) => updateData.value_per_unit = new_value)" />
 						<br>
 						<label for="updateTimestamp">Timestamp:</label>
 						<input type="datetime-local" id="updateTimestamp" v-model="updateData.timestamp">
@@ -121,35 +121,31 @@ export default {
 			}
 			
 			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
-			
-			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
 
 			if(!this.asset) {
 				console.error("this.asset isnt defined!")
 				return;
 			} else {
-				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = 0;
+				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 			}
 
 			this.config = {
 				...this.$detailPageConfig().asset,
-				data: {
-					...this.asset,
-					value_per_unit: this.asset.value_per_unit / minor_in_major,
-				},
+				data: structuredClone(toRaw(this.asset)),
 			};
 
 			this.transactionData = {
 				amount: 0,
-				value_per_unit: this.asset.value_per_unit / minor_in_major,
+				value_per_unit: this.asset.value_per_unit,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 				account_id: 0,
-				cost: 0
+				cost: {major: 0, minor: 0, minor_in_major: this.asset.value_per_unit.minor_in_major, symbol: this.asset.value_per_unit.symbol},
+				total: {major: 0, minor: 0, minor_in_major: this.asset.value_per_unit.minor_in_major, symbol: this.asset.value_per_unit.symbol},
 			};
 
 			this.updateData = {
 				amount: this.asset.amount,
-				value_per_unit: this.asset.value_per_unit / minor_in_major,
+				value_per_unit: this.asset.value_per_unit,
 				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8)
 			};
 
@@ -175,18 +171,16 @@ export default {
 		},
 
 		async saveTransaction() {
-			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
-
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
 					method: "POST",
 					body: {
 						amount_change: Number(this.transactionData.amount),
-						value_per_unit: Math.round(this.transactionData.value_per_unit * minor_in_major),
+						value_per_unit: this.transactionData.value_per_unit,
 						timestamp: new Date(this.transactionData.timestamp),
 						account_id: this.transactionData.account_id,
-						cost: Math.round(this.transactionData.cost * minor_in_major),
-						total_value: this.transactionData.total_manually_changed ? Math.round(this.transactionData.total * minor_in_major) : null
+						cost: this.transactionData.cost,
+						total_value: this.transactionData.total_manually_changed ? this.transactionData.total : null
 					}
 				})
 			} catch(e: any) {
@@ -200,18 +194,26 @@ export default {
 
 		updateTransactionTotal() {
 			this.transactionData.total_manually_changed = false;
-			this.transactionData.total = Math.round(((Number(this.transactionData.amount) * Number(this.transactionData.value_per_unit)) + Number(this.transactionData.cost)) * -100 + Number.EPSILON) / 100;
+			const raw_value_per_unit: number = (this.transactionData.value_per_unit.major * this.transactionData.value_per_unit.minor_in_major) + this.transactionData.value_per_unit.minor;
+			const raw_cost: number = (this.transactionData.cost.major * this.transactionData.cost.minor_in_major) + this.transactionData.cost.minor;
+			const raw_total = Math.round(((Number(this.transactionData.amount) * raw_value_per_unit) + raw_cost) * -100 + Number.EPSILON) / 100;
+			
+			this.transactionData.total = {
+				major: (raw_total / this.transactionData.value_per_unit.minor_in_major).toFixed(0),
+				minor: raw_total < 0 ? (raw_total % this.transactionData.value_per_unit.minor_in_major) * -1 : (raw_total % this.transactionData.value_per_unit.minor_in_major),
+				minor_in_major: this.transactionData.value_per_unit.minor_in_major,
+				symbol: this.transactionData.value_per_unit.symbol,
+				is_negative: raw_total < 0,
+			};
 		},
 
 		async saveUpdate() {
-			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${this.asset.currency_id}`) as Currency).minor_in_major;
-
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
 					method: "POST",
 					body: {
 						amount: Number(this.updateData.amount),
-						value_per_unit: Math.round(this.updateData.value_per_unit * minor_in_major),
+						value_per_unit: this.updateData.value_per_unit,
 						timestamp: new Date(this.updateData.timestamp)
 					}
 				})
