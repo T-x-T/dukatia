@@ -32,9 +32,9 @@ declare global {
 	}
 
 	type TotalCostOfOwnership = {
-		total: number,
-		monthly: number,
-		yearly: number,
+		total: Money,
+		monthly: Money,
+		yearly: Money,
 	}
 
 	type Currency = {

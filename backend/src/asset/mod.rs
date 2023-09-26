@@ -12,9 +12,9 @@ use crate::money::Money;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TotalCostOfOwnership {
-	pub total: i32,
-	pub monthly: i32,
-	pub yearly: i32,
+	pub total: Money,
+	pub monthly: Money,
+	pub yearly: Money,
 }
 
 
@@ -106,7 +106,7 @@ impl Asset {
 			.get().await?;
 		
 		return Ok(Self {
-			total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0)),
+			total_cost_of_ownership: if transactions.is_empty() { None } else { Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0, self.value_per_unit.clone().unwrap_or_default().get_minor_in_major(), self.value_per_unit.clone().unwrap_or_default().get_symbol())) },
 			..self
 		});
 	}
@@ -237,10 +237,8 @@ impl<'a> Loader<'a, AssetValuation> for AssetValuationLoader<'a> {
 	}
 }
 
-fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {
-	if transactions.is_empty() {
-		return TotalCostOfOwnership::default();
-	}
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool, minor_in_major: u32, symbol: String) -> TotalCostOfOwnership {
+	assert!(!transactions.is_empty());
 	
 	let total_cost_of_ownership: i32 = transactions
 		.iter()
@@ -268,8 +266,8 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, curr
 	};
 	
 	return TotalCostOfOwnership {
-		total: total_cost_of_ownership,
-		monthly: (total_cost_of_ownership / days_since_first_transaction) * 30,
-		yearly: (total_cost_of_ownership / days_since_first_transaction) * 365,
+		total: Money::from_amount(total_cost_of_ownership, minor_in_major, symbol.clone()),
+		monthly: Money::from_amount((total_cost_of_ownership / days_since_first_transaction) * 30, minor_in_major, symbol.clone()),
+		yearly: Money::from_amount((total_cost_of_ownership / days_since_first_transaction) * 365, minor_in_major, symbol),
 	};
 }
