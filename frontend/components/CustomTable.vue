@@ -160,7 +160,6 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		currencies: [] as Currency[],
 		rows: [] as Row[],
 		currentSort: {} as TableSort,
 		filters: [] as TableFilter[],
@@ -200,7 +199,6 @@ export default {
 					});
 				});
 				
-				this.currencies = await $fetch("/api/v1/currencies/all") as Currency[];
 				this.currentSort = this.tableData.defaultSort;
 				this.resetSelectedRows();
 			}

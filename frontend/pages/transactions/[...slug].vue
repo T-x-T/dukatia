@@ -190,16 +190,7 @@ export default {
 						{name: "Comment", type: "string", sortable: true},
 						{name: "Tags", type: "choice", options: this.tags.map(x => ({id: x.id, name: x.name}))},
 					],
-					rows: transactionsForDisplay.map(x => ([
-						x.id,
-						x.account?.name,
-						x.recipient?.name,
-						x.asset ? x.asset.name : "",
-						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
-						x.comment,
-						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
-					]))
+					rows: transactionsForDisplay.map(this.get_row)
 				};
 			});
 		},
@@ -419,16 +410,7 @@ export default {
 				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
 				return x;
 			});
-			this.tableData.rows = transactionsForDisplay.map(x => ([
-				x.id,
-				x.account?.name,
-				x.recipient?.name,
-				x.asset ? x.asset.name : "",
-				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
-				x.comment,
-				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
-			]));
+			this.tableData.rows = transactionsForDisplay.map(this.get_row);
 			this.tableData.row_count = this.total_row_count;
 			this.tableData.total_amount = this.total_amount;
 		},
@@ -468,6 +450,19 @@ export default {
 
 			return url;
 		},
+
+		get_row(x: Transaction) {
+			return [
+				x.id,
+				x.account?.name,
+				x.recipient?.name,
+				x.asset ? x.asset.name : "",
+				new Date(x.timestamp).toISOString().substring(0, 10),
+				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
+				x.comment,
+				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+			];
+		}
 	}
 }
 </script>

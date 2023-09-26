@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<h3>Update Asset Valuation History</h3>
-		<label for="applyUpdatesForwards">Apply updates forwards?</label>
-		<input type="checkbox" id="applyUpdatesForwards" v-model="applyUpdatesForwards">
+		<!-- <label for="applyUpdatesForwards">Apply updates forwards?</label>
+		<input type="checkbox" id="applyUpdatesForwards" v-model="applyUpdatesForwards"> -->
 		<table>
 			<thead>
 				<tr>
@@ -19,7 +19,7 @@
 						<input type="text" v-model="item.amount" @input="update(index, 'amount')">
 					</td>
 					<td>
-						<input type="text" v-model="item.value_per_unit" @input="update(index, 'value_per_unit')">
+						<InputMoney :initial_value="item.value_per_unit" v-on:update="(new_value: Money) => {item.value_per_unit = new_value; update(index, 'value_per_unit')}" />
 					</td>
 					<td><input type="checkbox" v-model="item.deleted"></td>
 				</tr>
@@ -34,7 +34,7 @@ export default {
 	data: () => ({
 		assetValuations: [] as AssetValuation[],
 		originalAssetValuations: [] as AssetValuation[],
-		applyUpdatesForwards: true
+		applyUpdatesForwards: false
 	}),
 
 	props: {
@@ -42,11 +42,7 @@ export default {
 	},
 
 	async created() {
-		const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
-		const minor_in_major: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_major;
-
 		this.assetValuations = (await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`) as AssetValuation[]).map(x => {
-			x.value_per_unit /= minor_in_major;
 			x.deleted = false;
 			return x;
 		});
@@ -55,7 +51,8 @@ export default {
 
 	methods: {
 		update(i: number, prop: "value_per_unit" | "amount" | "timestamp" | "deleted") {
-			if(this.applyUpdatesForwards) {
+			//TODO: re-enable this at some point
+			/* if(this.applyUpdatesForwards) {
 				if(Number.isNaN(Number(this.assetValuations[i][prop])) || prop == "timestamp" || prop == "deleted") return;
 				const difference = Number(this.assetValuations[i][prop]) - Number(this.originalAssetValuations[i][prop]);
 				this.assetValuations = this.assetValuations.map((x, j) => {
@@ -64,14 +61,11 @@ export default {
 					}
 					return x;
 				});
-			}
+			} */
 			this.originalAssetValuations = structuredClone(toRaw(this.assetValuations).map(x => toRaw(x)));
 		},
 
 		async save() {
-			const asset: Asset = await $fetch(`/api/v1/assets/${this.assetId}`);
-			const minor_in_major: number = (await $fetch(`/api/v1/currencies/${asset.currency_id}`) as Currency).minor_in_major;
-
 			try {
 				await $fetch(`/api/v1/assets/${this.assetId}/valuation_history`, {
 					method: "POST",
@@ -79,7 +73,7 @@ export default {
 						.filter(x => !x.deleted)
 						.map(x => ({
 							amount: Number(x.amount),
-							value_per_unit: Math.round(Number(x.value_per_unit) * minor_in_major),
+							value_per_unit: x.value_per_unit,
 							timestamp: x.timestamp
 						}))
 				});
