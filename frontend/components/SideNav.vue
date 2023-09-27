@@ -103,7 +103,8 @@ export default {
 	},
 
 	methods: {
-		logout() {
+		async logout() {
+			await $fetch('/api/v1/logout', {method: "POST"});
 			document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
 			location.reload();
 		},

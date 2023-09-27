@@ -1044,6 +1044,25 @@
 			]
 		},
 		{
+			"name": "logout",
+			"tests": [
+				{
+					"name": "logout returns 200",
+					"endpoint": "/api/v1/logout",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"method": "POST",
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				}
+			]
+		},
+		{
 			"name": "transactions",
 			"defaults": {
 				"cookies": {

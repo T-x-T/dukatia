@@ -39,6 +39,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 				})
 			})
 			.service(user::rest_api::post_login)
+			.service(user::rest_api::post_logout)
 			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::get_by_id)
@@ -84,11 +85,11 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 		.await;
 }
 
-pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Error>> {
+pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
 	if req.cookie("accessToken").is_none() {
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }
 
 	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
-	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string()).await?);
+	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string(), session_expiry_days).await?);
 }

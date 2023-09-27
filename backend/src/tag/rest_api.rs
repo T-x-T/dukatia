@@ -18,7 +18,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/tags/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -53,7 +53,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/tags/{tag_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -83,7 +83,7 @@ struct TagPost {
 
 #[post("/api/v1/tags")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPost>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -102,7 +102,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPo
 
 #[put("/api/v1/tags/{tag_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPost>, tag_id: web::Path<u32>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -122,7 +122,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 
 #[delete("/api/v1/tags/{tag_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
-	let _ = match is_authorized(&data.pool, &req).await {
+	let _ = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};

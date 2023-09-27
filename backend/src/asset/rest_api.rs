@@ -32,7 +32,7 @@ struct RequestParameters {
 //TODO: test filters and sorting for properties other than id
 #[get("/api/v1/assets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -104,7 +104,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/assets/{asset_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -135,7 +135,7 @@ struct AssetPost {
 
 #[post("/api/v1/assets")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -156,7 +156,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 
 #[put("/api/v1/assets/{asset_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>, asset_id: web::Path<u32>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -178,7 +178,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 
 #[delete("/api/v1/assets/{asset_id}")]
 async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -200,7 +200,7 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 
 #[get("/api/v1/assets/{asset_id}/valuation_history")]
 async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -227,7 +227,7 @@ struct AssetValuationPost {
 
 #[post("/api/v1/assets/{asset_id}/valuation_history")]
 async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>, body: web::Json<Vec<AssetValuationPost>>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -258,7 +258,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 #[post("/api/v1/assets/{asset_id}/valuations")]
 async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetValuationPost>, asset_id: web::Path<u32>) -> impl Responder {
 	let asset_id = asset_id.into_inner();
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};

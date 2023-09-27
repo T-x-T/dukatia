@@ -55,6 +55,10 @@ pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) 
 	return access_token::add(pool, &user).await;
 }
 
+pub async fn logout(pool: &Pool, user_id: u32, access_token: String) -> Result<(), Box<dyn Error>> {
+	return access_token::delete_token(pool, user_id, &access_token).await;
+}
+
 pub async fn update_secret(config: &Config, pool: &Pool, old_secret: String, new_secret: String, input_user_id: u32) -> Result<(), Box<dyn Error>> {
 	let user_from_db = db::get_by_id(pool, &input_user_id).await?;
 

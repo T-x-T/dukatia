@@ -22,6 +22,10 @@ pub async fn add(pool: &Pool, user: &User) -> Result<String, Box<dyn Error>> {
 	return Ok(access_token);
 }
 
-pub async fn get_user_of_token(pool: &Pool, access_token: &String) -> Result<u32, Box<dyn Error>> {
-	return db::get_user_of_token(pool, access_token).await;
+pub async fn get_user_of_token(pool: &Pool, access_token: &String, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
+	return db::get_user_of_token(pool, access_token, session_expiry_days).await;
+}
+
+pub async fn delete_token(pool: &Pool, user_id: u32, access_token: &String) -> Result<(), Box<dyn Error>> {
+	return db::delete_token(pool, user_id, access_token).await;
 }
