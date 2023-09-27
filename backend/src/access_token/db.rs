@@ -34,7 +34,7 @@ pub async fn delete_token(pool: &Pool, user_id: u32, access_token: &String) -> R
 		.await?;
 
 	if res.len() != 1 {
-		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("access_token"), filter: String::from("")}));
+		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("access_token"), filter: String::new()}));
 	}
 
 	return Ok(());
