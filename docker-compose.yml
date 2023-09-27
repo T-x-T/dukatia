@@ -20,7 +20,7 @@ services:
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: changeme
-      DATABASE_NAME: txts_treasury
+      DATABASE_NAME: dukatia
       ADMIN_PASSWORD: changeme
       PEPPER: changeme
     links:
