@@ -128,7 +128,7 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 			RawOutputProperties::Currency => transaction.currency_id.unwrap(),
 			RawOutputProperties::EarningSpendingNet => {
 				*output.entry(2)
-					.or_insert(BTreeMap::new())
+					.or_default()
 					.entry(get_date_for_period(date_period, &transaction.timestamp))
 					.or_insert(PointWithCurrencies {
 						timestamp: transaction.timestamp,
@@ -146,7 +146,7 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 		};	
 	
 		*output.entry(id)
-			.or_insert(BTreeMap::new())
+			.or_default()
 			.entry(get_date_for_period(date_period, &transaction.timestamp))
 			.or_insert(PointWithCurrencies {
 				timestamp: transaction.timestamp,
@@ -238,7 +238,7 @@ fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>
 			});
 	
 			output.entry(x.0)
-				.or_insert(Vec::new())
+				.or_default()
 				.append(&mut vec![Point {
 					timestamp: y.0.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
 					value,

@@ -100,7 +100,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	};
 
 	match super::add(&data.pool, &chart).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
@@ -132,7 +132,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 	};
 
 	match super::update(&data.pool, &chart).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
@@ -145,7 +145,7 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path
 	};
 
 	match super::delete(&data.pool, chart_id.into_inner()).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

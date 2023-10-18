@@ -235,6 +235,7 @@ impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	}
 }
 
+#[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Transaction {
 	fn from(value: tokio_postgres::Row) -> Transaction {
 		let id: i32 = value.get(0);

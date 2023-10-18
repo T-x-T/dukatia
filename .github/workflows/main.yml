@@ -75,7 +75,7 @@ jobs:
       - name: Test backend
         working-directory: backend
         run: |
-          rustup default nightly-2023-06-09
+          rustup default nightly
           POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
           
   backend_clippy:
@@ -90,8 +90,8 @@ jobs:
       - name: Run clippy on backend
         working-directory: backend
         run: |
-          rustup default nightly-2023-06-09
-          rustup component add --toolchain nightly-2023-06-09 clippy
+          rustup default nightly
+          rustup component add --toolchain nightly clippy
           cargo clippy
 
   push_backend:

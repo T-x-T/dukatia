@@ -73,35 +73,35 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 	let filters = Filters { 
 		id: request_parameters.filter_id.map(|x| {
-			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
-			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or_default().into())
 		}),
 		asset_id: request_parameters.filter_asset_id.map(|x| {
-			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or_default().into())
 		}),
 		user_id: request_parameters.filter_user_id.map(|x| {
-			(x, request_parameters.filter_mode_user_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_user_id.clone().unwrap_or_default().into())
 		}),
 		currency_id: request_parameters.filter_currency_id.map(|x| {
-			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
 		account_id: request_parameters.filter_account_id.map(|x| {
-			(x, request_parameters.filter_mode_account_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_account_id.clone().unwrap_or_default().into())
 		}),
 		recipient_id: request_parameters.filter_recipient_id.map(|x| {
-			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or_default().into())
 		}),
 		tag_id: request_parameters.filter_tag_id.map(|x| {
-			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or_default().into())
 		}),
 		comment: request_parameters.filter_comment.clone().map(|x| {
-			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_comment.clone().unwrap_or_default().into())
 		}),
 		time_range: request_parameters.filter_time_range_lower.and_then(|x| {
 			request_parameters.filter_time_range_upper.map(|y| {
-				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
+				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or_default().into())
 			})
 		}),
 		..Default::default()
@@ -134,35 +134,35 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 	let filters = Filters { 
 		id: request_parameters.filter_id.map(|x| {
-			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
-			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_total_amount.clone().unwrap_or_default().into())
 		}),
 		asset_id: request_parameters.filter_asset_id.map(|x| {
-			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or_default().into())
 		}),
 		user_id: request_parameters.filter_user_id.map(|x| {
-			(x, request_parameters.filter_mode_user_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_user_id.clone().unwrap_or_default().into())
 		}),
 		currency_id: request_parameters.filter_currency_id.map(|x| {
-			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
 		account_id: request_parameters.filter_account_id.map(|x| {
-			(x, request_parameters.filter_mode_account_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_account_id.clone().unwrap_or_default().into())
 		}),
 		recipient_id: request_parameters.filter_recipient_id.map(|x| {
-			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_recipient_id.clone().unwrap_or_default().into())
 		}),
 		tag_id: request_parameters.filter_tag_id.map(|x| {
-			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or_default().into())
 		}),
 		comment: request_parameters.filter_comment.clone().map(|x| {
-			(x, request_parameters.filter_mode_comment.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_comment.clone().unwrap_or_default().into())
 		}),
 		time_range: request_parameters.filter_time_range_lower.and_then(|x| {
 			request_parameters.filter_time_range_upper.map(|y| {
-				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or(String::new()).into())
+				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or_default().into())
 			})
 		}),
 		..Default::default()
@@ -298,7 +298,7 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web
 		.delete(&data.pool).await;
 
 	return match result {
-		Ok(_) => HttpResponse::Ok().body(""),
+		Ok(()) => HttpResponse::Ok().body(""),
 		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }

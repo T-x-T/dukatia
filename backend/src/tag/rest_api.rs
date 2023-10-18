@@ -25,13 +25,13 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 	let filters = Filters {
 		id: request_parameters.filter_id.map(|x| {
-			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
-			(x, request_parameters.filter_mode_name.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_name.clone().unwrap_or_default().into())
 		}),
 		parent_id: request_parameters.filter_parent_id.map(|x| {
-			(x, request_parameters.filter_mode_parent_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_parent_id.clone().unwrap_or_default().into())
 		}),
 		..Default::default()
 	};
@@ -132,7 +132,7 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u
 		.delete(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

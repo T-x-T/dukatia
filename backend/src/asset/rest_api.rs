@@ -64,22 +64,22 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 	let filters = Filters {
 		id: request_parameters.filter_id.map(|x| {
-			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
-			(x, request_parameters.filter_mode_name.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_name.clone().unwrap_or_default().into())
 		}),
 		description: request_parameters.filter_description.clone().map(|x| {
-			(x, request_parameters.filter_mode_description.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_description.clone().unwrap_or_default().into())
 		}),
 		amount: request_parameters.filter_amount.map(|x| {
-			(x, request_parameters.filter_mode_amount.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_amount.clone().unwrap_or_default().into())
 		}),
 		value_per_unit: request_parameters.filter_value_per_unit.map(|x| {
-			(x, request_parameters.filter_mode_value_per_unit.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_value_per_unit.clone().unwrap_or_default().into())
 		}),
 		tag_id: request_parameters.filter_tag_id.map(|x| {
-			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or_default().into())
 		}),
 		..Default::default()
 	};
@@ -188,7 +188,7 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 		.delete(&data.pool).await;
 
 	return match result {
-		Ok(_) => HttpResponse::Ok().body(""),
+		Ok(()) => HttpResponse::Ok().body(""),
 		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
@@ -250,7 +250,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 		.replace_valuation_history(&data.pool, asset_valuations).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
@@ -281,7 +281,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	}
 
 	return match add_valuation(&data.pool, &asset_valuation, asset_id, user_id).await {
-		Ok(_) => HttpResponse::Ok().body(""),
+		Ok(()) => HttpResponse::Ok().body(""),
 		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
@@ -320,7 +320,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	let amount: Money = if body.total_value.is_some() {
 		body.total_value.clone().unwrap()
 	} else {
-		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or(Money::default()).to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
+		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or_default().to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
 	};
 
 	Transaction::default()

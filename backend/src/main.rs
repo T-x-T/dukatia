@@ -15,9 +15,6 @@
   deprecated,
 )]
 
-#![feature(async_fn_in_trait)]
-#![feature(coerce_unsized)]
-
 mod webserver;
 mod access_token;
 mod user;

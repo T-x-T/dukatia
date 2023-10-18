@@ -25,13 +25,13 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 	let filters = Filters {
 		id: request_parameters.filter_id.map(|x| {
-			(x, request_parameters.filter_mode_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
-			(x, request_parameters.filter_mode_name.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_name.clone().unwrap_or_default().into())
 		}),
 		tag_id: request_parameters.filter_tag_id.map(|x| {
-			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or(String::new()).into())
+			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or_default().into())
 		}),
 		..Default::default()
 	};
