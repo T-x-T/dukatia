@@ -43,7 +43,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				"id" => Some(FilterAndSortProperties::Id),
 				"name" => Some(FilterAndSortProperties::Name),
 				"description" => Some(FilterAndSortProperties::Description),
-				"amount" => Some(FilterAndSortProperties::Amount),
+				"amount" => Some(FilterAndSortProperties::FloatAmount),
 				"value per unit" => Some(FilterAndSortProperties::ValuePerUnit),
 				_ => return HttpResponse::BadRequest().body(format!("{{\"error\":\"sort_property is invalid: {x}\"}}")),
 			}
@@ -72,7 +72,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		description: request_parameters.filter_description.clone().map(|x| {
 			(x, request_parameters.filter_mode_description.clone().unwrap_or_default().into())
 		}),
-		amount: request_parameters.filter_amount.map(|x| {
+		float_amount: request_parameters.filter_amount.map(|x| {
 			(x, request_parameters.filter_mode_amount.clone().unwrap_or_default().into())
 		}),
 		value_per_unit: request_parameters.filter_value_per_unit.map(|x| {

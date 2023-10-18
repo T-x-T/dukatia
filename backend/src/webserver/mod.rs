@@ -14,6 +14,7 @@ use super::transaction;
 use super::asset;
 use super::dashboard;
 use super::chart;
+use super::budget;
 use super::access_token::get_user_of_token;
 
 pub struct AppState {
@@ -78,7 +79,12 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(currency::rest_api::get_all)
 			.service(currency::rest_api::get_by_id)
 			.service(currency::rest_api::post)
-			.service(currency::rest_api::put);
+			.service(currency::rest_api::put)
+			.service(budget::rest_api::delete)
+			.service(budget::rest_api::get_all)
+			.service(budget::rest_api::get_by_id)
+			.service(budget::rest_api::post)
+			.service(budget::rest_api::put);
 	})
 		.bind(("0.0.0.0", api_port))?
 		.run()
