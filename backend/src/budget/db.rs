@@ -164,6 +164,9 @@ impl From<tokio_postgres::Row> for Budget {
 			active_from,
 			active_to,
 			currency_id: currency_id as u32,
+			used_amount: None,
+			available_amount: None,
+			utilization: None,
 		};
 	}
 }

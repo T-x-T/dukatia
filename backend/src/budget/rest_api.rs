@@ -76,7 +76,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 			.set_skip_results_opt(request_parameters.skip_results)
 			.set_filters(filters)
 	)
-	.get().await;
+	.get_full().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -93,7 +93,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 
 	let result = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
-		.get_first().await;
+		.get_first_full().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
