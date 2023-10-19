@@ -1337,6 +1337,54 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_active_from_between() {
+			let mut filters = Filters::default();
+			filters.active_from = Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Between));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE active_from BETWEEN $1 AND $2");
+			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+		}
+
+		#[test]
+		fn filter_active_from_outside() {
+			let mut filters = Filters::default();
+			filters.active_from = Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Outside));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE active_from NOT BETWEEN $1 AND $2");
+			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+		}
+
+		#[test]
+		fn filter_active_to_between() {
+			let mut filters = Filters::default();
+			filters.active_to = Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Between));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE active_to BETWEEN $1 AND $2");
+			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+		}
+
+		#[test]
+		fn filter_active_to_outside() {
+			let mut filters = Filters::default();
+			filters.active_to = Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Outside));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE active_to NOT BETWEEN $1 AND $2");
+			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+		}
+
+		#[test]
 		fn filter_description_and_time_range() {
 			let mut filters = Filters::default();
 			filters.time_range = Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Outside));
@@ -1379,14 +1427,16 @@ mod db_reader {
 						int_amount: Some((17, NumberFilterModes::Exact)),
 						value_per_unit: Some((18, NumberFilterModes::Exact)),
 						rollover: Some((true, BoolFilterModes::Is)),
+						active_from: Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Between)),
+						active_to: Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Outside)),
 					}
 				}
 			);
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND amount=$13 AND value_per_unit=$14 AND $15 = ANY(tags) AND rollover=$16 AND comment ILIKE $17 AND name ILIKE $18 AND symbol ILIKE $19 AND description ILIKE $20 AND timestamp BETWEEN $21 AND $22 ORDER BY id ASC OFFSET $23 LIMIT $24");
-			assert_eq!(format!("{res_values:?}"), "[1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 14, 17.5, 17, 18, 8, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
+			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND amount=$13 AND value_per_unit=$14 AND $15 = ANY(tags) AND rollover=$16 AND comment ILIKE $17 AND name ILIKE $18 AND symbol ILIKE $19 AND description ILIKE $20 AND timestamp BETWEEN $21 AND $22 AND active_from BETWEEN $23 AND $24 AND active_to NOT BETWEEN $25 AND $26 ORDER BY id ASC OFFSET $27 LIMIT $28");
+			assert_eq!(format!("{res_values:?}"), "[1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 14, 17.5, 17, 18, 8, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
 		}
 	}
 }

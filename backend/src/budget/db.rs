@@ -1,4 +1,5 @@
 use deadpool_postgres::Pool;
+use chrono::{DateTime, Utc};
 use std::error::Error;
 use super::super::CustomError;
 use super::{Budget, Period};
@@ -62,8 +63,8 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		let client = self.pool.get().await.unwrap();
 		let id: i32 = client
 			.query(
-				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period) VALUES (DEFAULT, $1, $2, $3, $4, $5) RETURNING id;",
-				&[&self.budget.name, &(self.budget.user_id as i32), &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32)]
+				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period, currency_id, active_from, active_to) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
+				&[&self.budget.name, &(self.budget.user_id as i32), &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to]
 			)
 			.await?
 			[0].get(0);
@@ -88,8 +89,8 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		let client = self.pool.get().await?;
 		
 		client.query(
-				"UPDATE public.budgets SET name=$1, amount=$2, rollover=$3, period=$4 WHERE id=$5;",
-				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.id.unwrap() as i32)]
+				"UPDATE public.budgets SET name=$1, amount=$2, rollover=$3, period=$4, currency_id=$5, active_from=$6, active_to=$7 WHERE id=$8;",
+				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to, &(self.budget.id.unwrap() as i32)]
 			)
 			.await?;
 		
@@ -139,12 +140,17 @@ impl From<tokio_postgres::Row> for Budget {
 			.into_iter()
 			.map(|x: i32| x as u32)
 			.collect();
+		let active_from: DateTime<Utc> = value.get(7);
+		let active_to: Option<DateTime<Utc>> = value.get(8);
+		let minor_in_major: i32 = value.get(9);
+		let symbol: String = value.get(10);
+		let currency_id: i32 = value.get(11);
 		
 		return Budget {
 			id: Some(id as u32),
 			name,
 			user_id: user_id as u32,
-			amount: Money::from_amount(amount, 100, "€".to_string()), //TODO: figure out currency shit
+			amount: Money::from_amount(amount, minor_in_major as u32, symbol),
 			rollover,
 			period: match period {
 				0 => Period::Daily,
@@ -155,6 +161,9 @@ impl From<tokio_postgres::Row> for Budget {
 				_ => panic!("unknown period found in budgets table"),
 			},
 			filter_tag_ids,
+			active_from,
+			active_to,
+			currency_id: currency_id as u32,
 		};
 	}
 }

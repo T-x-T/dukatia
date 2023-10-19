@@ -32,6 +32,8 @@ pub enum FilterAndSortProperties {
 	IntAmount,
 	ValuePerUnit,
 	Rollover,
+	ActiveFrom,
+	ActiveTo,
 }
 
 impl std::fmt::Display for FilterAndSortProperties {
@@ -57,6 +59,8 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::FloatAmount | FilterAndSortProperties::IntAmount => write!(f, "amount"),
 			FilterAndSortProperties::ValuePerUnit => write!(f, "value_per_unit"),
 			FilterAndSortProperties::Rollover => write!(f, "rollover"),
+			FilterAndSortProperties::ActiveFrom => write!(f, "active_from"),
+			FilterAndSortProperties::ActiveTo => write!(f, "active_to"),
 		}
 	}
 }
@@ -140,6 +144,8 @@ pub struct Filters {
 	pub int_amount: Option<(i32, NumberFilterModes)>,
 	pub value_per_unit: Option<(u32, NumberFilterModes)>,
 	pub rollover: Option<(bool, BoolFilterModes)>,
+	pub active_from: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
+	pub active_to: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -366,6 +372,18 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn set_filter_rollover(self, rollover: bool, filter_mode: BoolFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.rollover = Some((rollover, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_active_from(self, lower_active_from: DateTime<Utc>, upper_active_from: DateTime<Utc>, filter_mode: TimeRangeFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.active_from = Some((lower_active_from, upper_active_from, filter_mode));
+		return self.set_query_parameters(query_parameters);
+	}
+
+	fn set_filter_active_to(self, lower_active_to: DateTime<Utc>, upper_active_to: DateTime<Utc>, filter_mode: TimeRangeFilterModes) -> Self {
+		let mut query_parameters = self.get_query_parameters().clone();
+		query_parameters.filters.active_to = Some((lower_active_to, upper_active_to, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 
@@ -698,9 +716,31 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				TimeRangeFilterModes::Between => parameters.push_str(format!(" {} {}timestamp BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
 				TimeRangeFilterModes::Outside => parameters.push_str(format!(" {} {}timestamp NOT BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
 			};
-			//first_where_clause = false;
+			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.time_range.unwrap().0));
 			parameter_values.push(Box::new(self.get_query_parameters().filters.time_range.unwrap().1));
+			i += 2;
+		}
+
+		if self.get_query_parameters().filters.active_from.is_some() {
+			match self.get_query_parameters().filters.active_from.unwrap().2 {
+				TimeRangeFilterModes::Between => parameters.push_str(format!(" {} {}active_from BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+				TimeRangeFilterModes::Outside => parameters.push_str(format!(" {} {}active_from NOT BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+			};
+			first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.active_from.unwrap().0));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.active_from.unwrap().1));
+			i += 2;
+		}
+
+		if self.get_query_parameters().filters.active_to.is_some() {
+			match self.get_query_parameters().filters.active_to.unwrap().2 {
+				TimeRangeFilterModes::Between => parameters.push_str(format!(" {} {}active_to BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+				TimeRangeFilterModes::Outside => parameters.push_str(format!(" {} {}active_to NOT BETWEEN ${i} AND ${}", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}, i + 1).as_str()),
+			};
+			//first_where_clause = false;
+			parameter_values.push(Box::new(self.get_query_parameters().filters.active_to.unwrap().0));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.active_to.unwrap().1));
 			i += 2;
 		}
 

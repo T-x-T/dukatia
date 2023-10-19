@@ -1,17 +1,24 @@
-CREATE TABLE public.budgets
+CREATE TABLE IF NOT EXISTS public.budgets
 (
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 0 MINVALUE 0 ),
-    name text NOT NULL,
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 0 MINVALUE 0 MAXVALUE 2147483647 CACHE 1 ),
+    name text COLLATE pg_catalog."default" NOT NULL,
     user_id integer NOT NULL,
     amount integer NOT NULL,
     rollover boolean NOT NULL,
     period integer NOT NULL,
-    PRIMARY KEY (id),
+    currency_id integer NOT NULL,
+    active_from timestamp with time zone NOT NULL,
+    active_to timestamp with time zone,
+    CONSTRAINT budgets_pkey PRIMARY KEY (id),
+    CONSTRAINT currency_id FOREIGN KEY (currency_id)
+        REFERENCES public.currencies (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+        NOT VALID,
     CONSTRAINT user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-        NOT VALID
 );
 
 ALTER TABLE IF EXISTS public.budgets
@@ -41,11 +48,9 @@ ALTER TABLE IF EXISTS public.budget_filter_tags
 
 CREATE VIEW public.budget_data
  AS
-SELECT b.id, b.name, b.user_id, b.amount, b.rollover, b.period, array_agg(DISTINCT bft.tag_id) AS filter_tag_ids
+SELECT b.id, b.name, b.user_id, b.amount, b.rollover, b.period, array_agg(DISTINCT bft.tag_id) AS filter_tag_ids, b.active_from, b.active_to, c.minor_in_major, c.symbol, b.currency_id
 FROM public.budgets b
 LEFT JOIN public.budget_filter_tags bft ON b.id = bft.budget_id
-GROUP BY b.id
+LEFT JOIN public.currencies c ON c.id = b.currency_id
+GROUP BY b.id, c.id
 ORDER BY b.id;
-
-ALTER TABLE public.budget_data
-    OWNER TO postgres;

@@ -4,6 +4,7 @@ mod db;
 use serde::{Serialize, Deserialize};
 use std::error::Error;
 use deadpool_postgres::Pool;
+use chrono::{DateTime, Utc};
 use crate::money::Money;
 use crate::traits::*;
 
@@ -27,6 +28,9 @@ pub struct Budget {
 	pub rollover: bool,
 	pub period: Period,
 	pub filter_tag_ids: Vec<u32>,
+	pub currency_id: u32,
+	pub active_from: DateTime<Utc>,
+	pub active_to: Option<DateTime<Utc>>,
 }
 
 impl Save for Budget {
@@ -83,6 +87,21 @@ impl Budget {
 
 	pub fn set_filter_tag_ids(mut self, filter_tag_ids: Vec<u32>) -> Self {
 		self.filter_tag_ids = filter_tag_ids;
+		return self;
+	}
+
+	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+		self.currency_id = currency_id;
+		return self;
+	}
+
+	pub fn set_active_from(mut self, active_from: DateTime<Utc>) -> Self {
+		self.active_from = active_from;
+		return self;
+	}
+
+	pub fn set_active_to_opt(mut self, active_to: Option<DateTime<Utc>>) -> Self {
+		self.active_to = active_to;
 		return self;
 	}
 }

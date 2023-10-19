@@ -1,5 +1,6 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
+use chrono::{DateTime, Utc};
 use super::Period;
 use crate::webserver::{AppState, is_authorized};
 use crate::traits::*;
@@ -18,6 +19,14 @@ struct RequestParameters {
 	filter_mode_rollover: Option<String>,
 	filter_filter_tag_id: Option<u32>,
 	filter_mode_filter_tag_id: Option<String>,
+	filter_lower_active_from: Option<DateTime<Utc>>,
+	filter_upper_active_from: Option<DateTime<Utc>>,
+	filter_mode_active_from: Option<String>,
+	filter_lower_active_to: Option<DateTime<Utc>>,
+	filter_upper_active_to: Option<DateTime<Utc>>,
+	filter_mode_active_to: Option<String>,
+	filter_currency_id: Option<u32>,
+	filter_mode_currency_id: Option<String>,
 }
 
 //TODO: test filters for properties other than id
@@ -43,6 +52,19 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		}),
 		tag_id: request_parameters.filter_filter_tag_id.map(|x| {
 			(x, request_parameters.filter_mode_filter_tag_id.clone().unwrap_or_default().into())
+		}),
+		active_from: request_parameters.filter_lower_active_from.and_then(|x| {
+			request_parameters.filter_upper_active_from.map(|y| {
+				(x, y, request_parameters.filter_mode_active_from.clone().unwrap_or_default().into())
+			})
+		}),
+		active_to: request_parameters.filter_lower_active_to.and_then(|x| {
+			request_parameters.filter_upper_active_to.map(|y| {
+				(x, y, request_parameters.filter_mode_active_to.clone().unwrap_or_default().into())
+			})
+		}),
+		currency_id: request_parameters.filter_currency_id.map(|x| {
+			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
 		..Default::default()
 	};
@@ -92,6 +114,9 @@ struct BudgetPost {
 	period: u8,
 	amount: u32,
 	filter_tag_ids: Vec<u32>,
+	currency_id: u32,
+	active_from: DateTime<Utc>,
+	active_to: Option<DateTime<Utc>>,
 }
 
 #[post("/api/v1/budgets")]
@@ -111,10 +136,13 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budge
 			2 => Period::Monthly,
 			3 => Period::Quarterly,
 			4 => Period::Yearly,
-			_ => panic!("unknown period found in budgets table"),
+			_ => panic!("unknown period"),
 		})
 		.set_amount(body.amount)
 		.set_filter_tag_ids(body.filter_tag_ids.clone())
+		.set_currency_id(body.currency_id)
+		.set_active_from(body.active_from)
+		.set_active_to_opt(body.active_to)
 		.save(&data.pool).await;
 
 	match result {
@@ -141,10 +169,13 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budget
 			2 => Period::Monthly,
 			3 => Period::Quarterly,
 			4 => Period::Yearly,
-			_ => panic!("unknown period found in budgets table"),
+			_ => panic!("unknown period"),
 		})
 		.set_amount(body.amount)
 		.set_filter_tag_ids(body.filter_tag_ids.clone())
+		.set_currency_id(body.currency_id)
+		.set_active_from(body.active_from)
+		.set_active_to_opt(body.active_to)
 		.save(&data.pool).await;
 
 	match result {
