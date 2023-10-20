@@ -3705,6 +3705,263 @@
 						"status_code_equals": 200,
 						"body_equals": [{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
+				},
+				{
+					"name": "post of new transaction returns 200 1",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"amount": {
+									"major": -1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 2",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-01-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [0],
+						"positions": [
+							{
+								"amount": {
+									"major": -1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 3",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [0, 1],
+						"positions": [
+							{
+								"amount": {
+									"major": -2,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 4",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-05-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [1, 2],
+						"positions": [
+							{
+								"amount": {
+									"major": -1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 5",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-06-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [1, 2],
+						"positions": [
+							{
+								"amount": {
+									"major": 1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 6",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-08-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [2],
+						"positions": [
+							{
+								"amount": {
+									"major": 1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 7",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-10-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [1],
+						"positions": [
+							{
+								"amount": {
+									"major": -1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 8",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-11-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [0,1,2],
+						"positions": [
+							{
+								"amount": {
+									"major": -2,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of new transaction returns 200 9",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-11-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"tag_ids": [0,1,2],
+						"positions": [
+							{
+								"amount": {
+									"major": -1,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "budgets get correctly calculated",
+					"endpoint": "/api/v1/budgets/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
+							{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854},
+							{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
+							{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":3,"minor":90,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":9,"minor":88,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.2830188679245283},
+							{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854}
+						]
+					}
 				}
 			]
 		}

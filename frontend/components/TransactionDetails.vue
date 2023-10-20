@@ -80,7 +80,7 @@ export default {
 			data: this.transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
-			prepareForApi: async (x: Transaction) => {
+			prepareForApi: (x: Transaction) => {
 				return {
 					account_id: x.account_id,
 					recipient_id: x.recipient_id,

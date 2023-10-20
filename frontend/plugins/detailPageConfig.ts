@@ -232,6 +232,93 @@ export default defineNuxtPlugin(_nuxtApp => {
 						symbol: ""
 					}
 				} as DetailFormConfig,
+				budget: {
+					fields: [
+						{
+							label: "ID",
+							property: "id",
+							type: "number",
+							disabled: true
+						},
+						{
+							label: "Name",
+							property: "name",
+							type: "string",
+						},
+						{
+							label: "Total Amount",
+							property: "amount",
+							type: "money",
+						},
+						{
+							label: "Rollover enabled",
+							property: "rollover",
+							type: "boolean",
+						},
+						{
+							label: "Period",
+							property: "period",
+							type: "choice",
+							choices: [
+								{value: 0, display: "Daily"},
+								{value: 1, display: "Weekly"},
+								{value: 2, display: "Monthly"},
+								{value: 3, display: "Quarterly"},
+								{value: 4, display: "Yearly"},
+							]
+						},
+						{
+							label: "Currency",
+							property: "currency_id",
+							type: "currency",
+						},
+						{
+							label: "Active From",
+							property: "active_from",
+							type: "timestamp",
+						},
+						{
+							label: "Active To",
+							property: "active_to",
+							type: "timestamp",
+						},
+						{
+							label: "Filter Tags",
+							property: "filter_tag_ids",
+							type: "tags"
+						}
+					],
+					data: {
+						name: "",
+						amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
+						rollover: false,
+						period: 2,
+						filter_tag_ids: [],
+						currency_id: 0,
+						active_from: new Date(),
+					},
+					apiEndpoint: "/api/v1/budgets",
+					prepareForApi: (x: any) => ({
+						id: x.id,
+						name: x.name,
+						amount: x.amount,
+						rollover: x.rollover,
+						period: x.period,
+						filter_tag_ids: x.filter_tag_ids,
+						currency_id: x.currency_id,
+						active_from: new Date(new Date(x.active_from).valueOf() - new Date(x.active_from).getTimezoneOffset() * 60000).toISOString(),
+						active_to: x.active_to ? new Date(new Date(x.active_to).valueOf() - new Date(x.active_to).getTimezoneOffset() * 60000).toISOString() : null,
+					}),
+					defaultData: {
+						name: "",
+						amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
+						rollover: false,
+						period: 2,
+						filter_tag_ids: [],
+						currency_id: 0,
+						active_from: new Date(),
+					}
+				} as DetailFormConfig,
 			})
     }
   }

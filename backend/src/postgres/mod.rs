@@ -144,8 +144,13 @@ fn get_pool(config: &Config) -> Pool {
 	cfg.port = Some(config.db_port);
 	cfg.dbname = Some(config.db_database.clone());
 	cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
+	cfg.application_name = Some("Dukatia".to_string());
+	
+	let mut pool_config = cfg.get_pool_config();
+	pool_config.max_size = 50;
+	cfg.pool = Some(pool_config);
 
 	println!("Connecting to database {} on host {}", config.db_database, config.db_host);
-
+	
 	return cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
 }

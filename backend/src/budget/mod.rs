@@ -5,6 +5,7 @@ mod db;
 mod test;
 
 use serde::{Serialize, Deserialize};
+use serde_repr::Serialize_repr;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
@@ -12,7 +13,7 @@ use crate::money::Money;
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Copy, Serialize_repr, Deserialize, Default)]
 #[repr(u8)]
 pub enum Period {
 	Daily = 0,
@@ -77,8 +78,8 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_amount(mut self, amount: u32) -> Self {
-		self.amount = Money::from_amount(amount as i32, 100, "€".to_string()); //TODO: figure out currency shit
+	pub fn set_amount(mut self, amount: Money) -> Self {
+		self.amount = amount;
 		return self;
 	}
 
@@ -119,7 +120,7 @@ impl Budget {
 		if transactions.is_empty() {
 			self.used_amount = Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()));
 		} else {
-			self.used_amount = Some(transactions.into_iter().map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()))).sum());
+			self.used_amount = Some(transactions.into_iter().map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate()).sum());
 		}
 
 		self.available_amount = Some(self.clone().amount - self.clone().used_amount.unwrap());
@@ -136,13 +137,22 @@ impl Budget {
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let mut transactions: Vec<Transaction> = Vec::new();
 
+		let mut retrieved_tag_ids: Vec<u32> = Vec::new();
+
 		for tag_id in &self.filter_tag_ids {
 			transactions.append(
 				&mut TransactionLoader::new(pool)
 					.set_filter_tag_id(*tag_id, NumberFilterModes::Exact)
 					.set_filter_time_range(from_timestamp, to_timestamp, TimeRangeFilterModes::Between)
-					.get().await?
+					.set_filter_currency_id(self.currency_id, NumberFilterModes::Exact)
+					.get()
+					.await?
+					.into_iter()
+					.filter(|transaction| !transaction.tag_ids.clone().unwrap_or_default().iter().any(|tag_id| retrieved_tag_ids.contains(tag_id)))
+					.collect()
 			);
+
+			retrieved_tag_ids.push(*tag_id);
 		}
 
 		return Ok(transactions);

@@ -15,6 +15,18 @@
 					<input type="text" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 				</div>
 
+				<div v-else-if="field.type == 'boolean'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<input type="checkbox" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
+				</div>
+
+				<div v-else-if="field.type == 'choice'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
+						<option v-for="(item, i) in field.choices" :key="i" :value="item.value">{{item.display}}</option>
+					</select>	
+				</div>
+
 				<div v-else-if="field.type == 'timestamp'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="datetime-local" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
@@ -158,7 +170,6 @@ export default {
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		
-		this.config.data.tag_ids = Array.isArray(this.config.data.tag_ids) ? [...this.config.data.tag_ids] : [null];
 		await this.updateSelectData();
 
 		this.$nextTick(() => {(this as any).$refs.forminput1?.[0].focus()});
@@ -167,7 +178,11 @@ export default {
 	methods: {
 		tagUpdate(selected: number[]) {
 			this.tagsManuallyChanged = true;
-			this.config.data.tag_ids = selected;
+			if(Array.isArray(this.config.data.filter_tag_ids)) {
+				this.config.data.filter_tag_ids = selected;
+			} else {
+				this.config.data.tag_ids = selected;
+			}
 		},
 
 		async send(goBack: boolean) {
@@ -176,12 +191,12 @@ export default {
 				if(typeof this.config.data.id == "number") {
 					res = await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, {
 						method: "PUT",
-						body: await this.config.prepareForApi(this.config.data)
+						body: this.config.prepareForApi(this.config.data)
 					});
 				} else {
 					res = await $fetch(this.config.apiEndpoint, {
 						method: "POST",
-						body: await this.config.prepareForApi(this.config.data)
+						body: this.config.prepareForApi(this.config.data)
 					});
 				}
 			} catch(e: any) {
@@ -211,7 +226,7 @@ export default {
 		async updateSelectData() {
 			this.selectData = {
 				options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
-				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : [],
+				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : this.config.data.filter_tag_ids ? [...this.config.data.filter_tag_ids] : [],
 				label: "Tags:"
 			};
 		},
@@ -248,7 +263,7 @@ export default {
 	},
 
 	watch: {
-		"config.data.recipient_id": async function(oldVal, newVal) {
+		"config.data.recipient_id": async function() {
 			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged && typeof this.config.data.id != "number") {
 				const tag_idsOfRecipient = this.recipients.filter(x => x.id === this.config.data.recipient_id)[0].tag_ids;
 				this.config.data.tag_ids = tag_idsOfRecipient;

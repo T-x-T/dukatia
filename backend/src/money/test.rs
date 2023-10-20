@@ -52,6 +52,70 @@ mod fix_minor_amounts {
 	}
 }
 
+mod negate {
+	use super::*;
+
+	#[test]
+	fn works_with_positive_major_and_is_negative_none() {
+		let money = Money {
+			major: 100,
+			minor: 50,
+			minor_in_major: 100,
+			symbol: "€".to_string(),
+			is_negative: None,
+		}.negate();
+		assert_eq!(money.to_string(), "-100.50€");
+	}
+
+	#[test]
+	fn works_with_negative_major_and_is_negative_none() {
+		let money = Money {
+			major: -100,
+			minor: 50,
+			minor_in_major: 100,
+			symbol: "€".to_string(),
+			is_negative: None,
+		}.negate();
+		assert_eq!(money.to_string(), "100.50€");
+	}
+
+	#[test]
+	fn works_with_positive_major_and_is_negative_true() {
+		let money = Money {
+			major: 100,
+			minor: 50,
+			minor_in_major: 100,
+			symbol: "€".to_string(),
+			is_negative: Some(true),
+		}.negate();
+		assert_eq!(money.to_string(), "100.50€");
+	}
+
+	#[test]
+	fn works_with_positive_major_and_is_negative_false() {
+		let money = Money {
+			major: 100,
+			minor: 50,
+			minor_in_major: 100,
+			symbol: "€".to_string(),
+			is_negative: Some(false),
+		}.negate();
+		assert_eq!(money.to_string(), "-100.50€");
+	}
+
+	#[test]
+	fn works_with_negative_major_and_is_negative_true() {
+		let money = Money {
+			major: -100,
+			minor: 50,
+			minor_in_major: 100,
+			symbol: "€".to_string(),
+			is_negative: Some(true),
+		}.negate();
+		assert_eq!(money.to_string(), "100.50€");
+	}
+}
+
 mod add {
 	use super::*;
 

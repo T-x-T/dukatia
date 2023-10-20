@@ -2,6 +2,7 @@ use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responde
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
 use super::Period;
+use crate::money::Money;
 use crate::webserver::{AppState, is_authorized};
 use crate::traits::*;
 
@@ -112,7 +113,7 @@ struct BudgetPost {
 	name: String,
 	rollover: bool,
 	period: u8,
-	amount: u32,
+	amount: Money,
 	filter_tag_ids: Vec<u32>,
 	currency_id: u32,
 	active_from: DateTime<Utc>,
@@ -138,7 +139,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budge
 			4 => Period::Yearly,
 			_ => panic!("unknown period"),
 		})
-		.set_amount(body.amount)
+		.set_amount(body.amount.clone())
 		.set_filter_tag_ids(body.filter_tag_ids.clone())
 		.set_currency_id(body.currency_id)
 		.set_active_from(body.active_from)
@@ -171,7 +172,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budget
 			4 => Period::Yearly,
 			_ => panic!("unknown period"),
 		})
-		.set_amount(body.amount)
+		.set_amount(body.amount.clone())
 		.set_filter_tag_ids(body.filter_tag_ids.clone())
 		.set_currency_id(body.currency_id)
 		.set_active_from(body.active_from)

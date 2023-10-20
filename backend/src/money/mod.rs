@@ -44,6 +44,20 @@ impl Money {
 		return self;
 	}
 
+	pub fn negate(mut self) -> Self {
+		if self.major.is_negative() || self.is_negative.unwrap_or(false) {
+			if self.major.is_negative() {
+				self.major *= -1;
+			}
+			self.is_negative = Some(false);
+		} else {
+			self.major *= -1;
+			self.is_negative = Some(true);
+		}
+
+		return self;
+	}
+
 	pub fn get_minor_in_major(&self) -> u32 {
 		return self.minor_in_major;
 	}
