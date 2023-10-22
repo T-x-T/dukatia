@@ -28,8 +28,8 @@ export default {
 			...this.$detailPageConfig().budget,
 			data: {
 				...this.budget,
-				active_from: new Date(new Date(this.budget.active_from).valueOf() - new Date(this.budget.active_from).getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - new Date(this.budget.active_to).getTimezoneOffset() * 60000).toISOString().slice(0, -8) : null,
+				active_from: new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
+				active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : null,
 			},
 		}
 	}

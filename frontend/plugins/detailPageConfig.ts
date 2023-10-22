@@ -306,8 +306,8 @@ export default defineNuxtPlugin(_nuxtApp => {
 						period: x.period,
 						filter_tag_ids: x.filter_tag_ids,
 						currency_id: x.currency_id,
-						active_from: new Date(new Date(x.active_from).valueOf() - new Date(x.active_from).getTimezoneOffset() * 60000).toISOString(),
-						active_to: x.active_to ? new Date(new Date(x.active_to).valueOf() - new Date(x.active_to).getTimezoneOffset() * 60000).toISOString() : null,
+						active_from: new Date(x.active_from).toISOString(),
+						active_to: x.active_to ? new Date(x.active_to).toISOString() : null,
 					}),
 					defaultData: {
 						name: "",

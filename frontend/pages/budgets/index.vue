@@ -55,8 +55,8 @@ export default {
 				currencies.filter(y => y.id === x.currency_id)[0].name,
 				x.rollover ? "Enabled" : "Disabled",
 				x.period === 0 ? "Daily" : x.period === 1 ? "Weekly" : x.period === 2 ? "Monthly" : x.period === 3 ? "Quarterly" : "Yearly",
-				new Date(x.active_from).toISOString().substring(0, 10),
-				x.active_to == undefined ? "" : new Date(x.active_to).toISOString().substring(0, 10),
+				new Date(new Date(x.active_from).valueOf() - (new Date(x.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
+				x.active_to ? new Date(new Date(x.active_to).valueOf() - (new Date(x.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : null,
 				`${x.amount.major >= 0 && x.amount.is_negative ? "-" : ""}${x.amount.major}.${x.amount.minor.toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.used_amount === undefined ? "" : x.used_amount.major >= 0 && x.used_amount.is_negative ? "-" : ""}${x.used_amount === undefined ? "0": x.used_amount.major}.${(x.used_amount === undefined ? 0 : x.used_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.available_amount === undefined ? "" : x.available_amount.major >= 0 && x.available_amount.is_negative ? "-" : ""}${x.available_amount === undefined ? "0": x.available_amount.major}.${(x.available_amount === undefined ? 0 : x.available_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
@@ -71,7 +71,7 @@ export default {
 			await useRouter().push(`/budgets/${row[0]}`);
 		},
 
-		async newRecipient() {
+		async newBudget() {
 			await useRouter().push("/budgets/new");
 		},
 

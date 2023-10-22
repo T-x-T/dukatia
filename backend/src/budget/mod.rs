@@ -114,7 +114,15 @@ impl Budget {
 	}
 
 	pub async fn calculate_utilization(mut self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
-		let period = self.get_period_at_timestamp(Utc::now());
+		let mut period = self.get_period_at_timestamp(Utc::now());
+		
+		if period.0 < self.active_from {
+			period.0 = self.active_from;
+		}
+		if self.active_to.is_some() && period.1 > self.active_to.unwrap() {
+			period.1 = self.active_to.unwrap();
+		}
+
 		let transactions = self.get_transactions(pool, period.0, period.1).await?;
 
 		if transactions.is_empty() {
