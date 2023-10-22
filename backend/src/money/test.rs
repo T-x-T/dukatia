@@ -135,6 +135,21 @@ mod add {
 		assert_eq!(money.to_string(), "24.00€");
 	}
 }
+mod mul_u32 {
+	use super::*;
+
+	#[test]
+	fn works() {
+		let money = Money::from_amount(123, 100, "€".to_string()) * 3;
+		assert_eq!(money.to_string(), "3.69€");
+	}
+
+	#[test]
+	fn works_with_negative() {
+		let money = Money::from_amount(123, 100, "€".to_string()) * -3;
+		assert_eq!(money.to_string(), "-3.69€");
+	}
+}
 
 mod sub {
 	use super::*;

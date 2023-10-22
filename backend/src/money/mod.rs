@@ -94,6 +94,14 @@ impl std::ops::Sub for Money {
 	}
 }
 
+impl std::ops::Mul<i32> for Money {
+	type Output = Money;
+
+	fn mul(self, rhs: i32) -> Self::Output {
+		return Money::from_amount(self.to_amount() * rhs, self.minor_in_major, self.symbol);
+	}
+}
+
 impl std::iter::Sum<Money> for i32 {
 	fn sum<I: Iterator<Item = Money>>(iter: I) -> i32 {
 		return iter.map(|x| x.to_amount()).sum();

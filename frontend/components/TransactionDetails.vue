@@ -27,12 +27,10 @@ export default {
 	},
 
 	async created() {
-		let transaction = await $fetch(`/api/v1/transactions/${this.transaction.id}`);
+		let transaction = this.transaction.id ? await $fetch(`/api/v1/transactions/${this.transaction.id}`) : this.default_transaction;
 		transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
 		transaction.asset_id = transaction.asset?.id;
-		console.log(transaction.timestamp)
 		transaction.timestamp = new Date(new Date(transaction.timestamp).valueOf() - (new Date(transaction.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
-		console.log(transaction.timestamp)
 		
 		this.config = {
 			fields: [

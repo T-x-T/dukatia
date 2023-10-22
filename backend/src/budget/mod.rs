@@ -115,12 +115,19 @@ impl Budget {
 
 	pub async fn calculate_utilization(mut self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
 		let mut period = self.get_period_at_timestamp(Utc::now());
-		
+		let mut period_count: i32 = 1;
+
 		if period.0 < self.active_from {
 			period.0 = self.active_from;
 		}
 		if self.active_to.is_some() && period.1 > self.active_to.unwrap() {
 			period.1 = self.active_to.unwrap();
+		}
+
+		if self.rollover {
+			period.0 = self.active_from;
+			period.1 = self.active_to.unwrap_or(Utc::now());
+			period_count = self.get_period_count(period.0, period.1);
 		}
 
 		let transactions = self.get_transactions(pool, period.0, period.1).await?;
@@ -131,15 +138,10 @@ impl Budget {
 			self.used_amount = Some(transactions.into_iter().map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate()).sum());
 		}
 
-		self.available_amount = Some(self.clone().amount - self.clone().used_amount.unwrap());
-		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / f64::from(self.clone().amount.to_amount()));
+		self.available_amount = Some(self.clone().amount * period_count - self.clone().used_amount.unwrap());
+		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / (f64::from(self.clone().amount.to_amount() * period_count)));
 
 		return Ok(self);
-	}
-
-	#[allow(dead_code)]
-	pub async fn get_all_transactions(&self, pool: &Pool) -> Result<Vec<Transaction>, Box<dyn Error>> {
-		return self.get_transactions(pool, DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC).await;
 	}
 
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
@@ -164,6 +166,42 @@ impl Budget {
 		}
 
 		return Ok(transactions);
+	}
+
+	fn get_period_count(&self, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> i32 {
+		match self.period {
+			Period::Daily => {
+				let from_day_count = from_timestamp.num_days_from_ce();
+				let to_day_count = to_timestamp.num_days_from_ce();
+				
+				return to_day_count - from_day_count;
+			},
+			Period::Weekly => {
+				let from_day_count = f64::from(from_timestamp.num_days_from_ce()) / 7.0;
+				let to_day_count = f64::from(to_timestamp.num_days_from_ce()) / 7.0;
+
+				return (to_day_count - from_day_count).ceil() as i32;
+			},
+			Period::Monthly => {
+				if from_timestamp.year() == to_timestamp.year() {
+					return (to_timestamp.month() - from_timestamp.month()) as i32 + 1;
+				} else {
+					let years = to_timestamp.year() - from_timestamp.year();
+					return (to_timestamp.month() - from_timestamp.month()) as i32 + (years * 12) + 1;
+				}
+			},
+			Period::Quarterly => {
+				if from_timestamp.year() == to_timestamp.year() {
+					return ((to_timestamp.month() - from_timestamp.month()) as f64 / 4.0).ceil() as i32;
+				} else {
+					let years = to_timestamp.year() - from_timestamp.year();
+					return ((to_timestamp.month() - from_timestamp.month()) as f64 / 4.0).ceil() as i32 + (years * 4);
+				}
+			},
+			Period::Yearly => {
+				return to_timestamp.year() - from_timestamp.year() + 1;
+			},
+		}
 	}
 
 	fn get_period_at_timestamp(&self, timestamp: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {

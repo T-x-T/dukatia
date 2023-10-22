@@ -3472,7 +3472,12 @@
 						"name": "test",
 						"rollover": true,
 						"period": 1,
-						"amount": 1000,
+						"amount": {
+							"major": 10,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "€"
+						},
 						"filter_tag_ids": [0, 2],
 						"currency_id": 0,
 						"active_from": "2021-02-04T12:34:56Z",
@@ -3488,7 +3493,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Weekly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":7310,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3497,7 +3502,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Weekly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}
+						"body_equals": {"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":7310,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}
 					}
 				},
 				{
@@ -3517,7 +3522,12 @@
 						"name": "edited test",
 						"rollover": false,
 						"period": 2,
-						"amount": 2000,
+						"amount": {
+							"major": 20,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "$"
+						},
 						"filter_tag_ids": [2, 1],
 						"currency_id": 1,
 						"active_from": "2020-02-04T12:34:56Z",
@@ -3533,7 +3543,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3544,7 +3554,12 @@
 						"name": "test for deletion",
 						"rollover": true,
 						"period": 1,
-						"amount": 1000,
+						"amount": {
+							"major": 10,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "$"
+						},
 						"filter_tag_ids": [0, 2],
 						"currency_id": 1,
 						"active_from": "2021-02-04T12:34:56Z",
@@ -3568,7 +3583,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3579,7 +3594,12 @@
 						"name": "test 2",
 						"rollover": false,
 						"period": 3,
-						"amount": 1378,
+						"amount": {
+							"major": 13,
+							"minor": 78,
+							"minor_in_major": 100,
+							"symbol": "€"
+						},
 						"filter_tag_ids": [0, 2],
 						"currency_id": 0,
 						"active_from": "2021-02-04T12:34:56Z",
@@ -3597,7 +3617,12 @@
 						"name": "test 3",
 						"rollover": false,
 						"period": 3,
-						"amount": 1378,
+						"amount": {
+							"major": 13,
+							"minor": 78,
+							"minor_in_major": 100,
+							"symbol": "$"
+						},
 						"filter_tag_ids": [0, 2],
 						"currency_id": 1,
 						"active_from": "2020-02-04T12:34:56Z",
@@ -3615,7 +3640,12 @@
 						"name": "test 4",
 						"rollover": true,
 						"period": 3,
-						"amount": 1378,
+						"amount": {
+							"major": 13,
+							"minor": 78,
+							"minor_in_major": 100,
+							"symbol": "€"
+						},
 						"filter_tag_ids": [1, 2],
 						"currency_id": 0,
 						"active_from": "2021-02-04T12:34:56Z",
@@ -3633,7 +3663,12 @@
 						"name": "test 5",
 						"rollover": false,
 						"period": 3,
-						"amount": 1378,
+						"amount": {
+							"major": 13,
+							"minor": 78,
+							"minor_in_major": 100,
+							"symbol": "€"
+						},
 						"filter_tag_ids": [0, 2],
 						"currency_id": 0,
 						"active_from": "2021-02-04T12:34:56Z",
@@ -3649,7 +3684,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":771,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3658,7 +3693,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":771,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3667,7 +3702,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":771,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3676,7 +3711,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":771,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3685,7 +3720,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3694,7 +3729,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3703,7 +3738,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -3955,11 +3990,11 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Monthly","filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
-							{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854},
-							{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
-							{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":"Quarterly","filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":3,"minor":90,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":9,"minor":88,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.2830188679245283},
-							{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":"Quarterly","filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854}
+							{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
+							{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854},
+							{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},
+							{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":6,"minor":35,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":765,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.008228799502384409},
+							{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854}
 						]
 					}
 				}
