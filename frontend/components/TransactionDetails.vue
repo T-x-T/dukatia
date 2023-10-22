@@ -27,8 +27,12 @@ export default {
 	},
 
 	async created() {
-		this.transaction.tag_ids = Array.isArray(this.transaction.tag_ids) ? [...this.transaction.tag_ids] : [];
-		this.transaction.asset_id = this.transaction.asset?.id;
+		let transaction = await $fetch(`/api/v1/transactions/${this.transaction.id}`);
+		transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
+		transaction.asset_id = transaction.asset?.id;
+		console.log(transaction.timestamp)
+		transaction.timestamp = new Date(new Date(transaction.timestamp).valueOf() - (new Date(transaction.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
+		console.log(transaction.timestamp)
 		
 		this.config = {
 			fields: [
@@ -77,7 +81,7 @@ export default {
 					addNew: true
 				}
 			],
-			data: this.transaction,
+			data: transaction,
 			apiEndpoint: "/api/v1/transactions",
 			populateTagsUsingRecipient: true,
 			prepareForApi: (x: Transaction) => {
