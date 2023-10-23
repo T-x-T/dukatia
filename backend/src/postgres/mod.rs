@@ -52,7 +52,7 @@ async fn get_schema_version(config: &Config) -> u32 {
 		.query("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename=$1);", &[&"Meta"])
 		.await
 		.expect("error trying to find out if database schema is version 0")
-		.get(0)
+		.first()
 		.unwrap()
 		.get(0);
 
@@ -61,7 +61,7 @@ async fn get_schema_version(config: &Config) -> u32 {
 			.query("SELECT schema_version FROM public.\"Meta\";", &[])
 			.await
 			.unwrap()
-			.get(0)
+			.first()
 			.unwrap()
 			.get(0);
 		return version as u32;
