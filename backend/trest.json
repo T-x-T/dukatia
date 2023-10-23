@@ -2320,7 +2320,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":10,"user_id":0,"chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2342,7 +2342,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2364,7 +2364,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":12,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":12,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2387,7 +2387,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2410,7 +2410,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2433,7 +2433,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2456,7 +2456,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period":"monthly","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2479,7 +2479,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2502,7 +2502,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
@@ -2525,7 +2525,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period":"daily","asset_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 
@@ -2559,7 +2559,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":20,"user_id":0,"chart_type":"line","title":"test","text_template":null,"filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"asset_amount","date_period":"daily","asset_id":null,"max_items":12,"date_range":3,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
+						"body_equals": {"id":20,"user_id":0,"chart_type":"line","title":"test","text_template":null,"filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"asset_amount","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
 					}
 				},
 				{
@@ -2585,12 +2585,12 @@
 					}
 				},
 				{
-					"name": "chart with all options got created correctly",
+					"name": "chart with all options modified got created correctly",
 					"endpoint": "/api/v1/charts/20",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":20,"user_id":0,"chart_type":"pie","title":"test2","text_template":null,"filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"tags","date_period":"monthly","asset_id":null,"max_items":2,"date_range":1,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
+						"body_equals": {"id":20,"user_id":0,"chart_type":"pie","title":"test2","text_template":null,"filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"tags","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
 					}
 				},
 				{

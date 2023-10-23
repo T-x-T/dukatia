@@ -113,8 +113,12 @@ impl Budget {
 		return self;
 	}
 
-	pub async fn calculate_utilization(mut self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
-		let mut period = self.get_period_at_timestamp(Utc::now());
+	pub async fn calculate_utilization(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
+		return self.calculate_utilization_at(pool, Utc::now()).await;
+	}
+
+	pub async fn calculate_utilization_at(mut self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Self, Box<dyn Error>> {
+		let mut period = self.get_period_at_timestamp(timestamp);
 		let mut period_count: i32 = 1;
 
 		if period.0 < self.active_from {
@@ -185,18 +189,18 @@ impl Budget {
 			Period::Monthly => {
 				if from_timestamp.year() == to_timestamp.year() {
 					return (to_timestamp.month() - from_timestamp.month()) as i32 + 1;
-				} else {
-					let years = to_timestamp.year() - from_timestamp.year();
-					return (to_timestamp.month() - from_timestamp.month()) as i32 + (years * 12) + 1;
 				}
+
+				let years = to_timestamp.year() - from_timestamp.year();
+				return (to_timestamp.month() - from_timestamp.month()) as i32 + (years * 12) + 1;
 			},
 			Period::Quarterly => {
 				if from_timestamp.year() == to_timestamp.year() {
-					return ((to_timestamp.month() - from_timestamp.month()) as f64 / 4.0).ceil() as i32;
-				} else {
-					let years = to_timestamp.year() - from_timestamp.year();
-					return ((to_timestamp.month() - from_timestamp.month()) as f64 / 4.0).ceil() as i32 + (years * 4);
+					return (f64::from(to_timestamp.month() - from_timestamp.month()) / 4.0).ceil() as i32;
 				}
+
+				let years = to_timestamp.year() - from_timestamp.year();
+				return (f64::from(to_timestamp.month() - from_timestamp.month()) / 4.0).ceil() as i32 + (years * 4);
 			},
 			Period::Yearly => {
 				return to_timestamp.year() - from_timestamp.year() + 1;

@@ -39,6 +39,7 @@ pub struct ChartOptions {
 	pub only_parents: Option<bool>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
+	pub budget_id: Option<u32>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
 }
@@ -51,6 +52,19 @@ async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart
 	};
 
 	match super::get_chart_contents_by_id(&data.pool, chart_id.into_inner(), options.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	}
+}
+
+#[get("/api/v1/charts/{chart_type}/{filter_collection}/data")]
+async fn get_chart_data_by_type_filter_collection(data: web::Data<AppState>, req: HttpRequest, path: web::Path<(String, String)>, options: web::Query<ChartOptions>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match super::get_chart_data_by_type_filter_collection(&data.pool, path.0.clone(), path.1.clone(), options.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -91,6 +105,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
 		asset_id: None,
+		budget_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
 		top_left_x: body.top_left_x,
@@ -123,6 +138,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
 		asset_id: None,
+		budget_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
 		top_left_x: body.top_left_x,

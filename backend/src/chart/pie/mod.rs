@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod test;
+
 use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
@@ -11,6 +14,8 @@ use crate::traits::*;
 use crate::currency;
 use crate::recipient;
 use crate::tag;
+use crate::budget;
+use crate::money::Money;
 
 pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<dyn Error>> {
 	if chart.filter_collection.is_none() {
@@ -20,6 +25,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 	let output = match chart.filter_collection.as_ref().unwrap().as_str() {
 		"recipients" => compute_recipients(pool, chart).await?,
 		"tags" => compute_tags(pool, chart).await?,
+		"single_budget_current_period" => compute_single_budget_current_period(pool, chart).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Pie chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
@@ -78,6 +84,34 @@ async fn compute_tags(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String,
 	let limited_output: Vec<(String, (String, f64))> = sorted_output.into_iter().take(chart.max_items.unwrap_or(u32::MAX) as usize).collect();
 
 	return Ok(limited_output);
+}
+
+async fn compute_single_budget_current_period(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
+	if chart.budget_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
+	}
+	
+	let budget: budget::Budget = budget::BudgetLoader::new(pool)
+		.set_filter_id(chart.budget_id.unwrap(), NumberFilterModes::Exact)
+		.get_first()
+		.await?
+		.calculate_utilization_at(pool, chart.filter_from.unwrap_or(chrono::Utc::now()))
+		.await?;
+
+	return Ok(actually_compute_single_budget_current_period(budget));
+}
+
+fn actually_compute_single_budget_current_period(budget: budget::Budget) -> Vec<(String, (String, f64))> {
+	let mut output: Vec<(String, (String, f64))> = Vec::new();
+
+	let used_amount: Money = budget.used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let raw_available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let available_amount: Money = if raw_available_amount.to_amount().is_negative() { Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()) } else { raw_available_amount.clone() };
+
+	output.push(("used".to_string(), (used_amount.to_string(), f64::from(used_amount.to_amount()))));
+	output.push(("available".to_string(), (available_amount.to_string(), f64::from(available_amount.to_amount()))));
+
+	return output;
 }
 
 async fn get_relevant_transactions(pool: &Pool, chart: &Chart) -> Result<Vec<Transaction>, Box<dyn Error>> {
