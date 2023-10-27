@@ -5,6 +5,7 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
 use chrono::{MIN_DATETIME, MAX_DATETIME};
+use chrono::prelude::*;
 
 use super::{Chart, ChartData};
 
@@ -26,6 +27,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		"recipients" => compute_recipients(pool, chart).await?,
 		"tags" => compute_tags(pool, chart).await?,
 		"single_budget_current_period" => compute_single_budget_current_period(pool, chart).await?,
+		"single_budget_previous_period" => compute_single_budget_previous_period(pool, chart).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Pie chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
@@ -95,13 +97,36 @@ async fn compute_single_budget_current_period(pool: &Pool, chart: Chart) -> Resu
 		.set_filter_id(chart.budget_id.unwrap(), NumberFilterModes::Exact)
 		.get_first()
 		.await?
-		.calculate_utilization_at(pool, chart.filter_from.unwrap_or(chrono::Utc::now()))
+		.calculate_utilization_of_current_period(pool)
 		.await?;
 
-	return Ok(actually_compute_single_budget_current_period(budget));
+	return Ok(actually_compute_single_budget_period(budget));
 }
 
-fn actually_compute_single_budget_current_period(budget: budget::Budget) -> Vec<(String, (String, f64))> {
+async fn compute_single_budget_previous_period(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {
+	if chart.budget_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
+	}
+	
+	let budget: budget::Budget = budget::BudgetLoader::new(pool)
+		.set_filter_id(chart.budget_id.unwrap(), NumberFilterModes::Exact)
+		.get_first()
+		.await?;
+
+	let timestamp_for_calculation: DateTime<Utc> = match budget.period {
+    budget::Period::Daily => Utc::now().checked_sub_days(chrono::Days::new(1)).unwrap(),
+    budget::Period::Weekly => Utc::now().checked_sub_days(chrono::Days::new(7)).unwrap(),
+    budget::Period::Monthly => Utc::now().checked_sub_months(chrono::Months::new(1)).unwrap(),
+    budget::Period::Quarterly => Utc::now().checked_sub_months(chrono::Months::new(3)).unwrap(),
+    budget::Period::Yearly => Utc::now().checked_sub_months(chrono::Months::new(12)).unwrap(),
+	};
+
+	let budget = budget.calculate_utilization_of_period_at(pool, timestamp_for_calculation).await?;
+
+	return Ok(actually_compute_single_budget_period(budget));
+}
+
+fn actually_compute_single_budget_period(budget: budget::Budget) -> Vec<(String, (String, f64))> {
 	let mut output: Vec<(String, (String, f64))> = Vec::new();
 
 	let used_amount: Money = budget.used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));

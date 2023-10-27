@@ -108,6 +108,43 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 	}
 }
 
+#[get("/api/v1/budgets/{budget_id}/transactions")]
+async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	let budget = super::BudgetLoader::new(&data.pool)
+		.set_filter_id(*budget_id, NumberFilterModes::Exact)
+		.get_first()
+		.await;
+
+	match budget {
+		Ok(budget) => {
+			let transactions = budget.get_transactions_of_period_at(&data.pool, Utc::now()).await;
+
+			match transactions {
+				Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+				Err(e) => {
+					if e.to_string().starts_with("no item of type unknown found") {
+						return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+					}
+					
+					return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
+				}
+			}
+		},
+		Err(e) => {
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+			}
+			
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
+		}
+	}
+}
+
 #[derive(Debug, Deserialize)]
 struct BudgetPost {
 	name: String,

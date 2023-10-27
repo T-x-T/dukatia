@@ -139,7 +139,7 @@
 			</tbody>
 		</table>
 		<div id="bottom_bar" class="background_color_darkest">
-			<div>
+			<div v-if="!tableData.disable_pagination">
 				<label for="page_size">Rows per Page: </label>
 				<input type="number" name="page_size" v-model="pageSize" @change="updatePage()">
 				<button @click="() => {currentPage=0; updatePage()}">First</button>

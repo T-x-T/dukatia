@@ -84,6 +84,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(budget::rest_api::delete)
 			.service(budget::rest_api::get_all)
 			.service(budget::rest_api::get_by_id)
+			.service(budget::rest_api::get_transactions)
 			.service(budget::rest_api::post)
 			.service(budget::rest_api::put);
 	})

@@ -317,7 +317,10 @@ export default defineNuxtPlugin(_nuxtApp => {
 						filter_tag_ids: [],
 						currency_id: 0,
 						active_from: new Date(),
-					}
+					},
+					deletable: true,
+					noGoBackOnSave: true,
+					noSaveAndNew: true,
 				} as DetailFormConfig,
 			})
     }

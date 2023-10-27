@@ -113,39 +113,58 @@ impl Budget {
 		return self;
 	}
 
-	pub async fn calculate_utilization(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
-		return self.calculate_utilization_at(pool, Utc::now()).await;
+	pub async fn calculate_utilization_of_current_period(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
+		return self.calculate_utilization_of_period_at(pool, Utc::now()).await;
 	}
 
-	pub async fn calculate_utilization_at(mut self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Self, Box<dyn Error>> {
-		let mut period = self.get_period_at_timestamp(timestamp);
+	pub async fn calculate_utilization_of_period_at(mut self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Self, Box<dyn Error>> {
+		let period = self.get_period_at_timestamp(timestamp);
+		let mut date_range = period;
 		let mut period_count: i32 = 1;
 
-		if period.0 < self.active_from {
-			period.0 = self.active_from;
+		if date_range.1 < self.active_from || (self.active_to.is_some() && date_range.0 > self.active_to.unwrap()) {
+			self.used_amount = Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()));
+			self.available_amount = Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()));
+			self.utilization = Some(0.0);
+
+			return Ok(self);
 		}
-		if self.active_to.is_some() && period.1 > self.active_to.unwrap() {
-			period.1 = self.active_to.unwrap();
+
+		if date_range.0 < self.active_from {
+			date_range.0 = self.active_from;
+		}
+		if self.active_to.is_some() && date_range.1 > self.active_to.unwrap() {
+			date_range.1 = self.active_to.unwrap();
 		}
 
 		if self.rollover {
-			period.0 = self.active_from;
-			period.1 = self.active_to.unwrap_or(Utc::now());
-			period_count = self.get_period_count(period.0, period.1);
+			date_range.0 = self.active_from;
+			period_count = self.get_period_count(date_range.0, date_range.1);
 		}
 
-		let transactions = self.get_transactions(pool, period.0, period.1).await?;
+		let transactions = self.get_transactions(pool, date_range.0, date_range.1).await?;
 
 		if transactions.is_empty() {
 			self.used_amount = Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()));
 		} else {
-			self.used_amount = Some(transactions.into_iter().map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate()).sum());
+			self.used_amount = Some(
+				transactions.into_iter()
+					.filter(|x| x.timestamp > period.0)
+					.map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate())
+					.sum()
+			);
 		}
 
 		self.available_amount = Some(self.clone().amount * period_count - self.clone().used_amount.unwrap());
 		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / (f64::from(self.clone().amount.to_amount() * period_count)));
 
 		return Ok(self);
+	}
+
+	pub async fn get_transactions_of_period_at(&self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
+		let period = self.get_period_at_timestamp(timestamp);
+		
+		return self.get_transactions(pool, period.0, period.1).await;
 	}
 
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
@@ -206,6 +225,23 @@ impl Budget {
 				return to_timestamp.year() - from_timestamp.year() + 1;
 			},
 		}
+	}
+
+	pub fn get_past_and_current_periods(&self, max_date: DateTime<Utc>) -> Vec<(DateTime<Utc>, DateTime<Utc>)> {
+		let mut output: Vec<(DateTime<Utc>, DateTime<Utc>)> = vec![self.get_period_at_timestamp(self.active_from)];
+		
+		loop {
+			#[allow(clippy::if_same_then_else)]
+			if self.active_to.is_some() && (output.last().unwrap().1 >= self.active_to.unwrap()) {
+				break;
+			} else if output.last().unwrap().1 >= max_date {
+				break;
+			}
+
+			output.push(self.get_period_at_timestamp(output.last().unwrap().1.checked_add_days(chrono::Days::new(1)).unwrap()));
+		}
+
+		return output;
 	}
 
 	fn get_period_at_timestamp(&self, timestamp: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
@@ -272,7 +308,7 @@ impl<'a> BudgetLoader<'a> {
 		let mut budgets: Vec<Budget> = Vec::new();
 
 		for x in res {
-			budgets.push(x.calculate_utilization(self.pool).await?);
+			budgets.push(x.calculate_utilization_of_current_period(self.pool).await?);
 		}
 
 		return Ok(budgets);
@@ -281,7 +317,7 @@ impl<'a> BudgetLoader<'a> {
 	async fn get_first_full(self) -> Result<Budget, Box<dyn Error>> {
 		let res = self.clone().get_first().await?;
 
-		return res.calculate_utilization(self.pool).await;
+		return res.calculate_utilization_of_current_period(self.pool).await;
 	}
 }
 

@@ -151,10 +151,9 @@ declare global {
 		defaultSort: TableSort,
 		columns: Column[],
 		rows: Row[],
-		displaySum?: boolean,
-		sumColumn?: number,
 		row_count?: number,
 		total_amount?: number,
+		disable_pagination?: boolean,
 	}
 
 	type TableFilterOption = 

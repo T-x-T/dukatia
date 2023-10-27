@@ -6,12 +6,32 @@
 					v-if="Object.keys(config).length > 0"
 					:config="config"
 					v-on:back="$emit('back')"
+					v-on:updateData="update"
 				/>
 			</div>
 
-			<div v-if="budget?.id !== undefined && render_charts" class="gridItem pie_chart">
+			<div v-if="chart_utilization_current_period" class="gridItem pie_chart">
+				<h3>Current Period</h3>
 				<ChartPie
-					:pie="chart_utilization"
+					:pie="chart_utilization_current_period"
+				/>
+			</div>
+			<div v-if="chart_utilization_previous_period" class="gridItem pie_chart">
+				<h3>Previous Period</h3>
+				<ChartPie
+					:pie="chart_utilization_previous_period"
+				/>
+			</div>
+			<div v-if="chart_utilization_history" class="gridItem line_chart">
+				<h3>Utilization History</h3>
+				<ChartLine
+					:line="chart_utilization_history"
+				/>
+			</div>
+			<div v-if="Object.keys(table_data).length > 0" class="gridItem">
+				<h3>Transactions in current Period</h3>
+				<CustomTable
+					:tableDataProp="table_data"
 				/>
 			</div>
 		</div>
@@ -22,8 +42,10 @@
 export default {
 	data: () => ({
 		config: {} as DetailFormConfig,
-		render_charts: false,
-		chart_utilization: {} as ChartOptions,
+		chart_utilization_current_period: null as any,
+		chart_utilization_previous_period: null as any,
+		chart_utilization_history: null as any,
+		table_data: {} as TableData,
 	}),
 
 	props: {
@@ -51,8 +73,58 @@ export default {
 			}
 
 			if(this.budget?.id !== undefined) {
-				this.chart_utilization = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
-				this.render_charts = true;
+				this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
+				
+				const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${this.budget.id}`)).pie;
+				if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
+					this.chart_utilization_previous_period = chart_utilization_previous_period;
+				}
+
+				this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${this.budget.id}`)).line;
+
+				const transactions = await $fetch(`/api/v1/budgets/${this.budget.id}/transactions`) as Transaction[];
+				const accounts = await $fetch("/api/v1/accounts/all") as Account[];
+				const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
+				const recipients = await $fetch("/api/v1/recipients/all") as Recipient[];
+				const tags = await $fetch("/api/v1/tags/all") as Tag[];
+ 
+				const transactionsForDisplay = transactions.map(x => {
+					x.account = accounts.filter(a => a.id === x.account_id)[0];
+					x.currency = currencies.filter(c => c.id === x.currency_id)[0];
+					x.recipient = recipients.filter(r => r.id === x.recipient_id)[0];
+					return x;
+				});
+				this.table_data = {} as TableData;
+				this.$nextTick(() => {
+					this.table_data = {
+						multiSelect: false,
+						disable_pagination: true,
+						defaultSort: {
+							column: 4,
+							sort: "desc"
+						},
+						columns: [
+							{name: "ID", type: "number", sortable: false, no_filter: true},
+							{name: "Account", type: "string", sortable: false, no_filter: true},
+							{name: "Recipient", type: "string", sortable: false, no_filter: true},
+							{name: "Asset", type: "string", sortable: false, no_filter: true},
+							{name: "Timestamp", type: "date", sortable: false, no_filter: true},
+							{name: "Amount", type: "number", sortable: false, no_filter: true},
+							{name: "Comment", type: "string", sortable: false, no_filter: true},
+							{name: "Tags", type: "string", sortable: false, no_filter: true},
+						],
+						rows: transactionsForDisplay.map(x => ([
+							x.id,
+							x.account?.name,
+							x.recipient?.name,
+							x.asset ? x.asset.name : "",
+							new Date(new Date(x.timestamp).valueOf() - (new Date(x.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
+							`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
+							x.comment,
+							tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+						]))
+					};
+				});
 			}
 		}
 	}
@@ -60,6 +132,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+
+h3
+	text-align: center
+	font-size: 1.5em
 
 div#grid
 	display: flex
@@ -81,5 +157,9 @@ div.gridItem
 
 div.pie_chart
 	width: 20em
+	height: 20em
+
+div.line_chart
+	width: 60em
 	height: 20em
 </style>
