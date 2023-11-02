@@ -1,5 +1,11 @@
 <template>
 	<div>
+		<div v-if="chart_utilization_overview" class="gridItem line_chart">
+			<h3>Current period utilization overview</h3>
+			<ChartBar
+				:bar="chart_utilization_overview"
+			/>
+		</div>
 		<button class="green" @click="newBudget">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
@@ -22,12 +28,14 @@ export default {
 			skip_results: 0,
 			max_results: 50,
 		} as QueryParameters,
+		chart_utilization_overview: null as any
 	}),
 
 	async mounted() {
 		const budgets = await $fetch("/api/v1/budgets/all") as Budget[];
 		const tags = await $fetch("/api/v1/tags/all") as Tag[];
 		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
+		this.chart_utilization_overview = (await $fetch(`/api/v1/charts/bar/compute_all_budget_utilization_overview/data`)).bar;
 		
 		this.tableData = {
 			multiSelect: false,
@@ -234,3 +242,22 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+
+h3
+	text-align: center
+	font-size: 1.5em
+
+div.gridItem
+	padding: 10px
+
+div.pie_chart
+	width: 20em
+	height: 20em
+
+div.line_chart
+	width: 60em
+	height: 20em
+
+</style>

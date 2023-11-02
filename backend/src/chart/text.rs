@@ -28,7 +28,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		}
 	}
 
-	return Ok(ChartData { text: Some(output), pie: None, line: None });
+	return Ok(ChartData { text: Some(output), pie: None, line: None, bar: None });
 }
 
 async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn Error>> {

@@ -28,6 +28,7 @@ struct RequestParameters {
 	filter_mode_active_to: Option<String>,
 	filter_currency_id: Option<u32>,
 	filter_mode_currency_id: Option<String>,
+	at_timestamp: Option<DateTime<Utc>>,
 }
 
 //TODO: test filters for properties other than id
@@ -77,7 +78,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 			.set_skip_results_opt(request_parameters.skip_results)
 			.set_filters(filters)
 	)
-	.get_full().await;
+	.get_full_at(request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -86,7 +87,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/budgets/{budget_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>) -> impl Responder {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -94,7 +95,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 
 	let result = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
-		.get_first_full().await;
+		.get_first_full_at(request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),

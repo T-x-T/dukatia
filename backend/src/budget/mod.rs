@@ -244,7 +244,7 @@ impl Budget {
 		return output;
 	}
 
-	fn get_period_at_timestamp(&self, timestamp: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
+	pub fn get_period_at_timestamp(&self, timestamp: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
 		match self.period {
 			Period::Daily => {
 				let start = timestamp.date_naive().and_time(NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap()).and_utc();	
@@ -302,22 +302,31 @@ pub struct BudgetLoader<'a> {
 }
 
 impl<'a> BudgetLoader<'a> {
-	async fn get_full(self) -> Result<Vec<Budget>, Box<dyn Error>> {
+	pub async fn get_full(self) -> Result<Vec<Budget>, Box<dyn Error>> {
+		return self.get_full_at(Utc::now()).await;
+	}
+
+	#[allow(dead_code)]
+	pub async fn get_first_full(self) -> Result<Budget, Box<dyn Error>> {
+		return self.get_first_full_at(Utc::now()).await;
+	}
+
+	pub async fn get_full_at(self, timestamp: DateTime<Utc>) -> Result<Vec<Budget>, Box<dyn Error>> {
 		let res = self.clone().get().await?;
 
 		let mut budgets: Vec<Budget> = Vec::new();
 
 		for x in res {
-			budgets.push(x.calculate_utilization_of_current_period(self.pool).await?);
+			budgets.push(x.calculate_utilization_of_period_at(self.pool, timestamp).await?);
 		}
 
 		return Ok(budgets);
 	}
 
-	async fn get_first_full(self) -> Result<Budget, Box<dyn Error>> {
+	pub async fn get_first_full_at(self, timestamp: DateTime<Utc>) -> Result<Budget, Box<dyn Error>> {
 		let res = self.clone().get_first().await?;
 
-		return res.calculate_utilization_of_current_period(self.pool).await;
+		return res.calculate_utilization_of_period_at(self.pool, timestamp).await;
 	}
 }
 

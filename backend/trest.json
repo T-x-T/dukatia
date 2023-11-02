@@ -2764,7 +2764,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 123€\nUSD: 10$\n","pie":null,"line":null}
+						"body_equals": {"text":"Euro: 123€\nUSD: 10$\n","pie":null,"line":null,"bar":null}
 					}
 				},
 				{
@@ -2773,7 +2773,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["test",["-0.45€ 10$ ",9.55]],["Default",["123.45€ ",123.45]]],"line":null}
+						"body_equals": {"text":null,"pie":[["test",["-0.45€ 10$ ",9.55]],["Default",["123.45€ ",123.45]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -2782,7 +2782,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["tag2",["-0.45€ 10$ ",9.55]],["tag1",["123€ ",123.0]]],"line":null}
+						"body_equals": {"text":null,"pie":[["tag2",["-0.45€ 10$ ",9.55]],["tag1",["123€ ",123.0]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -2791,7 +2791,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["test",[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["test",[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -2800,7 +2800,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -2809,7 +2809,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":123.0,"label":"123€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":10.0,"label":"10$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -2818,7 +2818,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}]],["Net",[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}]],["Net",[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]],"bar":null}
 					}
 				},
 
@@ -2995,7 +2995,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 129€\nUSD: 16$\n","pie":null,"line":null}
+						"body_equals": {"text":"Euro: 129€\nUSD: 16$\n","pie":null,"line":null,"bar":null}
 					}
 				},
 				{
@@ -3004,7 +3004,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["test",["3.55€ 16$ ",19.55]],["Default",["125.45€ ",125.45]]],"line":null}
+						"body_equals": {"text":null,"pie":[["test",["3.55€ 16$ ",19.55]],["Default",["125.45€ ",125.45]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3013,7 +3013,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["tag2",["3.55€ 16$ ",19.55]],["tag1",["129€ ",129.0]]],"line":null}
+						"body_equals": {"text":null,"pie":[["tag2",["3.55€ 16$ ",19.55]],["tag1",["129€ ",129.0]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3022,8 +3022,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[
-							["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}]],["test",[{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":14.55,"label":"1.55€ 13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":19.55,"label":"3.55€ 16$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}]],["test",[{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":14.55,"label":"1.55€ 13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":19.55,"label":"3.55€ 16$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3032,7 +3031,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.55,"label":"3.55€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "},{"timestamp":"2123-03-25T00:00:00Z","value":125.45,"label":"125.45€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.55,"label":"3.55€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3041,7 +3040,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "},{"timestamp":"2123-03-25T00:00:00Z","value":129.0,"label":"129€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "},{"timestamp":"2123-03-25T00:00:00Z","value":129.0,"label":"129€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "},{"timestamp":"2123-03-25T00:00:00Z","value":16.0,"label":"16$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3050,7 +3049,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]],"bar":null}
 					}
 				},
 
@@ -3062,7 +3061,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["test",["-0.45€ 10$ ",9.55]],["Default",["123.45€ ",123.45]]],"line":null}
+						"body_equals": {"text":null,"pie":[["test",["-0.45€ 10$ ",9.55]],["Default",["123.45€ ",123.45]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3071,7 +3070,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["tag2",["-0.45€ 10$ ",9.55]],["tag1",["123€ ",123.0]]],"line":null}
+						"body_equals": {"text":null,"pie":[["tag2",["-0.45€ 10$ ",9.55]],["tag1",["123€ ",123.0]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3080,7 +3079,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["test",[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":123.45,"label":"123.45€ "}]],["test",[{"timestamp":"2023-03-25T00:00:00Z","value":9.55,"label":"-0.45€ 10$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3089,7 +3088,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"2023-03-25T00:00:00Z","value":124.45,"label":"124.45€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]],["euro",[{"timestamp":"2023-03-25T00:00:00Z","value":1.55,"label":"1.55€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3098,7 +3097,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"2023-03-25T00:00:00Z","value":126.0,"label":"126€ "}]],["USD",[{"timestamp":"2023-03-25T00:00:00Z","value":13.0,"label":"13$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3107,7 +3106,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}]],["Net",[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"2023-03-25T00:00:00Z","value":133.45,"label":"123.45€ 10$ "}]],["Net",[{"timestamp":"2023-03-25T00:00:00Z","value":133.0,"label":"123€ 10$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.45,"label":"-0.45€ "}]]],"bar":null}
 					}
 				},
 
@@ -3204,7 +3203,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 252€\nUSD: 26$\n","pie":null,"line":null}
+						"body_equals": {"text":"Euro: 252€\nUSD: 26$\n","pie":null,"line":null,"bar":null}
 					}
 				},
 				{
@@ -3213,7 +3212,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["test",["3.1€ 26$ ",29.1]],["Default",["248.9€ ",248.9]]],"line":null}
+						"body_equals": {"text":null,"pie":[["test",["3.1€ 26$ ",29.1]],["Default",["248.9€ ",248.9]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3222,7 +3221,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["tag2",["3.1€ 26$ ",29.1]],["tag1",["252€ ",252.0]]],"line":null}
+						"body_equals": {"text":null,"pie":[["tag2",["3.1€ 26$ ",29.1]],["tag1",["252€ ",252.0]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3231,7 +3230,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["test",[{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":24.1,"label":"1.1€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":29.1,"label":"3.1€ 26$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["test",[{"timestamp":"1923-03-25T00:00:00Z","value":5.0,"label":"2€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":24.1,"label":"1.1€ 23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":29.1,"label":"3.1€ 26$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3240,7 +3239,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.1,"label":"1.1€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.1,"label":"3.1€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.1,"label":"1.1€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.1,"label":"3.1€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3249,7 +3248,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},{"timestamp":"2023-03-25T00:00:00Z","value":249.0,"label":"249€ "},{"timestamp":"2123-03-25T00:00:00Z","value":252.0,"label":"252€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Euro",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3€ "},{"timestamp":"2023-03-25T00:00:00Z","value":249.0,"label":"249€ "},{"timestamp":"2123-03-25T00:00:00Z","value":252.0,"label":"252€ "}]],["USD",[{"timestamp":"1923-03-25T00:00:00Z","value":3.0,"label":"3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":23.0,"label":"23$ "},{"timestamp":"2123-03-25T00:00:00Z","value":26.0,"label":"26$ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3258,7 +3257,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]],"bar":null}
 					}
 				},
 
@@ -3269,7 +3268,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["tag2",["3.1€ 26$ ",29.1]]],"line":null}
+						"body_equals": {"text":null,"pie":[["tag2",["3.1€ 26$ ",29.1]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3278,7 +3277,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":[["test",["3.1€ 26$ ",29.1]]],"line":null}
+						"body_equals": {"text":null,"pie":[["test",["3.1€ 26$ ",29.1]]],"line":null,"bar":null}
 					}
 				},
 				{
@@ -3287,7 +3286,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.1,"label":"1.1€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.1,"label":"3.1€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Default",[{"timestamp":"1923-03-25T00:00:00Z","value":1.0,"label":"1€ "},{"timestamp":"2023-03-25T00:00:00Z","value":247.9,"label":"247.9€ "},{"timestamp":"2123-03-25T00:00:00Z","value":248.9,"label":"248.9€ "}]],["euro",[{"timestamp":"1923-03-25T00:00:00Z","value":2.0,"label":"2€ "},{"timestamp":"2023-03-25T00:00:00Z","value":1.1,"label":"1.1€ "},{"timestamp":"2123-03-25T00:00:00Z","value":3.1,"label":"3.1€ "}]]],"bar":null}
 					}
 				},
 
@@ -3298,7 +3297,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-25T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-25T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-25T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3307,7 +3306,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-03-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-03-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-03-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3316,7 +3315,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]],"bar":null}
 					}
 				},
 				{
@@ -3325,7 +3324,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["Earning",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.9,"label":"246.9€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Net",[{"timestamp":"1923-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "},{"timestamp":"2023-01-01T00:00:00Z","value":266.0,"label":"246€ 20$ "},{"timestamp":"2123-01-01T00:00:00Z","value":6.0,"label":"3€ 3$ "}]],["Spending",[{"timestamp":"2023-01-01T00:00:00Z","value":-0.9,"label":"-0.9€ "}]]],"bar":null}
 					}
 				},
 
@@ -3388,7 +3387,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":12.3,"label":"12.3€"},{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20€"}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":12.3,"label":"12.3€"},{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20€"}]]],"bar":null}
 					}
 				},
 				{
@@ -3397,7 +3396,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":1.23,"label":"1.23€"},{"timestamp":"2022-03-18T00:00:00Z","value":1.0,"label":"1€"}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":1.23,"label":"1.23€"},{"timestamp":"2022-03-18T00:00:00Z","value":1.0,"label":"1€"}]]],"bar":null}
 					}
 				},
 				{
@@ -3406,7 +3405,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":10.0,"label":"10"},{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20"}]]]}
+						"body_equals": {"text":null,"pie":null,"line":[["test",[{"timestamp":"2021-03-18T00:00:00Z","value":10.0,"label":"10"},{"timestamp":"2022-03-18T00:00:00Z","value":20.0,"label":"20"}]]],"bar":null}
 					}
 				}
 			]
@@ -3489,7 +3488,7 @@
 				},
 				{
 					"name": "new budget created correctly",
-					"endpoint": "/api/v1/budgets/all",
+					"endpoint": "/api/v1/budgets/all?at_timestamp=2023-10-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3498,7 +3497,7 @@
 				},
 				{
 					"name": "get single budget by id works",
-					"endpoint": "/api/v1/budgets/0",
+					"endpoint": "/api/v1/budgets/0?at_timestamp=2023-10-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,

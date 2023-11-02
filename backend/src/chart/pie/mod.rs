@@ -31,7 +31,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Pie chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
-	return Ok(ChartData { text: None, pie: Some(output), line: None });
+	return Ok(ChartData { text: None, pie: Some(output), line: None, bar: None });
 }
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, (String, f64))>, Box<dyn Error>> {

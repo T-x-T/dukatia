@@ -2,7 +2,7 @@
 	<div>
 		<BudgetDetails 
 			v-if="Object.keys(budgetData).length > 0"
-			:budget="budgetData"
+			:prop_budget="budgetData"
 			v-on:back="useRouter().push('/budgets')"
 		/>		
 	</div>

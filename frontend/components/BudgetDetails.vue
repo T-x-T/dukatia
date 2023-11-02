@@ -6,7 +6,7 @@
 					v-if="Object.keys(config).length > 0"
 					:config="config"
 					v-on:back="$emit('back')"
-					v-on:updateData="update"
+					v-on:updateData="reload"
 				/>
 			</div>
 
@@ -46,41 +46,59 @@ export default {
 		chart_utilization_previous_period: null as any,
 		chart_utilization_history: null as any,
 		table_data: {} as TableData,
+		budget: {} as Budget,
 	}),
 
 	props: {
-		budget: {
+		prop_budget: {
 			type: Object as PropType<Budget>,
 			required: true,
 		}
 	},
 
 	async created() {
+		this.budget = structuredClone(toRaw(this.prop_budget));
 		await this.update();
 	},
 
 	methods: {
-		async update() {
-			this.budget.filter_tag_ids = Array.isArray(this.budget.filter_tag_ids) ? [...this.budget.filter_tag_ids] : []
+		async reload() {
+			this.budget = await $fetch(`/api/v1/budgets/${this.budget.id}`);
+			await this.update();
+		},
 
-			this.config = {
-				...this.$detailPageConfig().budget,
-				data: {
-					...this.budget,
-					active_from: new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
-					active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : null,
-				},
-			}
+		async update() {
+			this.budget.filter_tag_ids = Array.isArray(this.budget.filter_tag_ids) ? [...this.budget.filter_tag_ids] : [];
+
+			(this as any).config = {};
+			this.$nextTick(() => {
+				this.config = {
+					...this.$detailPageConfig().budget,
+					data: {
+						...this.budget,
+						active_from: new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
+						active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : null,
+					},
+				};
+			});
+
 
 			if(this.budget?.id !== undefined) {
-				this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
-				
-				const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${this.budget.id}`)).pie;
-				if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
-					this.chart_utilization_previous_period = chart_utilization_previous_period;
-				}
+				this.chart_utilization_current_period = null;
+				this.chart_utilization_previous_period = null;
+				this.chart_utilization_history = null;
 
-				this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${this.budget.id}`)).line;
+				this.$nextTick(async () => {
+					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
+					
+					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${this.budget.id}`)).pie;
+					if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
+						this.chart_utilization_previous_period = chart_utilization_previous_period;
+					}
+	
+					this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${this.budget.id}`)).line;
+				});
+
 
 				const transactions = await $fetch(`/api/v1/budgets/${this.budget.id}/transactions`) as Transaction[];
 				const accounts = await $fetch("/api/v1/accounts/all") as Account[];

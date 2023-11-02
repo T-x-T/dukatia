@@ -55,7 +55,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Line chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
-	return Ok(ChartData { text: None, pie: None, line: Some(output) });
+	return Ok(ChartData { text: None, pie: None, line: Some(output), bar: None });
 }
 
 async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
