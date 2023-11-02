@@ -173,7 +173,6 @@ export default {
 			this.$nextTick(() => {
 				this.tableData = {
 					multiSelect: true,
-					displaySum: true,
 					row_count: this.total_row_count,
 					total_amount: this.total_amount,
 					defaultSort: {
@@ -390,7 +389,6 @@ export default {
 		},
 
 		async applyFilter() {
-			
 			await this.updateTable();
 		},
 
