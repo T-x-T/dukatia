@@ -34,7 +34,6 @@ export default {
 
 		this.tableData = {
 			multiSelect: false,
-			displaySum: true,
 			defaultSort: {
 				column: 0,
 				sort: "asc"
@@ -60,7 +59,7 @@ export default {
 			await useRouter().push(`/assets/${row[0]}`);
 		},
 
-		async newAset() {
+		async newAsset() {
 			await useRouter().push("/assets/new");
 		},
 
