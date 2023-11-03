@@ -129,7 +129,7 @@ async fn compute_single_budget_utilization_history(pool: &Pool, chart: Chart) ->
 
 	for period in periods {
 		let local_budget = budget.clone().calculate_utilization_of_period_at(pool, period.0).await?;
-		let res = actually_compute_single_budget_utilization_history_part(local_budget, period);
+		let res = actually_compute_single_budget_utilization_history_part(&local_budget, period);
 
 		output[0].1.push(res.0);
 		output[1].1.push(res.1);
@@ -139,7 +139,7 @@ async fn compute_single_budget_utilization_history(pool: &Pool, chart: Chart) ->
 	return Ok(output);
 }
 
-fn actually_compute_single_budget_utilization_history_part(budget: budget::Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> (Point, Point, Point) {
+fn actually_compute_single_budget_utilization_history_part(budget: &budget::Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> (Point, Point, Point) {
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1);

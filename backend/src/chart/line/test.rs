@@ -111,7 +111,7 @@ mod actually_compute_single_budget_utilization_history_part {
 
 	#[test]
 	fn default_budgets() {
-		let res = actually_compute_single_budget_utilization_history_part(budget::Budget::default(), (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget::Budget::default(), (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.0, label: "0.0".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.0, label: "0.0".to_string() });
@@ -135,7 +135,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(0.005),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.50, label: "0.50€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 99.50, label: "99.50€".to_string() });
@@ -159,7 +159,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(0.5),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 50.0, label: "50.00€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 50.0, label: "50.00€".to_string() });
@@ -183,7 +183,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(0.999),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 99.99, label: "99.99€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.01, label: "0.01€".to_string() });
@@ -207,7 +207,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(1.0),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 100.0, label: "100.00€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.0, label: "0.00€".to_string() });
@@ -231,7 +231,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(1.5),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 150.0, label: "150.00€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 0.0, label: "0.00€".to_string() });
@@ -255,7 +255,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(0.0),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: -50.0, label: "-50.00€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 150.0, label: "150.00€".to_string() });
@@ -279,7 +279,7 @@ mod actually_compute_single_budget_utilization_history_part {
 			utilization: Some(0.0),
 		};
 
-		let res = actually_compute_single_budget_utilization_history_part(budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
+		let res = actually_compute_single_budget_utilization_history_part(&budget, (DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-10-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()));
 
 		assert_eq!(res.0, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: 150.0, label: "150.00€".to_string() });
 		assert_eq!(res.1, Point{ timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), value: -50.0, label: "-50.00€".to_string() });
