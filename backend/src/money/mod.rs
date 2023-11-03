@@ -3,7 +3,7 @@ mod test;
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct Money {
 	major: i32,
 	minor: u32,

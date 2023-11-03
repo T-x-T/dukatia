@@ -62,7 +62,8 @@ export default {
 	},
 
 	methods: {
-		async reload() {
+		async reload(res?: any) {
+			if(Number.isInteger(res?.id)) await useRouter().push(`/budgets/${res.id}`);
 			this.budget = await $fetch(`/api/v1/budgets/${this.budget.id}`);
 			await this.update();
 		},

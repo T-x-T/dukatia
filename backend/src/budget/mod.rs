@@ -143,19 +143,31 @@ impl Budget {
 		}
 
 		let transactions = self.get_transactions(pool, date_range.0, date_range.1).await?;
+		
+		let mut full_used_amount = Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol());
+		if !transactions.is_empty() {
+			full_used_amount = transactions.iter()
+				.map(|x| x.total_amount.clone().unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate())
+				.sum();
+		}
+
 
 		if transactions.is_empty() {
 			self.used_amount = Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()));
 		} else {
-			self.used_amount = Some(
-				transactions.into_iter()
-					.filter(|x| x.timestamp > period.0)
-					.map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate())
-					.sum()
-			);
+			let sum: Money = transactions.into_iter()
+				.filter(|x| x.timestamp > period.0)
+				.map(|x| x.total_amount.unwrap_or(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol())).negate())
+				.sum();
+
+			self.used_amount = if sum.clone().to_amount() == 0 && sum.get_symbol().is_empty() {
+				Some(Money::from_amount(0, self.amount.get_minor_in_major(), self.amount.get_symbol()))
+			} else {
+				Some(sum)
+			};
 		}
 
-		self.available_amount = Some(self.clone().amount * period_count - self.clone().used_amount.unwrap());
+		self.available_amount = Some(self.clone().amount * period_count - full_used_amount);
 		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / (f64::from(self.clone().amount.to_amount() * period_count)));
 
 		return Ok(self);
@@ -191,7 +203,7 @@ impl Budget {
 		return Ok(transactions);
 	}
 
-	fn get_period_count(&self, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> i32 {
+	pub fn get_period_count(&self, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> i32 {
 		match self.period {
 			Period::Daily => {
 				let from_day_count = from_timestamp.num_days_from_ce();
@@ -211,7 +223,7 @@ impl Budget {
 				}
 
 				let years = to_timestamp.year() - from_timestamp.year();
-				return (to_timestamp.month() - from_timestamp.month()) as i32 + (years * 12) + 1;
+				return ((to_timestamp.month() + 12) - from_timestamp.month()) as i32 + (years * 12) - 11;
 			},
 			Period::Quarterly => {
 				if from_timestamp.year() == to_timestamp.year() {
@@ -219,7 +231,7 @@ impl Budget {
 				}
 
 				let years = to_timestamp.year() - from_timestamp.year();
-				return (f64::from(to_timestamp.month() - from_timestamp.month()) / 4.0).ceil() as i32 + (years * 4);
+				return ((f64::from((to_timestamp.month() + 12) - from_timestamp.month()) - 12.0) / 4.0).ceil() as i32 + (years * 4);
 			},
 			Period::Yearly => {
 				return to_timestamp.year() - from_timestamp.year() + 1;

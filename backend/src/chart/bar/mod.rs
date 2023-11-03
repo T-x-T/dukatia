@@ -48,9 +48,8 @@ async fn compute_all_budget_utilization_overview(pool: &Pool, _chart: Chart) -> 
 }
 
 fn actually_compute_single_budget_utilization(budget: budget::Budget) -> (Bar, Bar) {
-	let used_amount: Money = budget.used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
-	let raw_available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
-	let available_amount: Money = if raw_available_amount.to_amount().is_negative() { Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()) } else { raw_available_amount.clone() };
+	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 
 	return (
 		Bar {

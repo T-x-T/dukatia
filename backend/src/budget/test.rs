@@ -141,11 +141,27 @@ mod get_period_count {
 	}
 
 	#[test]
+	fn monthly_same_year_nov_to_jan() {
+		let budget = Budget::default().set_period(Period::Monthly);
+		let res = budget.get_period_count(DateTime::parse_from_str("2023-01-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-11-03 13:56:04 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into());
+
+		assert_eq!(res, 11);
+	}
+
+	#[test]
 	fn monthly_different_year() {
 		let budget = Budget::default().set_period(Period::Monthly);
 		let res = budget.get_period_count(DateTime::parse_from_str("2021-06-19 13:56:04 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-12-19 13:56:04 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into());
 
 		assert_eq!(res, 31);
+	}
+
+	#[test]
+	fn monthly_different_year2() {
+		let budget = Budget::default().set_period(Period::Monthly);
+		let res = budget.get_period_count(DateTime::parse_from_str("2022-12-31 23:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-11-30 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into());
+
+		assert_eq!(res, 12);
 	}
 
 	#[test]
@@ -162,6 +178,14 @@ mod get_period_count {
 		let res = budget.get_period_count(DateTime::parse_from_str("2021-06-19 13:56:04 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-12-19 13:56:04 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into());
 
 		assert_eq!(res, 10);
+	}
+
+	#[test]
+	fn quarterly_different_year2() {
+		let budget = Budget::default().set_period(Period::Quarterly);
+		let res = budget.get_period_count(DateTime::parse_from_str("2022-12-31 23:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), DateTime::parse_from_str("2023-11-30 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into());
+
+		assert_eq!(res, 4);
 	}
 
 	#[test]

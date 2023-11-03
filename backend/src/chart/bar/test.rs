@@ -168,6 +168,6 @@ mod actually_compute_single_budget_utilization {
 
 		let res = actually_compute_single_budget_utilization(budget);
 
-		assert_eq!(res, (Bar {name: "test".to_string(), value: 150.0, label: "150.00€".to_string()}, Bar {name: "test".to_string(), value: 0.0, label: "0.00€".to_string()}));
+		assert_eq!(res, (Bar {name: "test".to_string(), value: 150.0, label: "150.00€".to_string()}, Bar {name: "test".to_string(), value: -50.0, label: "-50.00€".to_string()}));
 	}
 }

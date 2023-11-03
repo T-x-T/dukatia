@@ -110,9 +110,14 @@ export default {
 
 	methods: {
 		async logout() {
-			await $fetch('/api/v1/logout', {method: "POST"});
-			document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-			location.reload();
+			try {
+				await $fetch('/api/v1/logout', {method: "POST"});
+			} catch(e) {
+				console.error("failed to post logout", e);
+			} finally {
+				document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+				location.reload();
+			}
 		},
 
 		change_route(new_route: string) {

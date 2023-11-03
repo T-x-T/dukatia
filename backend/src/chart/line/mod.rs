@@ -122,7 +122,7 @@ async fn compute_single_budget_utilization_history(pool: &Pool, chart: Chart) ->
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
 
-	let mut output: Vec<(String, Vec<Point>)> = vec![("used".to_string(), Vec::new()), ("available".to_string(), Vec::new())];
+	let mut output: Vec<(String, Vec<Point>)> = vec![("used".to_string(), Vec::new()), ("available".to_string(), Vec::new()), ("total".to_string(), Vec::new())];
 	
 	let budget = budget::BudgetLoader::new(pool).set_filter_id(chart.budget_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	let periods = budget.get_past_and_current_periods(Utc::now());
@@ -133,19 +133,33 @@ async fn compute_single_budget_utilization_history(pool: &Pool, chart: Chart) ->
 
 		output[0].1.push(res.0);
 		output[1].1.push(res.1);
+		output[2].1.push(res.2);
 	}
 
 	return Ok(output);
 }
 
-fn actually_compute_single_budget_utilization_history_part(budget: budget::Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> (Point, Point) {
-	let used_amount: Money = budget.used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
-	let raw_available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
-	let available_amount: Money = if raw_available_amount.to_amount().is_negative() { Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()) } else { raw_available_amount.clone() };
+fn actually_compute_single_budget_utilization_history_part(budget: budget::Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> (Point, Point, Point) {
+	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1);
 
 	return (
-		Point { timestamp: period.0, value: f64::from(used_amount.to_amount()), label: used_amount.to_string() },
-		Point { timestamp: period.0, value: f64::from(available_amount.to_amount()), label: available_amount.to_string() }
+		Point {
+			timestamp: period.0,
+			value: f64::from(used_amount.to_amount()) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
+			label: used_amount.to_string()
+		},
+		Point {
+			timestamp: period.0,
+			value: f64::from(available_amount.to_amount()) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
+			label: available_amount.to_string()
+		},
+		Point {
+			timestamp: period.0,
+			value: f64::from(total_amount.to_amount()) / f64::from(total_amount.get_minor_in_major()),
+			label: total_amount.to_string()
+		}
 	);
 }
 
