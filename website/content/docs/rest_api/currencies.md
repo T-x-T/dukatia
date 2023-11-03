@@ -20,7 +20,7 @@ Response:
 	{
 		"id": 0,
 		"name": "euro",
-		"minor_in_mayor": 100,
+		"minor_in_major": 100,
 		"symbol": "€"
 	}
 ]
@@ -30,7 +30,7 @@ Response:
 | ----------- | ----------- |
 | id | id of the currency |
 | name | name of the currency |
-| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| minor_in_major | for example there are 100 cents in 1 Euro -> minor_in_major = 100 |
 | symbol | symbol of the currency |
 
 ### get by id
@@ -46,7 +46,7 @@ Response:
 {
 	"id": 0,
 	"name": "euro",
-	"minor_in_mayor": 100,
+	"minor_in_major": 100,
 	"symbol": "€"
 }
 ```
@@ -55,7 +55,7 @@ Response:
 | ----------- | ----------- |
 | id | id of the currency |
 | name | name of the currency |
-| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| minor_in_major | for example there are 100 cents in 1 Euro -> minor_in_major = 100 |
 | symbol | symbol of the currency |
 
 ### create currency
@@ -67,7 +67,7 @@ Request:
 ```json
 {
 		"name": "euro",
-		"minor_in_mayor": 100,
+		"minor_in_major": 100,
 		"symbol": "€"
 }
 ```
@@ -75,7 +75,7 @@ Request:
 | Property | Description |
 | ----------- | ----------- |
 | name | name of the currency |
-| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| minor_in_major | for example there are 100 cents in 1 Euro -> minor_in_major = 100 |
 | symbol | symbol of the currency |
 
 ### modify currency
@@ -88,7 +88,7 @@ Request:
 ```json
 {
 		"name": "euro",
-		"minor_in_mayor": 100,
+		"minor_in_major": 100,
 		"symbol": "€"
 }
 ```
@@ -96,6 +96,6 @@ Request:
 | Property | Description |
 | ----------- | ----------- |
 | name | name of the currency |
-| minor_in_mayor | for example there are 100 cents in 1 Euro -> minor_in_mayor = 100 |
+| minor_in_major | for example there are 100 cents in 1 Euro -> minor_in_major = 100 |
 | symbol | symbol of the currency |
 

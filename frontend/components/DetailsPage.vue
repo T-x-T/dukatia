@@ -4,46 +4,58 @@
 		<div id="formWrapper">
 			<div class="formInput" v-for="(field, index) in config.fields" :key="index">
 			
-				<div v-if="field.type == 'number'">
+				<div v-if="field.type == 'number'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="number" v-model="config.data[field.property]" :step="field.step" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 					<span v-if="field.suffix == 'currencyOfAccountSymbol'">{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 				</div>
 
-				<div v-else-if="field.type == 'string'">
+				<div v-else-if="field.type == 'string'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="text" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 				</div>
 
-				<div v-else-if="field.type == 'timestamp'">
+				<div v-else-if="field.type == 'boolean'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<input type="checkbox" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
+				</div>
+
+				<div v-else-if="field.type == 'choice'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
+						<option v-for="(item, i) in field.choices" :key="i" :value="item.value">{{item.display}}</option>
+					</select>	
+				</div>
+
+				<div v-else-if="field.type == 'timestamp'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<input type="datetime-local" v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 				</div>
 
-				<div v-else-if="field.type == 'currency'">
+				<div v-else-if="field.type == 'currency'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(currency, cindex) in currencies" :key="cindex" :value="currency.id">{{currency.name}}</option>
 					</select>
 				</div>
 
-				<div v-else-if="field.type == 'account'">
+				<div v-else-if="field.type == 'account'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(account, aindex) in accounts" :key="aindex" :value="account.id">{{account.name}}</option>
 					</select>
-					<button v-if="field.addNew" class="green" @click="subForm = 'account'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'account'" tabindex="-1">+</button>
 				</div>
 
-				<div v-else-if="field.type == 'recipient'">
+				<div v-else-if="field.type == 'recipient'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(recipient, rindex) in recipients" :key="rindex" :value="recipient.id">{{recipient.name}}</option>
 					</select>	
-					<button v-if="field.addNew" class="green" @click="subForm = 'recipient'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'recipient'" tabindex="-1">+</button>	
 				</div>
 
-				<div v-else-if="field.type == 'asset'">
+				<div v-else-if="field.type == 'asset'" class="field_container">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
 						<option v-for="(asset, aindex) in [...assets].sort((a, b) => a.name > b.name ? 1 : -1)" :key="aindex" :value="asset.id">{{asset.name}}</option>
@@ -51,14 +63,15 @@
 				</div>
 
 				<div v-else-if="field.type == 'tags'">
-					<CustomSelect
+					<InputMultiSelect
 						v-if="Object.keys(selectData).length > 0 && renderCustomSelect"
 						:selectData="selectData"
 						v-on:update="tagUpdate"
+						style="margin-right: 5px;"
 					/>
-					<button v-if="field.addNew" class="green" @click="subForm = 'tags'" tabindex="-1">New</button>	
+					<button v-if="field.addNew" class="green" @click="subForm = 'tags'" tabindex="-1">+</button>
 				</div>
-
+				
 				<div v-else-if="field.type == 'singleTag'">
 					<label>{{`${field.label}: `}}</label>
 					<select v-model="config.data[field.property]" :disabled="field.disabled || (field.initial && config.data.id !== undefined) as boolean" :ref="'forminput' + index">
@@ -68,10 +81,12 @@
 				</div>
 
 				<div v-else-if="field.type == 'positions'">
-					<label>{{`${field.label}: `}}</label>
-					<div v-for="(position_data, position_index) in config.data[field.property]">
+					<div v-if="config.data[field.property].length > 1" v-for="(position_data, position_index) in config.data[field.property]">
+						<label>{{`${field.label}: `}}</label>
 						<label>Amount: </label>
-						<input type="number" v-model="config.data[field.property][position_index].amount">
+						<input type="number" v-model="config.data[field.property][position_index].amount.major">
+						.
+						<input type="number" v-model="config.data[field.property][position_index].amount.minor" :max="config.data[field.property][position_index].amount.minor_in_major - 1">
 						<span>{{(currencies as Currency[]).filter(y => y.id == (accounts as Account[]).filter(x => x.id == config.data.account_id)[0]?.default_currency_id)[0]?.symbol}}</span>
 						<br>
 						<label>Comment: </label>
@@ -86,7 +101,16 @@
 						<button class="red" @click="config.data[field.property].splice(position_index, 1)">Delete Position</button>
 						<hr>
 					</div>
+					<div v-else class="field_container">
+						<label>Amount: </label>
+						<InputMoney :initial_value="config.data[field.property][0].amount" v-on:update="((new_value: Money) => config.data[field.property][0].amount = new_value)" />
+					</div>
 					<button class="green" @click="config.data[field.property].push({...(config as any).defaultData[field.property][0]})">Add Position</button>
+				</div>
+
+				<div v-if="field.type == 'money'" class="field_container">
+					<label>{{`${field.label}: `}}</label>
+					<InputMoney :initial_value="config.data[field.property]" :disabled="field.disabled" v-on:update="((new_value: Money) => config.data[field.property] = new_value)" />
 				</div>
 			</div>
 			<button class="green" @click="send(true)">Save</button>
@@ -146,7 +170,6 @@ export default {
 		this.accounts = await $fetch("/api/v1/accounts/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
 		
-		this.config.data.tag_ids = Array.isArray(this.config.data.tag_ids) ? [...this.config.data.tag_ids] : [null];
 		await this.updateSelectData();
 
 		this.$nextTick(() => {(this as any).$refs.forminput1?.[0].focus()});
@@ -155,7 +178,11 @@ export default {
 	methods: {
 		tagUpdate(selected: number[]) {
 			this.tagsManuallyChanged = true;
-			this.config.data.tag_ids = selected;
+			if(Array.isArray(this.config.data.filter_tag_ids)) {
+				this.config.data.filter_tag_ids = selected;
+			} else {
+				this.config.data.tag_ids = selected;
+			}
 		},
 
 		async send(goBack: boolean) {
@@ -164,12 +191,12 @@ export default {
 				if(typeof this.config.data.id == "number") {
 					res = await $fetch(`${this.config.apiEndpoint}/${this.config.data.id}`, {
 						method: "PUT",
-						body: await this.config.prepareForApi(this.config.data)
+						body: this.config.prepareForApi(this.config.data)
 					});
 				} else {
 					res = await $fetch(this.config.apiEndpoint, {
 						method: "POST",
-						body: await this.config.prepareForApi(this.config.data)
+						body: this.config.prepareForApi(this.config.data)
 					});
 				}
 			} catch(e: any) {
@@ -179,11 +206,10 @@ export default {
 			}
 
 			if(!this.config.noGoBackOnSave && goBack) {
+				this.$emit("updateData");
 				this.$emit("back");
 			} else {
 				this.$emit("updateData", res);
-				
-				if(this.config.noGoBackOnSave) return;
 
 				this.tagsManuallyChanged = false;
 				this.config.data = {...this.config.defaultData};
@@ -200,7 +226,7 @@ export default {
 		async updateSelectData() {
 			this.selectData = {
 				options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
-				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : [],
+				selected: this.config.data.tag_ids ? [...this.config.data.tag_ids] : this.config.data.filter_tag_ids ? [...this.config.data.filter_tag_ids] : [],
 				label: "Tags:"
 			};
 		},
@@ -237,7 +263,7 @@ export default {
 	},
 
 	watch: {
-		"config.data.recipient_id": async function(oldVal, newVal) {
+		"config.data.recipient_id": async function() {
 			if(this.config.populateTagsUsingRecipient && !this.tagsManuallyChanged && typeof this.config.data.id != "number") {
 				const tag_idsOfRecipient = this.recipients.filter(x => x.id === this.config.data.recipient_id)[0].tag_ids;
 				this.config.data.tag_ids = tag_idsOfRecipient;
@@ -247,3 +273,16 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+select
+	width: 200px
+
+div#formWrapper
+	width: 350px
+
+div.field_container
+	display: flex
+	input, select
+		flex-grow: 1
+</style>

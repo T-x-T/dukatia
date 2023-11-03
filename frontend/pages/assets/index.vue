@@ -25,21 +25,15 @@ export default {
 			sort_property: "id",
 			sort_direction: "asc",
 		} as QueryParameters,
+		tags: {} as Tag[],
 	}),
 
 	async mounted() {
 		const assets = await $fetch(this.build_request_url("/api/v1/assets/all")) as Asset[];
-		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
-		const tags = await $fetch("/api/v1/tags/all") as Tag[];
-
-		const assetsForDisplay = assets.map(x => {
-			x.currency = currencies.filter(c => c.id == x.currency_id)[0];
-			return x;
-		});
+		this.tags = await $fetch("/api/v1/tags/all") as Tag[];
 
 		this.tableData = {
 			multiSelect: false,
-			displaySum: true,
 			defaultSort: {
 				column: 0,
 				sort: "asc"
@@ -54,26 +48,9 @@ export default {
 				{name: "total TCO", type: "number", no_filter: true},
 				{name: "monthly TCO", type: "number", no_filter: true},
 				{name: "yearly TCO", type: "number", no_filter: true},
-				{name: "Tags", type: "choice", options: tags.map(x => ({id: x.id, name: x.name}))}
+				{name: "Tags", type: "choice", options: this.tags.map(x => ({id: x.id, name: x.name}))}
 			],
-			rows: assetsForDisplay.map(x => {
-				x.amount = x.amount ? x.amount : 0;
-				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
-				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_mayor: 100, symbol: "€"};
-
-				return [
-					x.id,
-					x.name,
-					x.description,
-					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
-				];
-			})
+			rows: this.tableData.rows = assets.map(x => this.get_row(x, this.tags)),
 		};
 	},
 
@@ -82,7 +59,7 @@ export default {
 			await useRouter().push(`/assets/${row[0]}`);
 		},
 
-		async newAset() {
+		async newAsset() {
 			await useRouter().push("/assets/new");
 		},
 
@@ -178,33 +155,9 @@ export default {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
 			const assets = await $fetch(this.build_request_url("/api/v1/assets/all")) as Asset[];
-			const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
-			const tags = await $fetch("/api/v1/tags/all") as Tag[];
 			if(this.data_revision > local_data_revision) return;
-			
-			const assetsForDisplay = assets.map(x => {
-				x.currency = currencies.filter(c => c.id == x.currency_id)[0];
-				return x;
-			});
 
-			this.tableData.rows = assetsForDisplay.map(x => {
-				x.amount = x.amount ? x.amount : 0;
-				x.value_per_unit = x.value_per_unit ? x.value_per_unit : 0;
-				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_mayor: 100, symbol: "€"};
-
-				return [
-					x.id,
-					x.name,
-					x.description,
-					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
-					`${x.value_per_unit / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${Math.round(((x.amount * x.value_per_unit) / x.currency.minor_in_mayor) * 100 + Number.EPSILON) / 100}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.total ? x.total_cost_of_ownership.total : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.monthly ? x.total_cost_of_ownership.monthly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					`${(x.total_cost_of_ownership?.yearly ? x.total_cost_of_ownership.yearly : 0) * -1 / x.currency.minor_in_mayor}${x.currency.symbol}`,
-					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
-				];
-			});
+			this.tableData.rows = assets.map(x => this.get_row(x, this.tags));
 		},
 
 		build_request_url(base_url: string) {
@@ -218,7 +171,7 @@ export default {
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(typeof this.query_parameters.filter_amount == "number") url += `&filter_amount=${this.query_parameters.filter_amount}`; 
 			if(this.query_parameters.filter_mode_amount) url += `&filter_mode_amount=${this.query_parameters.filter_mode_amount}`;
-			if(typeof this.query_parameters.filter_value_per_unit == "number") url += `&filter_value_per_unit=${Number(this.query_parameters.filter_value_per_unit) * 100}`; //TODO not using minor_in_mayor
+			if(typeof this.query_parameters.filter_value_per_unit == "number") url += `&filter_value_per_unit=${Number(this.query_parameters.filter_value_per_unit) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_value_per_unit) url += `&filter_mode_value_per_unit=${this.query_parameters.filter_mode_value_per_unit}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
@@ -229,6 +182,25 @@ export default {
 
 			return url;
 		},
+
+		get_row(x: Asset, tags: Tag[]) {
+			x.amount = x.amount ? x.amount : 0;
+				x.value_per_unit = x.value_per_unit ? x.value_per_unit : {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
+				x.currency = x.currency ? x.currency : {name: "Euro", minor_in_major: 100, symbol: "€"};
+
+				return [
+					x.id,
+					x.name,
+					x.description,
+					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
+					`${x.value_per_unit.major >= 0 && x.value_per_unit.is_negative ? "-" : ""}${x.value_per_unit.major}.${x.value_per_unit.minor.toString().padStart(x.value_per_unit.minor_in_major.toString().length - 1, "0")}${x.value_per_unit.symbol}`,
+					`${((((x.value_per_unit.major * x.value_per_unit.minor_in_major) + x.value_per_unit.minor) * x.amount) / 100).toFixed(2)}${x.value_per_unit.symbol}`,
+					`${(x.total_cost_of_ownership?.total.major ? x.total_cost_of_ownership?.total.major : 0) >= 0 && x.total_cost_of_ownership?.total.is_negative ? "-" : ""}${x.total_cost_of_ownership?.total.major}.${x.total_cost_of_ownership?.total.minor.toString().padStart(x.total_cost_of_ownership?.total.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.total.symbol}`,
+					`${(x.total_cost_of_ownership?.monthly.major ? x.total_cost_of_ownership?.monthly.major : 0) >= 0 && x.total_cost_of_ownership?.monthly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.monthly.major}.${x.total_cost_of_ownership?.monthly.minor.toString().padStart(x.total_cost_of_ownership?.monthly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.monthly.symbol}`,
+					`${(x.total_cost_of_ownership?.yearly.major ? x.total_cost_of_ownership?.yearly.major : 0) >= 0 && x.total_cost_of_ownership?.yearly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.yearly.major}.${x.total_cost_of_ownership?.yearly.minor.toString().padStart(x.total_cost_of_ownership?.yearly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.yearly.symbol}`,
+					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				];
+		}
 	},
 }
 </script>

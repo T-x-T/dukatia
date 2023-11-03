@@ -2,30 +2,31 @@ mod db;
 pub mod rest_api;
 
 use deadpool_postgres::Pool;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::error::Error;
 use chrono::{DateTime, Utc};
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
 use crate::CustomError;
+use crate::money::Money;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TotalCostOfOwnership {
-	pub total: i32,
-	pub monthly: i32,
-	pub yearly: i32,
+	pub total: Money,
+	pub monthly: Money,
+	pub yearly: Money,
 }
 
 
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize, Default, Deserialize)]
 pub struct Asset {
 	pub id: Option<u32>,
 	pub user_id: u32,
 	pub name: String,
 	pub description: Option<String>,
 	pub currency_id: u32,
-	pub value_per_unit: Option<u32>,
+	pub value_per_unit: Option<Money>,
 	pub amount: Option<f64>,
 	pub tag_ids: Option<Vec<u32>>,
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
@@ -68,7 +69,7 @@ impl Asset {
 		return self;
 	}
 
-	#[allow(unused)]
+	#[allow(dead_code)]
 	pub fn set_description(mut self, description: String) -> Self {
 		self.description = Some(description);
 		return self;
@@ -84,7 +85,7 @@ impl Asset {
 		return self;
 	}
 
-	#[allow(unused)]
+	#[allow(dead_code)]
 	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
 		self.tag_ids = Some(tag_ids);
 		return self;
@@ -105,7 +106,7 @@ impl Asset {
 			.get().await?;
 		
 		return Ok(Self {
-			total_cost_of_ownership: Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0)),
+			total_cost_of_ownership: if transactions.is_empty() { None } else { Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0, self.value_per_unit.clone().unwrap_or_default().get_minor_in_major(), self.value_per_unit.clone().unwrap_or_default().get_symbol())) },
 			..self
 		});
 	}
@@ -157,7 +158,7 @@ impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct AssetValuation {
-	pub value_per_unit: u32,
+	pub value_per_unit: Money,
 	pub amount: f64,
 	pub timestamp: DateTime<Utc>,
 	pub asset_id: u32,
@@ -236,14 +237,12 @@ impl<'a> Loader<'a, AssetValuation> for AssetValuationLoader<'a> {
 	}
 }
 
-fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool) -> TotalCostOfOwnership {
-	if transactions.is_empty() {
-		return TotalCostOfOwnership::default();
-	}
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool, minor_in_major: u32, symbol: String) -> TotalCostOfOwnership {
+	assert!(!transactions.is_empty());
 	
 	let total_cost_of_ownership: i32 = transactions
 		.iter()
-		.map(|x| x.total_amount.unwrap())
+		.map(|x| x.total_amount.clone().unwrap())
 		.sum();
 
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
@@ -267,8 +266,8 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, curr
 	};
 	
 	return TotalCostOfOwnership {
-		total: total_cost_of_ownership,
-		monthly: (total_cost_of_ownership / days_since_first_transaction) * 30,
-		yearly: (total_cost_of_ownership / days_since_first_transaction) * 365,
+		total: Money::from_amount(total_cost_of_ownership, minor_in_major, symbol.clone()),
+		monthly: Money::from_amount((total_cost_of_ownership / days_since_first_transaction) * 30, minor_in_major, symbol.clone()),
+		yearly: Money::from_amount((total_cost_of_ownership / days_since_first_transaction) * 365, minor_in_major, symbol),
 	};
 }

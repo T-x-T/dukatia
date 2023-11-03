@@ -10,14 +10,6 @@ declare global {
 		default_currency?: Currency,
 		balance?: number,
 	}
-	
-	type DeepAccount = {
-		id: number,
-		name: string,
-		default_currency: Currency,
-		user: User,
-		tags: DeepTag[],
-	}
 
 	type User = {
 		id?: number,
@@ -32,35 +24,23 @@ declare global {
 		name: string,
 		description?: string,
 		currency_id: number,
-		value_per_unit?: number,
+		value_per_unit?: Money,
 		amount?: number,
 		tag_ids?: number[],
 		currency?: Currency,
 		total_cost_of_ownership?: TotalCostOfOwnership,
 	}
 
-	type DeepAsset = {
-		id: number,
-		name: string,
-		description?: string,
-		value_per_unit: number,
-		amount: number,
-		user: User,
-		currency: Currency,
-		tags: DeepTag[],
-		total_cost_of_ownership?: TotalCostOfOwnership,
-	}
-
 	type TotalCostOfOwnership = {
-		total: number,
-		monthly: number,
-		yearly: number,
+		total: Money,
+		monthly: Money,
+		yearly: Money,
 	}
 
 	type Currency = {
 		id?: number,
 		name: string,
-		minor_in_mayor: number,
+		minor_in_major: number,
 		symbol: string,
 	}
 
@@ -71,27 +51,12 @@ declare global {
 		tag_ids?: number[],
 	}
 
-	type DeepRecipient = {
-		id: number,
-		name: string,
-		user?: User,
-		tags: DeepTag[],
-	}
-
 	type Tag = {
 		id?: number,
 		name: string,
 		user_id?: number,
 		parent_id?: number,
 	}
-
-	type DeepTag = {
-		id: number,
-		name: string,
-		user: User,
-		parent?: Tag,
-	}
-
 	type Transaction = {
 		id?: number,
 		user_id?: number,
@@ -100,7 +65,7 @@ declare global {
 		recipient_id: number,
 		status: TransactionStatus,
 		timestamp: string,
-		total_amount: number,
+		total_amount: Money,
 		comment?: string,
 		tag_ids?: number[],
 		asset?: Asset,
@@ -111,26 +76,35 @@ declare global {
 		positions: Position[],
 	}
 
-	type DeepTransaction = {
-		id: number,
-		status: TransactionStatus,
-		timestamp: string,
-		total_amount: number,
-		comment?: string,
-		currency: Currency,
-		user: User,
-		account: DeepAccount,
-		recipient: DeepRecipient,
-		tags: DeepTag[],
-		asset?: DeepAsset,
-		positions: Position[],
-	}
-
 	type Position = {
 		id?: number,
-		amount: number,
+		amount: Money,
 		comment?: string,
 		tag_id?: number,
+	}
+
+	type Budget = {
+		id?: number,
+		name: string,
+		user_id?: number,
+		amount: Money,
+		rollover: boolean,
+		period: number,
+		filter_tag_ids: number[],
+		currency_id: number,
+		active_from: Date,
+		active_to?: Date,
+		used_amount?: Money,
+		available_amount?: Money,
+		utilization?: number,
+	}
+
+	type Money = {
+		major: number,
+		minor: number,
+		minor_in_major: number,
+		symbol: string,
+		is_negative?: boolean,
 	}
 
 	enum TransactionStatus {
@@ -145,7 +119,7 @@ declare global {
 	}
 
 	type AssetValuation = {
-		value_per_unit: number,
+		value_per_unit: Money,
 		amount: number,
 		timestamp: string,
 		deleted?: boolean,
@@ -177,10 +151,9 @@ declare global {
 		defaultSort: TableSort,
 		columns: Column[],
 		rows: Row[],
-		displaySum?: boolean,
-		sumColumn?: number,
 		row_count?: number,
 		total_amount?: number,
+		disable_pagination?: boolean,
 	}
 
 	type TableFilterOption = 
@@ -211,12 +184,13 @@ declare global {
 	type DetailFormField = {
 		label: string,
 		property: string,
-		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions",
+		type: "number" | "string" | "tags" | "currency" | "singleTag" | "timestamp" | "account" | "recipient" | "asset" | "positions" | "money" | "boolean" | "choice" | "break",
 		disabled?: boolean,
 		step?: string,
 		initial?: number,
 		suffix?: "currencyOfAccountSymbol",
 		addNew?: boolean,
+		choices?: {value: any, display: string[]},
 	}
 
 	type DetailFormConfig = {
@@ -286,8 +260,8 @@ declare global {
 		filter_mode_name?: string,
 		filter_symbol?: string,
 		filter_mode_symbol?: string,
-		filter_minor_in_mayor?: number,
-		filter_mode_minor_in_mayor?: string,
+		filter_minor_in_major?: number,
+		filter_mode_minor_in_major?: string,
 		filter_parent_id?: number,
 		filter_mode_parent_id?: string,
 		filter_balance?: number,
@@ -298,5 +272,15 @@ declare global {
 		filter_mode_amount?: string,
 		filter_value_per_unit?: number,
 		filter_mode_value_per_unit?: string,
+		filter_rollover?: boolean,
+		filter_mode_rollover?: string,
+		filter_filter_tag_id?: number,
+		filter_mode_filter_tag_id?: string,
+		filter_lower_active_from?: Date,
+		filter_upper_active_from?: Date,
+		filter_mode_active_from?: string,
+		filter_lower_active_to?: Date,
+		filter_upper_active_to?: Date,
+		filter_mode_active_to?: string,
 	}
 }

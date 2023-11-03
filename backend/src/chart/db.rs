@@ -122,6 +122,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		filter_collection,
 		date_period,
 		asset_id: None,
+		budget_id: None,
 		max_items: max_items.map(|x| x as u32),
 		date_range: date_range.map(|x| x as u32),
 		top_left_x: top_left_x.map(|x| x as u32),

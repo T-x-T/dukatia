@@ -43,7 +43,7 @@
 					</div>
 
 					<div>
-						<CustomSelect
+						<InputMultiSelect
 							v-if="Object.keys(selectData).length > 0"
 							:selectData="selectData"
 							v-on:update="tagUpdate"
@@ -59,7 +59,8 @@
 				<TransactionDetails 
 					v-if="Object.keys(selectedRow).length > 0"
 					:transaction="selectedRow"
-					v-on:back="updateAndLoadTable"
+					:default_transaction="default_transaction"
+					v-on:back="closeDetails"
 					v-on:updateData="updateTable"
 				/>
 			</div>
@@ -95,6 +96,7 @@ export default {
 		total_row_count: 0,
 		total_amount: 0,
 		data_revision: 0,
+		default_transaction: {} as Transaction,
 	}),
 	
 	async mounted() {
@@ -121,25 +123,56 @@ export default {
 			openTop: true
 		}
 
-		const id = Number(useRoute().path.split("/")[2]);
-		if(Number.isInteger(id)) {
+		if (useRoute().path.split("/")[2] == "new") {
+			this.$nextTick(() => this.newTransaction());
+		} else if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(Number(useRoute().path.split("/")[2]))) {
+			const id = Number(useRoute().path.split("/")[2]);
+			if(this.transactions.filter(x => x.id === id).length === 0) {
+				this.transactions.push(await $fetch(`/api/v1/transactions/${id}`));
+			}
 			this.openDetailPage(id);
 		}
+
+		this.default_transaction = {
+			account_id: 0,
+			currency_id: 0,
+			recipient_id: 0,
+			status: 1,
+			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
+			total_amount: {
+				major: 0,
+				minor: 0,
+				minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
+				symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+				is_negative: false,
+			},
+			comment: "",
+			currency: structuredClone(toRaw(this.currencies.filter(x => x.id == 0)[0])),
+			positions: [{
+				amount: {
+					major: 0,
+					minor: 0,
+					minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
+					symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+					is_negative: false,
+				},
+				comment: "",
+			}],
+		};
 	},
 
 	methods: {
 		updateTransactions() {
 			const transactionsForDisplay = this.transactions.map(x => {
-				x.account = this.accounts.filter(a => a.id == x.account_id)[0];
-				x.currency = this.currencies.filter(c => c.id == x.currency_id)[0];
-				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
+				x.account = this.accounts.filter(a => a.id === x.account_id)[0];
+				x.currency = this.currencies.filter(c => c.id === x.currency_id)[0];
+				x.recipient = this.recipients.filter(r => r.id === x.recipient_id)[0];
 				return x;
 			});
 			this.tableData = {} as TableData;
 			this.$nextTick(() => {
 				this.tableData = {
 					multiSelect: true,
-					displaySum: true,
 					row_count: this.total_row_count,
 					total_amount: this.total_amount,
 					defaultSort: {
@@ -156,16 +189,7 @@ export default {
 						{name: "Comment", type: "string", sortable: true},
 						{name: "Tags", type: "choice", options: this.tags.map(x => ({id: x.id, name: x.name}))},
 					],
-					rows: transactionsForDisplay.map(x => ([
-						x.id,
-						x.account?.name,
-						x.recipient?.name,
-						x.asset ? x.asset.name : "",
-						new Date(x.timestamp).toISOString().substring(0, 10),
-						`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
-						x.comment,
-						this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
-					]))
+					rows: transactionsForDisplay.map(this.get_row)
 				};
 			});
 		},
@@ -177,8 +201,8 @@ export default {
 		},
 
 		openDetailPage(transaction_id: number) {
-			const transaction = this.transactions.filter(x => x.id == transaction_id)[0];
-			this.selectedRow = {...transaction, total_amount: transaction.total_amount / 100, timestamp: transaction.timestamp.slice(0, -1)};			
+			const transaction = this.transactions.filter(x => x.id === transaction_id)[0];
+			this.selectedRow = {...transaction, timestamp: transaction.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
 			this.$nextTick(() => this.detailsOpen = true);
 		},
@@ -188,21 +212,10 @@ export default {
 		},
 
 		async newTransaction() {
-			this.selectedRow = {
-				account_id: 0,
-				currency_id: 0,
-				recipient_id: 0,
-				status: 1,
-				timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
-				total_amount: 0,
-				comment: "",
-				currency: this.currencies.filter(x => x.id == 0)[0],
-				positions: [
-					{
-						amount: 0,
-						comment: "",
-					}
-				],
+			this.selectedRow = structuredClone(toRaw(this.default_transaction));
+
+			if(useRoute().path != "/transactions/new") {
+				history.pushState({}, "", `/transactions/new`);
 			}
 
 			this.detailsOpen = false;
@@ -261,6 +274,11 @@ export default {
 			await this.updateTable();
 			this.detailsOpen = false;
 			this.selectedRow = {} as Transaction;
+			history.pushState({}, "", "/transactions");
+		},
+		
+		closeDetails() {
+			this.detailsOpen = false;
 			history.pushState({}, "", "/transactions");
 		},
 
@@ -371,7 +389,6 @@ export default {
 		},
 
 		async applyFilter() {
-			
 			await this.updateTable();
 		},
 
@@ -391,16 +408,7 @@ export default {
 				x.recipient = this.recipients.filter(r => r.id == x.recipient_id)[0];
 				return x;
 			});
-			this.tableData.rows = transactionsForDisplay.map(x => ([
-				x.id,
-				x.account?.name,
-				x.recipient?.name,
-				x.asset ? x.asset.name : "",
-				new Date(x.timestamp).toISOString().substring(0, 10),
-				`${x.total_amount / (x.currency?.minor_in_mayor ? x.currency?.minor_in_mayor : 100)}${x.currency?.symbol}`,
-				x.comment,
-				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
-			]));
+			this.tableData.rows = transactionsForDisplay.map(this.get_row);
 			this.tableData.row_count = this.total_row_count;
 			this.tableData.total_amount = this.total_amount;
 		},
@@ -430,7 +438,7 @@ export default {
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
 			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
-			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_mayor
+			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_total_amount) url += `&filter_mode_total_amount=${this.query_parameters.filter_mode_total_amount}`;
 			if(this.query_parameters.filter_comment) url += `&filter_comment=${this.query_parameters.filter_comment}`;
 			if(this.query_parameters.filter_mode_comment) url += `&filter_mode_comment=${this.query_parameters.filter_mode_comment}`;
@@ -440,6 +448,19 @@ export default {
 
 			return url;
 		},
+
+		get_row(x: Transaction) {
+			return [
+				x.id,
+				x.account?.name,
+				x.recipient?.name,
+				x.asset ? x.asset.name : "",
+				new Date(new Date(x.timestamp).valueOf() - (new Date(x.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
+				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
+				x.comment,
+				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+			];
+		}
 	}
 }
 </script>
@@ -458,9 +479,6 @@ div.detailBar
 	padding-left: 8px
 	@media screen and (max-width: 800px)
 		position: absolute
-		width: 100%
-		height: 100%
-		margin: 0
 
 div#batchEdit
 	select

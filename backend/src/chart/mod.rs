@@ -2,6 +2,7 @@ mod db;
 mod text;
 mod pie;
 mod line;
+mod bar;
 pub mod rest_api;
 
 use crate::CustomError;
@@ -15,6 +16,7 @@ use chrono::{DateTime, Utc};
 pub struct Chart {
 	pub id: Option<u32>,
 	pub user_id: Option<u32>,
+	#[allow(clippy::struct_field_names)]
 	pub chart_type: String,
 	pub title: String,
 	pub text_template: Option<String>,
@@ -23,6 +25,7 @@ pub struct Chart {
 	pub filter_collection: Option<String>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
+	pub budget_id: Option<u32>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
 	pub top_left_x: Option<u32>,
@@ -35,7 +38,8 @@ pub struct Chart {
 pub struct ChartData {
 	pub text: Option<String>,
 	pub pie: Option<Vec<(String, (String, f64))>>,
-	pub line: Option<Vec<(std::string::String, Vec<line::Point>)>>,
+	pub line: Option<Vec<(String, Vec<line::Point>)>>,
+	pub bar: Option<Vec<(String, Vec<bar::Bar>)>>,
 }
 
 pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
@@ -73,6 +77,9 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_
 	if options.asset_id.is_some() {
 		chart.asset_id = options.asset_id;
 	}
+	if options.budget_id.is_some() {
+		chart.budget_id = options.budget_id;
+	}
 	if options.max_items.is_some() {
 		chart.max_items = options.max_items;
 	}
@@ -86,7 +93,44 @@ pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_
 		return pie::get_chart_data(pool, chart).await;
 	} else if chart.chart_type == "line" {
 		return line::get_chart_data(pool, chart).await;
+	} else if chart.chart_type == "bar" {
+		return bar::get_chart_data(pool, chart).await;
 	}
 
-	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie or line") }));
+	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie, line or bar") }));
+}
+
+pub async fn get_chart_data_by_type_filter_collection(pool: &Pool, chart_type: String, filter_collection: String, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+	let chart = Chart {
+		id: None,
+		user_id: None,
+		chart_type,
+		title: filter_collection.clone(),
+		text_template: None,
+		filter_from: options.from_date,
+		filter_to: options.to_date,
+		filter_collection: Some(filter_collection),
+		date_period: options.date_period,
+		asset_id: options.asset_id,
+		budget_id: options.budget_id,
+		max_items: options.max_items,
+		date_range: options.date_range,
+		top_left_x: None,
+		top_left_y: None,
+		bottom_right_x: None,
+		bottom_right_y: None,
+	};
+
+
+	if chart.chart_type == "text" {
+		return text::get_chart_data(pool, chart).await;
+	} else if chart.chart_type == "pie" {
+		return pie::get_chart_data(pool, chart).await;
+	} else if chart.chart_type == "line" {
+		return line::get_chart_data(pool, chart).await;
+	} else if chart.chart_type == "bar" {
+		return bar::get_chart_data(pool, chart).await;
+	}
+
+	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie, line or bar") }));
 }

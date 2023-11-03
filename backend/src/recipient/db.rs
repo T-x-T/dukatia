@@ -112,6 +112,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 	}
 }
 
+#[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Recipient {
 	fn from(value: tokio_postgres::Row) -> Self {
 		let id: i32 = value.get(0);

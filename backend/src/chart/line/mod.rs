@@ -9,6 +9,7 @@ use chrono::{DateTime, Date, NaiveTime, NaiveDate, Datelike, Utc, MIN_DATETIME, 
 
 use super::{Chart, ChartData};
 
+use crate::money::Money;
 use crate::CustomError;
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
@@ -16,8 +17,9 @@ use crate::currency;
 use crate::recipient;
 use crate::account;
 use crate::asset;
+use crate::budget;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Point {
 	pub timestamp: DateTime<Utc>,
 	pub value: f64,
@@ -49,13 +51,14 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		"asset_total_value" => compute_asset_total_value(pool, chart).await?,
 		"asset_single_value" => compute_asset_single_value(pool, chart).await?,
 		"asset_amount" => compute_asset_amount(pool, chart).await?,
+		"single_budget_utilization_history" => compute_single_budget_utilization_history(pool, chart).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("Line chart collection {} is not recognized", chart.filter_collection.unwrap()) })),
 	};
 
-	return Ok(ChartData { text: None, pie: None, line: Some(output) });
+	return Ok(ChartData { text: None, pie: None, line: Some(output), bar: None });
 }
 
-async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
+async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
 	let recipients = recipient::RecipientLoader::new(pool).get().await?;
@@ -71,7 +74,7 @@ async fn compute_recipients(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 	return Ok(limited_output);
 }
 
-async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
+async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
 	let accounts = account::AccountLoader::new(pool).get().await?;
@@ -87,7 +90,7 @@ async fn compute_accounts(pool: &Pool, chart: Chart) -> Result<Vec<(std::string:
 	return Ok(limited_output);
 }
 
-async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
+async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, true).await?;
 
@@ -103,7 +106,7 @@ async fn compute_currencies(pool: &Pool, chart: Chart) -> Result<Vec<(std::strin
 	return Ok(limited_output);
 }
 
-async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(std::string::String, Vec<Point>)>, Box<dyn Error>> {
+async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
 	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 	let transactions = get_relevant_time_sorted_transactions(pool, &chart, false).await?;
 
@@ -112,6 +115,52 @@ async fn compute_earning_spending_net(pool: &Pool, chart: Chart) -> Result<Vec<(
 	let named_output = add_names_to_output(&output, &NamedTypes::EarningSpendingNet);
 
 	return Ok(Vec::from_iter(named_output));
+}
+
+async fn compute_single_budget_utilization_history(pool: &Pool, chart: Chart) -> Result<Vec<(String, Vec<Point>)>, Box<dyn Error>> {
+	if chart.budget_id.is_none() {
+		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
+	}
+
+	let mut output: Vec<(String, Vec<Point>)> = vec![("used".to_string(), Vec::new()), ("available".to_string(), Vec::new()), ("total".to_string(), Vec::new())];
+	
+	let budget = budget::BudgetLoader::new(pool).set_filter_id(chart.budget_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	let periods = budget.get_past_and_current_periods(Utc::now());
+
+	for period in periods {
+		let local_budget = budget.clone().calculate_utilization_of_period_at(pool, period.0).await?;
+		let res = actually_compute_single_budget_utilization_history_part(&local_budget, period);
+
+		output[0].1.push(res.0);
+		output[1].1.push(res.1);
+		output[2].1.push(res.2);
+	}
+
+	return Ok(output);
+}
+
+fn actually_compute_single_budget_utilization_history_part(budget: &budget::Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> (Point, Point, Point) {
+	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
+	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1);
+
+	return (
+		Point {
+			timestamp: period.0,
+			value: f64::from(used_amount.to_amount()) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
+			label: used_amount.to_string()
+		},
+		Point {
+			timestamp: period.0,
+			value: f64::from(available_amount.to_amount()) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
+			label: available_amount.to_string()
+		},
+		Point {
+			timestamp: period.0,
+			value: f64::from(total_amount.to_amount()) / f64::from(total_amount.get_minor_in_major()),
+			label: total_amount.to_string()
+		}
+	);
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -128,16 +177,16 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 			RawOutputProperties::Currency => transaction.currency_id.unwrap(),
 			RawOutputProperties::EarningSpendingNet => {
 				*output.entry(2)
-					.or_insert(BTreeMap::new())
+					.or_default()
 					.entry(get_date_for_period(date_period, &transaction.timestamp))
 					.or_insert(PointWithCurrencies {
 						timestamp: transaction.timestamp,
 						value: BTreeMap::new(),
 					})
 					.value.entry(transaction.currency_id.unwrap())
-					.or_insert(0) += transaction.total_amount.unwrap_or(0);
+					.or_insert(0) += transaction.total_amount.clone().unwrap_or_default().to_amount();
 				
-				if transaction.total_amount.unwrap_or(0) > 0 {
+				if transaction.total_amount.clone().unwrap_or_default().to_amount() > 0 {
 					0
 				} else { 
 					1
@@ -146,14 +195,14 @@ fn build_raw_output(transactions: Vec<Transaction>, property: RawOutputPropertie
 		};	
 	
 		*output.entry(id)
-			.or_insert(BTreeMap::new())
+			.or_default()
 			.entry(get_date_for_period(date_period, &transaction.timestamp))
 			.or_insert(PointWithCurrencies {
 				timestamp: transaction.timestamp,
 				value: BTreeMap::new(),
 			})
 			.value.entry(transaction.currency_id.unwrap())
-			.or_insert(0) += transaction.total_amount.unwrap_or(0);
+			.or_insert(0) += transaction.total_amount.unwrap_or_default().to_amount();
 	}
 
 	return output;
@@ -230,7 +279,7 @@ fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>
 			let mut label = String::new();
 			y.1.value.into_iter().for_each(|z| {
 				let currency = currencies.iter().find(|c| c.id.unwrap() == z.0).unwrap();
-				let current_value = f64::from(z.1) / f64::from(currency.minor_in_mayor);
+				let current_value = f64::from(z.1) / f64::from(currency.minor_in_major);
 				value += current_value;
 				label.push_str(
 					format!("{}{} ", current_value, currency.symbol).as_str()
@@ -238,7 +287,7 @@ fn sum_currencies(input: BTreeMap<u32, BTreeMap<Date<Utc>, PointWithCurrencies>>
 			});
 	
 			output.entry(x.0)
-				.or_insert(Vec::new())
+				.or_default()
 				.append(&mut vec![Point {
 					timestamp: y.0.and_time(NaiveTime::from_num_seconds_from_midnight(0, 0)).unwrap(),
 					value,
@@ -349,7 +398,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
 	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
-	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
+	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit.to_amount() as u32)).collect();
 	let amount_history: BTreeMap<DateTime<Utc>, f64> = asset_valuation_history.iter().map(|x| (x.timestamp, x.amount)).collect();
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
@@ -368,7 +417,7 @@ async fn compute_asset_total_value(pool: &Pool, chart: Chart) -> Result<Vec<(std
 		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 		let no_future_amounts: BTreeMap<&DateTime<Utc>, &f64> = amount_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 
-		let value = (f64::from(**no_future_values.last_key_value().unwrap().1) * **no_future_amounts.last_key_value().unwrap().1) / f64::from(currency.minor_in_mayor);
+		let value = (f64::from(**no_future_values.last_key_value().unwrap().1) * **no_future_amounts.last_key_value().unwrap().1) / f64::from(currency.minor_in_major);
 
 		if (last_value - value).abs() > 0.0001 {
 			let point = Point {
@@ -393,7 +442,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 	let asset = asset::AssetLoader::new(pool).set_filter_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get_first().await?;
 	let currency = currency::CurrencyLoader::new(pool).set_filter_id(asset.currency_id, NumberFilterModes::Exact).get_first().await?;
 	let asset_valuation_history = asset::AssetValuationLoader::new(pool).set_filter_asset_id(chart.asset_id.unwrap(), NumberFilterModes::Exact).get().await?;
-	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit)).collect();
+	let value_history: BTreeMap<DateTime<Utc>, u32> = asset_valuation_history.iter().map(|x| (x.timestamp, x.value_per_unit.to_amount() as u32)).collect();
 	
 	let mut output: BTreeMap<String, Vec<Point>> = BTreeMap::new();
 	output.insert(asset.name.clone(), Vec::new());
@@ -410,7 +459,7 @@ async fn compute_asset_single_value(pool: &Pool, chart: Chart) -> Result<Vec<(st
 	while tomorrow.signed_duration_since(current_day).num_seconds() > 0 {
 		let no_future_values: BTreeMap<&DateTime<Utc>, &u32> = value_history.iter().filter(|(x, _)| x.date().signed_duration_since(current_day).num_seconds() <= 0).collect();
 		
-		let value = f64::from(**no_future_values.last_key_value().unwrap().1) / f64::from(currency.minor_in_mayor);
+		let value = f64::from(**no_future_values.last_key_value().unwrap().1) / f64::from(currency.minor_in_major);
 		
 		if (last_value - value).abs() > 0.0001 {
 			let point = Point {

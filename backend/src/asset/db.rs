@@ -3,6 +3,7 @@ use std::error::Error;
 use crate::CustomError;
 use super::{Asset, AssetValuation};
 use crate::traits::*;
+use crate::money::Money;
 
 #[derive(Debug)]
 pub struct AssetDbReader<'a> {
@@ -206,7 +207,7 @@ impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 		
 		client.query(
 			"INSERT INTO public.asset_valuations (asset_id, timestamp, value_per_unit) VALUES ($1, $2, $3)", 
-			&[&(self.asset_valuation.asset_id as i32), &self.asset_valuation.timestamp, &(self.asset_valuation.value_per_unit as i32)]
+			&[&(self.asset_valuation.asset_id as i32), &self.asset_valuation.timestamp, &self.asset_valuation.value_per_unit.to_amount()]
 		).await?;
 	
 		return Ok(0);
@@ -235,6 +236,7 @@ impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
 	}
 }
 
+#[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Asset {
 	fn from(value: tokio_postgres::Row) -> Self {
 		let id: i32 = value.get(0);
@@ -249,6 +251,8 @@ impl From<tokio_postgres::Row> for Asset {
 			.collect();
 		let amount: f64 = value.try_get(6).unwrap_or(0.0);
 		let value_per_unit: i32 = value.try_get(7).unwrap_or(0);
+		let minor_in_major: i32 = value.get(8);
+		let symbol: String = value.get(9);
 
 		return Asset {
 			id: Some(id as u32),
@@ -257,7 +261,7 @@ impl From<tokio_postgres::Row> for Asset {
 			user_id: user_id as u32,
 			currency_id: currency_id as u32,
 			tag_ids: Some(tag_ids),
-			value_per_unit: Some(value_per_unit as u32),
+			value_per_unit: Some(Money::from_amount(value_per_unit, minor_in_major as u32, symbol)),
 			amount: Some(amount),
 			total_cost_of_ownership: None,
 		}
@@ -270,10 +274,12 @@ impl From<tokio_postgres::Row> for AssetValuation {
 		let timestamp: chrono::DateTime<chrono::Utc> = value.get(1);
 		let amount: f64 = value.try_get(2).unwrap_or(0.0);
 		let value_per_unit: i32 = value.try_get(3).unwrap_or(0);
+		let minor_in_major: i32 = value.get(4);
+		let symbol: String = value.get(5);
 	
 		return AssetValuation {
 			asset_id: asset_id as u32,
-			value_per_unit: value_per_unit as u32,
+			value_per_unit: Money::from_amount(value_per_unit, minor_in_major as u32, symbol),
 			amount,
 			timestamp
 		}

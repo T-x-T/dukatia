@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<p>Batch import Transactions</p>
-		<p>Format:<br>account_id,recipient_id,timestamp,comment,amount<br>(No headers)</p>
+		<p>Format:<br>account_id,recipient_id,timestamp,comment,major_amount,minor_amount<br>(No headers)</p>
 		<input type="file" accept=".csv" @change="load_data">
 		<br>
 		<button @click="upload_data">Start import</button>
@@ -49,7 +49,7 @@ export default {
 				status: 1,
 				timestamp: new Date(parts[2]),
 				comment: parts[3],
-				positions: [{amount: Number(Number(parts[4]) * 100)}], //TODO: using predefined minor in mayor
+				positions: [{major_amount: Number(parts[4]), minor_amount: Number(parts[5])}],
 			};
 		}
 	}

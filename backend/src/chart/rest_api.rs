@@ -7,7 +7,7 @@ use crate::webserver::{AppState, is_authorized};
 
 #[get("/api/v1/charts/{chart_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -20,7 +20,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::P
 
 #[get("/api/v1/dashboards/{dashboard_id}/charts")]
 async fn get_all_charts_in_dashboard(data: web::Data<AppState>, req: HttpRequest, dashboard_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -39,18 +39,32 @@ pub struct ChartOptions {
 	pub only_parents: Option<bool>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
+	pub budget_id: Option<u32>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
 }
 
 #[get("/api/v1/charts/{chart_id}/data")]
 async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<ChartOptions>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::get_chart_contents_by_id(&data.pool, chart_id.into_inner(), options.into_inner()).await {
+		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	}
+}
+
+#[get("/api/v1/charts/{chart_type}/{filter_collection}/data")]
+async fn get_chart_data_by_type_filter_collection(data: web::Data<AppState>, req: HttpRequest, path: web::Path<(String, String)>, options: web::Query<ChartOptions>) -> impl Responder {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match super::get_chart_data_by_type_filter_collection(&data.pool, path.0.clone(), path.1.clone(), options.into_inner()).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -75,7 +89,7 @@ struct ChartPost {
 
 #[post("/api/v1/charts")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -91,6 +105,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
 		asset_id: None,
+		budget_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
 		top_left_x: body.top_left_x,
@@ -100,14 +115,14 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	};
 
 	match super::add(&data.pool, &chart).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
 #[put("/api/v1/charts/{chart_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>, chart_id: web::Path<u32>) -> impl Responder {
-	let user_id = match is_authorized(&data.pool, &req).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}")),
 	};
@@ -123,6 +138,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 		filter_collection: body.filter_collection,
 		date_period: body.date_period,
 		asset_id: None,
+		budget_id: None,
 		max_items: body.max_items,
 		date_range: body.date_range,
 		top_left_x: body.top_left_x,
@@ -132,20 +148,20 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 	};
 
 	match super::update(&data.pool, &chart).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
 #[delete("/api/v1/charts/{chart_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req).await {
+	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match super::delete(&data.pool, chart_id.into_inner()).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

@@ -14,6 +14,7 @@ use super::transaction;
 use super::asset;
 use super::dashboard;
 use super::chart;
+use super::budget;
 use super::access_token::get_user_of_token;
 
 pub struct AppState {
@@ -39,6 +40,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 				})
 			})
 			.service(user::rest_api::post_login)
+			.service(user::rest_api::post_logout)
 			.service(user::rest_api::put_secret)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::get_by_id)
@@ -70,6 +72,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(dashboard::rest_api::get_all_of_user)
 			.service(chart::rest_api::get_by_id)
 			.service(chart::rest_api::get_chart_data_by_id)
+			.service(chart::rest_api::get_chart_data_by_type_filter_collection)
 			.service(chart::rest_api::get_all_charts_in_dashboard)
 			.service(chart::rest_api::post)
 			.service(chart::rest_api::put)
@@ -77,18 +80,24 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(currency::rest_api::get_all)
 			.service(currency::rest_api::get_by_id)
 			.service(currency::rest_api::post)
-			.service(currency::rest_api::put);
+			.service(currency::rest_api::put)
+			.service(budget::rest_api::delete)
+			.service(budget::rest_api::get_all)
+			.service(budget::rest_api::get_by_id)
+			.service(budget::rest_api::get_transactions)
+			.service(budget::rest_api::post)
+			.service(budget::rest_api::put);
 	})
 		.bind(("0.0.0.0", api_port))?
 		.run()
 		.await;
 }
 
-pub async fn is_authorized(pool: &Pool, req: &HttpRequest) -> Result<u32, Box<dyn Error>> {
+pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
 	if req.cookie("accessToken").is_none() {
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }
 
 	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
-	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string()).await?);
+	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string(), session_expiry_days).await?);
 }

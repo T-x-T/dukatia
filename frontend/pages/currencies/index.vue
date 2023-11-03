@@ -37,13 +37,13 @@ export default {
 				{name: "ID", type: "number"},
 				{name: "Name", type: "string"},
 				{name: "Symbol", type: "string"},
-				{name: "Minor in Mayor", type: "number"},
+				{name: "Minor in major", type: "number"},
 			],
 			rows: currencies.map(x => ([
 				x.id,
 				x.name,
 				x.symbol,
-				x.minor_in_mayor
+				x.minor_in_major
 			]))
 		}
 	},
@@ -81,9 +81,9 @@ export default {
 					this.query_parameters.filter_mode_symbol = mode;
 					break;
 				}
-				case "minor in mayor": {
-					this.query_parameters.filter_minor_in_mayor = value;
-					this.query_parameters.filter_mode_minor_in_mayor = mode;
+				case "minor in major": {
+					this.query_parameters.filter_minor_in_major = value;
+					this.query_parameters.filter_mode_minor_in_major = mode;
 					break;
 				}
 			}
@@ -107,9 +107,9 @@ export default {
 					this.query_parameters.filter_mode_symbol = undefined;
 					break;
 				}
-				case "minor in mayor": {
-					this.query_parameters.filter_minor_in_mayor = undefined;
-					this.query_parameters.filter_mode_minor_in_mayor = undefined;
+				case "minor in major": {
+					this.query_parameters.filter_minor_in_major = undefined;
+					this.query_parameters.filter_mode_minor_in_major = undefined;
 					break;
 				}
 			}
@@ -129,7 +129,7 @@ export default {
 				x.id,
 				x.name,
 				x.symbol,
-				x.minor_in_mayor
+				x.minor_in_major
 			]));
 		},
 
@@ -140,8 +140,8 @@ export default {
 
 			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
-			if(Number.isInteger(this.query_parameters.filter_minor_in_mayor)) url += `&filter_minor_in_mayor=${this.query_parameters.filter_minor_in_mayor}`;
-			if(this.query_parameters.filter_mode_minor_in_mayor) url += `&filter_mode_minor_in_mayor=${this.query_parameters.filter_mode_minor_in_mayor}`;
+			if(Number.isInteger(this.query_parameters.filter_minor_in_major)) url += `&filter_minor_in_major=${this.query_parameters.filter_minor_in_major}`;
+			if(this.query_parameters.filter_mode_minor_in_major) url += `&filter_mode_minor_in_major=${this.query_parameters.filter_mode_minor_in_major}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
 			if(this.query_parameters.filter_symbol) url += `&filter_symbol=${this.query_parameters.filter_symbol}`;

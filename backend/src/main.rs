@@ -15,9 +15,6 @@
   deprecated,
 )]
 
-#![feature(async_fn_in_trait)]
-#![feature(coerce_unsized)]
-
 mod webserver;
 mod access_token;
 mod user;
@@ -32,6 +29,8 @@ mod asset;
 mod dashboard;
 mod chart;
 mod traits;
+mod money;
+mod budget;
 
 use std::fmt;
 use std::error::Error;

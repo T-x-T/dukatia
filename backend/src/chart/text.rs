@@ -28,7 +28,7 @@ pub async fn get_chart_data(pool: &Pool, chart: Chart) -> Result<ChartData, Box<
 		}
 	}
 
-	return Ok(ChartData { text: Some(output), pie: None, line: None });
+	return Ok(ChartData { text: Some(output), pie: None, line: None, bar: None });
 }
 
 async fn compute_function(pool: &Pool, function: &str) -> Result<String, Box<dyn Error>> {
@@ -101,7 +101,7 @@ async fn compute_token_currency(pool: &Pool, token_name: &str, currency: &curren
 				current_balance_of_currency(
 					pool, currency.id.unwrap()
 				).await?
-			) / f64::from(currency.minor_in_mayor)).to_string(),
+			) / f64::from(currency.minor_in_major)).to_string(),
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("token name {token_name:?} is not recognized in function foreach_currency") })),
 	});
 }
@@ -112,7 +112,7 @@ async fn current_balance_of_currency(pool: &Pool, currency_id: u32) -> Result<i3
 
 	for transaction in transactions {
 		if transaction.currency_id.unwrap() == currency_id {
-			output += transaction.total_amount.unwrap_or(0);
+			output += transaction.total_amount.unwrap_or_default().to_amount();
 		}
 	}
 

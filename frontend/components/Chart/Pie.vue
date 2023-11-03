@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<p v-if="no_data">No data</p>
 		<PieChart
 			:chartData="chart_data"
 			:chartOptions="chart_options"
@@ -10,6 +11,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
+		no_data: false,
 		chart_options: {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -52,10 +54,13 @@ export default {
 
 	methods: {
 		update() {
+			let has_data = false;
 			Object.keys(this.pie).forEach(x => {
+				if(this.pie[x][1][1]) has_data = true;
 				this.chart_data.datasets[0].data.push(this.pie[x][1][1]);
 				this.chart_data.labels.push(this.pie[x][0]);
 			});
+			this.no_data = !has_data;
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
 				return " " + this.pie.filter((x: any) => x[0] === context.label)[0][1][0];
