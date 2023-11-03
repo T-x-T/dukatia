@@ -69,13 +69,14 @@ export default {
 	methods: {
 		update() {
 			const colors = [
-				"rgba(255, 99, 132, 0.2)",
-				"rgba(75, 192, 192, 0.2)",
-				"rgba(255, 205, 86, 0.2)",
-				"rgba(255, 159, 64, 0.2)",
-				"rgba(54, 162, 235, 0.2)",
-				"rgba(153, 102, 255, 0.2)",
-				"rgba(201, 203, 207, 0.2)",
+				"#E84444",
+				"#54D88D",
+				"#F79148",
+				"#45DCCA",
+				"#619CF5",
+				"#E26FFF",
+				"#F74887",
+				"#F7EA48",
 			];
 			this.bar.forEach((x: any, i: number) => {
 				if(this.chart_data.labels.length === 0) x[1].forEach((y: any) => this.chart_data.labels.push(y.name));

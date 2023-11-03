@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<button class="green" @click="newAccount">Add</button>
+		<button id="add" class="green" @click="newAccount">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
 			:tableDataProp="tableData"
@@ -171,3 +171,8 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+button#add
+	margin: 10px
+</style>	

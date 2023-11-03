@@ -6,7 +6,7 @@
 				:bar="chart_utilization_overview"
 			/>
 		</div>
-		<button class="green" @click="newBudget">Add</button>
+		<button id="add" class="green" @click="newBudget">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
 			:tableDataProp="tableData"
@@ -259,5 +259,8 @@ div.pie_chart
 div.line_chart
 	width: 60em
 	height: 20em
+
+button#add
+	margin: 10px
 
 </style>

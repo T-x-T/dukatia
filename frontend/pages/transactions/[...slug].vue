@@ -1,11 +1,11 @@
 <template>
 	<div id="main">		
-		<div v-if="!(small_device && detailsOpen)" id="top_controls">
-			<button class="green" @click="newTransaction">Add</button>
-		</div>
-
 		<div id="table_and_details">
 			<div id="table">
+				<div v-if="!(small_device && detailsOpen)" id="top_controls">
+					<button id="add" class="green" @click="newTransaction">Add</button>
+				</div>
+
 				<CustomTable
 					v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
 					:tableDataProp="tableData"
@@ -476,7 +476,7 @@ div#table
 	overflow: auto
 
 div.detailBar
-	padding-left: 8px
+	padding: 10px
 	@media screen and (max-width: 800px)
 		position: absolute
 
@@ -487,5 +487,8 @@ div#batchEdit
 		margin: 0
 		margin-left: 1em
 		height: 100%
+
+button#add
+	margin: 10px
 
 </style>

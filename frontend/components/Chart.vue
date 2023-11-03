@@ -99,6 +99,7 @@ div#chart_wrapper
 
 h5
 	text-align: center
+	background: #0C3A2B
 
 div#line_chart
 	flex-grow: 1

@@ -1,7 +1,7 @@
 <template>
 	<nav v-if="loggedIn" :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
-			<h1 v-if="!collapsed">Dukatia</h1>
+			<img id="logo" src="~/assets/dukatia-beta_logo_white.svg" alt="logo">
 		</div>
 		<ul v-if="!hidden || !small_device">
 			<li ref="dashboard" @click="change_route('dashboard')">
@@ -10,6 +10,7 @@
 					<span v-if="!collapsed">Dashboard</span>
 				</NuxtLink>
 			</li>
+			<br>
 			<li ref="transactions" @click="change_route('transactions')">
 				<NuxtLink to="/transactions" :class="currentRoute == 'transactions' ? 'active' : ''">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>
@@ -28,6 +29,7 @@
 					<span v-if="!collapsed">Assets</span>
 				</NuxtLink>
 			</li>
+			<br>
 			<li ref="accounts" @click="change_route('accounts')">
 				<NuxtLink to="/accounts" :class="currentRoute == 'accounts' ? 'active' : ''">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
@@ -52,7 +54,7 @@
 					<span v-if="!collapsed">Currencies</span>
 				</NuxtLink>
 			</li>
-			<br><br>
+			<br>
 			<li ref="settings" @click="change_route('settings')">
 				<NuxtLink to="/settings" :class="currentRoute == 'settings' ? 'active' : ''">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" /></svg>
@@ -132,8 +134,11 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 @import "assets/_vars.sass"
+
+img#logo
+	margin: 5%
 
 nav
 	width: fit-content
@@ -142,16 +147,8 @@ nav
 	grid-template-columns: 1fr
 	grid-template-rows: 5em 1fr 5em
 	transition-duration: 0.2s
-	h1
-		font-size: 2em
-		margin: 0.5em
-		cursor: pointer
-		user-select: none
-		text-shadow: 4px 4px 8px black
-		&:hover
-			transform: scale(1.1) rotate(5deg)
 	a, span
-		@extend .semibold
+		@extend .bold
 		font-size: 24px
 		margin: 10px
 		transition-duration: 0.2s
@@ -164,9 +161,6 @@ nav
 		width: 100dvw
 		z-index: 100
 		border-right: none !important
-		h1
-			&:hover
-				transform: scale(1) rotate(0deg)
 
 .mobile
 	@media screen and (max-width: 800px)
@@ -179,21 +173,13 @@ nav
 @media screen and (max-width: 800px)
 	html.dark-mode 
 		nav
-			border-bottom: 2px solid $dark-heavy
+			border-bottom: 2px solid $dark-bright
 	html.light-mode
 		nav
 			border-bottom: 2px solid $light-heavy
-	html.monochrome-mode
-		nav
-			border-bottom: 2px solid $monochrome-heavy
-	html.black-mode
-		nav
-			border-bottom: 2px solid $black-heavy
 
 li
 	width: fit-content
-	&:hover
-		letter-spacing: 0.08em
 	svg
 		height: 1.5em
 		margin-bottom: -0.4em

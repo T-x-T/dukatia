@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="main">
 		<h3>{{ dashboard_data.name }}</h3>
 		
 		<button v-if="!add_chart_open" id="add_chart" class="mobile_hidden" @click="add_chart_open = true">Add Chart</button>
@@ -50,6 +50,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+
+div#main
+	margin: 10px
 
 div#grid
 	display: grid

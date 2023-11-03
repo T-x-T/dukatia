@@ -54,10 +54,21 @@ export default {
 
 	methods: {
 		update() {
+			const colors = [
+				"#E84444",
+				"#F79148",
+				"#45DCCA",
+				"#619CF5",
+				"#E26FFF",
+				"#F74887",
+				"#F7EA48",
+			];
+
 			let has_data = false;
-			Object.keys(this.pie).forEach(x => {
+			Object.keys(this.pie).forEach((x, i) => {
 				if(this.pie[x][1][1]) has_data = true;
 				this.chart_data.datasets[0].data.push(this.pie[x][1][1]);
+				(this as any).chart_data.datasets[0].backgroundColor = colors;
 				this.chart_data.labels.push(this.pie[x][0]);
 			});
 			this.no_data = !has_data;

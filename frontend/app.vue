@@ -55,7 +55,4 @@ main
 	@media screen and (max-width: 800px)
 		height: 1rem
 		width: 100vw
-
-#innerContent
-	margin: 10px 10px 10px 10px
 </style>

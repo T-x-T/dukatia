@@ -79,6 +79,17 @@ export default {
 
 	methods: {
 		update() {
+			const colors = [
+				"#E84444",
+				"#F79148",
+				"#45DCCA",
+				"#619CF5",
+				"#E26FFF",
+				"#F74887",
+				"#F7EA48",
+			];
+
+			let i = 0;
 			for (const dataset in this.line) {
 				this.chart_data.datasets.push({
 					label: this.line[dataset][0],
@@ -88,7 +99,11 @@ export default {
 							y: this.line[dataset][1][item].value
 						}
 					)),
-				})
+					backgroundColor: colors[i],
+					borderColor: colors[i],
+				});
+				i += 1;
+				if(i >= colors.length) i = 0;
 			}
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
