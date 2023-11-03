@@ -1,6 +1,6 @@
 {
   "name": "fronted",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "front end written in nuxt.js for dukatia",
   "main": "index.js",
   "scripts": {
