@@ -4,8 +4,8 @@
   "display": "standalone",
   "icons": [
     {
-      "src": "/logo_800.png",
-      "type": "image/png",
+      "src": "/dukatia_signet.svg",
+      "type": "image/svg+xml",
       "sizes": "800x800"
     }
   ]

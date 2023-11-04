@@ -67,12 +67,18 @@ export default {
 	},
 
 	created() {
-		if(this.$colorMode.preference == "light") {
+		if(this.$colorMode.value == "light") {
 			this.chart_options.plugins.legend.labels.color = "#000";
 			this.chart_options.scales.x.ticks.fontColor = "#111";
 			this.chart_options.scales.x.gridLines.color = "#0002";
-			this.chart_options.scales.y.ticks.fontColor = "111";
-			this.chart_options.scales.y.gridLines.color = "0002";
+			this.chart_options.scales.y.ticks.fontColor = "#111";
+			this.chart_options.scales.y.gridLines.color = "#0002";
+		} else {
+			this.chart_options.plugins.legend.labels.color = "#ffffff";
+			this.chart_options.scales.x.ticks.fontColor = "#ffffff";
+			this.chart_options.scales.x.gridLines.color = "#ffffff";
+			this.chart_options.scales.y.ticks.fontColor = "#ffffff";
+			this.chart_options.scales.y.gridLines.color = "#ffffff";
 		}
 		this.update();
 	},

@@ -46,7 +46,7 @@ export default {
 	},
 
 	created() {
-		if(this.$colorMode.preference == "light") {
+		if(this.$colorMode.value == "light") {
 			this.chart_options.plugins.legend.labels.color = "#000";
 		}
 		this.update();

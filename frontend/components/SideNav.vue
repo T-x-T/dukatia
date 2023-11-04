@@ -1,7 +1,10 @@
 <template>
 	<nav v-if="loggedIn" :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
-			<img id="logo" src="~/assets/dukatia-beta_logo_white.svg" alt="logo">
+			<a href="https://dukatia.com" target="_blank">
+				<img v-if="$colorMode.value == 'dark'" id="logo" src="/dukatia-beta_logo_white.svg" alt="logo">
+				<img v-if="$colorMode.value == 'light'" id="logo" src="/dukatia-beta_logo.svg" alt="logo">
+			</a>
 		</div>
 		<ul v-if="!hidden || !small_device">
 			<li ref="dashboard" @click="change_route('dashboard')">
@@ -81,6 +84,12 @@
 				</div>
 			</div>
 		</div>
+		<div id="smol_logo" v-if="hidden">
+			<a href="https://dukatia.com" target="_blank">
+				<img v-if="$colorMode.value == 'dark' && small_device" id="logo" src="/dukatia_signet.svg" alt="logo">
+				<img v-if="$colorMode.value == 'light' && small_device" id="logo" src="/dukatia_signet.svg" alt="logo">
+			</a>
+		</div>
 	</nav>
 </template>
 
@@ -137,8 +146,24 @@ export default {
 <style lang="sass" scoped>
 @import "assets/_vars.sass"
 
-img#logo
-	margin: 5%
+div#header
+	a
+		margin: 0
+	img#logo
+		margin: 5%
+		&:hover
+			scale: 1.05
+			rotate: 5deg
+			cursor: pointer
+
+div#smol_logo
+	padding: 0.5em
+	a
+		font-size: unset
+		margin: 0
+	img
+		height: 3em
+		width: 3em
 
 nav
 	width: fit-content
@@ -161,11 +186,15 @@ nav
 		width: 100dvw
 		z-index: 100
 		border-right: none !important
+		ul
+			margin-top: 20%
 
 .mobile
 	@media screen and (max-width: 800px)
 		position: inherit
-		display: block
+		display: flex
+		align-items: center
+		justify-content: space-between
 		min-height: 4em
 		height: 4em
 		width: 100dvw
@@ -176,7 +205,7 @@ nav
 			border-bottom: 2px solid $dark-bright
 	html.light-mode
 		nav
-			border-bottom: 2px solid $light-heavy
+			border-bottom: 2px solid $light-darkest
 
 li
 	width: fit-content

@@ -6,8 +6,8 @@ html.dark-mode
   ::selection
     color: $dark-bright
   nav
-    background: $dark-darkest
     border-right: 2px solid $dark-bright
+    background: $dark-darkest
     a
       color: $dark-brightest
       &.active
@@ -28,15 +28,12 @@ html.dark-mode
         background: $warn
     &:hover
       background: $dark-bright
-  select
+  select, input
     background: $dark-darker
     color: $dark-brightest
-  input
-    background: $dark-darker
-    color: $dark-brightest
+    border-bottom: 2px solid $dark-dark
     &:disabled
-      background: $dark-darker
-      opacity: 0.75
+      opacity: 0.5
   thead
     svg
       &:hover
@@ -53,35 +50,38 @@ html.dark-mode
       background: $dark-dark
   div.gridItem
     border: 2px solid $dark-dark
-    background: $dark-darkest
   div.detailBar
     border-left: 2px solid $dark-bright
+    @media screen and (max-width: 800px)
+      border-left: none
   div#input
     svg
       color: $dark-brightest
       &:hover
         color: $dark-bright
+  h5
+    background: $dark-darker
 
 
 
 
 html.light-mode
-  scrollbar-color: $light-dark $light-bright
-  background: $light-bgdarkest
-  color: black
+  background: $light-bright
+  color: $light-darkest
   ::selection
-    color: $light-heavy
+    color: $light-dark
   nav
-    background: $light-darkest
-    border-right: 2px solid $light-heavy
+    border-right: 2px solid $light-darker
+    background: $light-bright
     a
-      color: black
+      color: $light-darkest
       &.active
-        color: $light-heavy
+        color: $light-darker
       &:hover
-        color: $light-heavy
+        color: $light-darker
   button
-    background: $light-heavy
+    background: $light-dark
+    color: $light-darkest
     &.red
       &:hover
         background: $error
@@ -92,41 +92,40 @@ html.light-mode
       &:hover
         background: $warn
     &:hover
-      background: $light-heavy
-  select
-    background: $light-heavydark
-  input
-    background: $light-heavydark
+      background: $light-bright
+  select, input
+    background: $light-dark
+    color: $light-darkest
+    border-bottom: 2px solid $light-darkest
     &:disabled
-      background: $light-dark
-  h1
-    color: $light-heavy
+      opacity: 0.5
   thead
     svg
       &:hover
-        color: $light-heavy
+        color: $light-bright
   th
-    background: $light-darkest
-    border-bottom: 2px solid $light-heavydark
+    background: $light-dark
+    border-bottom: 2px solid $light-darkest
   tr
     &:nth-child(even) td
-      background: $light-darkest
+      background: $light-bright
     &:nth-child(odd) td
-      background: $light-dark
+      background: $light-medium
     &:hover td
       background: $light-dark
   div.gridItem
-    background: $light-darkest
-  div#detailBar
-    border-left: 2px solid $light-heavydark
+    border: 2px solid $light-darker
+  div.detailBar
+    border-left: 2px solid $light-darker
+    @media screen and (max-width: 800px)
+      border-left: none
   div#input
     svg
-      color: $light-brightest
+      color: $light-darkest
       &:hover
-        color: $light-heavy
-  .background_color_darkest
-    background: $light-darkest
-    border-top: 2px solid $light-heavydark
+        color: $light-darker
+  h5
+    background: $light-dark
   
 *
   margin: 0
