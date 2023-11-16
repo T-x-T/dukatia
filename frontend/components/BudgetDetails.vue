@@ -2,11 +2,11 @@
 	<div>
 		<div id="grid">
 			<div class="gridItem form">
-				<DetailsPage
-					v-if="Object.keys(config).length > 0"
-					:config="config"
-					v-on:back="$emit('back')"
-					v-on:updateData="reload"
+				<BudgetForm
+					v-if="Object.keys(budget).length > 0"
+					:data="budget"
+					@back="$emit('back')"
+					@data_saved="reload"
 				/>
 			</div>
 
@@ -41,7 +41,6 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {} as DetailFormConfig,
 		chart_utilization_current_period: null as any,
 		chart_utilization_previous_period: null as any,
 		chart_utilization_history: null as any,
@@ -69,21 +68,6 @@ export default {
 		},
 
 		async update() {
-			this.budget.filter_tag_ids = Array.isArray(this.budget.filter_tag_ids) ? [...this.budget.filter_tag_ids] : [];
-
-			(this as any).config = {};
-			this.$nextTick(() => {
-				this.config = {
-					...this.$detailPageConfig().budget,
-					data: {
-						...this.budget,
-						active_from: new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
-						active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : null,
-					},
-				};
-			});
-
-
 			if(this.budget?.id !== undefined) {
 				this.chart_utilization_current_period = null;
 				this.chart_utilization_previous_period = null;

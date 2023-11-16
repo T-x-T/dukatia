@@ -6,11 +6,11 @@
 			<div class="gridItem form">
 				<div id="inner">
 					<h3>Asset data</h3>
-					<DetailsPage
-						v-if="Object.keys(config).length > 0"
-						:config="config"
-						v-on:back="$emit('back')"
-						v-on:updateData="reload"
+					<AssetForm
+						v-if="Object.keys(asset).length > 0"
+						:data="asset"
+						@back="$emit('back')"
+						@data_saved="reload"
 					/>
 				</div>
 			</div>
@@ -87,12 +87,10 @@
 export default {
 	data: () => ({
 		asset: {} as Asset,
-		config: {} as DetailFormConfig,
 		transactionData: {} as {[key: string]: any},
 		updateData: {} as {[key: string]: any},
 		renderCharts: false,
 		showAssetValuationEditor: false,
-		assets: [] as Asset[],
 		accounts: [] as Account[],
 		asset_total_value_chart: {} as ChartOptions,
 		asset_single_value_chart: {} as ChartOptions,
@@ -106,14 +104,13 @@ export default {
 		}
 	},
 
-	created() {
-		this.update();
+	async created() {
+		await this.update();
 	},
 
 	methods: {
 		async update() {
 			try {
-				this.assets = await $fetch("/api/v1/assets/all") as Asset[];
 				this.accounts = await $fetch("/api/v1/accounts/all");
 			} catch(e: any) {
 				console.error(e?.data?.data);
@@ -128,11 +125,6 @@ export default {
 			} else {
 				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 			}
-
-			this.config = {
-				...this.$detailPageConfig().asset,
-				data: structuredClone(toRaw(this.asset)),
-			};
 
 			this.transactionData = {
 				amount: 0,
@@ -160,10 +152,8 @@ export default {
 		},
 
 		async reload(res?: any) {
-			this.assets = await $fetch("/api/v1/assets/all");
-
 			if (res?.id) this.asset.id = res.id;
-			this.asset = this.assets.filter(x => x.id == this.asset.id)[0];
+			this.asset = await $fetch(`/api/v1/assets/${this.asset.id}`);
 			
 			await this.update();
 			this.renderCharts = false;

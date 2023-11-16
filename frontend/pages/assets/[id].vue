@@ -16,7 +16,15 @@ export default {
 
 	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
-			this.assetData = this.$detailPageConfig().asset.defaultData as Asset;
+			this.assetData = {
+				name: "",
+				description: "",
+				amount: 0,
+				value_per_unit: {major: 0, minor: 0, minor_in_major: 100, symbol: ""},
+				currency_id: 0,
+				tag_ids: [],
+				user_id: 0
+			};
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
 			this.assetData = await $fetch(`/api/v1/assets/${id}`);

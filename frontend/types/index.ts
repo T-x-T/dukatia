@@ -74,6 +74,7 @@ declare global {
 		recipient?: Recipient,
 		asset_id?: number,
 		positions: Position[],
+		timestamp_string?: string,
 	}
 
 	type Position = {
@@ -94,6 +95,8 @@ declare global {
 		currency_id: number,
 		active_from: Date,
 		active_to?: Date,
+		active_from_string?: string,
+		active_to_string?: string,
 		used_amount?: Money,
 		available_amount?: Money,
 		utilization?: number,
@@ -190,7 +193,7 @@ declare global {
 		initial?: number,
 		suffix?: "currencyOfAccountSymbol",
 		addNew?: boolean,
-		choices?: {value: any, display: string[]},
+		choices?: {value: any, display: string}[],
 	}
 
 	type DetailFormConfig = {

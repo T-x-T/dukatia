@@ -16,7 +16,11 @@ export default {
 
 	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
-			this.currencyData = this.$detailPageConfig().currency.defaultData as Currency;
+			this.currencyData = {
+				name: "",
+				minor_in_major: 100,
+				symbol: ""
+			};
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
 			this.currencyData = await $fetch(`/api/v1/currencies/${id}`);
