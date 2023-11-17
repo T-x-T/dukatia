@@ -172,6 +172,8 @@ export default {
 		tableData: {} as TableData,
 	}),
 
+	emits: ["rowClick", "updateSort", "resetSort", "updateFilter", "resetFilter", "applyFilter", "updatePage", "rowSelect"],
+
 	props: {
 		tableDataProp: {
 			type: Object as PropType<TableData>,

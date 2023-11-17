@@ -54,6 +54,8 @@ export default {
 		show_options: false,
 	}),
 
+	emits: ["change_size", "deleted"],
+
 	props: {
 		chart_options: {
 			type: Object as PropType<ChartOptions>,

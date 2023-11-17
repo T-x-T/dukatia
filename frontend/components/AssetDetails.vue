@@ -64,6 +64,8 @@ export default {
 		asset_amount_chart: {} as ChartOptions,
 	}),
 
+	emits: ["back"],
+
 	props: {
 		propAsset: {
 			type: Object as PropType<Asset>,

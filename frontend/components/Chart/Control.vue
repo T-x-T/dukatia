@@ -37,6 +37,8 @@ export default {
 		date_period: "",
 	}),
 
+	emits: ["update"],
+
 	props: {
 		default_date_range: String,
 		default_date_period: String,

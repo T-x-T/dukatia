@@ -81,6 +81,8 @@ export default {
 		}
 	}),
 
+	emits: ["back", "change_size", "deleted"],
+
 	props: {
 		chart_options: {
 			type: Object as PropType<ChartOptions>,

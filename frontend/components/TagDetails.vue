@@ -9,6 +9,8 @@
 
 <script lang="ts">
 export default {
+	emits: ["back"],
+
 	props: {
 		tag: {
 			type: Object as PropType<Tag>,

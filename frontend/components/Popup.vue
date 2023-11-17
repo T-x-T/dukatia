@@ -11,6 +11,12 @@
 	</div>
 </template>
 
+<script lang="ts">
+export default {
+	emits: ["close"],
+}
+</script>
+
 <style lang="sass" scoped>
 #wrapper
 	width: 100vw

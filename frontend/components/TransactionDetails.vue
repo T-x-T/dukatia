@@ -12,6 +12,8 @@
 
 <script lang="ts">
 export default {
+	emits: ["back", "updateData"],
+
 	props: {
 		transaction: {
 			type: Object as PropType<Transaction>,

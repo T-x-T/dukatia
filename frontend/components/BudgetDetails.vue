@@ -55,6 +55,8 @@ export default {
 		}
 	},
 
+	emits: ["back"],
+
 	async created() {
 		this.budget = structuredClone(toRaw(this.prop_budget));
 		await this.update();

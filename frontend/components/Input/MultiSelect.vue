@@ -29,6 +29,8 @@ export default {
 		searchTerm: ""
 	}),
 
+	emits: ["update"],
+
 	props: {
 		selectData: {
 			type: Object as PropType<SelectData>,
