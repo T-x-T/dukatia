@@ -272,14 +272,13 @@ export default {
 		},
 
 		async updateAndLoadTable() {
+			this.closeDetails();
 			await this.updateTable();
-			this.detailsOpen = false;
-			this.selectedRow = {} as Transaction;
-			history.pushState({}, "", "/transactions");
 		},
 		
 		closeDetails() {
 			this.detailsOpen = false;
+			this.selectedRow = {} as Transaction;
 			history.pushState({}, "", "/transactions");
 		},
 

@@ -5,7 +5,7 @@
 			:data="transaction"
 			:default_data="default_transaction"
 			@back="$emit('back')"
-			@data_saved="async () => {await update(); $emit('updateData');}"
+			@data_saved="$emit('updateData')"
 		/>
 	</div>
 </template>
@@ -24,15 +24,9 @@ export default {
 	},
 
 	async created() {
-		await this.update();
+		let transaction = this.transaction.id ? await $fetch(`/api/v1/transactions/${this.transaction.id}`) : structuredClone(toRaw(this.default_transaction));
+		transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
+		transaction.asset_id = transaction.asset ? transaction.asset.id : transaction.asset_id ? transaction.asset_id : undefined;
 	},
-
-	methods: {
-		async update() {
-			let transaction = this.transaction.id ? await $fetch(`/api/v1/transactions/${this.transaction.id}`) : structuredClone(toRaw(this.default_transaction));
-			transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
-			transaction.asset_id = transaction.asset ? transaction.asset.id : transaction.asset_id ? transaction.asset_id : undefined;
-		}
-	}
 }
 </script>

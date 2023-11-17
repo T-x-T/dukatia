@@ -6,20 +6,35 @@
 			ID:
 			<input type="number" v-model="transaction.id" disabled>
 		</label>
-		<label>
-			Account:
-			<select ref="first_input" v-model="transaction.account_id">
-				<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
-			</select>
-		</label>
-		<button tabindex="-1">+</button>
-		<label>
-			Recipient:
-			<select v-model="transaction.recipient_id">
-				<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
-			</select>
-		</label>
-		<button tabindex="-1">+</button>
+
+		<div class="label_wrapper">
+			<label>
+				Account:
+				<select ref="first_input" v-model="transaction.account_id">
+					<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
+				</select>
+			</label>
+			<button tabindex="-1" @click="show_account_form = true">+</button>
+		</div>
+
+		<div class="label_wrapper">
+			<label>
+				Recipient:
+				<select v-model="transaction.recipient_id">
+					<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
+				</select>
+			</label>
+			<button tabindex="-1" @click="show_recipient_form = true">+</button>
+		</div>
+
+		<InputMultiSelect
+		v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
+		:selectData="tags_select_data"
+		v-on:update="(selected: number[]) => transaction.tag_ids = selected"
+		style="margin-right: 5px;"
+		/>
+		<button tabindex="-1" @click="show_tag_form = true">+</button>
+
 		<label>
 			Asset:
 			<select v-model="transaction.asset_id">
@@ -27,15 +42,18 @@
 				<option v-for="(asset, index) in assets" :key="index" :value="asset.id">{{asset.name}}</option>
 			</select>
 		</label>
+
 		<label>
 			Timestamp:
 			<input type="datetime-local" v-model="transaction.timestamp_string">
 		</label>
+
 		<label>
 			Comment:
 			<input type="string" v-model="transaction.comment">
 		</label>
-		<div v-if="transaction.positions.length > 1" v-for="(position_data, position_index) in transaction.positions">
+
+		<div id="position_list_item" v-if="transaction.positions.length > 1" v-for="(position_data, position_index) in transaction.positions">
 			<label>
 				Amount:
 				<InputMoney
@@ -67,21 +85,30 @@
 				/>
 			</label>
 		</div>
-		<button @click="transaction.positions.push({...default_data.positions[0]})">Add Position</button>
+		
 		<br>
-		<InputMultiSelect
-			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
-			:selectData="tags_select_data"
-			v-on:update="(selected: number[]) => transaction.tag_ids = selected"
-			style="margin-right: 5px;"
-		/>
-		<button tabindex="-1">+</button>
-
+		<button @click="transaction.positions.push({...default_data.positions[0]})">Add Position</button>
 		<br>
 		<button class="green" @click="save(true)">Save</button>
 		<button class="orange" @click="$emit('back')">Cancel</button>
 		<button class="green" @click="save(false)">Save and New</button>
 		<button class="red" @click="delete_this">Delete</button>
+		<br>
+
+		<AccountForm
+			v-if="show_account_form"
+			@back="close_account_form"
+		/>	
+
+		<RecipientForm
+			v-if="show_recipient_form"
+			@back="close_recipient_form"
+		/>	
+
+		<TagForm
+			v-if="show_tag_form"
+			@back="close_tag_form"
+		/>	
 	</div>
 </template>
 
@@ -95,6 +122,9 @@ export default {
 		assets: [] as Asset[],
 		recipients: [] as Recipient[],
 		accounts: [] as Account[],
+		show_account_form: false,
+		show_recipient_form: false,
+		show_tag_form: false,
 	}),
 
 	emits: ["back", "data_saved"],
@@ -195,6 +225,22 @@ export default {
 				positions: this.transaction.positions,
 			};
 		},
+
+		async close_account_form() {
+			this.show_account_form = false;
+			this.accounts = await $fetch('/api/v1/accounts/all');
+		},
+
+		async close_recipient_form() {
+			this.show_recipient_form = false;
+			this.recipients = await $fetch('/api/v1/recipients/all');
+		},
+
+		async close_tag_form() {
+			this.show_tag_form = false;
+			this.tags = await $fetch('/api/v1/tags/all');
+			this.update_tags_select_data();
+		},
 	},
 }
 </script>
@@ -207,4 +253,13 @@ label
 	display: flex
 	input, select
 		flex-grow: 1
+		width: 100%
+
+div.label_wrapper
+	display: flex
+	label
+		flex-grow: 1
+
+div#position_list_item
+	margin: 24px
 </style>
