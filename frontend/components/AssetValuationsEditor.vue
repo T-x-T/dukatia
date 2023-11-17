@@ -19,7 +19,7 @@
 						<input type="text" v-model="item.amount" @input="update_amount(index)">
 					</td>
 					<td>
-						<InputMoney :initial_value="item.value_per_unit" v-on:update="(new_value: Money) => {item.value_per_unit = new_value; update_value_per_unit(index)}" />
+						<InputMoney :initial_value="item.value_per_unit" @update="(new_value: Money) => {item.value_per_unit = new_value; update_value_per_unit(index)}" />
 					</td>
 					<td><input type="checkbox" v-model="item.deleted"></td>
 				</tr>

@@ -3,7 +3,7 @@
 		<RecipientDetails 
 			v-if="loaded"
 			:recipient="recipientData"
-			v-on:back="useRouter().push('/recipients')"
+			@back="useRouter().push('/recipients')"
 		/>		
 	</div>
 </template>

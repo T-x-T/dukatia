@@ -10,11 +10,11 @@
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
 			:tableDataProp="tableData"
-			v-on:rowClick="rowClick"
-			v-on:updatePage="updatePage"
-			v-on:updateFilter="updateFilter"
-			v-on:resetFilter="resetFilter"
-			v-on:applyFilter="applyFilter"
+			@rowClick="rowClick"
+			@updatePage="updatePage"
+			@updateFilter="updateFilter"
+			@resetFilter="resetFilter"
+			@applyFilter="applyFilter"
 		/>
 	</div>
 </template>

@@ -11,7 +11,7 @@
 				Value per unit:
 				<InputMoney 
 					:initial_value="update_data.value_per_unit"
-					v-on:update="((new_value: Money) => update_data.value_per_unit = new_value)"
+					@update="((new_value: Money) => update_data.value_per_unit = new_value)"
 					/>
 			</label>
 			

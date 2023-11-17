@@ -9,13 +9,13 @@
 				<CustomTable
 					v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
 					:tableDataProp="tableData"
-					v-on:rowClick="rowClick"
-					v-on:rowSelect="rowSelect"
-					v-on:updatePage="updatePage"
-					v-on:updateSort="updateSort"
-					v-on:updateFilter="updateFilter"
-					v-on:resetFilter="resetFilter"
-					v-on:applyFilter="applyFilter"
+					@rowClick="rowClick"
+					@rowSelect="rowSelect"
+					@updatePage="updatePage"
+					@updateSort="updateSort"
+					@updateFilter="updateFilter"
+					@resetFilter="resetFilter"
+					@applyFilter="applyFilter"
 				/>
 			</div>
 
@@ -46,7 +46,7 @@
 						<InputMultiSelect
 							v-if="Object.keys(selectData).length > 0"
 							:selectData="selectData"
-							v-on:update="tagUpdate"
+							@update="tagUpdate"
 						/>	
 					</div>
 
@@ -60,8 +60,8 @@
 					v-if="Object.keys(selectedRow).length > 0"
 					:transaction="selectedRow"
 					:default_transaction="default_transaction"
-					v-on:back="closeDetails"
-					v-on:updateData="updateTable"
+					@back="closeDetails"
+					@updateData="updateTable"
 				/>
 			</div>
 		</div>

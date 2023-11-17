@@ -27,7 +27,7 @@
 			<div id="controls">
 				<ChartControl 
 					v-if="options.chart_type == 'pie' || options.chart_type == 'line'"
-					v-on:update="update_date"
+					@update="update_date"
 					:default_date_range="(Number.isInteger(options.date_range) ? options.date_range : 0).toString()"
 					:default_date_period="options.date_period"
 				/>
@@ -37,9 +37,9 @@
 		<div v-if="show_options" class="wrapper mobile_hidden">
 			<ChartOptions 
 				:chart_options="options"
-				v-on:back="reload"
-				v-on:change_size="$emit('change_size')"
-				v-on:deleted="(show_options = false) || $emit('deleted')"
+				@back="reload"
+				@change_size="$emit('change_size')"
+				@deleted="(show_options = false) || $emit('deleted')"
 			/>
 		</div>
 	</div>

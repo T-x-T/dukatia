@@ -30,7 +30,7 @@
 		<InputMultiSelect
 		v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
 		:selectData="tags_select_data"
-		v-on:update="(selected: number[]) => transaction.tag_ids = selected"
+		@update="(selected: number[]) => transaction.tag_ids = selected"
 		style="margin-right: 5px;"
 		/>
 		<button tabindex="-1" @click="show_tag_form = true">+</button>

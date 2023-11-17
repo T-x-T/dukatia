@@ -49,7 +49,7 @@
 		<InputMultiSelect
 			v-if="filter_tags_select_data && Object.keys(filter_tags_select_data).length > 0"
 			:selectData="filter_tags_select_data"
-			v-on:update="(selected: number[]) => budget.filter_tag_ids = selected"
+			@update="(selected: number[]) => budget.filter_tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 

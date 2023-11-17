@@ -3,7 +3,7 @@
 		<TagDetails
 			v-if="loaded"
 			:tag="tagData"
-			v-on:back="useRouter().push('/tags')"
+			@back="useRouter().push('/tags')"
 		/>
 	</div>
 </template>

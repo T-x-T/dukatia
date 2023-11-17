@@ -3,7 +3,7 @@
 		<CurrencyDetails
 			v-if="loaded"
 			:currency="currencyData"
-			v-on:back="useRouter().push('/currencies')"
+			@back="useRouter().push('/currencies')"
 		/>
 	</div>
 </template>

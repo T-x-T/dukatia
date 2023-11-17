@@ -42,7 +42,7 @@
 				<InputMoney
 				v-if="transaction_data.total && Object.keys(transaction_data.total).length > 0"
 					:initial_value="transaction_data.total"
-					v-on:update="((new_value: Money) => {transaction_data.total_manually_changed = true; transaction_data.total = new_value; update_transaction_total()})"
+					@update="((new_value: Money) => {transaction_data.total_manually_changed = true; transaction_data.total = new_value; update_transaction_total()})"
 					/>
 			</label>
 			

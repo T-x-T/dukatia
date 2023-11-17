@@ -5,7 +5,7 @@
 		<button v-if="!add_chart_open" id="add_chart" class="mobile_hidden" @click="add_chart_open = true">Add Chart</button>
 		<div v-if="add_chart_open" id="add_chart_box">
 			<ChartOptions 
-				v-on:back="(add_chart_open = false) || update()"
+				@back="(add_chart_open = false) || update()"
 			/>
 		</div>
 
@@ -14,8 +14,8 @@
 				<div id="chart_wrapper">
 					<Chart 
 						:chart_options="chart"
-						v-on:change_size="update"
-						v-on:deleted="update"
+						@change_size="update"
+						@deleted="update"
 					/>
 				</div>
 			</div>
