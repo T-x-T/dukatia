@@ -25,7 +25,6 @@
 	z-index: 1000
 
 #popup
-	background: #171717
 	z-index: 1001
 	padding: 10px
 

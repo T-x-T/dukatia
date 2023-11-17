@@ -43,9 +43,10 @@
 		</div>
 
 		<div v-if="showAssetValuationEditor">
-			<Popup v-on:close="closeAssetValuationEditor">
+			<Popup @close="closeAssetValuationEditor">
 				<AssetValuationsEditor 
 					:assetId="asset.id"
+					@close="closeAssetValuationEditor"
 				/>
 			</Popup>
 		</div>
