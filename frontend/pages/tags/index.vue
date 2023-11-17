@@ -111,12 +111,13 @@ export default {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
 			const tags = await $fetch(this.build_request_url("/api/v1/tags/all")) as Tag[];
+			const all_tags = await $fetch("/api/v1/tags/all") as Tag[];
 			if(this.data_revision > local_data_revision) return;
 
 			this.tableData.rows = tags.map(x => ([
 				x.id,
 				x.name,
-				tags.filter(y => y.id === x.parent_id)[0]?.name //TODO: this only shows parents name when its included in the filter, should be fixed probably
+				all_tags.filter(y => y.id === x.parent_id)[0]?.name
 			]))
 		},
 

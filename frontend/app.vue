@@ -4,9 +4,7 @@
 			:loggedIn="loggedIn"		
 		/>
 		<div id="content">
-			<div id="innerContent">
-				<NuxtPage />
-			</div>
+			<NuxtPage />
 		</div>
 	</main>
 </template>
