@@ -14,7 +14,7 @@ export default {
 	props: {
 		recipient: {
 			type: Object as PropType<Recipient>,
-			required: true,
+			required: false,
 		}
 	},
 }

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<RecipientDetails 
-			v-if="Object.keys(recipientData).length > 0"
+			v-if="loaded"
 			:recipient="recipientData"
 			v-on:back="useRouter().push('/recipients')"
 		/>		
@@ -11,17 +11,17 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		recipientData: {} as Recipient
+		recipientData: {} as Recipient,
+		loaded: false,
 	}),
 
 	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
-			this.recipientData = {
-				name: ""
-			};
+			this.loaded = true;
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
 			this.recipientData = await $fetch(`/api/v1/recipients/${id}`);
+			this.loaded = true;
 		}
 	}
 }

@@ -14,7 +14,7 @@ export default {
 	props: {
 		account: {
 			type: Object as PropType<Account>,
-			required: true,
+			required: false,
 		}
 	},
 }

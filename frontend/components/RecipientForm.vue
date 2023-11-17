@@ -47,7 +47,7 @@ export default {
 	},
 
 	async mounted() {
-		this.recipient = this.data ? this.data : structuredClone(toRaw(this.default_recipient));
+		this.recipient = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_recipient));
 
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.update_tags_select_data();

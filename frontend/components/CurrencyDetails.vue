@@ -14,7 +14,7 @@ export default {
 	props: {
 		currency: {
 			type: Object as PropType<Currency>,
-			required: true,
+			required: false,
 		}
 	},
 }

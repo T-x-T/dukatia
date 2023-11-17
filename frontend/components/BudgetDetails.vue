@@ -3,7 +3,6 @@
 		<div id="grid">
 			<div class="gridItem form">
 				<BudgetForm
-					v-if="Object.keys(budget).length > 0"
 					:data="budget"
 					@back="$emit('back')"
 					@data_saved="reload"
@@ -45,13 +44,13 @@ export default {
 		chart_utilization_previous_period: null as any,
 		chart_utilization_history: null as any,
 		table_data: {} as TableData,
-		budget: {} as Budget,
+		budget: {} as Budget | undefined,
 	}),
 
 	props: {
 		prop_budget: {
 			type: Object as PropType<Budget>,
-			required: true,
+			required: false,
 		}
 	},
 
@@ -64,8 +63,18 @@ export default {
 
 	methods: {
 		async reload(res?: any) {
-			if(Number.isInteger(res?.id)) await useRouter().push(`/budgets/${res.id}`);
-			this.budget = await $fetch(`/api/v1/budgets/${this.budget.id}`);
+			console.log(res)
+			if(this.budget && Object.keys(this.budget).length > 0) {
+				console.error("this.budget isnt defined in BudgetDetails.vue reload method");
+				return;
+			}
+
+			if(Number.isInteger(res?.id)) {
+				console.log("res.id is good")
+				await useRouter().push(`/budgets/${res.id}`);
+				(this.budget as Budget).id = res.id;
+			}
+			this.budget = await $fetch(`/api/v1/budgets/${(this.budget as Budget).id}`);
 			await this.update();
 		},
 
@@ -76,14 +85,14 @@ export default {
 				this.chart_utilization_history = null;
 
 				this.$nextTick(async () => {
-					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
+					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${(this.budget as Budget).id}`)).pie;
 					
-					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${this.budget.id}`)).pie;
+					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${(this.budget as Budget).id}`)).pie;
 					if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
 						this.chart_utilization_previous_period = chart_utilization_previous_period;
 					}
 	
-					this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${this.budget.id}`)).line;
+					this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${(this.budget as Budget).id}`)).line;
 				});
 
 

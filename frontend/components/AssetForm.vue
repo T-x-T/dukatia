@@ -73,7 +73,7 @@ export default {
 	},
 
 	async mounted() {
-		this.asset = this.data ? structuredClone(toRaw(this.data)) : structuredClone(toRaw(this.default_asset));
+		this.asset = this.data && Object.keys(this.data).length > 0 ? structuredClone(toRaw(this.data)) : structuredClone(toRaw(this.default_asset));
 
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");

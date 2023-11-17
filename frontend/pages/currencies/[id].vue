@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<CurrencyDetails
-			v-if="Object.keys(currencyData).length > 0"
+			v-if="loaded"
 			:currency="currencyData"
 			v-on:back="useRouter().push('/currencies')"
 		/>
@@ -11,19 +11,17 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		currencyData: {} as Currency
+		currencyData: {} as Currency,
+		loaded: false,
 	}),
 
 	async created() {
 		if(useRoute().path.split("/")[2] == "new") {
-			this.currencyData = {
-				name: "",
-				minor_in_major: 100,
-				symbol: ""
-			};
+			this.loaded = true;
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
 			this.currencyData = await $fetch(`/api/v1/currencies/${id}`);
+			this.loaded = true;
 		}
 	}
 }

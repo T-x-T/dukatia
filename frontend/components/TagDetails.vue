@@ -14,7 +14,7 @@ export default {
 	props: {
 		tag: {
 			type: Object as PropType<Tag>,
-			required: true,
+			required: false,
 		}
 	},
 }

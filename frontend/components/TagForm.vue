@@ -47,7 +47,7 @@ export default {
 	},
 
 	async mounted() {
-		this.tag = this.data ? this.data : structuredClone(toRaw(this.default_tag));
+		this.tag = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_tag));
 
 		this.tags = await $fetch("/api/v1/tags/all");
 		(this.$refs.first_input as any).focus();

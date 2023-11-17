@@ -89,7 +89,7 @@ export default {
 	},
 
 	async mounted() {
-		this.budget = this.data ? this.data : structuredClone(toRaw(this.default_budget));
+		this.budget = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_budget));
 		this.budget.active_from_string = new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
 		this.budget.active_to_string = this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : undefined,
 		

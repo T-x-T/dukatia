@@ -48,7 +48,7 @@ export default {
 	},
 
 	async mounted() {
-		this.currency = this.data ? this.data : structuredClone(toRaw(this.default_currency));
+		this.currency = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_currency));
 		(this.$refs.first_input as any).focus();
 	},
 

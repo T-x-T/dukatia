@@ -39,7 +39,7 @@ export default {
 		currencies: [] as Currency[],
 		default_account: {
 			id: undefined,
-			default_currency_id: undefined,
+			default_currency_id: 0,
 			name: "",
 			tag_ids: []
 		} as Account,
@@ -55,7 +55,7 @@ export default {
 	},
 
 	async mounted() {
-		this.account = this.data ? this.data : structuredClone(toRaw(this.default_account));
+		this.account = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_account));
 
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");

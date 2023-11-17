@@ -6,7 +6,6 @@
 			<div class="gridItem form">
 				<h3>Asset data</h3>
 				<AssetForm
-					v-if="Object.keys(asset).length > 0"
 					:data="asset"
 					@back="$emit('back')"
 					@data_saved="reload"
@@ -44,7 +43,8 @@
 
 		<div v-if="showAssetValuationEditor">
 			<Popup @close="closeAssetValuationEditor">
-				<AssetValuationsEditor 
+				<AssetValuationsEditor
+					v-if="asset && Number.isInteger(asset.id)"
 					:assetId="asset.id"
 					@close="closeAssetValuationEditor"
 				/>
@@ -56,7 +56,7 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		asset: {} as Asset,
+		asset: {} as Asset | undefined,
 		renderCharts: false,
 		showAssetValuationEditor: false,
 		asset_total_value_chart: {} as ChartOptions,
@@ -69,7 +69,7 @@ export default {
 	props: {
 		propAsset: {
 			type: Object as PropType<Asset>,
-			required: true,
+			required: false,
 		}
 	},
 
@@ -79,28 +79,31 @@ export default {
 
 	methods: {
 		async update() {			
-			this.asset = Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
+			this.asset = this.asset && Object.keys(this.asset).length > 0 ? this.asset : this.propAsset;
 
-			if(!this.asset) {
-				console.error("this.asset isnt defined!")
-				return;
-			} else {
+			if(this.asset && Object.keys(this.asset).length > 0) {
 				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
+				
+				this.asset_total_value_chart = await $fetch("/api/v1/charts/7");
+				this.asset_total_value_chart.asset_id = this.asset.id;
+				this.asset_single_value_chart = await $fetch("/api/v1/charts/8");
+				this.asset_single_value_chart.asset_id = this.asset.id;
+				this.asset_amount_chart = await $fetch("/api/v1/charts/9");
+				this.asset_amount_chart.asset_id = this.asset.id;
+
+				this.renderCharts = true;
 			}
-
-			this.asset_total_value_chart = await $fetch("/api/v1/charts/7");
-			this.asset_total_value_chart.asset_id = this.asset.id;
-			this.asset_single_value_chart = await $fetch("/api/v1/charts/8");
-			this.asset_single_value_chart.asset_id = this.asset.id;
-			this.asset_amount_chart = await $fetch("/api/v1/charts/9");
-			this.asset_amount_chart.asset_id = this.asset.id;
-
-			this.renderCharts = true;
 		},
 
 		async reload(res?: any) {
-			if (res?.id) this.asset.id = res.id;
-			this.asset = await $fetch(`/api/v1/assets/${this.asset.id}`);
+			if(this.asset && Object.keys(this.asset).length > 0) {
+				console.error("this.asset isnt defined in AssetDetails.vue reload method");
+				return;
+			}
+
+			if (res?.id) (this.asset as Asset).id = res.id;
+			this.asset = await $fetch(`/api/v1/assets/${(this.asset as Asset).id}`);
+			useRouter().push(`/assets/${(this.asset as Asset).id}`);
 			
 			await this.update();
 			this.renderCharts = false;

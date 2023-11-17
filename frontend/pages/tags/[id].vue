@@ -1,7 +1,7 @@
 <template>
 	<div id="main">
 		<TagDetails
-			v-if="Object.keys(tagData).length > 0"
+			v-if="loaded"
 			:tag="tagData"
 			v-on:back="useRouter().push('/tags')"
 		/>
@@ -11,17 +11,17 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		tagData: {} as Tag
+		tagData: {} as Tag,
+		loaded: false,
 	}),
 
 	async created() {		
 		if(useRoute().path.split("/")[2] == "new") {
-			this.tagData = {
-				name: ""
-			};
+			this.loaded = true;
 		} else {
 			const id = Number(useRoute().path.split("/")[2]);
 			this.tagData = await $fetch(`/api/v1/tags/${id}`);
+			this.loaded = true;
 		}
 	}
 }
