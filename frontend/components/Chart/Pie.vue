@@ -80,3 +80,8 @@ export default {
 	}
 }
 </script>
+
+<style lang="sass" scoped>
+div
+	height: 100%
+</style>

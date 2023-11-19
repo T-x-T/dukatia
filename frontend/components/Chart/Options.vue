@@ -1,6 +1,5 @@
 <template>
 	<div id="wrapper">
-		<button id="back_button" class="green" @click="save_and_go_back">Back</button>
 		<h5>Options</h5>
 
 		<label for="title">Title:</label>
@@ -49,7 +48,7 @@
 		</select>
 		<br>
 
-		<label for="top_left_y">Top:</label>
+<!-- 		<label for="top_left_y">Top:</label>
 		<input type="number" v-model="options.top_left_y" @change="change_size" name="top_left_y" />
 		<label for="top_left_x">Left:</label>
 		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
@@ -57,9 +56,11 @@
 		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
 		<label for="bottom_right_x">Right:</label>
 		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
-		<br>
+		<br> -->
 		
-		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete chart</button>
+		<button class="green" @click="save_and_go_back">Save</button>
+		<button class="orange" @click="$emit('back')">Cancel</button>
+		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete</button>
 	</div>
 </template>
 
@@ -153,10 +154,6 @@ div#wrapper
 
 h5
 	text-align: center
-
-#back_button
-	position: absolute
-	width: fit-content
 
 input
 	width: 4em

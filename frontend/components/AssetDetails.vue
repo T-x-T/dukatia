@@ -25,18 +25,18 @@
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<Chart
-					:chart_options="asset_total_value_chart"
+				<ChartLine
+					:line="asset_total_value_chart"
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<Chart
-					:chart_options="asset_single_value_chart"
+				<ChartLine
+					:line="asset_single_value_chart"
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
-				<Chart
-					:chart_options="asset_amount_chart"
+				<ChartLine
+					:line="asset_amount_chart"
 				/>
 			</div>
 		</div>
@@ -84,12 +84,9 @@ export default {
 			if(this.asset && Object.keys(this.asset).length > 0) {
 				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 				
-				this.asset_total_value_chart = await $fetch("/api/v1/charts/7");
-				this.asset_total_value_chart.asset_id = this.asset.id;
-				this.asset_single_value_chart = await $fetch("/api/v1/charts/8");
-				this.asset_single_value_chart.asset_id = this.asset.id;
-				this.asset_amount_chart = await $fetch("/api/v1/charts/9");
-				this.asset_amount_chart.asset_id = this.asset.id;
+				this.asset_total_value_chart = (await $fetch(`/api/v1/charts/line/asset_total_value/data?asset_id=${this.asset.id}`)).line;
+				this.asset_single_value_chart = (await $fetch(`/api/v1/charts/line/asset_single_value/data?asset_id=${this.asset.id}`)).line;
+				this.asset_amount_chart = (await $fetch(`/api/v1/charts/line/asset_amount/data?asset_id=${this.asset.id}`)).line;
 
 				this.renderCharts = true;
 			}
