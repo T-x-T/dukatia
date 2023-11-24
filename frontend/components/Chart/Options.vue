@@ -3,15 +3,15 @@
 		<h5>Options</h5>
 
 		<label for="title">Title:</label>
-		<input type="text" v-model="options.title" name="title" />
+		<input type="text" v-model="options.title" name="title" @input="change_options" />
 		<br>
 
 		<label for="max_items">Maximum Number of Items:</label>
-		<input type="number" v-model="options.max_items" name="max_items" />
+		<input type="number" v-model="options.max_items" name="max_items" @input="change_options" />
 		<br>
 
 		<label for="chart_type">Chart Type:</label>
-		<select v-model="options.chart_type" name="chart_type">
+		<select v-model="options.chart_type" name="chart_type" @change="change_options">
 			<option value="text">Text</option>
 			<option value="pie">Pie</option>
 			<option value="line">Line</option>
@@ -19,15 +19,15 @@
 		<br>
 
 		<label v-if="options.chart_type != 'text'" for="collection">Collection:</label>
-		<select v-if="options.chart_type != 'text'" v-model="options.filter_collection" name="collection">
-			<option v-for="(item, index) in filter_collections[options.chart_type]" :value="item">{{item}}</option>
+		<select v-if="options.chart_type != 'text'" v-model="options.filter_collection" name="collection" @change="change_options">
+			<option v-for="(item, index) in filter_collections[options.chart_type]" :key="index" :value="item">{{item}}</option>
 		</select>
 		<label v-if="options.chart_type == 'text'" for="text_template">Template:</label>
 		<input type="text" v-if="options.chart_type == 'text'" v-model="options.text_template" name="text_template" />
 		<br>
 
 		<label v-if="options.chart_type == 'line'" for="date_period">Default Period:</label>
-		<select v-if="options.chart_type == 'line'" v-model="options.date_period" name="date_period">
+		<select v-if="options.chart_type == 'line'" v-model="options.date_period" name="date_period" @change="change_options">
 			<option value="daily">Daily</option>
 			<option value="monthly">Monthly</option>
 			<option value="quarterly">Quarterly</option>
@@ -36,7 +36,7 @@
 		<br>
 
 		<label for="date_range">Default Date Range:</label>
-		<select v-model="options.date_range" name="date_range">
+		<select v-model="options.date_range" name="date_range" @change="change_options">
 			<option value="0">Last 28 days</option>
 			<option value="1">Last month</option>
 			<option value="2">Current month</option>
@@ -47,19 +47,7 @@
 			<option value="7">Total</option>
 		</select>
 		<br>
-
-<!-- 		<label for="top_left_y">Top:</label>
-		<input type="number" v-model="options.top_left_y" @change="change_size" name="top_left_y" />
-		<label for="top_left_x">Left:</label>
-		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
-		<label for="bottom_right_y">Bottom:</label>
-		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
-		<label for="bottom_right_x">Right:</label>
-		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
-		<br> -->
 		
-		<button class="green" @click="save_and_go_back">Save</button>
-		<button class="orange" @click="$emit('back')">Cancel</button>
 		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete</button>
 	</div>
 </template>
@@ -82,7 +70,7 @@ export default {
 		}
 	}),
 
-	emits: ["back", "change_size", "deleted"],
+	emits: ["deleted", "update"],
 
 	props: {
 		chart_options: {
@@ -110,16 +98,6 @@ export default {
 	},
 
 	methods: {
-		async save_and_go_back() {
-			await this.save();
-			this.$emit('back');
-		},
-
-		async change_size() {
-			await this.save();
-			this.$emit('change_size');
-		},
-
 		async save() {
 			if(Number.isInteger(this.options.id)) {
 				await $fetch(`/api/v1/charts/${this.options.id}`, {
@@ -141,6 +119,11 @@ export default {
 		async delete_this() {
 			await $fetch(`/api/v1/charts/${this.options.id}`, {method: "DELETE"});
 			this.$emit('deleted');
+		},
+
+		async change_options() {
+			await this.save();
+			this.$emit("update", this.options);
 		},
 	},
 }

@@ -40,19 +40,23 @@ export default {
 	emits: ["update"],
 
 	props: {
-		default_date_range: String,
-		default_date_period: String,
+		prop_date_range: String,
+		prop_date_period: String,
 	},
 
 	mounted() {
-		if(this.default_date_range) {
-			this.date_range = this.default_date_range;
-			if(this.default_date_period) this.date_period = this.default_date_period;
-			this.update();
-		}
+		this.update_from_props();
 	},
 
 	methods: {
+		update_from_props() {
+			if(typeof this.prop_date_range == "string") {
+				this.date_range = this.prop_date_range;
+				if(typeof this.prop_date_period == "string") this.date_period = this.prop_date_period;
+				this.update();
+			}
+		},
+
 		updateDate() {
 			this.$emit("update", {
 				from_date: this.from_date,
@@ -152,6 +156,15 @@ export default {
 				date_period: this.date_period
 			});
 		}
+	},
+
+	watch: {
+		prop_date_period() {
+			this.update_from_props();
+		},
+		prop_date_range() {
+			this.update_from_props();
+		},
 	}
 }
 </script>

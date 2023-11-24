@@ -9,13 +9,12 @@
 			</button>
 			<div v-if="show_options && !fullscreen" id="chart_options" class="wrapper">
 				<ChartOptions 
-				:chart_options="options"
-				@back="reload"
-				@change_size="$emit('change_size')"
-				@deleted="(show_options = false) || $emit('deleted')"
+					:chart_options="options"
+					@deleted="(show_options = false) || $emit('deleted')"
+					@update="(new_options: ChartOptions) => {options = {...new_options}; reset_chart()}"
 				/>
 			</div>
-			<div class="chart_wrapper" v-if="show_chart">
+			<div class="chart_wrapper">
 				<button v-if="!show_options" id="fullscreen_button" class="mobile_hidden special_button" @click="() => {show_options = true; fullscreen = true;}">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
 				</button>
@@ -23,20 +22,20 @@
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
 				</button>
 				<h5>{{ options.title }}</h5>
-				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'text'">
+				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'text' && show_chart">
 					<ChartText
 						v-if="chart_data.text"
 						:text="chart_data.text"
 					/>
 				</div>
-				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'pie'">
+				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'pie' && show_chart">
 					<ChartPie
 						v-if="chart_data.pie"
 						:pie="chart_data.pie"
 						:key="key"
 					/>
 				</div>
-				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'line'">
+				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'line' && show_chart">
 					<ChartLine
 						v-if="chart_data.line"
 						:line="chart_data.line"
@@ -48,8 +47,8 @@
 					<ChartControl 
 						v-if="options.chart_type == 'pie' || options.chart_type == 'line'"
 						@update="update_date"
-						:default_date_range="(Number.isInteger(options.date_range) ? options.date_range : 0).toString()"
-						:default_date_period="options.date_period"
+						:prop_date_range="(Number.isInteger(Number(options.date_range)) ? options.date_range : 0).toString()"
+						:prop_date_period="options.date_period"
 					/>
 				</div>
 			</div>
@@ -66,9 +65,11 @@ export default {
 		show_options: false,
 		fullscreen: false,
 		show_chart: true,
+		query: "",
+		last_data_update: 0,
 	}),
 
-	emits: ["change_size", "deleted"],
+	emits: ["deleted"],
 
 	props: {
 		chart_options: {
@@ -87,19 +88,23 @@ export default {
 
 	methods: {
 		async update_date(options: {from_date: string, to_date: string, date_period: string}) {
-			let query = `?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`;
-			if (Number.isInteger(this.options.asset_id)) query += `&asset_id=${this.options.asset_id}`;
- 			this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data${query}`);
+			this.query = `?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`;
+			if((Date.now().valueOf() - this.last_data_update) > 2) {
+				this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data${this.query}`);
+			 	this.last_data_update = Date.now().valueOf();
+			}
 			this.key++;
 		},
 
 		async reload() {
-			this.reset_chart();
+			await this.reset_chart();
 			this.options = await $fetch(`/api/v1/charts/${this.options.id}`);
 			this.show_options = false
 		},
 
-		reset_chart() {
+		async reset_chart() {
+			this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data${this.query}`);
+			this.last_data_update = Date.now().valueOf();
 			this.show_chart = false;
 			this.$nextTick(() => this.show_chart = true);
 		},
