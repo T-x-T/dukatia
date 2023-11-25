@@ -2,13 +2,8 @@
 	<div id="main">
 		<h3>{{ dashboard_data.name }}</h3>
 		
-		<button v-if="!add_chart_open" id="add_chart" class="mobile_hidden" @click="add_chart_open = true">Add Chart</button>
+		<button id="add_chart" class="mobile_hidden" @click="add_chart">Add Chart</button>
 		<button id="edit_button" class="mobile_hidden" @click="edit_mode = !edit_mode">Edit mode</button>
-		<div v-if="add_chart_open" id="add_chart_box">
-			<ChartOptions 
-				@back="(add_chart_open = false) || update()"
-			/>
-		</div>
 
 		<div id="grid">
 			<div v-for="(chart, index) in charts" :key="index" class="gridItem" :style="`grid-column: ${chart.top_left_x + 1} / ${chart.bottom_right_x + 1}; grid-row: ${chart.top_left_y + 1} / ${chart.bottom_right_y + 1}`">
@@ -53,7 +48,6 @@
 export default {
 	data: () => ({
 		charts: [] as ChartOptions[],
-		add_chart_open: false,
 		edit_mode: false,
 		grid_width: 10,
 	}),
@@ -71,19 +65,41 @@ export default {
 
 	methods: {
 		async update() {
-			this.charts = await $fetch("/api/v1/dashboards/0/charts");
+			const new_charts = await $fetch("/api/v1/dashboards/0/charts");
+			this.charts = [];
+			this.$nextTick(() => this.charts = new_charts);
 		},
 
+		async add_chart() {
+			const lowest_chart_y = this.charts.map(x => x.bottom_right_y).sort((a, b) => b - a)[0];
+			const chart: ChartOptions = {
+				chart_type: "line",
+				title: "New chart",
+				date_period: "monthly",
+				filter_collection: "earning_spending_net",
+				date_range: 6,
+				top_left_x: 0,
+				top_left_y: lowest_chart_y,
+				bottom_right_x: 2,
+				bottom_right_y: lowest_chart_y + 2
+			};
+
+			await this.save(chart);
+			this.update();
+		},
+		
 		resize_top_smaller(chart: ChartOptions) {
 			if(this.get_height(chart) > 1) {
 				chart.top_left_y++;
 				this.reload_chart(chart);
+				this.save(chart);
 			}
 		},
 
 		resize_right_smaller(chart: ChartOptions) {
 			if(this.get_width(chart) > 1) {
 				chart.bottom_right_x--;
+				this.save(chart);
 			}
 		},
 
@@ -91,36 +107,42 @@ export default {
 			if(this.get_height(chart) > 1) {
 				chart.bottom_right_y--;
 				this.reload_chart(chart);
+				this.save(chart);
 			}
 		},
 
 		resize_left_smaller(chart: ChartOptions) {
 			if(this.get_width(chart) > 1) {
 				chart.top_left_x++;
+				this.save(chart);
 			}
 		},
 
 		resize_top_larger(chart: ChartOptions) {
 			if(chart.top_left_y > 0 && !this.collides_up(chart)) {
 				chart.top_left_y--;
+				this.save(chart);
 			}
 		},
 
 		resize_right_larger(chart: ChartOptions) {
 			if(chart.bottom_right_x < 10 && !this.collides_right(chart)) {
 				chart.bottom_right_x++;
+				this.save(chart);
 			}
 		},
 
 		resize_bottom_larger(chart: ChartOptions) {
 			if(!this.collides_down(chart)) {
 				chart.bottom_right_y++;
+				this.save(chart);
 			}
 		},
 
 		resize_left_larger(chart: ChartOptions) {
 			if(chart.top_left_x > 0 && !this.collides_left(chart)) {
 				chart.top_left_x--;
+				this.save(chart);
 			}
 		},
 
@@ -163,6 +185,24 @@ export default {
 		reload_chart(chart: ChartOptions) {
 			chart.disabled = true;
 			this.$nextTick(() => chart.disabled = false);
+		},
+
+		async save(chart: ChartOptions) {
+			if(Number.isInteger(chart.id)) {
+				await $fetch(`/api/v1/charts/${chart.id}`, {
+					method: "PUT", body: {
+						...chart,
+						date_range: Number(chart.date_range),
+					}
+				});
+			} else {
+				await $fetch("/api/v1/charts", {
+					method: "POST", body: {
+						...chart,
+						date_range: Number(chart.date_range),
+					}
+				});
+			}
 		},
 	}
 }
