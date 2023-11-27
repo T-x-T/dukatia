@@ -96,7 +96,7 @@ impl Asset {
 		return self;
 	}
 
-	pub async fn get_total_cost_of_ownership(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
+	pub async fn get_total_cost_of_ownership(self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Self, Box<dyn Error>> {
 		if self.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
 		}
@@ -106,7 +106,9 @@ impl Asset {
 			.get().await?;
 		
 		return Ok(Self {
-			total_cost_of_ownership: if transactions.is_empty() { None } else { Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0, self.value_per_unit.clone().unwrap_or_default().get_minor_in_major(), self.value_per_unit.clone().unwrap_or_default().get_symbol())) },
+			total_cost_of_ownership: if transactions.is_empty() { None } else { 
+				Some(actually_get_total_cost_of_ownership(transactions, self.amount.unwrap_or(0.0) == 0.0, self.value_per_unit.clone().unwrap_or_default().get_minor_in_major(), self.value_per_unit.clone().unwrap_or_default().get_symbol(), timestamp))
+			},
 			..self
 		});
 	}
@@ -125,6 +127,28 @@ pub struct AssetLoader<'a> {
 	query_parameters: QueryParameters,
 }
 
+impl<'a> AssetLoader<'a> {
+	async fn get_at(self, timestamp: DateTime<Utc>) -> Result<Vec<Asset>, Box<dyn Error>> {
+		let assets: Vec<Asset> = futures_util::future::try_join_all(
+			db::AssetDbReader::new(self.pool)
+				.set_query_parameters(self.query_parameters)
+				.execute()
+				.await?
+				.into_iter()
+				.map(|x| x.get_total_cost_of_ownership(self.pool, timestamp))
+		).await?;
+
+		return Ok(assets);
+	}
+
+	async fn get_first_at(self, timestamp: DateTime<Utc>) -> Result<Asset, Box<dyn Error>> {
+		match self.get_at(timestamp).await?.first() {
+			Some(x) => return Ok(x.clone()),
+			None => return Err(Box::new(crate::CustomError::NoItemFound { item_type: "unknown".to_string() })),
+		}
+	}
+}
+
 impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
 	fn new(pool: &'a Pool) -> Self {
 		Self {
@@ -134,16 +158,7 @@ impl<'a> Loader<'a, Asset> for AssetLoader<'a> {
 	}
 
 	async fn get(self) -> Result<Vec<Asset>, Box<dyn Error>> {
-		let assets: Vec<Asset> = futures_util::future::try_join_all(
-			db::AssetDbReader::new(self.pool)
-				.set_query_parameters(self.query_parameters)
-				.execute()
-				.await?
-				.into_iter()
-				.map(|x| x.get_total_cost_of_ownership(self.pool))
-		).await?;
-
-		return Ok(assets);
+		return self.get_at(Utc::now()).await;
 	}
 
 	fn get_query_parameters(&self) -> &QueryParameters {
@@ -237,7 +252,7 @@ impl<'a> Loader<'a, AssetValuation> for AssetValuationLoader<'a> {
 	}
 }
 
-fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool, minor_in_major: u32, symbol: String) -> TotalCostOfOwnership {
+fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool, minor_in_major: u32, symbol: String, timestamp: DateTime<Utc>) -> TotalCostOfOwnership {
 	assert!(!transactions.is_empty());
 	
 	let total_cost_of_ownership: i32 = transactions
@@ -251,11 +266,11 @@ fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, curr
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 
 	let last_timestamp = if transactions.is_empty() {
-		Utc::now()
+		timestamp
 	} else if current_amount_is_zero {
 		transactions.pop().unwrap().timestamp
 	} else {
-		Utc::now()
+		timestamp
 	};
 
 	

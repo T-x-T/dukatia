@@ -2214,7 +2214,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=not",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=not",
+					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=not&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -2223,7 +2223,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=less",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=less",
+					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=less&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -2232,7 +2232,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=more",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=more",
+					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=more&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -2241,7 +2241,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using sort_property=id",
-					"endpoint": "/api/v1/assets/all?sort_property=id",
+					"endpoint": "/api/v1/assets/all?sort_property=id&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -2250,7 +2250,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using sort_property=id and sort_direction=DESC",
-					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=DESC",
+					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=DESC&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -2259,7 +2259,7 @@
 				},
 				{
 					"name": "retrieval of assets returns expected output when using sort_property=id and sort_direction=ASC",
-					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=ASC",
+					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=ASC&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
