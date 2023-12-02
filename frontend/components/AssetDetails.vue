@@ -93,7 +93,7 @@ export default {
 		},
 
 		async reload(res?: any) {
-			if(this.asset && Object.keys(this.asset).length > 0) {
+			if(!this.asset || Object.keys(this.asset).length === 0) {
 				console.error("this.asset isnt defined in AssetDetails.vue reload method");
 				return;
 			}
