@@ -20,7 +20,7 @@
 		<div class="label_wrapper">
 			<label>
 				Recipient:
-				<select v-model="transaction.recipient_id">
+				<select v-model="transaction.recipient_id" @change="update_tags_using_recipient">
 					<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
 				</select>
 			</label>
@@ -28,10 +28,10 @@
 		</div>
 
 		<InputMultiSelect
-		v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
-		:selectData="tags_select_data"
-		@update="(selected: number[]) => transaction.tag_ids = selected"
-		style="margin-right: 5px;"
+			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
+			:selectData="tags_select_data"
+			@update="(selected: number[]) => {tags_manually_changed = true; transaction.tag_ids = selected}"
+			style="margin-right: 5px;"
 		/>
 		<button tabindex="-1" @click="show_tag_form = true">+</button>
 
@@ -117,6 +117,7 @@ export default {
 	data: () => ({
 		transaction: {} as Transaction,
 		tags_select_data: {} as SelectData | null,
+		tags_manually_changed: false,
 		tags: [] as Tag[],
 		currencies: [] as Currency[],
 		assets: [] as Asset[],
@@ -150,7 +151,11 @@ export default {
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 
-		this.update_tags_select_data();
+		if(typeof this.transaction.id !== "number") {
+			this.update_tags_using_recipient();
+		} else {
+			this.update_tags_select_data();
+		}
 		(this.$refs.first_input as any).focus();
 	},
 
@@ -199,6 +204,13 @@ export default {
 				console.error(e);
 				window.alert(e?.data);
 			}
+		},
+
+		update_tags_using_recipient() {
+			if(this.tags_manually_changed) return;
+			const recipient = this.recipients.filter(x => x.id === this.transaction.recipient_id)[0];
+			this.transaction.tag_ids = structuredClone(toRaw(recipient.tag_ids));
+			this.update_tags_select_data();
 		},
 
 		update_tags_select_data() {
