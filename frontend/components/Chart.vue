@@ -47,7 +47,7 @@
 					<ChartControl 
 						v-if="options.chart_type == 'pie' || options.chart_type == 'line'"
 						@update="update_date"
-						:prop_date_range="(Number.isInteger(Number(options.date_range)) ? options.date_range : 0).toString()"
+						:prop_date_range="typeof options.date_range === 'number' ? options.date_range.toString() : '0'"
 						:prop_date_period="options.date_period"
 					/>
 				</div>
