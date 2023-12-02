@@ -190,7 +190,8 @@ export default {
 				this.$nextTick(() => {
 					this.transaction = structuredClone(toRaw(this.default_data));
 					this.transaction.timestamp_string = new Date(new Date(this.transaction.timestamp).valueOf() - (new Date(this.transaction.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
-					this.update_tags_select_data();
+					this.tags_manually_changed = false;
+					this.update_tags_using_recipient();
 					this.$nextTick(() => (this.$refs.first_input as any).focus());
 				});
 			}
