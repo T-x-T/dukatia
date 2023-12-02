@@ -50,11 +50,9 @@ export default {
 
 	methods: {
 		update_from_props() {
-			if(typeof this.prop_date_range == "string") {
-				this.date_range = this.prop_date_range;
-				if(typeof this.prop_date_period == "string") this.date_period = this.prop_date_period;
-				this.update();
-			}
+			if(typeof this.prop_date_range == "string") this.date_range = this.prop_date_range;
+			if(typeof this.prop_date_period == "string") this.date_period = this.prop_date_period;
+			this.update();
 		},
 
 		updateDate() {
