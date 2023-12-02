@@ -2,6 +2,7 @@
 	<div>
 		<p v-if="no_data">No data</p>
 		<PieChart
+			v-if="!no_data"
 			:chartData="chart_data"
 			:chartOptions="chart_options"
 		/>
