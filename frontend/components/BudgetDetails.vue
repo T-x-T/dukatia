@@ -64,7 +64,7 @@ export default {
 	methods: {
 		async reload(res?: any) {
 			console.log(res)
-			if(this.budget && Object.keys(this.budget).length > 0) {
+			if(!this.budget || Object.keys(this.budget).length === 0) {
 				console.error("this.budget isnt defined in BudgetDetails.vue reload method");
 				return;
 			}
@@ -85,14 +85,14 @@ export default {
 				this.chart_utilization_history = null;
 
 				this.$nextTick(async () => {
-					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${(this.budget as Budget).id}`)).pie;
+					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_current_period_utilization?budget_id=${(this.budget as Budget).id}`));
 					
-					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${(this.budget as Budget).id}`)).pie;
-					if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
+					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_previous_period_utilization?budget_id=${(this.budget as Budget).id}`));
+					if (chart_utilization_previous_period.datasets[0].data[0].value !== 0 || chart_utilization_previous_period.datasets[1].data[0].value) {
 						this.chart_utilization_previous_period = chart_utilization_previous_period;
 					}
 	
-					this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${(this.budget as Budget).id}`)).line;
+					this.chart_utilization_history = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_utilization_history?budget_id=${(this.budget as Budget).id}`));
 				});
 
 

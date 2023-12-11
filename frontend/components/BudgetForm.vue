@@ -152,7 +152,7 @@ export default {
 				name: this.budget.name,
 				amount: this.budget.amount,
 				rollover: this.budget.rollover,
-				period: this.budget.period,
+				period: Number(this.budget.period),
 				filter_tag_ids: this.budget.filter_tag_ids,
 				currency_id: this.budget.currency_id,
 				active_from: new Date(this.budget.active_from_string as any).toISOString(),

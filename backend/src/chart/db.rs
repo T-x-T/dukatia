@@ -2,10 +2,10 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use chrono::{DateTime, Utc};
 
-use super::Chart;
+use super::ChartOptions;
 use crate::CustomError;
 
-pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
+pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Error>> {
 	let res = pool.get()
 		.await
 		.unwrap()
@@ -21,7 +21,7 @@ pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
 		return Ok(turn_row_into_chart(&res[0]));
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<Chart>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	let res = pool.get()
 	.await
 	.unwrap()
@@ -38,7 +38,7 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 	)
 }
 
-pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
 	let user_id: Option<i32> = chart.user_id.map(|x| x as i32);
 	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
 	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
@@ -61,7 +61,7 @@ pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
 	return Ok(());
 }
 
-pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
 	if chart.id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("chart") }));
 	}
@@ -94,7 +94,7 @@ pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
 	return Ok(());
 }
 
-fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
+fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 	let id: i32 = row.get(0);
 	let user_id: Option<i32> = row.get(1);
 	let chart_type: String = row.get(2);
@@ -111,7 +111,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 	let bottom_right_x: Option<i32> = row.get(13);
 	let bottom_right_y: Option<i32> = row.get(14);
 
-	return Chart {
+	return ChartOptions {
 		id: Some(id as u32),
 		user_id: user_id.map(|x| x as u32),
 		chart_type,
@@ -125,6 +125,8 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> Chart {
 		budget_id: None,
 		max_items: max_items.map(|x| x as u32),
 		date_range: date_range.map(|x| x as u32),
+		only_positive: None,
+		only_negative: None,
 		top_left_x: top_left_x.map(|x| x as u32),
 		top_left_y: top_left_y.map(|x| x as u32),
 		bottom_right_x: bottom_right_x.map(|x| x as u32),

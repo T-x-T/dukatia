@@ -13,16 +13,9 @@ export default {
 		chart_options: {
 			responsive: true,
 			maintainAspectRatio: false,
-			indexAxis: 'y',
+			indexAxis: "y",
 			scales: {
 				x: {
-					ticks: {
-						fontColor: "#ddd"
-					},
-					gridLines: {
-						color: "#fff2",
-						drawBorder: false
-					},
 					stacked: true
 				},
 				y: {
@@ -45,8 +38,8 @@ export default {
 			}
 		},
 		chart_data: {
-			labels: [] as any,
-			datasets: [] as any[]
+			datasets: [] as any[],
+			labels: [] as string[],
 		},
 	}),
 
@@ -60,14 +53,12 @@ export default {
 	created() {
 		if(this.$colorMode.value == "light") {
 			this.chart_options.plugins.legend.labels.color = "#000";
-			this.chart_options.scales.x.ticks.fontColor = "111";
-			this.chart_options.scales.x.gridLines.color = "0002";
 		}
 		this.update();
 	},
 
 	methods: {
-		update() {
+		get_color(i: number) {
 			const colors = [
 				"#E84444",
 				"#54D88D",
@@ -78,17 +69,23 @@ export default {
 				"#F74887",
 				"#F7EA48",
 			];
-			this.bar.forEach((x: any, i: number) => {
-				if(this.chart_data.labels.length === 0) x[1].forEach((y: any) => this.chart_data.labels.push(y.name));
-				this.chart_data.datasets.push({
-					data: x[1].map((y: any) => y.value),
-					label: x[0],
-					backgroundColor: colors[i],
-				});
-			});
+
+			while (i >= colors.length) i = i - colors.length;
+
+			return colors[i];
+		},
+
+		update() {
+			this.chart_data.labels = this.bar.datasets[0].data.map((x: any) => x.name);
+			this.chart_data.datasets = this.bar.datasets.map((x: any, i: number) => ({
+				data: x.data.map((y: any) => y.value),
+				label: x.label,
+				backgroundColor: this.get_color(i),
+				borderColor: this.get_color(i),
+			}));
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-				return `${this.bar[context.datasetIndex][0]}: ${this.bar[context.datasetIndex][1][context.dataIndex].label}`;
+				return `${this.bar.datasets[context.datasetIndex].label}: ${this.bar.datasets[context.datasetIndex].data[context.dataIndex].label}`;
 			}
 		}
 	}

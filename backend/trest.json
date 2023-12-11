@@ -2302,79 +2302,57 @@
 			},
 			"tests": [
 				{
-					"name": "adding text chart using foreach_currency returns 200",
-					"endpoint": "/api/v1/charts",
-					"method": "POST",
-					"body": {
-						"chart_type": "text",
-						"title": "Current Balance",
-						"text_template": "%foreach_currency{$name: $current_balance$symbol*}%"
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
-					"name": "text chart using foreach_currency got created correctly",
-					"endpoint": "/api/v1/charts/10",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"chart_type":"text","title":"Current Balance","text_template":"%foreach_currency{$name: $current_balance$symbol*}%","filter_from":null,"filter_to":null,"filter_collection":null,"date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
-					}
-				},
-				{
-					"name": "adding pie chart using filter_collection recipients returns 200",
+					"name": "adding pie chart using filter_collection get_per_recipient_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "pie",
 						"title": "Spending per recipient in date range",
-						"filter_collection": "recipients"
+						"filter_collection": "get_per_recipient_over_time"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
 				},
 				{
-					"name": "pie chart using filter_collection recipients got created correctly",
-					"endpoint": "/api/v1/charts/11",
+					"name": "pie chart using filter_collection get_per_recipient_over_time got created correctly",
+					"endpoint": "/api/v1/charts/10",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":10,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding pie chart using filter_collection tags returns 200",
+					"name": "adding pie chart using filter_collection get_per_tag_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "pie",
 						"title": "Spending per tag in date range",
-						"filter_collection": "tags"
+						"filter_collection": "get_per_tag_over_time"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
 				},
 				{
-					"name": "pie chart using filter_collection tags got created correctly",
-					"endpoint": "/api/v1/charts/12",
+					"name": "pie chart using filter_collection get_per_tag_over_time got created correctly",
+					"endpoint": "/api/v1/charts/11",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":12,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"tags","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_per_tag_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection recipients returns 200",
+					"name": "adding line chart using filter_collection get_per_recipient_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Spending per recipient over time",
-						"filter_collection": "recipients",
+						"filter_collection": "get_per_recipient_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2382,22 +2360,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection recipients got created correctly",
-					"endpoint": "/api/v1/charts/13",
+					"name": "line chart using filter_collection get_per_recipient_over_time got created correctly",
+					"endpoint": "/api/v1/charts/12",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"recipients","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":12,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection accounts returns 200",
+					"name": "adding line chart using filter_collection get_per_account_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Spending per account over time",
-						"filter_collection": "accounts",
+						"filter_collection": "get_per_account_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2405,22 +2383,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection accounts got created correctly",
-					"endpoint": "/api/v1/charts/14",
+					"name": "line chart using filter_collection get_per_account_over_time got created correctly",
+					"endpoint": "/api/v1/charts/13",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"accounts","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per account over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_per_account_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection currencies returns 200",
+					"name": "adding line chart using filter_collection get_per_currency_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Spending per currency over time",
-						"filter_collection": "currencies",
+						"filter_collection": "get_per_currency_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2428,22 +2406,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection currencies got created correctly",
-					"endpoint": "/api/v1/charts/15",
+					"name": "line chart using filter_collection get_per_currency_over_time got created correctly",
+					"endpoint": "/api/v1/charts/14",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"currencies","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per currency over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_per_currency_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection earning_spending_net returns 200",
+					"name": "adding line chart using filter_collection get_earning_spending_net_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Earning and spending over time",
-						"filter_collection": "earning_spending_net",
+						"filter_collection": "get_earning_spending_net_over_time",
 						"date_period": "monthly"
 					},
 					"expected_outcome": {
@@ -2451,22 +2429,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection earning_spending_net got created correctly",
-					"endpoint": "/api/v1/charts/16",
+					"name": "line chart using filter_collection get_earning_spending_net_over_time got created correctly",
+					"endpoint": "/api/v1/charts/15",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"earning_spending_net","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Earning and spending over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_earning_spending_net_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection asset_total_value returns 200",
+					"name": "adding line chart using filter_collection get_single_asset_total_value_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Total value over time",
-						"filter_collection": "asset_total_value",
+						"filter_collection": "get_single_asset_total_value_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2474,22 +2452,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection asset_total_value got created correctly",
-					"endpoint": "/api/v1/charts/17",
+					"name": "line chart using filter_collection get_single_asset_total_value_over_time got created correctly",
+					"endpoint": "/api/v1/charts/16",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_total_value","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Total value over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_total_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection asset_single_value returns 200",
+					"name": "adding line chart using filter_collection get_single_asset_single_value_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Value over time per single unit",
-						"filter_collection": "asset_single_value",
+						"filter_collection": "get_single_asset_single_value_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2497,22 +2475,22 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection asset_single_value got created correctly",
-					"endpoint": "/api/v1/charts/18",
+					"name": "line chart using filter_collection get_single_asset_single_value_over_time got created correctly",
+					"endpoint": "/api/v1/charts/17",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_single_value","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Value over time per single unit","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_single_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 				{
-					"name": "adding line chart using filter_collection asset_amount returns 200",
+					"name": "adding line chart using filter_collection get_single_asset_amount_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
 					"body": {
 						"chart_type": "line",
 						"title": "Amount over time",
-						"filter_collection": "asset_amount",
+						"filter_collection": "get_single_asset_amount_over_time",
 						"date_period": "daily"
 					},
 					"expected_outcome": {
@@ -2520,12 +2498,12 @@
 					}
 				},
 				{
-					"name": "line chart using filter_collection asset_amount got created correctly",
-					"endpoint": "/api/v1/charts/19",
+					"name": "line chart using filter_collection get_single_asset_amount_over_time got created correctly",
+					"endpoint": "/api/v1/charts/18",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"asset_amount","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Amount over time","text_template":null,"filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
 					}
 				},
 
@@ -2540,7 +2518,7 @@
 						"title": "test",
 						"filter_from": "2022-03-25T11:22:00.000Z",
 						"filter_to": "2023-03-25T11:22:00.000Z",
-						"filter_collection": "asset_amount",
+						"filter_collection": "get_single_asset_amount_over_time",
 						"date_period": "daily",
 						"max_items": 12,
 						"date_range": 3,
@@ -2555,23 +2533,23 @@
 				},
 				{
 					"name": "chart with all options got created correctly",
-					"endpoint": "/api/v1/charts/20",
+					"endpoint": "/api/v1/charts/19",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":20,"user_id":0,"chart_type":"line","title":"test","text_template":null,"filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"asset_amount","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
+						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"test","text_template":null,"filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"only_positive":null,"only_negative":null,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
 					}
 				},
 				{
 					"name": "modifying chart with all options returns 200",
-					"endpoint": "/api/v1/charts/20",
+					"endpoint": "/api/v1/charts/19",
 					"method": "PUT",
 					"body": {
 						"chart_type": "pie",
 						"title": "test2",
 						"filter_from": "2021-03-25T11:22:00.000Z",
 						"filter_to": "2022-03-25T11:22:00.000Z",
-						"filter_collection": "tags",
+						"filter_collection": "get_per_tag_over_time",
 						"date_period": "monthly",
 						"max_items": 2,
 						"date_range": 1,
@@ -2586,16 +2564,16 @@
 				},
 				{
 					"name": "chart with all options modified got created correctly",
-					"endpoint": "/api/v1/charts/20",
+					"endpoint": "/api/v1/charts/19",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":20,"user_id":0,"chart_type":"pie","title":"test2","text_template":null,"filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"tags","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
+						"body_equals": {"id":19,"user_id":0,"chart_type":"pie","title":"test2","text_template":null,"filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"get_per_tag_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"only_positive":null,"only_negative":null,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
 					}
 				},
 				{
 					"name": "deleting chart returns 200",
-					"endpoint": "/api/v1/charts/20",
+					"endpoint": "/api/v1/charts/19",
 					"method": "DELETE",
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -2603,11 +2581,11 @@
 				},
 				{
 					"name": "deleted chart isnt there anymore",
-					"endpoint": "/api/v1/charts/20",
+					"endpoint": "/api/v1/charts/19",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error":"specified item of type chart not found with filter id=20"}
+						"body_equals": {"error":"specified item of type chart not found with filter id=19"}
 					}
 				},
 
@@ -2759,16 +2737,7 @@
 
 
 				{
-					"name": "retrieval of text chart using foreach_currency returns correct output",
-					"endpoint": "/api/v1/charts/0/data",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 123€\nUSD: 10$\n","pie":null,"line":null,"bar":null}
-					}
-				},
-				{
-					"name": "retrieval of pie chart using filter_collection recipients returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time returns correct output",
 					"endpoint": "/api/v1/charts/1/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -2777,7 +2746,7 @@
 					}
 				},
 				{
-					"name": "retrieval of pie chart using filter_collection tags returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time returns correct output",
 					"endpoint": "/api/v1/charts/2/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -2786,7 +2755,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection recipients returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time returns correct output",
 					"endpoint": "/api/v1/charts/3/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -2795,7 +2764,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection accounts returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_account_over_time returns correct output",
 					"endpoint": "/api/v1/charts/4/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -2804,7 +2773,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection currencies returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_currency_over_time returns correct output",
 					"endpoint": "/api/v1/charts/5/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -2813,7 +2782,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output",
+					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time returns correct output",
 					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
@@ -2989,17 +2958,9 @@
 
 
 
+
 				{
-					"name": "retrieval of text chart using foreach_currency returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/0/data",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 129€\nUSD: 16$\n","pie":null,"line":null,"bar":null}
-					}
-				},
-				{
-					"name": "retrieval of pie chart using filter_collection recipients returns correct output with more transactions",
+					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/1/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3008,7 +2969,7 @@
 					}
 				},
 				{
-					"name": "retrieval of pie chart using filter_collection tags returns correct output with more transactions",
+					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/2/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3017,7 +2978,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection recipients returns correct output with more transactions",
+					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/3/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3026,7 +2987,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection accounts returns correct output with more transactions",
+					"name": "retrieval of line chart using filter_collection get_per_account_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/4/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3035,7 +2996,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection currencies returns correct output with more transactions",
+					"name": "retrieval of line chart using filter_collection get_per_currency_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/5/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3044,7 +3005,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection earning_spending_net returns correct output with more transactions",
+					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time returns correct output with more transactions",
 					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
@@ -3056,7 +3017,7 @@
 
 
 				{
-					"name": "retrieval of pie chart using filter_collection recipients within date range returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/1/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
@@ -3065,7 +3026,7 @@
 					}
 				},
 				{
-					"name": "retrieval of pie chart using filter_collection tags within date range returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/2/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
@@ -3074,7 +3035,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection recipients within date range returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/3/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
@@ -3083,7 +3044,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection accounts within date range returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_account_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/4/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
@@ -3092,7 +3053,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection currencies within date range returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_currency_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/5/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
@@ -3101,7 +3062,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection earning_spending_net within date range returns correct output",
+					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time within date range returns correct output",
 					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z&date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
@@ -3198,16 +3159,7 @@
 
 
 				{
-					"name": "retrieval of text chart using foreach_currency with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/0/data",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": {"text":"Euro: 252€\nUSD: 26$\n","pie":null,"line":null,"bar":null}
-					}
-				},
-				{
-					"name": "retrieval of pie chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/1/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3216,7 +3168,7 @@
 					}
 				},
 				{
-					"name": "retrieval of pie chart using filter_collection tags with multiple transactions on one day returns correct output",
+					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/2/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3225,7 +3177,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection recipients with multiple transactions on one day returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/3/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3234,7 +3186,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection accounts with multiple transactions on one day returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_account_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/4/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3243,7 +3195,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection currencies with multiple transactions on one day returns correct output",
+					"name": "retrieval of line chart using filter_collection get_per_currency_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/5/data",
 					"method": "GET",
 					"expected_outcome": {
@@ -3252,7 +3204,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection earning_spending_net with multiple transactions on one day returns correct output",
+					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time with multiple transactions on one day returns correct output",
 					"endpoint": "/api/v1/charts/6/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
@@ -3263,7 +3215,7 @@
 
 
 				{
-					"name": "retrieval of pie chart tags using option max_items returns correct output",
+					"name": "retrieval of pie chart get_per_tag_over_time using option max_items returns correct output",
 					"endpoint": "/api/v1/charts/2/data?max_items=1",
 					"method": "GET",
 					"expected_outcome": {
@@ -3272,7 +3224,7 @@
 					}
 				},
 				{
-					"name": "retrieval of pie chart recipients using option max_items returns correct output",
+					"name": "retrieval of pie chart get_per_recipients_over_time using option max_items returns correct output",
 					"endpoint": "/api/v1/charts/1/data?max_items=1",
 					"method": "GET",
 					"expected_outcome": {
@@ -3382,7 +3334,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection asset_total_value returns correct output two valuations",
+					"name": "retrieval of line chart using filter_collection get_single_asset_total_value_over_time returns correct output two valuations",
 					"endpoint": "/api/v1/charts/17/data?asset_id=0",
 					"method": "GET",
 					"expected_outcome": {
@@ -3391,7 +3343,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection asset_single_value returns correct output two valuations",
+					"name": "retrieval of line chart using filter_collection get_single_asset_single_value_over_time returns correct output two valuations",
 					"endpoint": "/api/v1/charts/18/data?asset_id=0",
 					"method": "GET",
 					"expected_outcome": {
@@ -3400,7 +3352,7 @@
 					}
 				},
 				{
-					"name": "retrieval of line chart using filter_collection asset_amount returns correct output two valuations",
+					"name": "retrieval of line chart using filter_collection get_single_asset_amount_over_time returns correct output two valuations",
 					"endpoint": "/api/v1/charts/19/data?asset_id=0",
 					"method": "GET",
 					"expected_outcome": {

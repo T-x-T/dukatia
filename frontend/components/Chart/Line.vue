@@ -16,9 +16,6 @@ export default {
 			scales: {
 				x: {
 					type: "time",
-					time: {
-						unit: "day"
-					},
 					ticks: {
 						fontColor: "#ddd"
 					},
@@ -53,9 +50,7 @@ export default {
 			}
 		},
 		chart_data: {
-			datasets: [
-
-			] as any[]
+			datasets: [] as any[]
 		},
 	}),
 
@@ -84,7 +79,7 @@ export default {
 	},
 
 	methods: {
-		update() {
+		get_color(i: number) {
 			const colors = [
 				"#E84444",
 				"#F79148",
@@ -95,30 +90,21 @@ export default {
 				"#F7EA48",
 			];
 
-			let i = 0;
-			for (const dataset in this.line) {
-				this.chart_data.datasets.push({
-					label: this.line[dataset][0],
-					data: Object.keys(this.line[dataset][1]).map(item => (
-						{
-							x: this.line[dataset][1][item].timestamp, 
-							y: this.line[dataset][1][item].value
-						}
-					)),
-					backgroundColor: colors[i],
-					borderColor: colors[i],
-				});
-				i += 1;
-				if(i >= colors.length) i = 0;
-			}
+			while (i >= colors.length) i = i - colors.length;
+
+			return colors[i];
+		},
+
+		update() {
+			this.chart_data.datasets = this.line.datasets.map((x: any, i: number) => ({
+				label: x.label,
+				data: x.data.map((y: any) => ({x: y.timestamp, y: y.value})),
+				backgroundColor: this.get_color(i),
+				borderColor: this.get_color(i),
+			}));
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-				let line = {} as any;
-				Object.keys(this.line).forEach(x => line[this.line[x][0]] = this.line[x][1])
-
-				return ` ${context.dataset.label}: ` + line[context.dataset.label].filter((x: any) => {
-					return new Date(context.label.replaceAll(".", "")).toISOString() == new Date(x.timestamp).toISOString();
-				})[0].label;
+				return `${this.line.datasets[context.datasetIndex].label}: ${this.line.datasets[context.datasetIndex].data[context.dataIndex].label}`;
 			}
 		}
 	}

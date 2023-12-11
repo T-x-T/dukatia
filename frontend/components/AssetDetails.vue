@@ -25,16 +25,19 @@
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
+				<h3>Total value over time</h3>
 				<ChartLine
 					:line="asset_total_value_chart"
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
+				<h3>Total value over time of single item</h3>
 				<ChartLine
 					:line="asset_single_value_chart"
 				/>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
+				<h3>Total amount over time</h3>
 				<ChartLine
 					:line="asset_amount_chart"
 				/>
@@ -84,9 +87,9 @@ export default {
 			if(this.asset && Object.keys(this.asset).length > 0) {
 				if(this.asset.value_per_unit === undefined) this.asset.value_per_unit = {major: 0, minor: 0, minor_in_major: 100, symbol: "€"};
 				
-				this.asset_total_value_chart = (await $fetch(`/api/v1/charts/line/asset_total_value/data?asset_id=${this.asset.id}`)).line;
-				this.asset_single_value_chart = (await $fetch(`/api/v1/charts/line/asset_single_value/data?asset_id=${this.asset.id}`)).line;
-				this.asset_amount_chart = (await $fetch(`/api/v1/charts/line/asset_amount/data?asset_id=${this.asset.id}`)).line;
+				this.asset_total_value_chart = (await $fetch(`/api/v1/charts/by_collection/get_single_asset_total_value_over_time?asset_id=${this.asset.id}`));
+				this.asset_single_value_chart = (await $fetch(`/api/v1/charts/by_collection/get_single_asset_single_value_over_time?asset_id=${this.asset.id}`));
+				this.asset_amount_chart = (await $fetch(`/api/v1/charts/by_collection/get_single_asset_amount_over_time?asset_id=${this.asset.id}`));
 
 				this.renderCharts = true;
 			}
@@ -118,6 +121,10 @@ export default {
 <style lang="sass" scoped>
 div#wrapper
 	margin: 10px
+
+h3
+	text-align: center
+	font-size: 1.5em
 
 div#grid
 	display: flex

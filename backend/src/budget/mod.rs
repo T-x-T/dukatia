@@ -1,4 +1,5 @@
 pub mod rest_api;
+pub mod chart;
 mod db;
 
 #[cfg(test)]
@@ -168,7 +169,7 @@ impl Budget {
 		}
 
 		self.available_amount = Some(self.clone().amount * period_count - full_used_amount);
-		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / (f64::from(self.clone().amount.to_amount() * period_count)));
+		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount() as i32) / (f64::from(self.clone().amount.to_amount() as i32 * period_count)));
 
 		return Ok(self);
 	}
@@ -318,7 +319,6 @@ impl<'a> BudgetLoader<'a> {
 		return self.get_full_at(Utc::now()).await;
 	}
 
-	#[allow(dead_code)]
 	pub async fn get_first_full(self) -> Result<Budget, Box<dyn Error>> {
 		return self.get_first_full_at(Utc::now()).await;
 	}

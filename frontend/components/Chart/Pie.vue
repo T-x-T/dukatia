@@ -33,7 +33,16 @@ export default {
 		},
 		chart_data: {
 			datasets: [{
-				data: [] as number[]
+				data: [] as number[],
+				backgroundColor: [
+					"#E84444",
+					"#F79148",
+					"#45DCCA",
+					"#619CF5",
+					"#E26FFF",
+					"#F74887",
+					"#F7EA48",
+				],
 			}],
 			labels: [] as string[]
 		},
@@ -54,28 +63,15 @@ export default {
 	},
 
 	methods: {
-		update() {
-			const colors = [
-				"#E84444",
-				"#F79148",
-				"#45DCCA",
-				"#619CF5",
-				"#E26FFF",
-				"#F74887",
-				"#F7EA48",
-			];
 
-			let has_data = false;
-			Object.keys(this.pie).forEach((x, i) => {
-				if(this.pie[x][1][1]) has_data = true;
-				this.chart_data.datasets[0].data.push(this.pie[x][1][1]);
-				(this as any).chart_data.datasets[0].backgroundColor = colors;
-				this.chart_data.labels.push(this.pie[x][0]);
-			});
-			this.no_data = !has_data;
+		update() {
+			this.no_data = this.pie.datasets.length === 0;
+
+			this.chart_data.datasets[0].data = this.pie.datasets.map((x: any) => x.data[x.data.length - 1].value);
+			this.chart_data.labels = this.pie.datasets.map((x: any) => x.label);
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {
-				return " " + this.pie.filter((x: any) => x[0] === context.label)[0][1][0];
+				return `${this.pie.datasets[context.dataIndex].label}: ${this.pie.datasets[context.dataIndex].data[this.pie.datasets[context.dataIndex].data.length - 1].label}`;
 			}
 		},
 	}

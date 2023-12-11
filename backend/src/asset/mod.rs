@@ -1,5 +1,6 @@
 mod db;
 pub mod rest_api;
+pub mod chart;
 
 use deadpool_postgres::Pool;
 use serde::{Serialize, Deserialize};

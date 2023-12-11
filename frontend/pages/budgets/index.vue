@@ -35,7 +35,7 @@ export default {
 		const budgets = await $fetch("/api/v1/budgets/all") as Budget[];
 		const tags = await $fetch("/api/v1/tags/all") as Tag[];
 		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
-		this.chart_utilization_overview = (await $fetch(`/api/v1/charts/bar/compute_all_budget_utilization_overview/data`)).bar;
+		this.chart_utilization_overview = await $fetch(`/api/v1/charts/by_collection/get_all_budget_utilization_overview`);
 		
 		this.tableData = {
 			multiSelect: false,

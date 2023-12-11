@@ -1,22 +1,31 @@
 mod db;
-mod text;
-mod pie;
-mod line;
-mod bar;
 pub mod rest_api;
 
+
+#[cfg(test)]
+mod test;
+
 use crate::CustomError;
+use crate::transaction::{self, Transaction, TransactionLoader};
+use crate::traits::*;
+use crate::money::Money;
+use crate::recipient;
+use crate::budget;
+use crate::asset;
+use crate::account;
+use crate::currency;
+use crate::tag;
 
 use serde::Serialize;
 use std::error::Error;
+use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
-use chrono::{DateTime, Utc};
+use chrono::prelude::*;
 
-#[derive(Debug, Clone, Serialize)]
-pub struct Chart {
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct ChartOptions {
 	pub id: Option<u32>,
 	pub user_id: Option<u32>,
-	#[allow(clippy::struct_field_names)]
 	pub chart_type: String,
 	pub title: String,
 	pub text_template: Option<String>,
@@ -28,33 +37,67 @@ pub struct Chart {
 	pub budget_id: Option<u32>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
+	pub only_positive: Option<bool>,
+	pub only_negative: Option<bool>,
 	pub top_left_x: Option<u32>,
 	pub top_left_y: Option<u32>,
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct ChartData {
-	pub text: Option<String>,
-	pub pie: Option<Vec<(String, (String, f64))>>,
-	pub line: Option<Vec<(String, Vec<line::Point>)>>,
-	pub bar: Option<Vec<(String, Vec<bar::Bar>)>>,
+	pub datasets: Vec<Dataset>,
 }
 
-pub async fn get_by_id(pool: &Pool, id: u32) -> Result<Chart, Box<dyn Error>> {
+#[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
+pub struct IntermediateChartData {
+	pub datasets: BTreeMap<u32, Dataset>,
+}
+
+#[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
+pub struct Dataset {
+	pub label: String,
+	pub data: Vec<DataPoint>,
+}
+
+#[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
+pub struct DataPoint {
+	pub name: Option<String>,
+	pub timestamp: Option<chrono::NaiveDate>,
+	pub value: f64,
+	pub label: String,
+}
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct DataPointMonetary {
+	pub name: Option<String>,
+	pub timestamp: Option<chrono::NaiveDate>,
+	pub value: Money,
+	pub label: String,
+}
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct DataPointMonetaryMultiCurrency {
+	pub name: Option<String>,
+	pub timestamp: Option<chrono::NaiveDate>,
+	pub value: BTreeMap<u32, Money>,
+	pub label: String,
+}
+
+pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Error>> {
 	return db::get_by_id(pool, id).await;
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<Chart>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	return db::get_all_charts_in_dashboard(pool, dashboard_id).await;
 }
 
-pub async fn add(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
 	return db::add(pool, chart).await;
 }
 
-pub async fn update(pool: &Pool, chart: &Chart) -> Result<(), Box<dyn Error>> {
+pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
 	return db::update(pool, chart).await;
 }
 
@@ -62,75 +105,133 @@ pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
 	return db::delete(pool, chart_id).await;
 }
 
-pub async fn get_chart_contents_by_id(pool: &Pool, chart_id: u32, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
-	let mut chart = get_by_id(pool, chart_id).await?;
+pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
+		"get_per_recipient_over_time" => recipient::chart::get_per_recipient_over_time(pool, options.clone()).await?,
+		"get_all_budget_utilization_overview" => budget::chart::get_all_budget_utilization_overview(pool, options.clone()).await?,
+		"get_single_budget_current_period_utilization" => budget::chart::get_single_budget_current_period_utilization(pool, options.clone()).await?,
+		"get_single_budget_previous_period_utilization" => budget::chart::get_single_budget_previous_period_utilization(pool, options.clone()).await?,
+		"get_single_budget_utilization_history" => budget::chart::get_single_budget_utilization_history(pool, options.clone()).await?,
+		"get_single_asset_total_value_over_time" => asset::chart::get_single_asset_total_value_over_time(pool, options.clone()).await?,
+		"get_single_asset_single_value_over_time" => asset::chart::get_single_asset_single_value_over_time(pool, options.clone()).await?,
+		"get_single_asset_amount_over_time" => asset::chart::get_single_asset_amount_over_time(pool, options.clone()).await?,
+		"get_per_account_over_time" => account::chart::get_per_account_over_time(pool, options.clone()).await?,
+		"get_per_currency_over_time" => currency::chart::get_per_currency_over_time(pool, options.clone()).await?,
+		"get_earning_spending_net_over_time" => transaction::chart::get_earning_spending_net_over_time(pool, options.clone()).await?,
+		"get_per_tag_over_time" => tag::chart::get_per_tag_over_time(pool, options.clone()).await?,
+		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
+	};
 	
-	if options.from_date.is_some() {
-		chart.filter_from = options.from_date;
+	let limited_output: Vec<(u32, Dataset)>;
+	if options.only_positive.is_some() && options.only_positive.unwrap() {
+		limited_output = limit_output_only_positive(sort_output(output), options.max_items);
+	} else if options.only_negative.is_some() && options.only_negative.unwrap() {
+		limited_output = limit_output_only_negative(sort_output(output), options.max_items);
+	} else {
+		limited_output = limit_output(sort_output(output), options.max_items);
 	}
-	if options.to_date.is_some() {
-		chart.filter_to = options.to_date;
-	}
-	if options.date_period.is_some() {
-		chart.date_period = options.date_period;
-	}
-	if options.asset_id.is_some() {
-		chart.asset_id = options.asset_id;
-	}
-	if options.budget_id.is_some() {
-		chart.budget_id = options.budget_id;
-	}
-	if options.max_items.is_some() {
-		chart.max_items = options.max_items;
-	}
-	if options.date_range.is_some() {
-		chart.date_range = options.date_range;
-	}
+	let datasets: Vec<Dataset> = limited_output.into_iter().map(|x| x.1).collect();
 
-	if chart.chart_type == "text" {
-		return text::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "pie" {
-		return pie::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "line" {
-		return line::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "bar" {
-		return bar::get_chart_data(pool, chart).await;
-	}
-
-	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie, line or bar") }));
+	return Ok(ChartData {datasets});
 }
 
-pub async fn get_chart_data_by_type_filter_collection(pool: &Pool, chart_type: String, filter_collection: String, options: rest_api::ChartOptions) -> Result<ChartData, Box<dyn Error>> {
-	let chart = Chart {
-		id: None,
-		user_id: None,
-		chart_type,
-		title: filter_collection.clone(),
-		text_template: None,
-		filter_from: options.from_date,
-		filter_to: options.to_date,
-		filter_collection: Some(filter_collection),
-		date_period: options.date_period,
-		asset_id: options.asset_id,
-		budget_id: options.budget_id,
-		max_items: options.max_items,
-		date_range: options.date_range,
-		top_left_x: None,
-		top_left_y: None,
-		bottom_right_x: None,
-		bottom_right_y: None,
+
+
+
+pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOptions, get_all: bool) -> Result<Vec<Transaction>, Box<dyn Error>> {
+	let min_time = DateTime::parse_from_str("0000-01-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
+	let max_time = DateTime::parse_from_str("9999-12-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
+	
+	let from_date = if get_all {
+		min_time
+	} else {
+		chart.filter_from.unwrap_or(min_time)
+	};
+	let to_date = if get_all {
+		max_time
+	} else {
+		chart.filter_to.unwrap_or(max_time)
 	};
 
+	let transactions = TransactionLoader::new(pool)
+	.set_query_parameters(
+		QueryParameters::default()
+			.set_sort_property_opt(Some(FilterAndSortProperties::Timestamp))
+			.set_sort_direction_opt(Some(SortDirection::Asc))
+		)
+		.set_filter_time_range(from_date, to_date, TimeRangeFilterModes::Between)
+		.get().await?;
 
-	if chart.chart_type == "text" {
-		return text::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "pie" {
-		return pie::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "line" {
-		return line::get_chart_data(pool, chart).await;
-	} else if chart.chart_type == "bar" {
-		return bar::get_chart_data(pool, chart).await;
+	return Ok(transactions);
+}
+
+//Tests for this exist in line
+pub fn get_date_for_period(date_period: &str, timestamp: NaiveDate) -> NaiveDate {
+	match date_period {
+		"yearly" => {
+			NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap()
+		},
+		"quarterly" => {
+			match timestamp.month() {
+				1..=3 => NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(),
+				4..=6 => NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(),
+				7..=9 => NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(),
+				_ => NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(),
+			}
+		},
+		"monthly" => {
+			NaiveDate::from_ymd_opt(timestamp.year(), timestamp.month(), 1).unwrap()
+		},
+		_ => {
+			timestamp
+		},
+	}
+}
+
+fn sort_output(input: IntermediateChartData) -> Vec<(u32, Dataset)> {
+	let mut datasets = Vec::from_iter(input.datasets);
+	datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
+	return datasets;
+}
+
+fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+	let mut output: Vec<(u32, Dataset)>;
+	
+	if limit.is_some() && input.len() > limit.unwrap() as usize {
+		let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(limit.unwrap() as usize / 2).collect();
+		input.reverse();
+		let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize / 2).collect();
+		bottom_limited_output.reverse();
+		output = top_limited_output;
+		output.append(&mut bottom_limited_output);
+	} else {
+		output = input;
 	}
 
-	return Err(Box::new(CustomError::InvalidItem { reason: String::from("chart_type is not equal to text, pie, line or bar") }));
+	return output;
+}
+
+fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+	let output: Vec<(u32, Dataset)>;
+	let default = DataPoint::default();
+	if limit.is_some() && input.len() > limit.unwrap() as usize {
+		output = input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect();
+	} else {
+		output = input;
+	}
+
+	return output;
+}
+
+fn limit_output_only_negative(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+	let output: Vec<(u32, Dataset)>;
+	let default = DataPoint::default();
+	if limit.is_some() && input.len() > limit.unwrap() as usize {
+		input.reverse();
+		output = input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect();
+	} else {
+		output = input;
+	}
+
+	return output;
 }
