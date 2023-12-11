@@ -43,7 +43,7 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 						value: vec![(transaction.currency_id.unwrap_or_default(), transaction_total_amount.clone())].into_iter().collect(),
 						label: transaction_total_amount.clone().to_string(),
 					}
-				)
+				);
 			}
 		}
 
@@ -60,7 +60,7 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 						value: vec![(transaction.currency_id.unwrap_or_default(), transaction_total_amount.clone())].into_iter().collect(),
 						label: transaction_total_amount.clone().to_string(),
 					}
-				)
+				);
 			}
 		}
 
@@ -76,7 +76,7 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 					value: vec![(transaction.currency_id.unwrap_or_default(), transaction_total_amount.clone())].into_iter().collect(),
 					label: transaction_total_amount.clone().to_string(),
 				}
-			)
+			);
 		}
 	}
 
@@ -88,10 +88,10 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 				DataPoint { 
 					name: data_point.name,
 					timestamp: data_point.timestamp,
-					value: data_point.value.values().map(|x| f64::from(x.to_amount() as i32) / f64::from(x.get_minor_in_major())).sum(),
+					value: data_point.value.values().map(|x| f64::from(x.to_amount()) / f64::from(x.get_minor_in_major())).sum(),
 					label: data_point.label,
 				}
-			)
+			);
 		}
 	}
 

@@ -212,26 +212,24 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 }
 
 fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
-	let output: Vec<(u32, Dataset)>;
 	let default = DataPoint::default();
-	if limit.is_some() && input.len() > limit.unwrap() as usize {
-		output = input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect();
+	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
+		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
 	} else {
-		output = input;
-	}
+		input
+	};
 
 	return output;
 }
 
 fn limit_output_only_negative(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
-	let output: Vec<(u32, Dataset)>;
 	let default = DataPoint::default();
-	if limit.is_some() && input.len() > limit.unwrap() as usize {
+	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
 		input.reverse();
-		output = input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect();
+		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect()
 	} else {
-		output = input;
-	}
+		input
+	};
 
 	return output;
 }

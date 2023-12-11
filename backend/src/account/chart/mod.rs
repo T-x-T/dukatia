@@ -16,10 +16,10 @@ pub async fn get_per_account_over_time(pool: &Pool, options: ChartOptions) -> Re
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let accounts = AccountLoader::new(pool).get().await?;
 
-	return Ok(calculate_get_per_account_over_time(&options, transactions, accounts));
+	return Ok(calculate_get_per_account_over_time(&options, transactions, &accounts));
 }
 
-fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec<Transaction>, accounts: Vec<Account>) -> IntermediateChartData {
+fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec<Transaction>, accounts: &[Account]) -> IntermediateChartData {
 	let mut output = IntermediateChartData::default();
 	let mut datasets_monetary: BTreeMap<u32, Vec<DataPointMonetary>> = BTreeMap::new();
 
@@ -42,7 +42,7 @@ fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec
 					value: data_point.value.clone(),
 					label: data_point.value.to_string(),
 				}
-			)
+			);
 		}
 	}
 
@@ -54,10 +54,10 @@ fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec
 				DataPoint { 
 					name: data_point.name,
 					timestamp: data_point.timestamp,
-					value: f64::from(data_point.value.to_amount() as i32) / f64::from(data_point.value.get_minor_in_major()),
+					value: f64::from(data_point.value.to_amount()) / f64::from(data_point.value.get_minor_in_major()),
 					label: data_point.label,
 				}
-			)
+			);
 		}
 	}
 

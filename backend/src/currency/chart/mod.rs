@@ -16,11 +16,11 @@ pub async fn get_per_currency_over_time(pool: &Pool, options: ChartOptions) -> R
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let currencies = CurrencyLoader::new(pool).get().await?;
 
-	return Ok(calculate_get_per_currency_over_time(&options, transactions, currencies));
+	return Ok(calculate_get_per_currency_over_time(&options, transactions, &currencies));
 }
 
 
-fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Vec<Transaction>, currencies: Vec<Currency>) -> IntermediateChartData {
+fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Vec<Transaction>, currencies: &[Currency]) -> IntermediateChartData {
 	let mut output = IntermediateChartData::default();
 	let mut datasets_monetary: BTreeMap<u32, Vec<DataPointMonetary>> = BTreeMap::new();
 
@@ -43,7 +43,7 @@ fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Ve
 					value: data_point.value.clone(),
 					label: data_point.value.to_string(),
 				}
-			)
+			);
 		}
 	}
 
@@ -55,10 +55,10 @@ fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Ve
 				DataPoint { 
 					name: data_point.name,
 					timestamp: data_point.timestamp,
-					value: f64::from(data_point.value.to_amount() as i32) / f64::from(data_point.value.get_minor_in_major()),
+					value: f64::from(data_point.value.to_amount()) / f64::from(data_point.value.get_minor_in_major()),
 					label: data_point.label,
 				}
-			)
+			);
 		}
 	}
 

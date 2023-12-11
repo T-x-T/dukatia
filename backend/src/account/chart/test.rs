@@ -10,7 +10,7 @@ mod calculate_get_per_account_over_time {
 
 	#[test]
 	fn no_data_default_chart() {
-		let res = calculate_get_per_account_over_time(&ChartOptions::default(), Vec::new(), Vec::new());
+		let res = calculate_get_per_account_over_time(&ChartOptions::default(), Vec::new(), &Vec::new());
 
 		assert_eq!(res, IntermediateChartData::default());
 	}
@@ -25,7 +25,7 @@ mod calculate_get_per_account_over_time {
 			Transaction::default().set_id(4).set_account_id(1).set_timestamp(DateTime::parse_from_str("2020-01-03 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(2000, 100, "€".to_string())).set_currency_id(0),
 			Transaction::default().set_id(5).set_account_id(2).set_timestamp(DateTime::parse_from_str("2020-01-04 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(-2100, 100, "€".to_string())).set_currency_id(0),
 		];
-		let res = calculate_get_per_account_over_time(&ChartOptions::default(), transactions, get_accounts(5));
+		let res = calculate_get_per_account_over_time(&ChartOptions::default(), transactions, &get_accounts(5));
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
@@ -57,7 +57,7 @@ mod calculate_get_per_account_over_time {
 			Transaction::default().set_id(4).set_account_id(1).set_timestamp(DateTime::parse_from_str("2020-01-03 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(2000, 100, "€".to_string())).set_currency_id(0),
 			Transaction::default().set_id(5).set_account_id(2).set_timestamp(DateTime::parse_from_str("2020-01-04 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(-2100, 100, "€".to_string())).set_currency_id(0),
 		];
-		let res = calculate_get_per_account_over_time(&chart_options, transactions, get_accounts(5));
+		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
@@ -89,7 +89,7 @@ mod calculate_get_per_account_over_time {
 			Transaction::default().set_id(4).set_account_id(1).set_timestamp(DateTime::parse_from_str("2020-03-03 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(2000, 100, "€".to_string())).set_currency_id(0),
 			Transaction::default().set_id(5).set_account_id(2).set_timestamp(DateTime::parse_from_str("2020-04-04 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(-2100, 100, "€".to_string())).set_currency_id(0),
 		];
-		let res = calculate_get_per_account_over_time(&chart_options, transactions, get_accounts(5));
+		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
@@ -121,7 +121,7 @@ mod calculate_get_per_account_over_time {
 			Transaction::default().set_id(4).set_account_id(1).set_timestamp(DateTime::parse_from_str("2020-08-03 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(2000, 100, "€".to_string())).set_currency_id(0),
 			Transaction::default().set_id(5).set_account_id(2).set_timestamp(DateTime::parse_from_str("2020-12-04 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(-2100, 100, "€".to_string())).set_currency_id(0),
 		];
-		let res = calculate_get_per_account_over_time(&chart_options, transactions, get_accounts(5));
+		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
@@ -153,7 +153,7 @@ mod calculate_get_per_account_over_time {
 			Transaction::default().set_id(4).set_account_id(1).set_timestamp(DateTime::parse_from_str("2022-08-03 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(2000, 100, "€".to_string())).set_currency_id(0),
 			Transaction::default().set_id(5).set_account_id(2).set_timestamp(DateTime::parse_from_str("2023-12-04 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(-2100, 100, "€".to_string())).set_currency_id(0),
 		];
-		let res = calculate_get_per_account_over_time(&chart_options, transactions, get_accounts(5));
+		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: [

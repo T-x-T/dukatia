@@ -16,11 +16,11 @@ pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let tags = TagLoader::new(pool).get().await?;
 
-	return Ok(calculate_get_per_tag_over_time(&options, transactions, tags));
+	return Ok(calculate_get_per_tag_over_time(&options, transactions, &tags));
 }
 
 
-fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: Vec<Tag>) -> IntermediateChartData {
+fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> IntermediateChartData {
 	let mut output = IntermediateChartData::default();
 	let mut datasets_multi_currency: BTreeMap<u32, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
 
@@ -56,7 +56,7 @@ fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Tra
 				DataPoint { 
 					name: data_point.name,
 					timestamp: data_point.timestamp,
-					value: data_point.value.values().map(|x| f64::from(x.to_amount() as i32) / f64::from(x.get_minor_in_major())).sum(),
+					value: data_point.value.values().map(|x| f64::from(x.to_amount()) / f64::from(x.get_minor_in_major())).sum(),
 					label: data_point.label,
 				}
 			);

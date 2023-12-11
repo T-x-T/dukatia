@@ -30,7 +30,7 @@ pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartO
 		.get()
 		.await?;
 
-	return Ok(calculate_get_single_asset_total_value_over_time(asset, asset_valuation_history));
+	return Ok(calculate_get_single_asset_total_value_over_time(asset, &asset_valuation_history));
 }
 
 pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
@@ -48,7 +48,7 @@ pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: Chart
 		.get()
 		.await?;
 
-	return Ok(calculate_get_single_asset_single_value_over_time(asset, asset_valuation_history));
+	return Ok(calculate_get_single_asset_single_value_over_time(asset, &asset_valuation_history));
 }
 
 pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
@@ -66,7 +66,7 @@ pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOption
 		.get()
 		.await?;
 
-	return Ok(calculate_get_single_asset_amount_over_time(asset, asset_valuation_history));
+	return Ok(calculate_get_single_asset_amount_over_time(asset, &asset_valuation_history));
 }
 
 
@@ -76,7 +76,7 @@ pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOption
 
 
 
-fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuation_history: Vec<AssetValuation>) -> IntermediateChartData {
+fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
 	let value_history: BTreeMap<NaiveDate, Money> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.value_per_unit.clone()))
 		.collect();
@@ -89,15 +89,17 @@ fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuatio
 		return IntermediateChartData::default();
 	}	
 
-	let mut dataset = Dataset::default();
-	dataset.label = asset.name;
+	let mut dataset = Dataset { 
+		label: asset.name,
+		..Default::default()
+	};
 
 	let mut first_day: NaiveDate = Utc::now().date_naive();
 	if !value_history.is_empty() && value_history.first_key_value().unwrap().0.signed_duration_since(first_day).num_seconds() < 0 {
-		first_day = value_history.first_key_value().unwrap().0.clone();	
+		first_day = *value_history.first_key_value().unwrap().0;	
 	}
 	if !amount_history.is_empty() && amount_history.first_key_value().unwrap().0.signed_duration_since(first_day).num_seconds() < 0 {
-		first_day = amount_history.first_key_value().unwrap().0.clone();	
+		first_day = *amount_history.first_key_value().unwrap().0;	
 	}
 	let tomorrow: NaiveDate = Utc::now().date_naive().checked_add_signed(chrono::Duration::days(1)).unwrap();
 
@@ -128,7 +130,7 @@ fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuatio
 	};
 }
 
-fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuation_history: Vec<AssetValuation>) -> IntermediateChartData {
+fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
 	let value_history: BTreeMap<NaiveDate, Money> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.value_per_unit.clone()))
 		.collect();
@@ -137,12 +139,14 @@ fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuati
 		return IntermediateChartData::default();
 	}	
 
-	let mut dataset = Dataset::default();
-	dataset.label = asset.name;
+	let mut dataset = Dataset {
+		label: asset.name,
+		..Default::default()
+	};
 
 	let mut first_day: NaiveDate = Utc::now().date_naive();
 	if !value_history.is_empty() && value_history.first_key_value().unwrap().0.signed_duration_since(first_day).num_seconds() < 0 {
-		first_day = value_history.first_key_value().unwrap().0.clone();	
+		first_day = *value_history.first_key_value().unwrap().0;	
 	}
 	let tomorrow: NaiveDate = Utc::now().date_naive().checked_add_signed(chrono::Duration::days(1)).unwrap();
 
@@ -172,7 +176,7 @@ fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuati
 	};
 }
 
-fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_history: Vec<AssetValuation>) -> IntermediateChartData {
+fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
 	let amount_history: BTreeMap<NaiveDate, f64> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.amount))
 		.collect();
@@ -181,12 +185,14 @@ fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_his
 		return IntermediateChartData::default();
 	}	
 
-	let mut dataset = Dataset::default();
-	dataset.label = asset.name;
+	let mut dataset = Dataset {
+		label: asset.name,
+		..Default::default()
+	};
 
 	let mut first_day: NaiveDate = Utc::now().date_naive();
 	if !amount_history.is_empty() && amount_history.first_key_value().unwrap().0.signed_duration_since(first_day).num_seconds() < 0 {
-		first_day = amount_history.first_key_value().unwrap().0.clone();	
+		first_day = *amount_history.first_key_value().unwrap().0;	
 	}
 	let tomorrow: NaiveDate = Utc::now().date_naive().checked_add_signed(chrono::Duration::days(1)).unwrap();
 

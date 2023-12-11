@@ -114,6 +114,7 @@ impl Budget {
 		return self;
 	}
 
+	#[allow(unused)]
 	pub async fn calculate_utilization_of_current_period(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
 		return self.calculate_utilization_of_period_at(pool, Utc::now()).await;
 	}
@@ -169,7 +170,7 @@ impl Budget {
 		}
 
 		self.available_amount = Some(self.clone().amount * period_count - full_used_amount);
-		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount() as i32) / (f64::from(self.clone().amount.to_amount() as i32 * period_count)));
+		self.utilization = Some(f64::from(self.clone().used_amount.unwrap().to_amount()) / (f64::from(self.clone().amount.to_amount() * period_count)));
 
 		return Ok(self);
 	}

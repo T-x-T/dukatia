@@ -321,7 +321,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 	let amount: Money = if body.total_value.is_some() {
 		body.total_value.clone().unwrap()
 	} else {
-		Money::from_amount(-((f64::from(body.value_per_unit.to_amount() as i32) * amount_difference) as i32) - body.cost.clone().unwrap_or_default().to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
+		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or_default().to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
 	};
 
 	Transaction::default()

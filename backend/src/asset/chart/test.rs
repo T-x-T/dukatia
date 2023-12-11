@@ -14,7 +14,7 @@ mod calculate_get_single_asset_total_value_over_time {
 			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
 		];
 
-		let res = calculate_get_single_asset_total_value_over_time(asset, asset_valuation_history);
+		let res = calculate_get_single_asset_total_value_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![
@@ -65,7 +65,7 @@ mod calculate_get_single_asset_single_value_over_time {
 			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
 		];
 
-		let res = calculate_get_single_asset_single_value_over_time(asset, asset_valuation_history);
+		let res = calculate_get_single_asset_single_value_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![
@@ -116,7 +116,7 @@ mod calculate_get_single_asset_amount_over_time {
 			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
 		];
 
-		let res = calculate_get_single_asset_amount_over_time(asset, asset_valuation_history);
+		let res = calculate_get_single_asset_amount_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![

@@ -36,7 +36,6 @@ async fn get_all_charts_in_dashboard(data: web::Data<AppState>, req: HttpRequest
 struct ChartOptionsQuery {
 	from_date: Option<DateTime<Utc>>,
 	to_date: Option<DateTime<Utc>>,
-	only_parents: Option<bool>,
 	date_period: Option<String>,
 	asset_id: Option<u32>,
 	budget_id: Option<u32>,

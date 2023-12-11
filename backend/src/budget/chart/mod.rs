@@ -115,7 +115,7 @@ pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) ->
 				DataPoint { 
 					name: Some(budget.name.clone()),
 					timestamp: None,
-					value: f64::from(used_amount.to_amount() as i32) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
+					value: f64::from(used_amount.to_amount()) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
 					label: used_amount.to_string(),
 				},
 			] 
@@ -129,7 +129,7 @@ pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) ->
 				DataPoint { 
 					name: Some(budget.name),
 					timestamp: None,
-					value: f64::from(available_amount.to_amount() as i32) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
+					value: f64::from(available_amount.to_amount()) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
 					label: available_amount.to_string(),
 				},
 			] 
@@ -144,7 +144,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
-	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1).into();
+	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1);
 
 	output.datasets.insert(0, 
 		Dataset { 
@@ -153,7 +153,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 				DataPoint { 
 					name: None,
 					timestamp: Some(period.0.naive_utc().date()),
-					value: f64::from(used_amount.to_amount() as i32) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
+					value: f64::from(used_amount.to_amount()) / if used_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(used_amount.get_minor_in_major()) },
 					label: used_amount.to_string(),
 				},
 			] 
@@ -167,7 +167,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 				DataPoint { 
 					name: None,
 					timestamp: Some(period.0.naive_utc().date()),
-					value: f64::from(available_amount.to_amount() as i32) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
+					value: f64::from(available_amount.to_amount()) / if available_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(available_amount.get_minor_in_major()) },
 					label: available_amount.to_string(),
 				},
 			] 
@@ -181,7 +181,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 				DataPoint { 
 					name: None,
 					timestamp: Some(period.0.naive_utc().date()),
-					value: f64::from(total_amount.to_amount() as i32) / if total_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(total_amount.get_minor_in_major()) },
+					value: f64::from(total_amount.to_amount()) / if total_amount.get_minor_in_major() == 0 { 1.0 } else { f64::from(total_amount.get_minor_in_major()) },
 					label: total_amount.to_string(),
 				},
 			] 

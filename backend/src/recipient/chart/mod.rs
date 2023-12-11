@@ -54,7 +54,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 				DataPoint { 
 					name: data_point.name,
 					timestamp: data_point.timestamp,
-					value: data_point.value.values().map(|x| f64::from(x.to_amount() as i32) / f64::from(x.get_minor_in_major())).sum(),
+					value: data_point.value.values().map(|x| f64::from(x.to_amount()) / f64::from(x.get_minor_in_major())).sum(),
 					label: data_point.label,
 				}
 			);
