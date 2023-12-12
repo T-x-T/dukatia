@@ -51,9 +51,9 @@ pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>
 
 	let id: i32 = client.query(
 		"INSERT INTO public.charts 
-			(id, user_id, chart_type, title, text_template, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y)
-			VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id;", 
-		&[&user_id, &chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y]
+			(id, user_id, chart_type, title, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y, only_positive, only_negative)
+			VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id;", 
+		&[&user_id, &chart.chart_type, &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y, &chart.only_positive, &chart.only_negative]
 	).await?[0].get(0);
 
 	client.query("INSERT INTO public.dashboard_charts (dashboard_id, chart_id) VALUES ($1, $2)", &[&0i32, &id]).await?;
@@ -77,8 +77,8 @@ pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Err
 		.await
 		.unwrap()
 		.query(
-			"UPDATE public.charts SET chart_type=$1, title=$2, text_template=$3, filter_from=$4, filter_to=$5, filter_collection=$6, date_period=$7, max_items=$8, date_range=$9, top_left_x=$10, top_left_y=$11, bottom_right_x=$12, bottom_right_y=$13 WHERE id=$14", 
-			&[&chart.chart_type, &chart.title, &chart.text_template, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y, &(chart.id.unwrap() as i32)]
+			"UPDATE public.charts SET chart_type=$1, title=$2, filter_from=$3, filter_to=$4, filter_collection=$5, date_period=$6, max_items=$7, date_range=$8, top_left_x=$9, top_left_y=$10, bottom_right_x=$11, bottom_right_y=$12, only_positive=$13, only_negative=$14 WHERE id=$15", 
+			&[&chart.chart_type, &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y , &chart.only_positive, &chart.only_negative, &(chart.id.unwrap() as i32)]
 		).await?;
 	
 	return Ok(());
@@ -99,24 +99,24 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 	let user_id: Option<i32> = row.get(1);
 	let chart_type: String = row.get(2);
 	let title: String = row.get(3);
-	let text_template: Option<String> = row.get(4);
-	let filter_from: Option<DateTime<Utc>> = row.get(5);
-	let filter_to: Option<DateTime<Utc>> = row.get(6);
-	let filter_collection: Option<String> = row.get(7);
-	let date_period: Option<String> = row.get(8);
-	let max_items: Option<i32> = row.get(9);
-	let date_range: Option<i32> = row.get(10);
-	let top_left_x: Option<i32> = row.get(11);
-	let top_left_y: Option<i32> = row.get(12);
-	let bottom_right_x: Option<i32> = row.get(13);
-	let bottom_right_y: Option<i32> = row.get(14);
+	let filter_from: Option<DateTime<Utc>> = row.get(4);
+	let filter_to: Option<DateTime<Utc>> = row.get(5);
+	let filter_collection: Option<String> = row.get(6);
+	let date_period: Option<String> = row.get(7);
+	let max_items: Option<i32> = row.get(8);
+	let date_range: Option<i32> = row.get(9);
+	let top_left_x: Option<i32> = row.get(10);
+	let top_left_y: Option<i32> = row.get(11);
+	let bottom_right_x: Option<i32> = row.get(12);
+	let bottom_right_y: Option<i32> = row.get(13);
+	let only_positive: Option<bool> = row.get(14);
+	let only_negative: Option<bool> = row.get(15);
 
 	return ChartOptions {
 		id: Some(id as u32),
 		user_id: user_id.map(|x| x as u32),
 		chart_type,
 		title,
-		text_template,
 		filter_from,
 		filter_to,
 		filter_collection,
@@ -125,11 +125,11 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 		budget_id: None,
 		max_items: max_items.map(|x| x as u32),
 		date_range: date_range.map(|x| x as u32),
-		only_positive: None,
-		only_negative: None,
 		top_left_x: top_left_x.map(|x| x as u32),
 		top_left_y: top_left_y.map(|x| x as u32),
 		bottom_right_x: bottom_right_x.map(|x| x as u32),
 		bottom_right_y: bottom_right_y.map(|x| x as u32),
+		only_positive,
+		only_negative,
 	};
 }

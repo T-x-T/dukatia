@@ -28,7 +28,6 @@ pub struct ChartOptions {
 	pub user_id: Option<u32>,
 	pub chart_type: String,
 	pub title: String,
-	pub text_template: Option<String>,
 	pub filter_from: Option<DateTime<Utc>>,
 	pub filter_to: Option<DateTime<Utc>>,
 	pub filter_collection: Option<String>,
@@ -198,12 +197,16 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 	let mut output: Vec<(u32, Dataset)>;
 	
 	if limit.is_some() && input.len() > limit.unwrap() as usize {
-		let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(limit.unwrap() as usize / 2).collect();
-		input.reverse();
-		let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize / 2).collect();
-		bottom_limited_output.reverse();
-		output = top_limited_output;
-		output.append(&mut bottom_limited_output);
+		if limit.unwrap() == 1 {
+			output = input.clone().into_iter().take(1).collect();
+		} else {
+			let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(limit.unwrap() as usize / 2).collect();
+			input.reverse();
+			let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize / 2).collect();
+			bottom_limited_output.reverse();
+			output = top_limited_output;
+			output.append(&mut bottom_limited_output);
+		}
 	} else {
 		output = input;
 	}
