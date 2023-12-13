@@ -164,7 +164,6 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 	return Ok(transactions);
 }
 
-//Tests for this exist in line
 pub fn get_date_for_period(date_period: &str, timestamp: NaiveDate) -> NaiveDate {
 	match date_period {
 		"yearly" => {
@@ -200,9 +199,10 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 		if limit.unwrap() == 1 {
 			output = input.clone().into_iter().take(1).collect();
 		} else {
-			let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(limit.unwrap() as usize / 2).collect();
+			let n_from_top = (f64::from(limit.unwrap()) / 2.0).ceil() as usize;
+			let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(n_from_top).collect();
 			input.reverse();
-			let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize / 2).collect();
+			let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize - n_from_top).collect();
 			bottom_limited_output.reverse();
 			output = top_limited_output;
 			output.append(&mut bottom_limited_output);
@@ -217,9 +217,9 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
 	let default = DataPoint::default();
 	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
-		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
 	} else {
-		input
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).collect()
 	};
 
 	return output;
@@ -227,11 +227,11 @@ fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) ->
 
 fn limit_output_only_negative(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
 	let default = DataPoint::default();
+	input.reverse();
 	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
-		input.reverse();
 		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect()
 	} else {
-		input
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).collect()
 	};
 
 	return output;
