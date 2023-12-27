@@ -219,7 +219,7 @@ declare global {
 
 	type ChartOptions = {
 		id?: number,
-		chart_type: "text" | "pie" | "line",
+		chart_type: "table" | "pie" | "line",
 		title: string,
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",

@@ -34,6 +34,12 @@
 						:key="key"
 					/>
 				</div>
+				<div :class="show_options ? 'fullscreen_chart' : 'chart'" v-if="options.chart_type == 'table' && Object.keys(chart_data).length == 1 && show_chart">
+					<ChartTable
+						:table="chart_data"
+						:key="key"
+					/>
+				</div>
 	
 				<div id="controls">
 					<ChartControl 
@@ -73,14 +79,16 @@ export default {
 	created() {
 		this.options = structuredClone(toRaw(this.chart_options));
 	},
-
+	
 	async mounted() {
-		if(this.options.chart_type == "text") this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data`);
+		if (this.options.chart_type == "table") {
+			this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data${this.query}`);
+		}
 	},
 
 	methods: {
 		async update_date(options: {from_date: string, to_date: string, date_period: string}) {
-			this.query = `?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}&only_negative=true`;
+			this.query = `?from_date=${new Date(options.from_date).toISOString()}&to_date=${new Date(options.to_date).toISOString()}&date_period=${options.date_period}`;
 			if((Date.now().valueOf() - this.last_data_update) > 2) {
 				this.chart_data = await $fetch(`/api/v1/charts/${this.options.id}/data${this.query}`);
 			 	this.last_data_update = Date.now().valueOf();
