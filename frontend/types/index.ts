@@ -232,6 +232,8 @@ declare global {
 		bottom_right_x: number,
 		bottom_right_y: number,
 		disabled?: boolean,
+		only_positive: boolean,
+		only_negative: boolean,
 	}
 
 	type QueryParameters = {

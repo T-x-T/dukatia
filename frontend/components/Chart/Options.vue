@@ -12,22 +12,20 @@
 
 		<label for="chart_type">Chart Type:</label>
 		<select v-model="options.chart_type" name="chart_type" @change="change_options">
-			<option value="text">Text</option>
+			<option value="table">Table</option>
 			<option value="pie">Pie</option>
 			<option value="line">Line</option>
 		</select>
 		<br>
 
-		<label v-if="options.chart_type != 'text'" for="collection">Collection:</label>
-		<select v-if="options.chart_type != 'text'" v-model="options.filter_collection" name="collection" @change="change_options">
-			<option v-for="(item, index) in filter_collections[options.chart_type]" :key="index" :value="item">{{item}}</option>
+		<label for="collection">Collection:</label>
+		<select v-model="options.filter_collection" name="collection" @change="change_options">
+			<option v-for="(item, index) in filter_collections" :key="index" :value="item">{{item}}</option>
 		</select>
-		<label v-if="options.chart_type == 'text'" for="text_template">Template:</label>
-		<input type="text" v-if="options.chart_type == 'text'" v-model="options.text_template" name="text_template" />
 		<br>
 
-		<label v-if="options.chart_type == 'line'" for="date_period">Default Period:</label>
-		<select v-if="options.chart_type == 'line'" v-model="options.date_period" name="date_period" @change="change_options">
+		<label for="date_period">Default Period:</label>
+		<select v-model="options.date_period" name="date_period" @change="change_options">
 			<option value="daily">Daily</option>
 			<option value="monthly">Monthly</option>
 			<option value="quarterly">Quarterly</option>
@@ -47,6 +45,14 @@
 			<option value="7">Total</option>
 		</select>
 		<br>
+
+		<label for="only_positive">Only Positive:</label>
+		<input type="checkbox" v-model="options.only_positive" name="only_positive" @change="change_options" />
+		<br>
+
+		<label for="only_negative">Only Negative:</label>
+		<input type="checkbox" v-model="options.only_negative" name="only_negative" @change="change_options" />
+		<br>
 		
 		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete</button>
 	</div>
@@ -56,18 +62,14 @@
 export default {
 	data: () => ({
 		options: {} as ChartOptions,
-		filter_collections: {
-			"pie": [
-				"recipients",
-				"tags",
-			],
-			"line": [
-				"recipients",
-				"accounts",
-				"currencies",
-				"earning_spending_net",
-			],
-		}
+		filter_collections: [
+			"get_per_recipient_over_time",
+			"get_all_budget_utilization_overview",
+			"get_per_account_over_time",
+			"get_per_currency_over_time",
+			"get_earning_spending_net_over_time",
+			"get_per_tag_over_time",
+		]
 	}),
 
 	emits: ["deleted", "update"],
