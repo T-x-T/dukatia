@@ -124,7 +124,7 @@ async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: Htt
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let mut chart_options: super::ChartOptions = options.into_inner().try_into().unwrap();
+	let mut chart_options: super::ChartOptions = options.into_inner().into();
 	chart_options.filter_collection = Some(path.clone());
 
 	match super::get_chart_data(&data.pool, chart_options).await {
