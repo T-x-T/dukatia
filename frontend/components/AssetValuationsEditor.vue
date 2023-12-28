@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<h3>Update Asset Valuation History</h3>
-		<!-- <label for="applyUpdatesForwards">Apply updates forwards?</label>
-		<input type="checkbox" id="applyUpdatesForwards" v-model="applyUpdatesForwards"> -->
+		<label for="applyUpdatesForwards">Apply updates forwards?</label>
+		<input type="checkbox" id="applyUpdatesForwards" v-model="applyUpdatesForwards">
 		<table>
 			<thead>
 				<tr>
@@ -16,10 +16,10 @@
 				<tr v-for="(item, index) in assetValuations" :key="index" :class="item.deleted ? 'deleted' : ''">
 					<td>{{item.timestamp}}</td>
 					<td>
-						<input type="text" v-model="item.amount" @input="update(index, 'amount')">
+						<input type="text" v-model="item.amount" @input="update_amount(index)">
 					</td>
 					<td>
-						<InputMoney :initial_value="item.value_per_unit" v-on:update="(new_value: Money) => {item.value_per_unit = new_value; update(index, 'value_per_unit')}" />
+						<InputMoney :initial_value="item.value_per_unit" @update="(new_value: Money) => {item.value_per_unit = new_value; update_value_per_unit(index)}" />
 					</td>
 					<td><input type="checkbox" v-model="item.deleted"></td>
 				</tr>
@@ -37,6 +37,8 @@ export default {
 		applyUpdatesForwards: false
 	}),
 
+	emits: ["close"],
+
 	props: {
 		assetId: Number
 	},
@@ -50,18 +52,32 @@ export default {
 	},
 
 	methods: {
-		update(i: number, prop: "value_per_unit" | "amount" | "timestamp" | "deleted") {
-			//TODO: re-enable this at some point
-			/* if(this.applyUpdatesForwards) {
-				if(Number.isNaN(Number(this.assetValuations[i][prop])) || prop == "timestamp" || prop == "deleted") return;
-				const difference = Number(this.assetValuations[i][prop]) - Number(this.originalAssetValuations[i][prop]);
+		update_value_per_unit(i: number) {
+			if(this.applyUpdatesForwards) {
+				const difference_major = Number(this.assetValuations[i].value_per_unit.major) - Number(this.originalAssetValuations[i].value_per_unit.major);
+				const difference_minor = Number(this.assetValuations[i].value_per_unit.minor) - Number(this.originalAssetValuations[i].value_per_unit.minor);
 				this.assetValuations = this.assetValuations.map((x, j) => {
 					if (j > i) {
-						x[prop] += difference;
+						x.value_per_unit.major += difference_major;
+						x.value_per_unit.minor += difference_minor;
 					}
 					return x;
 				});
-			} */
+			}
+			this.originalAssetValuations = structuredClone(toRaw(this.assetValuations).map(x => toRaw(x)));
+		},
+		
+		update_amount(i: number) {
+			if(this.applyUpdatesForwards) {
+				if(Number.isNaN(Number(this.assetValuations[i].amount))) return;
+				const difference = Number(this.assetValuations[i].amount) - Number(this.originalAssetValuations[i].amount);
+				this.assetValuations = this.assetValuations.map((x, j) => {
+					if (j > i) {
+						x.amount += difference;
+					}
+					return x;
+				});
+			}
 			this.originalAssetValuations = structuredClone(toRaw(this.assetValuations).map(x => toRaw(x)));
 		},
 
@@ -77,6 +93,7 @@ export default {
 							timestamp: x.timestamp
 						}))
 				});
+				this.$emit("close");
 			} catch(e: any) {
 				console.error(e?.data?.data);
 				window.alert(e?.data?.data?.error);
@@ -89,5 +106,6 @@ export default {
 
 <style lang="sass" scoped>
 .deleted
-	color: red
+	td
+		background: red !important
 </style>

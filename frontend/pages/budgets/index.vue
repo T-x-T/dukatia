@@ -6,15 +6,15 @@
 				:bar="chart_utilization_overview"
 			/>
 		</div>
-		<button class="green" @click="newBudget">Add</button>
+		<button id="add" class="green" @click="newBudget">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
 			:tableDataProp="tableData"
-			v-on:rowClick="rowClick"
-			v-on:updatePage="updatePage"
-			v-on:updateFilter="updateFilter"
-			v-on:resetFilter="resetFilter"
-			v-on:applyFilter="applyFilter"
+			@rowClick="rowClick"
+			@updatePage="updatePage"
+			@updateFilter="updateFilter"
+			@resetFilter="resetFilter"
+			@applyFilter="applyFilter"
 		/>
 	</div>
 </template>
@@ -35,7 +35,7 @@ export default {
 		const budgets = await $fetch("/api/v1/budgets/all") as Budget[];
 		const tags = await $fetch("/api/v1/tags/all") as Tag[];
 		const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
-		this.chart_utilization_overview = (await $fetch(`/api/v1/charts/bar/compute_all_budget_utilization_overview/data`)).bar;
+		this.chart_utilization_overview = await $fetch(`/api/v1/charts/by_collection/get_all_budget_utilization_overview`);
 		
 		this.tableData = {
 			multiSelect: false,
@@ -259,5 +259,8 @@ div.pie_chart
 div.line_chart
 	width: 60em
 	height: 20em
+
+button#add
+	margin: 10px
 
 </style>

@@ -41,19 +41,4 @@ html.light-mode
 			color:$light-heavy
 		&.router-link-active
 			color:$light-heavy
-html.monochrome-mode	
-	a
-		color: $monochrome-brightest
-		&:hover
-			color:$monochrome-heavydark
-		&.router-link-active
-			color:$monochrome-heavydark
-
-html.black-mode	
-	a
-		color: $black-brightest
-		&:hover
-			color:$black-brighter
-		&.router-link-active
-			color:$black-brighter
 </style>

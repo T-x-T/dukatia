@@ -4,9 +4,7 @@
 			:loggedIn="loggedIn"		
 		/>
 		<div id="content">
-			<div id="innerContent">
-				<NuxtPage />
-			</div>
+			<NuxtPage />
 		</div>
 	</main>
 </template>
@@ -55,7 +53,4 @@ main
 	@media screen and (max-width: 800px)
 		height: 1rem
 		width: 100vw
-
-#innerContent
-	margin: 10px 10px 10px 10px
 </style>

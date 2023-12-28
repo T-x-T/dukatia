@@ -8,6 +8,8 @@ export default {
 		value: {} as Money,
 		value_for_display: "",
 	}),
+
+	emits: ["update"],
 	
 	props: {
 		initial_value: {

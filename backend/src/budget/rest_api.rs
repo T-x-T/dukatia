@@ -185,7 +185,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budge
 		.save(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(res) => return HttpResponse::Ok().body(format!("{{\"id\":{res}}}")),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

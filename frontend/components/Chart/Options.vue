@@ -1,34 +1,31 @@
 <template>
 	<div id="wrapper">
-		<button id="back_button" class="green" @click="save_and_go_back">Back</button>
 		<h5>Options</h5>
 
 		<label for="title">Title:</label>
-		<input type="text" v-model="options.title" name="title" />
+		<input type="text" v-model="options.title" name="title" @input="change_options" />
 		<br>
 
 		<label for="max_items">Maximum Number of Items:</label>
-		<input type="number" v-model="options.max_items" name="max_items" />
+		<input type="number" v-model="options.max_items" name="max_items" @input="change_options" />
 		<br>
 
 		<label for="chart_type">Chart Type:</label>
-		<select v-model="options.chart_type" name="chart_type">
-			<option value="text">Text</option>
+		<select v-model="options.chart_type" name="chart_type" @change="change_options">
+			<option value="table">Table</option>
 			<option value="pie">Pie</option>
 			<option value="line">Line</option>
 		</select>
 		<br>
 
-		<label v-if="options.chart_type != 'text'" for="collection">Collection:</label>
-		<select v-if="options.chart_type != 'text'" v-model="options.filter_collection" name="collection">
-			<option v-for="(item, index) in filter_collections[options.chart_type]" :value="item">{{item}}</option>
+		<label for="collection">Collection:</label>
+		<select v-model="options.filter_collection" name="collection" @change="change_options">
+			<option v-for="(item, index) in filter_collections" :key="index" :value="item">{{item}}</option>
 		</select>
-		<label v-if="options.chart_type == 'text'" for="text_template">Template:</label>
-		<input type="text" v-if="options.chart_type == 'text'" v-model="options.text_template" name="text_template" />
 		<br>
 
-		<label v-if="options.chart_type == 'line'" for="date_period">Default Period:</label>
-		<select v-if="options.chart_type == 'line'" v-model="options.date_period" name="date_period">
+		<label for="date_period">Default Period:</label>
+		<select v-model="options.date_period" name="date_period" @change="change_options">
 			<option value="daily">Daily</option>
 			<option value="monthly">Monthly</option>
 			<option value="quarterly">Quarterly</option>
@@ -37,7 +34,7 @@
 		<br>
 
 		<label for="date_range">Default Date Range:</label>
-		<select v-model="options.date_range" name="date_range">
+		<select v-model="options.date_range" name="date_range" @change="change_options">
 			<option value="0">Last 28 days</option>
 			<option value="1">Last month</option>
 			<option value="2">Current month</option>
@@ -49,17 +46,15 @@
 		</select>
 		<br>
 
-		<label for="top_left_y">Top:</label>
-		<input type="number" v-model="options.top_left_y" @change="change_size" name="top_left_y" />
-		<label for="top_left_x">Left:</label>
-		<input type="number" v-model="options.top_left_x" @change="change_size" name="top_left_x" />
-		<label for="bottom_right_y">Bottom:</label>
-		<input type="number" v-model="options.bottom_right_y" @change="change_size" name="bottom_right_y" />
-		<label for="bottom_right_x">Right:</label>
-		<input type="number" v-model="options.bottom_right_x" @change="change_size" name="bottom_right_x" />
+		<label for="only_positive">Only Positive:</label>
+		<input type="checkbox" v-model="options.only_positive" name="only_positive" @change="change_options" />
+		<br>
+
+		<label for="only_negative">Only Negative:</label>
+		<input type="checkbox" v-model="options.only_negative" name="only_negative" @change="change_options" />
 		<br>
 		
-		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete chart</button>
+		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete</button>
 	</div>
 </template>
 
@@ -67,19 +62,17 @@
 export default {
 	data: () => ({
 		options: {} as ChartOptions,
-		filter_collections: {
-			"pie": [
-				"recipients",
-				"tags",
-			],
-			"line": [
-				"recipients",
-				"accounts",
-				"currencies",
-				"earning_spending_net",
-			],
-		}
+		filter_collections: [
+			"get_per_recipient_over_time",
+			"get_all_budget_utilization_overview",
+			"get_per_account_over_time",
+			"get_per_currency_over_time",
+			"get_earning_spending_net_over_time",
+			"get_per_tag_over_time",
+		]
 	}),
+
+	emits: ["deleted", "update"],
 
 	props: {
 		chart_options: {
@@ -102,21 +95,13 @@ export default {
 				top_left_y: 0,
 				bottom_right_x: 5,
 				bottom_right_y: 2,
+				only_negative: false,
+				only_positive: false,
 			};
 		}
 	},
 
 	methods: {
-		async save_and_go_back() {
-			await this.save();
-			this.$emit('back');
-		},
-
-		async change_size() {
-			await this.save();
-			this.$emit('change_size');
-		},
-
 		async save() {
 			if(Number.isInteger(this.options.id)) {
 				await $fetch(`/api/v1/charts/${this.options.id}`, {
@@ -139,6 +124,11 @@ export default {
 			await $fetch(`/api/v1/charts/${this.options.id}`, {method: "DELETE"});
 			this.$emit('deleted');
 		},
+
+		async change_options() {
+			await this.save();
+			this.$emit("update", this.options);
+		},
 	},
 }
 </script>
@@ -151,10 +141,6 @@ div#wrapper
 
 h5
 	text-align: center
-
-#back_button
-	position: absolute
-	width: fit-content
 
 input
 	width: 4em

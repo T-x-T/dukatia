@@ -2,11 +2,10 @@
 	<div>
 		<div id="grid">
 			<div class="gridItem form">
-				<DetailsPage
-					v-if="Object.keys(config).length > 0"
-					:config="config"
-					v-on:back="$emit('back')"
-					v-on:updateData="reload"
+				<BudgetForm
+					:data="budget"
+					@back="$emit('back')"
+					@data_saved="reload"
 				/>
 			</div>
 
@@ -41,20 +40,21 @@
 <script lang="ts">
 export default {
 	data: () => ({
-		config: {} as DetailFormConfig,
 		chart_utilization_current_period: null as any,
 		chart_utilization_previous_period: null as any,
 		chart_utilization_history: null as any,
 		table_data: {} as TableData,
-		budget: {} as Budget,
+		budget: {} as Budget | undefined,
 	}),
 
 	props: {
 		prop_budget: {
 			type: Object as PropType<Budget>,
-			required: true,
+			required: false,
 		}
 	},
+
+	emits: ["back"],
 
 	async created() {
 		this.budget = structuredClone(toRaw(this.prop_budget));
@@ -63,41 +63,36 @@ export default {
 
 	methods: {
 		async reload(res?: any) {
-			if(Number.isInteger(res?.id)) await useRouter().push(`/budgets/${res.id}`);
-			this.budget = await $fetch(`/api/v1/budgets/${this.budget.id}`);
+			console.log(res)
+			if(!this.budget || Object.keys(this.budget).length === 0) {
+				console.error("this.budget isnt defined in BudgetDetails.vue reload method");
+				return;
+			}
+
+			if(Number.isInteger(res?.id)) {
+				console.log("res.id is good")
+				await useRouter().push(`/budgets/${res.id}`);
+				(this.budget as Budget).id = res.id;
+			}
+			this.budget = await $fetch(`/api/v1/budgets/${(this.budget as Budget).id}`);
 			await this.update();
 		},
 
 		async update() {
-			this.budget.filter_tag_ids = Array.isArray(this.budget.filter_tag_ids) ? [...this.budget.filter_tag_ids] : [];
-
-			(this as any).config = {};
-			this.$nextTick(() => {
-				this.config = {
-					...this.$detailPageConfig().budget,
-					data: {
-						...this.budget,
-						active_from: new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
-						active_to: this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : null,
-					},
-				};
-			});
-
-
 			if(this.budget?.id !== undefined) {
 				this.chart_utilization_current_period = null;
 				this.chart_utilization_previous_period = null;
 				this.chart_utilization_history = null;
 
 				this.$nextTick(async () => {
-					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/pie/single_budget_current_period/data?budget_id=${this.budget.id}`)).pie;
+					this.chart_utilization_current_period = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_current_period_utilization?budget_id=${(this.budget as Budget).id}`));
 					
-					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/pie/single_budget_previous_period/data?budget_id=${this.budget.id}`)).pie;
-					if (chart_utilization_previous_period[0][1][1] !== 0 || chart_utilization_previous_period[1][1][1] !== 0) {
+					const chart_utilization_previous_period = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_previous_period_utilization?budget_id=${(this.budget as Budget).id}`));
+					if (chart_utilization_previous_period.datasets[0].data[0].value !== 0 || chart_utilization_previous_period.datasets[1].data[0].value) {
 						this.chart_utilization_previous_period = chart_utilization_previous_period;
 					}
 	
-					this.chart_utilization_history = (await $fetch(`/api/v1/charts/line/single_budget_utilization_history/data?budget_id=${this.budget.id}`)).line;
+					this.chart_utilization_history = (await $fetch(`/api/v1/charts/by_collection/get_single_budget_utilization_history?budget_id=${(this.budget as Budget).id}`));
 				});
 
 

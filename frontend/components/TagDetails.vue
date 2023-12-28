@@ -1,28 +1,21 @@
 <template>
-	<div id="wrapper">
-		<DetailsPage
-			v-if="Object.keys(config).length > 0"
-			:config="config"
-			v-on:back="$emit('back')"
+	<div>
+		<TagForm
+			:data="tag"
+			@back="$emit('back')"
 		/>
-	</div>
+	</div>	
 </template>
 
 <script lang="ts">
 export default {
-	data: () => ({
-		config: {} as DetailFormConfig
-	}),
+	emits: ["back"],
 
 	props: {
-		tag: Object
-	},
-
-	created() {
-		this.config = {
-			...this.$detailPageConfig().tags,
-			data: this.tag
+		tag: {
+			type: Object as PropType<Tag>,
+			required: false,
 		}
-	}
+	},
 }
 </script>

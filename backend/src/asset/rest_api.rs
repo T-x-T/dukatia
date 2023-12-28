@@ -27,6 +27,7 @@ struct RequestParameters {
 	filter_mode_value_per_unit: Option<String>,
 	filter_tag_id: Option<u32>,
 	filter_mode_tag_id: Option<String>,
+	timestamp: Option<DateTime<Utc>>,
 }
 
 //TODO: test filters and sorting for properties other than id
@@ -93,7 +94,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 			.set_sort_direction_opt(sort_direction)
 			.set_filters(filters)
 	)
-	.get().await;
+	.get_at(request_parameters.timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -103,7 +104,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 
 #[get("/api/v1/assets/{asset_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>) -> impl Responder {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -111,7 +112,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::P
 
 	let result = super::AssetLoader::new(&data.pool)
 		.set_filter_id(*asset_id, NumberFilterModes::Exact)
-		.get_first().await;
+		.get_first_at(request_parameters.timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -149,7 +150,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		.save(&data.pool).await;
 
 	match result {
-		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":{id}}}")),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

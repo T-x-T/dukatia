@@ -1,21 +1,21 @@
 <template>
 	<div id="main">		
-		<div v-if="!(small_device && detailsOpen)" id="top_controls">
-			<button class="green" @click="newTransaction">Add</button>
-		</div>
-
 		<div id="table_and_details">
 			<div id="table">
+				<div v-if="!(small_device && detailsOpen)" id="top_controls">
+					<button id="add" class="green" @click="newTransaction">Add</button>
+				</div>
+
 				<CustomTable
 					v-if="Object.keys(tableData).length > 0 && !(small_device && detailsOpen)"
 					:tableDataProp="tableData"
-					v-on:rowClick="rowClick"
-					v-on:rowSelect="rowSelect"
-					v-on:updatePage="updatePage"
-					v-on:updateSort="updateSort"
-					v-on:updateFilter="updateFilter"
-					v-on:resetFilter="resetFilter"
-					v-on:applyFilter="applyFilter"
+					@rowClick="rowClick"
+					@rowSelect="rowSelect"
+					@updatePage="updatePage"
+					@updateSort="updateSort"
+					@updateFilter="updateFilter"
+					@resetFilter="resetFilter"
+					@applyFilter="applyFilter"
 				/>
 			</div>
 
@@ -46,7 +46,7 @@
 						<InputMultiSelect
 							v-if="Object.keys(selectData).length > 0"
 							:selectData="selectData"
-							v-on:update="tagUpdate"
+							@update="tagUpdate"
 						/>	
 					</div>
 
@@ -60,8 +60,8 @@
 					v-if="Object.keys(selectedRow).length > 0"
 					:transaction="selectedRow"
 					:default_transaction="default_transaction"
-					v-on:back="closeDetails"
-					v-on:updateData="updateTable"
+					@back="closeDetails"
+					@updateData="updateTable"
 				/>
 			</div>
 		</div>
@@ -137,6 +137,7 @@ export default {
 			account_id: 0,
 			currency_id: 0,
 			recipient_id: 0,
+			tag_ids: [],
 			status: 1,
 			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 			total_amount: {
@@ -271,14 +272,13 @@ export default {
 		},
 
 		async updateAndLoadTable() {
+			this.closeDetails();
 			await this.updateTable();
-			this.detailsOpen = false;
-			this.selectedRow = {} as Transaction;
-			history.pushState({}, "", "/transactions");
 		},
 		
 		closeDetails() {
 			this.detailsOpen = false;
+			this.selectedRow = {} as Transaction;
 			history.pushState({}, "", "/transactions");
 		},
 
@@ -476,7 +476,7 @@ div#table
 	overflow: auto
 
 div.detailBar
-	padding-left: 8px
+	padding: 10px
 	@media screen and (max-width: 800px)
 		position: absolute
 
@@ -487,5 +487,8 @@ div#batchEdit
 		margin: 0
 		margin-left: 1em
 		height: 100%
+
+button#add
+	margin: 10px
 
 </style>

@@ -11,6 +11,12 @@
 	</div>
 </template>
 
+<script lang="ts">
+export default {
+	emits: ["close"],
+}
+</script>
+
 <style lang="sass" scoped>
 #wrapper
 	width: 100vw
@@ -25,7 +31,6 @@
 	z-index: 1000
 
 #popup
-	background: #171717
 	z-index: 1001
 	padding: 10px
 

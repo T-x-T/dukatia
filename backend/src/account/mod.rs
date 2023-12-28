@@ -1,5 +1,6 @@
 mod db;
 pub mod rest_api;
+pub mod chart;
 
 use serde::Serialize;
 use std::error::Error;

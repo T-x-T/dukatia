@@ -1,4 +1,5 @@
 pub mod rest_api;
+pub mod chart;
 mod db;
 
 #[cfg(test)]
@@ -113,6 +114,7 @@ impl Budget {
 		return self;
 	}
 
+	#[allow(unused)]
 	pub async fn calculate_utilization_of_current_period(self, pool: &Pool) -> Result<Self, Box<dyn Error>> {
 		return self.calculate_utilization_of_period_at(pool, Utc::now()).await;
 	}
@@ -318,7 +320,6 @@ impl<'a> BudgetLoader<'a> {
 		return self.get_full_at(Utc::now()).await;
 	}
 
-	#[allow(dead_code)]
 	pub async fn get_first_full(self) -> Result<Budget, Box<dyn Error>> {
 		return self.get_first_full_at(Utc::now()).await;
 	}

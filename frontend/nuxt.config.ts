@@ -7,6 +7,10 @@ export default defineNuxtConfig ({
   modules: [
     "@nuxtjs/color-mode"
   ],
+  colorMode: {
+    preference: "dark",
+    fallback: "dark",
+  },
   css: ["assets/general.sass", "assets/_vars.sass"],
   telemetry: false,
   app: {
@@ -14,7 +18,8 @@ export default defineNuxtConfig ({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       link: [
-        {rel: "manifest", href: "/manifest.json"}
+        {rel: "manifest", href: "/manifest.json"},
+        {rel: "icon", type: "image/svg+xml", href: "/dukatia_signet.svg"},
       ]
     }
   }

@@ -133,7 +133,7 @@
 			</thead>
 			<tbody>
 				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
-					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]"></td>
+					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]" @change="updateSelectedRows"></td>
 					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
 				</tr>
 			</tbody>
@@ -172,6 +172,8 @@ export default {
 		tableData: {} as TableData,
 	}),
 
+	emits: ["rowClick", "updateSort", "resetSort", "updateFilter", "resetFilter", "applyFilter", "updatePage", "rowSelect"],
+
 	props: {
 		tableDataProp: {
 			type: Object as PropType<TableData>,
@@ -179,39 +181,47 @@ export default {
 		},
 	},
 	
-	async beforeMount() {
-		await this.update(true);
+	async mounted() {
+		this.update();
+
+		this.tableData.columns.forEach(c => {
+			this.filters.push({
+				type: c.type,
+				option: c.type == "choice" ? "exact" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
+				empty: c.type == "string" ? "anything" : "",
+			});
+		});
+
+		this.currentSort = this.tableData.defaultSort;
+		this.resetSelectedRows();
 	},
 	
 	methods: {
-		async update(initial: boolean) {
+		update() {
 			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
 			this.rowsForDisplay = this.rows;
-			
-			if(initial) {
-				
-				this.tableData.columns.forEach(c => {
-					this.filters.push({
-						type: c.type,
-						option: c.type == "choice" ? "exact" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
-						empty: c.type == "string" ? "anything" : ""
-					});
+			this.updateRowsCurrentPage();
+		},
+
+		updateSelectedRows() {
+			let selectedRowContents: Row = [];
+				this.selectedRows.forEach((selected, i) => {
+					if(selected) selectedRowContents.push({...this.rowsForDisplay[i]});
 				});
-				
-				this.currentSort = this.tableData.defaultSort;
-				this.resetSelectedRows();
-			}
+				this.$emit("rowSelect", selectedRowContents);
 		},
 
 		resetSelectedRows() {
 			this.selectedRows = [];
+			this.updateSelectedRows();
 			this.rowsForDisplay.forEach(() => this.selectedRows.push(false));
 		},
 
 		selectAllRows() {
 			this.allRowsSelected = !this.allRowsSelected;
 			this.selectedRows = this.selectedRows.map(() => this.allRowsSelected);
+			this.updateSelectedRows();
 		},
 
 		updateSort(i: number) {
@@ -281,28 +291,12 @@ export default {
 		}
 	},
 	watch: {
-		selectedRows: {
-			handler() {
-				let selectedRowContents: Row = [];
-				this.selectedRows.forEach((selected, i) => {
-					if(selected) selectedRowContents.push({...this.rowsForDisplay[i]});
-				});
-				this.$emit("rowSelect", selectedRowContents);
-			},
-			deep: true,
-		},
 		tableDataProp: {
 			handler() {
-				this.update(false);
+				this.update();
 			},
 			deep: true,
 		},
-		rowsForDisplay: {
-			handler() {
-				this.updateRowsCurrentPage();
-			},
-			deep: true
-		}
 	}
 }
 </script>
@@ -337,7 +331,7 @@ td
 tr
 	cursor: pointer
 
-th
+thead
 	position: sticky
 	top: 0
 	padding: 4px 0 4px
