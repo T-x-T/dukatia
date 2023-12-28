@@ -81,7 +81,9 @@ export default {
 				top_left_x: 0,
 				top_left_y: lowest_chart_y,
 				bottom_right_x: 2,
-				bottom_right_y: lowest_chart_y + 2
+				bottom_right_y: lowest_chart_y + 2,
+				only_negative: false,
+				only_positive: false,
 			};
 
 			await this.save(chart);

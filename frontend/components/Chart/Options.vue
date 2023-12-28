@@ -95,6 +95,8 @@ export default {
 				top_left_y: 0,
 				bottom_right_x: 5,
 				bottom_right_y: 2,
+				only_negative: false,
+				only_positive: false,
 			};
 		}
 	},
