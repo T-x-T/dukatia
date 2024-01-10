@@ -110,7 +110,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 }
 
 #[get("/api/v1/budgets/{budget_id}/transactions")]
-async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>) -> impl Responder {
+async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -123,7 +123,7 @@ async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id
 
 	match budget {
 		Ok(budget) => {
-			let transactions = budget.get_transactions_of_period_at(&data.pool, Utc::now()).await;
+			let transactions = budget.get_transactions_of_period_at(&data.pool, request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 			match transactions {
 				Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),

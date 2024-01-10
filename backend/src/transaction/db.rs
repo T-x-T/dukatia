@@ -279,11 +279,11 @@ impl From<tokio_postgres::Row> for Transaction {
 
 		let positions: Vec<Position> = transaction_position_ids
 			.into_iter()
-			.filter(Option::is_some)
+			.flatten()
 			.enumerate()
 			.map(|(i, transaction_position_id)| {
 				Position {
-					id: Some(transaction_position_id.unwrap() as u32),
+					id: Some(transaction_position_id as u32),
 					amount: Money::from_amount(transaction_position_amounts[i].unwrap(), minor_in_major as u32, symbol.clone()),
 					comment: transaction_position_comments[i].clone(),
 					tag_id: transaction_position_tag_ids[i].map(|x| x as u32),

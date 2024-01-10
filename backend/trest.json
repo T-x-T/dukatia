@@ -3635,7 +3635,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using skip_results",
-					"endpoint": "/api/v1/budgets/all?skip_results=2",
+					"endpoint": "/api/v1/budgets/all?skip_results=2&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3644,7 +3644,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using skip_results and max_results",
-					"endpoint": "/api/v1/budgets/all?skip_results=2&max_results=2",
+					"endpoint": "/api/v1/budgets/all?skip_results=2&max_results=2&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3653,7 +3653,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id",
-					"endpoint": "/api/v1/budgets/all?filter_id=4",
+					"endpoint": "/api/v1/budgets/all?filter_id=4&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3662,7 +3662,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=exact",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=exact",
+					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=exact&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3671,7 +3671,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=not",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=not",
+					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=not&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3680,7 +3680,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=less",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=less",
+					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=less&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3689,7 +3689,7 @@
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=more",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=more",
+					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=more&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3940,7 +3940,7 @@
 				},
 				{
 					"name": "budgets get correctly calculated",
-					"endpoint": "/api/v1/budgets/all",
+					"endpoint": "/api/v1/budgets/all?at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3949,7 +3949,7 @@
 				},
 				{
 					"name": "transactions matching budget get correctly returned",
-					"endpoint": "/api/v1/budgets/4/transactions",
+					"endpoint": "/api/v1/budgets/4/transactions?at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
