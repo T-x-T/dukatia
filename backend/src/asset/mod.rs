@@ -253,13 +253,14 @@ impl<'a> Loader<'a, AssetValuation> for AssetValuationLoader<'a> {
 	}
 }
 
+//TODO: add unit tests
 fn actually_get_total_cost_of_ownership(mut transactions: Vec<Transaction>, current_amount_is_zero: bool, minor_in_major: u32, symbol: String, timestamp: DateTime<Utc>) -> TotalCostOfOwnership {
 	assert!(!transactions.is_empty());
 	
 	let total_cost_of_ownership: i32 = transactions
 		.iter()
 		.map(|x| x.total_amount.clone().unwrap())
-		.sum();
+		.sum::<i32>() * -1;
 
 	transactions.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 	let first_timestamp = transactions.pop().unwrap().timestamp;
