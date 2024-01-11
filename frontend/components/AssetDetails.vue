@@ -96,12 +96,13 @@ export default {
 		},
 
 		async reload(res?: any) {
+			if (res?.id) (this.asset as Asset).id = res.id;
+			
 			if(!this.asset || Object.keys(this.asset).length === 0) {
 				console.error("this.asset isnt defined in AssetDetails.vue reload method");
 				return;
 			}
 
-			if (res?.id) (this.asset as Asset).id = res.id;
 			this.asset = await $fetch(`/api/v1/assets/${(this.asset as Asset).id}`);
 			useRouter().push(`/assets/${(this.asset as Asset).id}`);
 			
