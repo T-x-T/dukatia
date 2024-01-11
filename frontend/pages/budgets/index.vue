@@ -2,9 +2,11 @@
 	<div>
 		<div v-if="chart_utilization_overview" class="gridItem line_chart">
 			<h3>Current period utilization overview</h3>
-			<ChartBar
-				:bar="chart_utilization_overview"
-			/>
+			<div class="actual_chart">
+				<ChartBar
+					:bar="chart_utilization_overview"
+				/>
+			</div>
 		</div>
 		<button id="add" class="green" @click="newBudget">Add</button>
 		<CustomTable
@@ -252,12 +254,10 @@ h3
 div.gridItem
 	padding: 10px
 
-div.pie_chart
-	width: 20em
-	height: 20em
-
 div.line_chart
 	width: 60em
+
+div.actual_chart
 	height: 20em
 
 button#add

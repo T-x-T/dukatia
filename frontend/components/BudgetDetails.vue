@@ -11,21 +11,27 @@
 
 			<div v-if="chart_utilization_current_period" class="gridItem pie_chart">
 				<h3>Current Period</h3>
-				<ChartPie
-					:pie="chart_utilization_current_period"
-				/>
+				<div class="actual_chart">
+					<ChartPie
+						:pie="chart_utilization_current_period"
+					/>
+				</div>
 			</div>
 			<div v-if="chart_utilization_previous_period" class="gridItem pie_chart">
 				<h3>Previous Period</h3>
-				<ChartPie
-					:pie="chart_utilization_previous_period"
-				/>
+				<div class="actual_chart">
+					<ChartPie
+						:pie="chart_utilization_previous_period"
+					/>
+				</div>
 			</div>
 			<div v-if="chart_utilization_history" class="gridItem line_chart">
 				<h3>Utilization History</h3>
-				<ChartLine
-					:line="chart_utilization_history"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="chart_utilization_history"
+					/>
+				</div>
 			</div>
 			<div v-if="Object.keys(table_data).length > 0" class="gridItem">
 				<h3>Transactions in current Period</h3>
@@ -171,9 +177,10 @@ div.gridItem
 
 div.pie_chart
 	width: 20em
-	height: 20em
 
 div.line_chart
 	width: 60em
+
+div.actual_chart
 	height: 20em
 </style>

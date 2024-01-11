@@ -26,21 +26,27 @@
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total value over time</h3>
-				<ChartLine
-					:line="asset_total_value_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_total_value_chart"
+					/>
+				</div>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total value over time of single item</h3>
-				<ChartLine
-					:line="asset_single_value_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_single_value_chart"
+					/>
+				</div>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total amount over time</h3>
-				<ChartLine
-					:line="asset_amount_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_amount_chart"
+					/>
+				</div>
 			</div>
 		</div>
 
@@ -141,6 +147,8 @@ div.gridItem
 
 div.chart
 	flex-grow: 1
-	width: 50vw
-	height: 40vh
+	width: 100%
+
+div.actual_chart
+	height: 30vh
 </style>
