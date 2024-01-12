@@ -1,7 +1,7 @@
 use actix_web::{post, web, HttpResponse, HttpRequest, Responder, put};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
-use super::super::user::LoginCredentials;
+use super::*;
 
 
 #[post("/api/v1/login")]
@@ -19,7 +19,7 @@ async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Respon
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::logout(&data.pool, user_id, req.cookie("accessToken").unwrap().value().to_string()).await {
+	match User::default().set_id(user_id).logout(&data.pool, req.cookie("accessToken").unwrap().value().to_string()).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
@@ -39,8 +39,16 @@ async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, r
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::update_secret(&data.config, &data.pool, body.old_secret.clone(), body.new_secret.clone(), user_id).await {
-		Ok(()) => return HttpResponse::Ok().body(""),
+	let user = match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(x) => x,
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+
+	match user.update_secret(&data.pool, &data.config.pepper, body.old_secret.clone(), body.new_secret.clone()).await {
+		Ok(_) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
