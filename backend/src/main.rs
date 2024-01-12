@@ -13,6 +13,7 @@
   clippy::cast_possible_truncation,
   clippy::similar_names,
   clippy::no_effect_underscore_binding,
+  clippy::neg_multiply,
   deprecated,
 )]
 

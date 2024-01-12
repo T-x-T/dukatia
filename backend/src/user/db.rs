@@ -52,11 +52,11 @@ impl<'a> UserDbReader<'a> {
 			.map(Into::into)
 			.collect();
 			
-		if !users.is_empty() {
-			return Ok(users[0].clone());
-		} else {
+		if users.is_empty() {
 			return Err(Box::new(CustomError::NoItemFound { item_type: "user".to_string() }))
 		}
+		
+		return Ok(users[0].clone());
 	}
 }
 

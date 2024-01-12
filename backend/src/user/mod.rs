@@ -48,11 +48,13 @@ impl User {
 		return self;
 	}
 
+	#[allow(unused)]
 	pub fn set_secret(mut self, secret: String) -> Self {
 		self.secret = Some(secret);
 		return self;
 	}
 
+	#[allow(unused)]
 	pub fn set_secret_opt(mut self, secret: Option<String>) -> Self {
 		self.secret = secret;
 		return self;
@@ -63,6 +65,7 @@ impl User {
 		return self;
 	}
 
+	#[allow(unused)]
 	pub fn set_encrypted_secret_opt(mut self, encrypted_secret: Option<String>) -> Self {
 		self.encrypted_secret = encrypted_secret;
 		return self;
@@ -125,6 +128,7 @@ impl<'a> Loader<'a, User> for UserLoader<'a> {
 }
 
 impl<'a> UserLoader<'a> {
+	#[allow(unused)]
 	async fn get_first_with_encrypted_secret(self) -> Result<User, Box<dyn Error>> {
 		return db::UserDbReader::new(self.pool)
 			.set_query_parameters(self.query_parameters)
@@ -134,7 +138,7 @@ impl<'a> UserLoader<'a> {
 }
 
 pub async fn init(config: &Config, pool: &Pool) {
-	if UserLoader::new(pool).get().await.expect("failed to get user count in user::init").len() == 0 {	
+	if UserLoader::new(pool).get().await.expect("failed to get user count in user::init").is_empty() {	
 		let hashed_secret = create_hash(format!("{}{}{}", config.admin_username.clone(), config.admin_password.clone(), config.pepper));
 
 		User::default()
@@ -163,6 +167,7 @@ pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) 
 		superuser: false
 	};
 	
+	#[allow(clippy::needless_question_mark)]
 	return Ok(access_token::add(pool, &user).await?);
 }
 

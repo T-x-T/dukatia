@@ -48,7 +48,7 @@ async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, r
 		};
 
 	match user.update_secret(&data.pool, &data.config.pepper, body.old_secret.clone(), body.new_secret.clone()).await {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
