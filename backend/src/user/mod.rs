@@ -76,6 +76,11 @@ impl User {
 		return self;
 	}
 
+	pub fn encrypt_secret(mut self, pepper: &str) -> Self {
+		self.encrypted_secret = Some(create_hash(format!("{}{}{}", self.name, self.secret.clone().unwrap_or_default(), pepper)));
+		return self;
+	}
+
 	pub async fn update_secret(self, pool: &Pool, pepper: &str, old_secret: String, new_secret: String) -> Result<(), Box<dyn Error>> {
 		let user_from_db = db::get_by_id(pool, &self.id.unwrap()).await?;
 	
@@ -128,7 +133,6 @@ impl<'a> Loader<'a, User> for UserLoader<'a> {
 }
 
 impl<'a> UserLoader<'a> {
-	#[allow(unused)]
 	async fn get_first_with_encrypted_secret(self) -> Result<User, Box<dyn Error>> {
 		return db::UserDbReader::new(self.pool)
 			.set_query_parameters(self.query_parameters)
@@ -153,7 +157,7 @@ pub async fn init(config: &Config, pool: &Pool) {
 
 pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) -> Result<String, Box<dyn Error>> {
 	let hashed_secret = create_hash(format!("{}{}{}", credentials.name, credentials.secret, config.pepper));
-	let user = db::UserDbReader::new(pool).get_first_with_encrypted_secret().await?;
+	let user = UserLoader::new(pool).set_filter_name(credentials.name, StringFilterModes::Exact).get_first_with_encrypted_secret().await?;
 
 	if user.encrypted_secret.unwrap_or_default() != hashed_secret {
 		return Err(Box::new(CustomError::InvalidCredentials));

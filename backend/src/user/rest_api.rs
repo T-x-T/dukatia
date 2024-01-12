@@ -41,6 +41,64 @@ async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 		};
 }
 
+#[get("/api/v1/users")]
+async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool).get().await {
+		Ok(res) => {
+			let user: Vec<&User> = res.iter().filter(|x| x.id.unwrap() == user_id).collect();
+			
+			if user.first().unwrap().superuser {
+				return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap())
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+		},
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	};
+}
+
+#[derive(Deserialize)]
+struct PostUserBody {
+	name: String,
+	superuser: bool,
+	secret: String,
+}
+
+#[post("/api/v1/users")]
+async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(user) => {
+				if user.superuser {
+					match User::default()
+						.set_name(body.name.clone())
+						.set_superuser(body.superuser)
+						.set_secret(body.secret.clone())
+						.encrypt_secret(&data.config.pepper)
+						.save(&data.pool)
+						.await {
+							Ok(_) => return HttpResponse::Ok().body(""),
+							Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+						};	
+				}
+
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+			},
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+}
 
 #[derive(Deserialize)]
 struct PutSecretBody {

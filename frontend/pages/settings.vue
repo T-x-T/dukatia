@@ -1,7 +1,7 @@
 <template>
 	<div id="main">
 		<div class="gridItem">
-			<p>Update Password:</p>
+			<h3>Update Password</h3>
 			<input type="password" v-model="oldPassword" placeholder="Old Password">
 			<br>
 			<input type="password" v-model="newPassword" placeholder="New Password">
@@ -13,7 +13,7 @@
 		</div>
 
 		<div class="gridItem">
-			<p>Select Theme</p>
+			<h3>Select Theme</h3>
 			<select v-model="$colorMode.preference">
 				<option value="dark">Dark</option>
 				<option value="light">Light</option>
@@ -22,6 +22,10 @@
 
 		<div class="gridItem">
 			<BatchImport />
+		</div>
+
+		<div class="gridItem" id="userList">
+			<UserList />
 		</div>
 	</div>
 </template>
@@ -71,4 +75,7 @@ div.gridItem
 	padding: 5px
 	margin: 10px
 	box-shadow: 4px 4px 0px black
+
+div#userList
+	max-width: 400px
 </style>

@@ -989,6 +989,67 @@
 					} 
 				},
 				{
+					"name": "get all works",
+					"endpoint": "/api/v1/users",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"admin","secret":null,"encrypted_secret":null,"superuser":true}]
+					} 
+				},
+				{
+					"name": "post of new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user got created correctly",
+					"endpoint": "/api/v1/users",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"admin","secret":null,"encrypted_secret":null,"superuser":true},{"id":1,"name":"new user","secret":null,"encrypted_secret":null,"superuser":false}]
+					} 
+				},
+				{
+					"name": "new user can login",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
 					"name": "logout returns 200",
 					"endpoint": "/api/v1/logout",
 					"cookies": {

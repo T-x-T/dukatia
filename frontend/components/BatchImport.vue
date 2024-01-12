@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<p>Batch import Transactions</p>
+		<h3>Batch import Transactions</h3>
 		<p>Format:<br>account_id,recipient_id,timestamp,comment,major_amount,minor_amount<br>(No headers)</p>
 		<input type="file" accept=".csv" @change="load_data">
 		<br>
