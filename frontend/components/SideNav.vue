@@ -1,5 +1,5 @@
 <template>
-	<nav v-if="loggedIn" :class="hidden ? 'mobile' : ''">
+	<nav :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
 			<a href="https://dukatia.com" target="_blank">
 				<img v-if="$colorMode.value == 'dark'" id="logo" src="/dukatia-beta_logo_white.svg" alt="logo">
@@ -103,10 +103,6 @@ export default {
 	}),
 
 	props: {
-		loggedIn: {
-			type: Boolean,
-			required: true,
-		},
 		show_trigger: {
 			type: Number,
 		}

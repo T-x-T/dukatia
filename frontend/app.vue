@@ -1,7 +1,7 @@
 <template>
 	<main>
 		<SideNav 
-			:loggedIn="loggedIn"		
+			v-if="loggedIn"
 		/>
 		<div id="content">
 			<NuxtPage />
@@ -10,9 +10,13 @@
 </template>
 
 <script lang="ts" setup>
-const loggedIn = document.cookie.includes("accessToken");
-
-if(!loggedIn) useRouter().replace("/login");
+let loggedIn = false;
+try {
+	await $fetch("/api/v1/users/me");
+	loggedIn = true;
+} catch(e) {
+	useRouter().replace("/login");
+}
 
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {

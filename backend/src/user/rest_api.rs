@@ -1,4 +1,4 @@
-use actix_web::{post, web, HttpResponse, HttpRequest, Responder, put};
+use actix_web::{get, post, web, HttpResponse, HttpRequest, Responder, put};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
 use super::*;
@@ -23,6 +23,22 @@ async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Respon
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
+}
+
+#[get("/api/v1/users/me")]
+async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
 }
 
 
