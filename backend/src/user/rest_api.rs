@@ -41,7 +41,7 @@ async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 		};
 }
 
-#[get("/api/v1/users")]
+#[get("/api/v1/users/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
@@ -92,6 +92,54 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 							Ok(_) => return HttpResponse::Ok().body(""),
 							Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 						};	
+				}
+
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+			},
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+}
+
+#[derive(Deserialize)]
+struct PutUserBody {
+	superuser: Option<bool>,
+	secret: Option<String>,
+}
+
+#[put("/api/v1/users/{req_user_id}")]
+async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<u32>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(user) => {
+				if user.superuser {
+					match UserLoader::new(&data.pool)
+						.set_filter_id(*req_user_id, NumberFilterModes::Exact)
+						.get_first_with_encrypted_secret()
+						.await {
+							Ok(mut user_to_edit) => {
+								if body.superuser.is_some() {
+									user_to_edit.set_superuser_mut(body.superuser.unwrap());
+								}
+
+								if body.secret.is_some() {
+									user_to_edit.set_secret_mut(body.secret.clone().unwrap());
+									user_to_edit.encrypt_secret_mut(&data.config.pepper);
+								}
+
+								match user_to_edit.save(&data.pool).await {
+									Ok(_) => return HttpResponse::Ok().body(""),
+									Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+								}
+							},
+							Err(e) => return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}")),
+						}
 				}
 
 				return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));

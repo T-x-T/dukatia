@@ -54,6 +54,10 @@ impl User {
 		return self;
 	}
 
+	pub fn set_secret_mut(&mut self, secret: String) {
+		self.secret = Some(secret);
+	}
+
 	#[allow(unused)]
 	pub fn set_secret_opt(mut self, secret: Option<String>) -> Self {
 		self.secret = secret;
@@ -76,9 +80,17 @@ impl User {
 		return self;
 	}
 
+	pub fn set_superuser_mut(&mut self, superuser: bool) {
+		self.superuser = superuser;
+	}
+
 	pub fn encrypt_secret(mut self, pepper: &str) -> Self {
 		self.encrypted_secret = Some(create_hash(format!("{}{}{}", self.name, self.secret.clone().unwrap_or_default(), pepper)));
 		return self;
+	}
+
+	pub fn encrypt_secret_mut(&mut self, pepper: &str) {
+		self.encrypted_secret = Some(create_hash(format!("{}{}{}", self.name, self.secret.clone().unwrap_or_default(), pepper)));
 	}
 
 	pub async fn update_secret(self, pool: &Pool, pepper: &str, old_secret: String, new_secret: String) -> Result<(), Box<dyn Error>> {

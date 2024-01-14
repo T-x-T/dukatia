@@ -23,6 +23,14 @@
 				"name": "admin",
 				"secret": "changeme"
 			}
+		},
+		"login_as_user": {
+			"endpoint": "/api/v1/login",
+			"method": "POST",
+			"body": {
+				"name": "new user",
+				"secret": "default_pass123"
+			}
 		}
 	},
 	"tests": [
@@ -990,7 +998,7 @@
 				},
 				{
 					"name": "get all works",
-					"endpoint": "/api/v1/users",
+					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
 						"accessToken": "$login_as_admin.accessToken"
@@ -1024,7 +1032,7 @@
 				},
 				{
 					"name": "new user got created correctly",
-					"endpoint": "/api/v1/users",
+					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
 						"accessToken": "$login_as_admin.accessToken"
@@ -1044,6 +1052,127 @@
 					"body": {
 						"name": "new user",
 						"secret": "default_pass123"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "get all doesnt work for non superuser",
+					"endpoint": "/api/v1/users/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"before": [
+						"login_as_user"
+					],
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"you need to be a superuser for this action"}
+					} 
+				},
+				{
+					"name": "updating superuser and secret of user works",
+					"endpoint": "/api/v1/users/1",
+					"method": "PUT",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"secret": "new_pass",
+						"superuser": true
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "user got updated correctly",
+					"endpoint": "/api/v1/users/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"admin","secret":null,"encrypted_secret":null,"superuser":true},{"id":1,"name":"new user","secret":null,"encrypted_secret":null,"superuser":true}]
+					} 
+				},
+				{
+					"name": "user can login with changed password",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "new_pass"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "updating only superuser of user works",
+					"endpoint": "/api/v1/users/1",
+					"method": "PUT",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "user got updated correctly 2",
+					"endpoint": "/api/v1/users/all",
+					"method": "GET",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"admin","secret":null,"encrypted_secret":null,"superuser":true},{"id":1,"name":"new user","secret":null,"encrypted_secret":null,"superuser":false}]
+					} 
+				},
+				{
+					"name": "updating only secret of user works",
+					"endpoint": "/api/v1/users/1",
+					"method": "PUT",
+					"cookies": {
+						"accessToken": "$login_as_admin.accessToken"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"secret": "new_pass2"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "user can login with changed password 2",
+					"endpoint": "/api/v1/login",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "new_pass2"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200

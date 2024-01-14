@@ -45,6 +45,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(user::rest_api::get_me)
 			.service(user::rest_api::get_all)
 			.service(user::rest_api::post)
+			.service(user::rest_api::put)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::get_by_id)
 			.service(account::rest_api::post)

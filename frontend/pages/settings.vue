@@ -24,7 +24,7 @@
 			<BatchImport />
 		</div>
 
-		<div class="gridItem" id="userList">
+		<div v-if="me.superuser" class="gridItem" id="userList">
 			<UserList />
 		</div>
 	</div>
@@ -37,7 +37,12 @@ export default {
 		newPassword: null,
 		newPasswordConfirmation: null,
 		passwordUpdateMessage: "",
+		me: {} as User,
 	}),
+
+	async mounted() {
+		this.me = await $fetch("/api/v1/users/me");
+	},
 
 	methods: {
 		async updatePassword() {
