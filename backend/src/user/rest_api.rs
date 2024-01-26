@@ -56,7 +56,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 				return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap())
 			}
 
-			return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+			return HttpResponse::BadRequest().body("{{\"error\":\"you need to be a superuser for this action\"}}".to_string());
 		},
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
@@ -94,7 +94,7 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 						};	
 				}
 
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+				return HttpResponse::BadRequest().body("{{\"error\":\"you need to be a superuser for this action\"}}".to_string());
 			},
 			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 		};
@@ -121,7 +121,7 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 				if user.superuser {
 					match UserLoader::new(&data.pool)
 						.set_filter_id(*req_user_id, NumberFilterModes::Exact)
-						.get_first_with_encrypted_secret()
+						.get_first()
 						.await {
 							Ok(mut user_to_edit) => {
 								if body.superuser.is_some() {
@@ -142,7 +142,7 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 						}
 				}
 
-				return HttpResponse::BadRequest().body(format!("{{\"error\":\"you need to be a superuser for this action\"}}"));
+				return HttpResponse::BadRequest().body("{{\"error\":\"you need to be a superuser for this action\"}}".to_string());
 			},
 			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 		};

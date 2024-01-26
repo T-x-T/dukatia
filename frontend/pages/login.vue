@@ -1,5 +1,5 @@
 <template>
-	<div id="wrapper">
+	<div id="wrapper" v-if="show_login">
 		<h2>Login</h2>
 		<form @submit.prevent="login">
 			<label for="username">Username:</label>
@@ -19,8 +19,18 @@ export default {
 	data: () => ({
 		username: "",
 		password: "",
-		error: ""
+		error: "",
+		show_login: false,
 	}),
+
+	async mounted() {
+		try {
+			await $fetch("/api/v1/users/me");
+			useRouter().replace("/");
+		} catch(e) {
+			this.show_login = true;
+		}
+	},
 
 	methods: {
 		async login() {

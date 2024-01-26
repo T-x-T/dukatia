@@ -2,6 +2,7 @@ mod db;
 pub mod rest_api;
 
 use std::error::Error;
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use sha2::{Sha512, Digest};
 use deadpool_postgres::Pool;
@@ -10,13 +11,29 @@ use super::access_token;
 use super::CustomError;
 use crate::traits::*;
 
-#[derive(Serialize, Debug, Clone, Deserialize, Default)]
+#[derive(Serialize, Debug, Clone, Deserialize)]
 pub struct User {
 	pub id: Option<u32>,
 	pub name: String,
 	pub secret: Option<String>,
 	pub encrypted_secret: Option<String>,
 	pub superuser: bool,
+	pub active: bool,
+	pub last_logon: Option<DateTime<Utc>>,
+}
+
+impl Default for User {
+	fn default() -> Self {
+		return Self {
+			id: None,
+			name: String::new(),
+			secret: None,
+			encrypted_secret: None,
+			superuser: false,
+			active: true,
+			last_logon: None,
+		};
+	}
 }
 
 #[derive(Deserialize)]
@@ -144,15 +161,6 @@ impl<'a> Loader<'a, User> for UserLoader<'a> {
 	}
 }
 
-impl<'a> UserLoader<'a> {
-	async fn get_first_with_encrypted_secret(self) -> Result<User, Box<dyn Error>> {
-		return db::UserDbReader::new(self.pool)
-			.set_query_parameters(self.query_parameters)
-			.get_first_with_encrypted_secret()
-			.await;
-	}
-}
-
 pub async fn init(config: &Config, pool: &Pool) {
 	if UserLoader::new(pool).get().await.expect("failed to get user count in user::init").is_empty() {	
 		let hashed_secret = create_hash(format!("{}{}{}", config.admin_username.clone(), config.admin_password.clone(), config.pepper));
@@ -169,19 +177,16 @@ pub async fn init(config: &Config, pool: &Pool) {
 
 pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) -> Result<String, Box<dyn Error>> {
 	let hashed_secret = create_hash(format!("{}{}{}", credentials.name, credentials.secret, config.pepper));
-	let user = UserLoader::new(pool).set_filter_name(credentials.name, StringFilterModes::Exact).get_first_with_encrypted_secret().await?;
-
-	if user.encrypted_secret.unwrap_or_default() != hashed_secret {
-		return Err(Box::new(CustomError::InvalidCredentials));
-	}
+	let user = UserLoader::new(pool).set_filter_name(credentials.name.clone(), StringFilterModes::Exact).get_first().await?;
 
 	let user = User {
 		id: user.id,
 		name: user.name,
-		secret: Some(credentials.secret),
-		encrypted_secret: None,
-		superuser: false
+		secret: Some(credentials.secret.clone()),
+		..Default::default()
 	};
+
+	db::login(pool, &credentials, hashed_secret).await?;
 	
 	#[allow(clippy::needless_question_mark)]
 	return Ok(access_token::add(pool, &user).await?);

@@ -79,7 +79,6 @@ div.gridItem
 	height: max-content
 	padding: 5px
 	margin: 10px
-	box-shadow: 4px 4px 0px black
 
 div#userList
 	max-width: 400px

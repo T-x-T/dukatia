@@ -1,5 +1,6 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
+use chrono::prelude::*;
 use super::super::CustomError;
 use super::{User, LoginCredentials};
 use crate::traits::*;
@@ -32,7 +33,7 @@ impl<'a> DbReader<'a, User> for UserDbReader<'a> {
 	}
 
 	async fn execute(self) -> Result<Vec<User>, Box<dyn Error>> {
-		let query = "SELECT id, name, superuser FROM public.users";
+		let query = "SELECT id, name, superuser, active, last_logon FROM public.users";
 		return Ok(
 			self.actually_execute(query)
 				.await?
@@ -40,23 +41,6 @@ impl<'a> DbReader<'a, User> for UserDbReader<'a> {
 				.map(Into::into)
 				.collect()
 		);
-	}
-}
-
-impl<'a> UserDbReader<'a> {
-	pub async fn get_first_with_encrypted_secret(self) -> Result<User, Box<dyn Error>> {
-		let query = "SELECT id, name, superuser, secret FROM public.users";
-		let users: Vec<User> = self.actually_execute(query)
-			.await?
-			.into_iter()
-			.map(Into::into)
-			.collect();
-			
-		if users.is_empty() {
-			return Err(Box::new(CustomError::NoItemFound { item_type: "user".to_string() }))
-		}
-		
-		return Ok(users[0].clone());
 	}
 }
 
@@ -78,8 +62,8 @@ impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
 		let client = self.pool.get().await.unwrap();
 		let id: i32 = client
 			.query(
-				"INSERT INTO public.users (id, name, secret, superuser) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
-				&[&self.user.name, &self.user.encrypted_secret, &self.user.superuser]
+				"INSERT INTO public.users (id, name, secret, superuser, active) VALUES (DEFAULT, $1, $2, $3, $4) RETURNING id;", 
+				&[&self.user.name, &self.user.encrypted_secret, &self.user.superuser, &self.user.active]
 			).await?
 			[0].get(0);
 
@@ -101,21 +85,32 @@ impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
 	
 		let client = self.pool.get().await?;
 		
-		client
-			.query(
-				"UPDATE public.users SET name=$1, secret=$2, superuser=$3 WHERE id=$4;",
-				&[&self.user.name, &self.user.encrypted_secret, &self.user.superuser, &(self.user.id.unwrap() as i32)]
-			)
-			.await?;
+		if self.user.secret.is_some() {
+			client
+				.query(
+					"UPDATE public.users SET name=$1, secret=$2, superuser=$3, active=$4 WHERE id=$5;",
+					&[&self.user.name, &self.user.encrypted_secret, &self.user.superuser, &self.user.active, &(self.user.id.unwrap() as i32)]
+				)
+				.await?;
+		} else {
+			client
+				.query(
+					"UPDATE public.users SET name=$1, superuser=$2, active=$3 WHERE id=$4;",
+					&[&self.user.name, &self.user.superuser, &self.user.active, &(self.user.id.unwrap() as i32)]
+				)
+				.await?;
+		}
+
 
 		return Ok(());
 	}
 }
 
 pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: String) -> Result<u32, Box<dyn Error>> {
-	let rows = pool.get()
-		.await?
-	  .query(
+	let client = pool.get().await?;
+	
+	let rows = client
+		.query(
 			"SELECT id FROM public.users WHERE name=$1 AND secret=$2",
 			&[&credentials.name, &hashed_secret]
 		).await?;
@@ -125,6 +120,14 @@ pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: S
 	}
 
 	let user_id: i32 = rows[0].get(0);
+
+	client
+		.query(
+			"UPDATE public.users SET last_logon=$1 WHERE id=$2;",
+			&[&Some(Utc::now()), &user_id]
+		)
+		.await?;
+
 	return Ok(user_id as u32);
 }
 
@@ -143,16 +146,17 @@ pub async fn get_by_id(pool: &Pool, id: &u32) -> Result<User, Box<dyn Error>> {
 	let rows = pool.get()
 		.await?
 		.query(
-			"SELECT name, superuser FROM public.users WHERE id=$1",
+			"SELECT name, superuser, active, last_logon FROM public.users WHERE id=$1",
 			&[&(*id as i32)]
 		).await?;
 
 	return Ok(User {
 		id: Some(*id),
 		name: rows[0].get(0),
-		secret: None,
-		encrypted_secret: None,
-		superuser: rows[0].get(1)
+		superuser: rows[0].get(1),
+		active: rows[0].get(2),
+		last_logon: rows[0].get(3),
+		..Default::default()
 	});
 }
 
@@ -161,14 +165,19 @@ impl From<tokio_postgres::Row> for User {
 		let id: i32 = value.get(0);
 		let name: String = value.get(1);
 		let superuser: bool = value.get(2);
-		let encrypted_secret: Option<String> = value.try_get(3).unwrap_or_default();
+		let active: bool = value.get(3);
+		let last_logon: Option<DateTime<Utc>> = value.get(4);
+		let encrypted_secret: Option<String> = value.try_get(5).unwrap_or_default();
+
 
 		return User {
 			id: Some(id as u32),
 			name,
-			secret: None,
 			encrypted_secret,
 			superuser,
+			active,
+			last_logon,
+			..Default::default()
 		};
 	}
 }
