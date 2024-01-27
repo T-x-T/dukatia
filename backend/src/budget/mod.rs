@@ -177,8 +177,16 @@ impl Budget {
 
 	pub async fn get_transactions_of_period_at(&self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let period = self.get_period_at_timestamp(timestamp);
+		let mut date_range = period;
+
+		if date_range.0 < self.active_from {
+			date_range.0 = self.active_from;
+		}
+		if self.active_to.is_some() && date_range.1 > self.active_to.unwrap() {
+			date_range.1 = self.active_to.unwrap();
+		}
 		
-		return self.get_transactions(pool, period.0, period.1).await;
+		return self.get_transactions(pool, date_range.0, date_range.1).await;
 	}
 
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {

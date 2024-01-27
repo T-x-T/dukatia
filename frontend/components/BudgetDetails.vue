@@ -69,7 +69,8 @@ export default {
 
 	methods: {
 		async reload(res?: any) {
-			console.log(res)
+			if(res?.id) (this.budget as Budget).id = res.id;
+
 			if(!this.budget || Object.keys(this.budget).length === 0) {
 				console.error("this.budget isnt defined in BudgetDetails.vue reload method");
 				return;
