@@ -101,6 +101,15 @@ impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
 				.await?;
 		}
 
+		if !self.user.active {
+			client
+				.query(
+					"DELETE FROM public.access_tokens WHERE user_id=$1;",
+					&[&(self.user.id.unwrap() as i32)]
+				)
+				.await?;
+		}
+
 
 		return Ok(());
 	}
@@ -111,7 +120,7 @@ pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: S
 	
 	let rows = client
 		.query(
-			"SELECT id FROM public.users WHERE name=$1 AND secret=$2",
+			"SELECT id FROM public.users WHERE name=$1 AND secret=$2 AND active=true",
 			&[&credentials.name, &hashed_secret]
 		).await?;
 

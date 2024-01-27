@@ -81,5 +81,5 @@ div.gridItem
 	margin: 10px
 
 div#userList
-	max-width: 400px
+	max-width: 550px
 </style>

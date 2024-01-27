@@ -101,6 +101,16 @@ impl User {
 		self.superuser = superuser;
 	}
 
+	#[allow(unused)]
+	pub fn set_active(mut self, active: bool) -> Self {
+		self.active = active;
+		return self;
+	}
+
+	pub fn set_active_mut(&mut self, active: bool) {
+		self.active = active;
+	}
+
 	pub fn encrypt_secret(mut self, pepper: &str) -> Self {
 		self.encrypted_secret = Some(create_hash(format!("{}{}{}", self.name, self.secret.clone().unwrap_or_default(), pepper)));
 		return self;

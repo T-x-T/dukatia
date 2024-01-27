@@ -49,6 +49,9 @@
 			<br>
 			<button @click="update">Save admin</button>
 			<br>
+			<br>
+			<button v-if="new_user.active" @click="deactivate" class="red">Deactivate</button>
+			<button v-if="!new_user.active" @click="activate" class="green">Activate</button>
 		</Popup>
 	</div>
 </template>
@@ -63,6 +66,7 @@ export default {
 			name: "",
 			secret: "",
 			superuser: false,
+			active: true
 		} as User,
 	}),
 
@@ -86,11 +90,15 @@ export default {
 					{name: "ID", type: "number", no_filter: true},
 					{name: "Name", type: "string", no_filter: true},
 					{name: "Type", type: "string", no_filter: true},
+					{name: "Status", type: "string", no_filter: true},
+					{name: "Last Logon", type: "string", no_filter: true},
 				],
 				rows: users.map(x => ([
 					x.id,
 					x.name,
 					x.superuser ? "Admin" : "User",
+					x.active ? "Active" : "Disabled",
+					x.last_logon ? x.last_logon.slice(0, 10) : "Never"
 				]))
 			};
 		},
@@ -105,7 +113,7 @@ export default {
 				await this.reload();
 			} catch(e: any) {
 				console.error(e);
-				window.alert(e?.data);
+				window.alert(e?.data?.error);
 				return;
 			}
 		},
@@ -120,9 +128,21 @@ export default {
 				await this.reload();
 			} catch(e: any) {
 				console.error(e);
-				window.alert(e?.data);
+				window.alert(e?.data?.error);
 				return;
 			}
+		},
+
+		async deactivate() {
+			this.new_user.active = false;
+			this.edit_popup_open = false;
+			await this.update();
+		},
+
+		async activate() {
+			this.new_user.active = true;
+			this.edit_popup_open = false;
+			await this.update();
 		},
 
 		row_click(row: any) {
@@ -131,6 +151,7 @@ export default {
 				name: row[1],
 				secret: "",
 				superuser: row[2] === "Admin",
+				active: row[3] == "Active"
 			} as User;
 
 			this.edit_popup_open = true;

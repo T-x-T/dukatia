@@ -104,6 +104,7 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 struct PutUserBody {
 	superuser: Option<bool>,
 	secret: Option<String>,
+	active: Option<bool>,
 }
 
 #[put("/api/v1/users/{req_user_id}")]
@@ -131,6 +132,14 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 								if body.secret.is_some() {
 									user_to_edit.set_secret_mut(body.secret.clone().unwrap());
 									user_to_edit.encrypt_secret_mut(&data.config.pepper);
+								}
+
+								if body.active.is_some() {
+									if user_to_edit.id.unwrap() == user_id {
+										return HttpResponse::BadRequest().body("{\"error\":\"you cant disable yourself!\"}")
+									}
+
+									user_to_edit.set_active_mut(body.active.unwrap());
 								}
 
 								match user_to_edit.save(&data.pool).await {

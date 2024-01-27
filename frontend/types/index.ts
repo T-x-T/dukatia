@@ -16,6 +16,8 @@ declare global {
 		name: string,
 		secret?: string,
 		superuser: boolean,
+		active: boolean,
+		last_logon?: string,
 	}
 
 	type Asset = {
