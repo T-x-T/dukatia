@@ -198,7 +198,7 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 		.delete(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => {
 			if e.to_string().starts_with("you can only access items you own") {
 				return HttpResponse::NotFound().body("");
@@ -291,7 +291,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 				.replace_valuation_history(&data.pool, asset_valuations).await;
 		
 				match result {
-					Ok(_) => return HttpResponse::Ok().body(""),
+					Ok(()) => return HttpResponse::Ok().body(""),
 					Err(e) => {
 						if e.to_string().starts_with("no item of type unknown found") {
 							return HttpResponse::NotFound().body("");

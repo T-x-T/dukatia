@@ -416,7 +416,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0 as i32));
@@ -427,7 +427,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("total_amount", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.total_amount.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.total_amount.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(i64::from(self.get_query_parameters().filters.total_amount.unwrap().0)));
@@ -438,7 +438,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("asset_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.asset_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.asset_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap().0 as i32));
@@ -449,7 +449,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("user_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.user_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.user_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.user_id.unwrap().0 as i32));
@@ -460,7 +460,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("currency_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.currency_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.currency_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.currency_id.unwrap().0 as i32));
@@ -471,7 +471,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("account_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.account_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.account_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.account_id.unwrap().0 as i32));
@@ -482,7 +482,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("recipient_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.recipient_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.recipient_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0 as i32));
@@ -493,7 +493,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("minor_in_major", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.minor_in_major.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.minor_in_major.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.minor_in_major.unwrap().0 as i32));
@@ -504,7 +504,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("parent_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.parent_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.parent_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.parent_id.unwrap().0 as i32));
@@ -515,7 +515,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("default_currency_id", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.default_currency_id.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.default_currency_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.default_currency_id.unwrap().0 as i32));
@@ -526,7 +526,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("balance", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.balance.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.balance.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.balance.unwrap().0));
@@ -537,7 +537,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("amount", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.float_amount.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.float_amount.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.float_amount.unwrap().0));
@@ -548,7 +548,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("amount", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.int_amount.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.int_amount.unwrap().1, where_or_and, &property_name, i).as_str());
 			
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.int_amount.unwrap().0));
@@ -559,7 +559,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("value_per_unit", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.value_per_unit.unwrap().1, where_or_and, property_name, i).as_str());
+			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.value_per_unit.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
 			parameter_values.push(Box::new(self.get_query_parameters().filters.value_per_unit.unwrap().0 as i32));
@@ -568,11 +568,10 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		
 		if self.get_query_parameters().filters.tag_id.is_some() {
 			match self.get_query_parameters().filters.tag_id.unwrap().1 {
-				NumberFilterModes::Exact => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
+				NumberFilterModes::Exact | NumberFilterModes::ExactOrAlsoNull => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 				NumberFilterModes::Not => parameters.push_str(format!(" {} NOT ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 				NumberFilterModes::Less => parameters.push_str(format!(" {} ${i} > ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 				NumberFilterModes::More => parameters.push_str(format!(" {} ${i} < ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
-				NumberFilterModes::ExactOrAlsoNull => parameters.push_str(format!(" {} ${i} = ANY({}tags)", if first_where_clause {"WHERE"} else {"AND"}, if table_name.is_some() {table_name.clone().unwrap() + "."} else {String::new()}).as_str()),
 			};
 
 			first_where_clause = false;
@@ -597,7 +596,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("comment", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			let res = render_string_filter_mode(self.get_query_parameters().filters.comment.clone().unwrap(), where_or_and, property_name, i);
+			let res = render_string_filter_mode(self.get_query_parameters().filters.comment.clone().unwrap(), where_or_and, &property_name, i);
 			parameters.push_str(res.0.as_str());
 			parameter_values.push(Box::new(res.1));
 
@@ -609,7 +608,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("name", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			let res = render_string_filter_mode(self.get_query_parameters().filters.name.clone().unwrap(), where_or_and, property_name, i);
+			let res = render_string_filter_mode(self.get_query_parameters().filters.name.clone().unwrap(), where_or_and, &property_name, i);
 			parameters.push_str(res.0.as_str());
 			parameter_values.push(Box::new(res.1));
 
@@ -621,7 +620,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("symbol", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
-			let res = render_string_filter_mode(self.get_query_parameters().filters.symbol.clone().unwrap(), where_or_and, property_name, i);
+			let res = render_string_filter_mode(self.get_query_parameters().filters.symbol.clone().unwrap(), where_or_and, &property_name, i);
 			parameters.push_str(res.0.as_str());
 			parameter_values.push(Box::new(res.1));
 
@@ -633,7 +632,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			let property_name = get_property_name("description", &table_name);
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 			
-			let res = render_string_filter_mode(self.get_query_parameters().filters.description.clone().unwrap(), where_or_and, property_name, i);
+			let res = render_string_filter_mode(self.get_query_parameters().filters.description.clone().unwrap(), where_or_and, &property_name, i);
 			parameters.push_str(res.0.as_str());
 			parameter_values.push(Box::new(res.1));
 
@@ -743,7 +742,7 @@ fn get_property_name(property: &str, table_name: &Option<String>) -> String {
 	};
 }
 
-fn render_number_filter_mode(input: NumberFilterModes, where_or_and: &str, property_name: String, i: i32) -> String {
+fn render_number_filter_mode(input: NumberFilterModes, where_or_and: &str, property_name: &str, i: i32) -> String {
 	return match input {
 		NumberFilterModes::Exact => format!(" {where_or_and} {property_name}=${i}"),
 		NumberFilterModes::Not => format!(" {where_or_and} {property_name}!=${i}"),
@@ -753,7 +752,7 @@ fn render_number_filter_mode(input: NumberFilterModes, where_or_and: &str, prope
 	};
 }
 
-fn render_string_filter_mode(input: (String, StringFilterModes), where_or_and: &str, property_name: String, i: i32) -> (String, String) {
+fn render_string_filter_mode(input: (String, StringFilterModes), where_or_and: &str, property_name: &str, i: i32) -> (String, String) {
 	return match input.1 {
 		StringFilterModes::Exact => (format!(" {where_or_and} {property_name} ILIKE ${i}"), input.0),
 		StringFilterModes::Contains => (format!(" {where_or_and} {property_name} ILIKE ${i}"), format!("%{}%", input.0)),
