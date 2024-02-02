@@ -80,7 +80,13 @@ impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("account") }));
 		}
 	
-		super::AccountLoader::new(self.pool).set_filter_id(self.account.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+		let old = super::AccountLoader::new(self.pool)
+			.set_filter_id(self.account.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.account.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
 	
 		let client = self.pool.get().await?;
 	

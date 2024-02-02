@@ -84,8 +84,27 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("recipient")}));
 		}
 	
-		super::RecipientLoader::new(self.pool).get().await?;
-	
+		let old = super::RecipientLoader::new(self.pool)
+			.set_filter_id(self.recipient.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		match old.user_id {
+			Some(old_user_id) => {
+				if old_user_id != self.recipient.user_id.unwrap() {
+					return Err(Box::new(CustomError::UserIsntOwner));
+				}
+			},
+			None => {
+				let old_user = crate::user::UserLoader::new(self.pool)
+					.set_filter_id(self.recipient.id.unwrap(), NumberFilterModes::Exact)
+					.get_first().await?;
+
+				if !old_user.superuser {
+					return Err(Box::new(CustomError::UserIsntOwner));
+				}
+			},
+		}
+
 		let client = self.pool.get().await?;
 		
 		client.query(

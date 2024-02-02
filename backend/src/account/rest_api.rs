@@ -22,7 +22,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/accounts/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -43,6 +43,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		balance: request_parameters.filter_balance.map(|x| {
 			(x, request_parameters.filter_mode_balance.clone().unwrap_or_default().into())
 		}),
+		user_id: Some((user_id, NumberFilterModes::Exact)),
 		..Default::default()
 	};
 
@@ -63,12 +64,15 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/accounts/{account_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::AccountLoader::new(&data.pool).set_filter_id(*account_id, NumberFilterModes::Exact).get_first().await;
+	let result = super::AccountLoader::new(&data.pool)
+		.set_filter_id(*account_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
+		.get_first().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -124,8 +128,14 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accoun
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.save(&data.pool).await;
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+		match result {
+			Ok(_) => return HttpResponse::Ok().body(""),
+			Err(e) => {
+				if e.to_string().starts_with("you can only access items you own") {
+					return HttpResponse::NotFound().body("");
+				}
+	
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+			},
+		}
 }

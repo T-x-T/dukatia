@@ -242,6 +242,89 @@
 							{"id":5,"name":"test","minor_in_major":100,"symbol":"*"}
 						]
 					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "regular user cant post new currency",
+					"endpoint": "/api/v1/currencies",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test",
+						"minor_in_major": 100,
+						"symbol": "*"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"youre not allowed to create new currencies"}
+					}
+				},
+				{
+					"name": "regular user cant update currency",
+					"endpoint": "/api/v1/currencies/2",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name":"edited test",
+						"minor_in_major": 12,
+						"symbol": "/"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"youre not allowed to update existing currencies"}
+					}
+				},
+				{
+					"name": "regular user can retrieve all currencies",
+					"endpoint": "/api/v1/currencies/all",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Euro","minor_in_major":100,"symbol":"€"},{"id":1,"name":"USD","minor_in_major":100,"symbol":"$"},{"id":2,"name":"edited test","minor_in_major":12,"symbol":"/"},{"id":3,"name":"test","minor_in_major":100,"symbol":"*"},{"id":4,"name":"test","minor_in_major":100,"symbol":"*"},{"id":5,"name":"test","minor_in_major":100,"symbol":"*"}]
+					}
+				},
+				{
+					"name": "regular user can get single currency by id",
+					"endpoint": "/api/v1/currencies/1",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"id":1,"name":"USD","minor_in_major":100,"symbol":"$"}
+					}
 				}
 			]
 		},
@@ -454,6 +537,96 @@
 							{"id":5,"name":"test","user_id":0,"tag_ids":[]}
 						]
 					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post recipient",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test of new user"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user sees only their own recipients",
+					"endpoint": "/api/v1/recipients/all",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":0,"name":"Default","user_id":null,"tag_ids":[]},{"id":6,"name":"test of new user","user_id":1,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "updating recipient of other user doesnt work",
+					"endpoint": "/api/v1/recipients/1",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name":"edited test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "get single recipient of other user by id doesnt work",
+					"endpoint": "/api/v1/recipients/1",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "get single recipient of no user by id works",
+					"endpoint": "/api/v1/recipients/0",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
 				}
 			]
 		},
@@ -657,6 +830,84 @@
 							{"id":4,"name":"test","default_currency_id":0,"user_id":0,"tag_ids":[],"balance":null}
 						]
 					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post account",
+					"endpoint": "/api/v1/accounts",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test",
+						"default_currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user can only see their own accounts",
+					"endpoint": "/api/v1/accounts/all",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":5,"name":"test","default_currency_id":0,"user_id":1,"tag_ids":[],"balance":null}]
+					}
+				},
+				{
+					"name": "new user cant modify account of other user",
+					"endpoint": "/api/v1/accounts/1",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name":"edited test",
+						"default_currency_id": 1
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "get single account of other user doesnt work",
+					"endpoint": "/api/v1/accounts/1",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
 				}
 			]
 		},
@@ -800,11 +1051,11 @@
 				},
 				{
 					"name": "updated tag parent_id saved correctly",
-					"endpoint": "/api/v1/tags/all",
+					"endpoint": "/api/v1/tags/1",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":2,"name":"test","user_id":0,"parent_id":null},{"id":1,"name":"edited test","user_id":0,"parent_id":2}]
+						"body_equals": {"id":1,"name":"edited test","user_id":0,"parent_id":2}
 					}
 				},
 				{
@@ -974,6 +1225,96 @@
 						"body_equals": [
 							{"id":5,"name":"test","user_id":0,"parent_id":null}
 						]
+					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post tag",
+					"endpoint": "/api/v1/tags",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user can only see their own tags",
+					"endpoint": "/api/v1/tags/all",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":6,"name":"test","user_id":1,"parent_id":null}]
+					}
+				},
+				{
+					"name": "new user cant get get other users tag by id",
+					"endpoint": "/api/v1/tags/0",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant modify tag of other user",
+					"endpoint": "/api/v1/tags/5",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "PUT",
+					"body": {
+						"name":"edited test"
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant delete tag of other user",
+					"endpoint": "/api/v1/tags/5",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "DELETE",
+					"expected_outcome": {
+						"status_code_equals": 404
 					}
 				}
 			]
@@ -1786,7 +2127,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[1,0],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
+						"body_equals": [{"id":5,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[0,1],"asset":null,"positions":[{"id":5,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]},{"id":6,"user_id":0,"currency_id":1,"account_id":1,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":6,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"$","is_negative":false},"comment":"a","tag_id":null}]}]
 					}
 				},
 				{
@@ -1979,6 +2320,141 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": {"id":9,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2024-03-25T11:22:00Z","total_amount":{"major":56,"minor":89,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is an edited comment","tag_ids":[],"asset":null,"positions":[{"id":10,"amount":{"major":56,"minor":89,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"b","tag_id":null}]}
+					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post transaction",
+					"endpoint": "/api/v1/transactions",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2023-03-25T11:22:00.000Z",
+						"comment": "this is a comment",
+						"positions": [
+							{
+								"amount": {
+									"major": 123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "a"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user can only see their own transactions",
+					"endpoint": "/api/v1/transactions/all",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":10,"user_id":1,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-03-25T11:22:00Z","total_amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"this is a comment","tag_ids":[],"asset":null,"positions":[{"id":11,"amount":{"major":123,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"a","tag_id":null}]}]
+					}
+				},
+				{
+					"name": "new user cant modify transaction of other user",
+					"endpoint": "/api/v1/transactions/9",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"account_id": 0,
+						"recipient_id": 0,
+						"status": 1,
+						"timestamp": "2024-03-25T11:22:00.000Z",
+						"comment": "this is an edited comment",
+						"positions": [
+							{
+								"amount": {
+									"major": -123,
+									"minor": 45,
+									"minor_in_major": 100,
+									"symbol": "€"
+								},
+								"comment": "b"
+							}
+						]
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant get other users transaction by id",
+					"endpoint": "/api/v1/transactions/9",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant delete transaction of other user",
+					"endpoint": "/api/v1/transactions/9",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "DELETE",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "retrieval of summary only returns items of current user",
+					"endpoint": "/api/v1/transactions/summary",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": {"count":1,"total_amount":"123.45€"}
 					}
 				}
 			]
@@ -2528,6 +3004,166 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
+					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post asset",
+					"endpoint": "/api/v1/assets",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test",
+						"description": "description",
+						"currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user can only see their own assets",
+					"endpoint": "/api/v1/assets/all",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":7,"user_id":1,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
+					}
+				},
+				{
+					"name": "new user cant modify asset of other user",
+					"endpoint": "/api/v1/assets/1",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name":"edited test",
+						"description": "edited description",
+						"currency_id": 0
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant get other users asset by id",
+					"endpoint": "/api/v1/assets/1",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant get valuation history of other users asset by id",
+					"endpoint": "/api/v1/assets/1/valuation_history",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant replace valuation history for other users asset",
+					"endpoint": "/api/v1/assets/1/valuation_history",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "POST",
+					"body": [
+						{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":20.0,"timestamp":"2023-03-20T12:22:00Z"},
+						{"value_per_unit":{"major": 1,"minor": 25,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z"},
+						{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":10.0,"timestamp":"2023-03-22T14:22:00Z"}
+					],
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant post valuation for other users asset",
+					"endpoint": "/api/v1/assets/1/valuations",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "POST",
+					"body": {
+						"value_per_unit": {
+							"major": 1,
+							"minor": 23,
+							"minor_in_major": 100,
+							"symbol": "€",
+							"is_negative": false
+						},
+						"amount_change": -10,
+						"timestamp": "2023-03-24T11:22:00Z",
+						"account_id": 0,
+						"cost": {
+							"major": 1,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "€",
+							"is_negative": false
+						}
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant delete other users asset",
+					"endpoint": "/api/v1/assets/1",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "DELETE",
+					"expected_outcome": {
+						"status_code_equals": 404
 					}
 				}
 			]
@@ -4250,6 +4886,134 @@
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [{"id":7,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":0,"status":1,"timestamp":"2023-11-25T11:22:00Z","total_amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"this is a comment","tag_ids":[0,1,2],"asset":null,"positions":[{"id":7,"amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"a","tag_id":null}]}]
+					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post budget",
+					"endpoint": "/api/v1/budgets",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "test",
+						"rollover": true,
+						"period": 1,
+						"amount": {
+							"major": 10,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "€"
+						},
+						"filter_tag_ids": [0, 2],
+						"currency_id": 0,
+						"active_from": "2021-02-04T12:34:56Z",
+						"active_to": "2035-02-04T12:34:56Z"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "new user can only see their own budgets",
+					"endpoint": "/api/v1/budgets/all?at_timestamp=2023-11-28T12:34:56Z",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":6,"name":"test","user_id":1,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1480,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+					}
+				},
+				{
+					"name": "new user cant modify budget of other user",
+					"endpoint": "/api/v1/budgets/7",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"body": {
+						"name": "edited test",
+						"rollover": false,
+						"period": 2,
+						"amount": {
+							"major": 20,
+							"minor": 0,
+							"minor_in_major": 100,
+							"symbol": "$"
+						},
+						"filter_tag_ids": [2, 1],
+						"currency_id": 1,
+						"active_from": "2020-02-04T12:34:56Z",
+						"active_to": null
+					},
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant get other users budget by id",
+					"endpoint": "/api/v1/budgets/7",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant get transaction of other users budget",
+					"endpoint": "/api/v1/budgets/7/transactions",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 404
+					}
+				},
+				{
+					"name": "new user cant delete other users budget by id",
+					"endpoint": "/api/v1/budgets/7",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"accessToken": "$login_as_user.accessToken"
+					},
+					"method": "DELETE",
+					"expected_outcome": {
+						"status_code_equals": 404
 					}
 				}
 			]

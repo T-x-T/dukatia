@@ -84,7 +84,13 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("budget")}));
 		}
 	
-		super::BudgetLoader::new(self.pool).get().await?;
+		let old = super::BudgetLoader::new(self.pool)
+			.set_filter_id(self.budget.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.budget.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
 	
 		let client = self.pool.get().await?;
 		
@@ -115,6 +121,14 @@ impl<'a> DbDeleter<'a, Budget> for BudgetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.budget.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("budget")}));
+		}
+
+		let old = super::BudgetLoader::new(self.pool)
+			.set_filter_id(self.budget.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.budget.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
 
 		self.pool.get()

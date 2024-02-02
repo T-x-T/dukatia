@@ -126,7 +126,13 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
 		}
 	
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+		let old = super::AssetLoader::new(self.pool)
+			.set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.asset.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
 	
 		let client = self.pool.get().await?;
 	
@@ -223,6 +229,14 @@ impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.asset.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
+		}
+
+		let old = super::AssetLoader::new(self.pool)
+			.set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.asset.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
 
 		self.pool.get()

@@ -18,7 +18,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/recipients/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -33,6 +33,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		tag_id: request_parameters.filter_tag_id.map(|x| {
 			(x, request_parameters.filter_mode_tag_id.clone().unwrap_or_default().into())
 		}),
+		user_id: Some((user_id, NumberFilterModes::ExactOrAlsoNull)),
 		..Default::default()
 	};
 
@@ -53,13 +54,14 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/recipients/{recipient_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, recipient_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::RecipientLoader::new(&data.pool)
 		.set_filter_id(*recipient_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::ExactOrAlsoNull)
 		.get_first().await;
 
 	match result {
@@ -67,7 +69,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, recipient_id: we
 		Err(e) => {
 			if e.to_string().starts_with("no item of type unknown found") {
 				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type recipient not found with filter id={recipient_id}\"}}"));
-			}
+			}		
 			
 			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
 		}
@@ -115,6 +117,12 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Recipi
 
 	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => {
+			if e.to_string().starts_with("you can only access items you own") {
+				return HttpResponse::NotFound().body("");
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }

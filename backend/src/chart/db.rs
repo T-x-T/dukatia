@@ -39,7 +39,7 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Resu
 }
 
 pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
-	let user_id: Option<i32> = chart.user_id.map(|x| x as i32);
+	let user_id: i32 = chart.user_id as i32;
 	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
 	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
 	let top_left_x: Option<i32> = chart.top_left_x.map(|x| x as i32);
@@ -96,7 +96,7 @@ pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
 
 fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 	let id: i32 = row.get(0);
-	let user_id: Option<i32> = row.get(1);
+	let user_id: i32 = row.get(1);
 	let chart_type: String = row.get(2);
 	let title: String = row.get(3);
 	let filter_from: Option<DateTime<Utc>> = row.get(4);
@@ -114,7 +114,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 
 	return ChartOptions {
 		id: Some(id as u32),
-		user_id: user_id.map(|x| x as u32),
+		user_id: user_id as u32,
 		chart_type,
 		title,
 		filter_from,

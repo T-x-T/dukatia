@@ -149,7 +149,13 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
 		}
 	
-		super::TransactionLoader::new(self.pool).set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+		let old = super::TransactionLoader::new(self.pool)
+			.set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.transaction.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
 	
 		let client = self.pool.get().await?;
 	
@@ -214,6 +220,14 @@ impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.transaction.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
+		}
+
+		let old = super::TransactionLoader::new(self.pool)
+			.set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.transaction.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
 
 		self.pool.get()

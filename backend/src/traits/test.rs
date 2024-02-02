@@ -317,6 +317,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (id IS NULL OR id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_id_not() {
 			let mut filters = Filters::default();
 			filters.id = Some((10, NumberFilterModes::Not));
@@ -361,6 +373,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE total_amount=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_total_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.total_amount = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (total_amount IS NULL OR total_amount=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -413,6 +437,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_asset_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.asset_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (asset_id IS NULL OR asset_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_asset_id_not() {
 			let mut filters = Filters::default();
 			filters.asset_id = Some((10, NumberFilterModes::Not));
@@ -457,6 +493,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE user_id=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_user_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.user_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (user_id IS NULL OR user_id=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -509,6 +557,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_currency_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.currency_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (currency_id IS NULL OR currency_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_currency_id_not() {
 			let mut filters = Filters::default();
 			filters.currency_id = Some((10, NumberFilterModes::Not));
@@ -553,6 +613,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE account_id=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_account_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.account_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (account_id IS NULL OR account_id=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -605,6 +677,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_recipient_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.recipient_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (recipient_id IS NULL OR recipient_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_recipient_id_not() {
 			let mut filters = Filters::default();
 			filters.recipient_id = Some((10, NumberFilterModes::Not));
@@ -649,6 +733,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE minor_in_major=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_minor_in_major_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.minor_in_major = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (minor_in_major IS NULL OR minor_in_major=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -701,6 +797,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_parent_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.parent_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (parent_id IS NULL OR parent_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_parent_id_not() {
 			let mut filters = Filters::default();
 			filters.parent_id = Some((10, NumberFilterModes::Not));
@@ -745,6 +853,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE default_currency_id=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_default_currency_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.default_currency_id = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (default_currency_id IS NULL OR default_currency_id=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -797,6 +917,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_balance_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.balance = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (balance IS NULL OR balance=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_balance_not() {
 			let mut filters = Filters::default();
 			filters.balance = Some((10, NumberFilterModes::Not));
@@ -841,6 +973,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE amount=$1");
+			assert_eq!(format!("{res_values:?}"), "[10.5]");
+		}
+
+		#[test]
+		fn filter_float_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.float_amount = Some((10.5, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (amount IS NULL OR amount=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10.5]");
 		}
 
@@ -893,6 +1037,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_int_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.int_amount = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (amount IS NULL OR amount=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_int_amount_not() {
 			let mut filters = Filters::default();
 			filters.int_amount = Some((10, NumberFilterModes::Not));
@@ -937,6 +1093,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE value_per_unit=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_value_per_unit_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.value_per_unit = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (value_per_unit IS NULL OR value_per_unit=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 

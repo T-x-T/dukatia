@@ -46,31 +46,6 @@ struct ChartOptionsQuery {
 	filter_collection: Option<String>,
 }
 
-impl From<ChartOptionsQuery> for super::ChartOptions {
-	fn from(options: ChartOptionsQuery) -> Self {
-		return super::ChartOptions {
-			id: None,
-			user_id: None,
-			chart_type: String::new(),
-			title: options.filter_collection.clone().unwrap_or_default(),
-			filter_from: options.from_date,
-			filter_to: options.to_date,
-			filter_collection: options.filter_collection,
-			date_period: options.date_period,
-			asset_id: options.asset_id,
-			budget_id: options.budget_id,
-			max_items: options.max_items,
-			date_range: options.date_range,
-			only_positive: options.only_positive,
-			only_negative: options.only_negative,
-			top_left_x: None,
-			top_left_y: None,
-			bottom_right_x: None,
-			bottom_right_y: None,
-		};
-	}
-}
-
 #[get("/api/v1/charts/{chart_id}/data")]
 async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<ChartOptionsQuery>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -119,13 +94,31 @@ async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart
 
 #[get("/api/v1/charts/by_collection/{filter_collection}")]
 async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: HttpRequest, path: web::Path<String>, options: web::Query<ChartOptionsQuery>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let mut chart_options: super::ChartOptions = options.into_inner().into();
-	chart_options.filter_collection = Some(path.clone());
+	let chart_options = super::ChartOptions {
+		id: None,
+		user_id,
+		chart_type: String::new(),
+		title: options.filter_collection.clone().unwrap_or_default(),
+		filter_from: options.from_date,
+		filter_to: options.to_date,
+		filter_collection: Some(path.clone()),
+		date_period: options.date_period.clone(),
+		asset_id: options.asset_id,
+		budget_id: options.budget_id,
+		max_items: options.max_items,
+		date_range: options.date_range,
+		only_positive: options.only_positive,
+		only_negative: options.only_negative,
+		top_left_x: None,
+		top_left_y: None,
+		bottom_right_x: None,
+		bottom_right_y: None,
+	};
 
 	match super::get_chart_data(&data.pool, chart_options).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -160,7 +153,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	let body = body.into_inner();
 	let chart = super::ChartOptions {
 		id: None,
-		user_id: Some(user_id),
+		user_id,
 		chart_type: body.chart_type,
 		title: body.title,
 		filter_from: body.filter_from,
@@ -194,7 +187,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 	let body = body.into_inner();
 	let chart = super::ChartOptions {
 		id: Some(chart_id.into_inner()),
-		user_id: Some(user_id),
+		user_id,
 		chart_type: body.chart_type,
 		title: body.title,
 		filter_from: body.filter_from,

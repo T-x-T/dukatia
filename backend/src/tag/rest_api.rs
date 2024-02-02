@@ -18,7 +18,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/tags/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -33,6 +33,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		parent_id: request_parameters.filter_parent_id.map(|x| {
 			(x, request_parameters.filter_mode_parent_id.clone().unwrap_or_default().into())
 		}),
+		user_id: Some((user_id, NumberFilterModes::Exact)),
 		..Default::default()
 	};
 
@@ -53,15 +54,15 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/tags/{tag_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TagLoader::new(&data.pool)
-	.set_filter_id(*tag_id, NumberFilterModes::Exact)
-	.get_first()
-	.await;
+		.set_filter_id(*tag_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
+		.get_first().await;
 
 	match result {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -114,25 +115,38 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TagPos
 		.set_user_id(user_id)
 		.save(&data.pool).await;
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+		match result {
+			Ok(_) => return HttpResponse::Ok().body(""),
+			Err(e) => {
+				if e.to_string().starts_with("you can only access items you own") {
+					return HttpResponse::NotFound().body("");
+				}
+	
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+			},
+		}
 }
 
 #[delete("/api/v1/tags/{tag_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, tag_id: web::Path<u32>) -> impl Responder {
-	let _ = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::Tag::default()
 		.set_id(tag_id.into_inner())
+		.set_user_id(user_id)
 		.delete(&data.pool).await;
 
-	match result {
-		Ok(()) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+		match result {
+			Ok(_) => return HttpResponse::Ok().body(""),
+			Err(e) => {
+				if e.to_string().starts_with("you can only access items you own") {
+					return HttpResponse::NotFound().body("");
+				}
+	
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+			},
+		}
 }

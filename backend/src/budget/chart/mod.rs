@@ -11,8 +11,10 @@ use super::{BudgetLoader, Budget, Period};
 use crate::money::Money;
 use crate::traits::*;
 
-pub async fn get_all_budget_utilization_overview(pool: &Pool, _options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>>	{
-	let budgets = BudgetLoader::new(pool).get_full().await?;
+pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>>	{
+	let budgets = BudgetLoader::new(pool)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
+		.get_full().await?;
 
 	return Ok(calculate_get_all_budget_utilization_overview(budgets));
 }
@@ -24,6 +26,7 @@ pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: 
 	
 	let budget = BudgetLoader::new(pool)
 		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first_full()
 		.await?;
 
@@ -37,6 +40,7 @@ pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options:
 
 	let budget = BudgetLoader::new(pool)
 		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
 
@@ -62,6 +66,7 @@ pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOp
 
 	let budget = BudgetLoader::new(pool)
 		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
 

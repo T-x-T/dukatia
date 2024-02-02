@@ -200,6 +200,7 @@ impl Budget {
 					.set_filter_tag_id(*tag_id, NumberFilterModes::Exact)
 					.set_filter_time_range(from_timestamp, to_timestamp, TimeRangeFilterModes::Between)
 					.set_filter_currency_id(self.currency_id, NumberFilterModes::Exact)
+					.set_filter_user_id(self.user_id, NumberFilterModes::Exact)
 					.get()
 					.await?
 					.into_iter()

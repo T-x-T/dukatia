@@ -34,7 +34,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/budgets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -68,6 +68,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		currency_id: request_parameters.filter_currency_id.map(|x| {
 			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
+		user_id: Some((user_id, NumberFilterModes::ExactOrAlsoNull)),
 		..Default::default()
 	};
 
@@ -88,13 +89,14 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 
 #[get("/api/v1/budgets/{budget_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first_full_at(request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
@@ -111,13 +113,14 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 
 #[get("/api/v1/budgets/{budget_id}/transactions")]
 async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let budget = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await;
 
@@ -219,7 +222,17 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budget
 
 	match result {
 		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => {
+			if e.to_string().starts_with("you can only access items you own") {
+				return HttpResponse::NotFound().body("");
+			}
+
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }
 
@@ -236,6 +249,16 @@ async fn delete(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Pat
 
 	match result {
 		Ok(()) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => {
+			if e.to_string().starts_with("you can only access items you own") {
+				return HttpResponse::NotFound().body("");
+			}
+
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }

@@ -73,7 +73,13 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
 		}
 	
-		super::TagLoader::new(self.pool).set_filter_id(self.tag.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+		let old = super::TagLoader::new(self.pool)
+			.set_filter_id(self.tag.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.tag.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
 	
 		self.pool.get()
 			.await?
@@ -91,6 +97,14 @@ impl<'a> DbDeleter<'a, Tag> for TagDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.tag.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));
+		}
+
+		let old = super::TagLoader::new(self.pool)
+			.set_filter_id(self.tag.id.unwrap(), NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.tag.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
 
 		self.pool.get()

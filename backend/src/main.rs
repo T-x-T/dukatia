@@ -14,6 +14,7 @@
   clippy::similar_names,
   clippy::no_effect_underscore_binding,
   clippy::neg_multiply,
+  clippy::single_match_else,
   deprecated,
 )]
 
@@ -76,6 +77,7 @@ enum CustomError {
     action: String,
     item_type: String,
   },
+  UserIsntOwner,
 }
 
 impl fmt::Display for CustomError {
@@ -88,6 +90,7 @@ impl fmt::Display for CustomError {
       CustomError::MissingCookie {cookie} => write!(f, "cookie {cookie} not set"),
       CustomError::MissingProperty {property, item_type} => write!(f, "Missing property {property} on type {item_type}"),
       CustomError::InvalidActionForItem {action, item_type} => write!(f, "Cannot execute {action} on type {item_type}"),
+      CustomError::UserIsntOwner => write!(f, "you can only access items you own"),
     }
   }
 }

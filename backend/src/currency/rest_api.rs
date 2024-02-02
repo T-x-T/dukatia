@@ -88,39 +88,57 @@ struct CurrencyPost {
 
 #[post("/api/v1/currencies")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<CurrencyPost>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::Currency::default()
-		.set_name(body.name.clone())
-		.set_minor_in_major(body.minor_in_major)
-		.set_symbol(body.symbol.clone())
-		.save(&data.pool).await;
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+    Ok(user) => {
+			if !user.superuser {
+				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to create new currencies\"}");
+			}
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+			let result = super::Currency::default()
+				.set_name(body.name.clone())
+				.set_minor_in_major(body.minor_in_major)
+				.set_symbol(body.symbol.clone())
+				.save(&data.pool).await;
+		
+			match result {
+				Ok(_) => return HttpResponse::Ok().body(""),
+				Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+			}
+		},
+    Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	}	
 }
 
 #[put("/api/v1/currencies/{currency_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<CurrencyPost>, currency_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::Currency::default()
-		.set_id(*currency_id)
-		.set_name(body.name.clone())
-		.set_minor_in_major(body.minor_in_major)
-		.set_symbol(body.symbol.clone())
-		.save(&data.pool).await;
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+    Ok(user) => {
+			if !user.superuser {
+				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to update existing currencies\"}");
+			}
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+			let result = super::Currency::default()
+				.set_id(*currency_id)
+				.set_name(body.name.clone())
+				.set_minor_in_major(body.minor_in_major)
+				.set_symbol(body.symbol.clone())
+				.save(&data.pool).await;
+	
+			match result {
+				Ok(_) => return HttpResponse::Ok().body(""),
+				Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+			}
+		},
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

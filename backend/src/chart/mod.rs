@@ -25,7 +25,7 @@ use chrono::prelude::*;
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct ChartOptions {
 	pub id: Option<u32>,
-	pub user_id: Option<u32>,
+	pub user_id: u32,
 	pub chart_type: String,
 	pub title: String,
 	pub filter_from: Option<DateTime<Utc>>,
@@ -159,6 +159,7 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 			.set_sort_direction_opt(Some(SortDirection::Asc))
 		)
 		.set_filter_time_range(from_date, to_date, TimeRangeFilterModes::Between)
+		.set_filter_user_id(chart.user_id, NumberFilterModes::Exact)
 		.get().await?;
 
 	return Ok(transactions);
