@@ -115,7 +115,7 @@ impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
 	}
 }
 
-pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: String) -> Result<u32, Box<dyn Error>> {
+pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: String) -> Result<super::LoginResult, Box<dyn Error>> {
 	let client = pool.get().await?;
 	
 	let rows = client
@@ -137,7 +137,11 @@ pub async fn login(pool: &Pool, credentials: &LoginCredentials, hashed_secret: S
 		)
 		.await?;
 
-	return Ok(user_id as u32);
+	return Ok(super::LoginResult {
+		user_id: user_id as u32,
+		first_login: true,
+		..Default::default()
+	});
 }
 
 pub async fn update_secret(pool: &Pool, user_id: u32, new_hashed_secret: String) -> Result<(), Box<dyn Error>> {

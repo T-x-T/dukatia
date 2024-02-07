@@ -1,19 +1,12 @@
 <template>
-	<main>
-		<SideNav 
-			v-if="loggedIn"
-		/>
-		<div id="content">
-			<NuxtPage />
-		</div>
-	</main>
+	<NuxtLayout>
+		<NuxtPage />
+	</NuxtLayout>
 </template>
 
 <script lang="ts" setup>
-let loggedIn = false;
 try {
 	await $fetch("/api/v1/users/me");
-	loggedIn = true;
 } catch(e) {
 	useRouter().replace("/login");
 }
@@ -39,22 +32,3 @@ const registerServiceWorker = async () => {
 
 registerServiceWorker();
 </script>
-
-<style lang="sass" scoped>
-main
-	display: flex
-	height: 100svh
-	width: 100svw
-	overflow: hidden
-	@media screen and (max-width: 800px)
-		flex-direction: column
-
-#content
-	flex-grow: 1
-	width: 1rem
-	height: 100vh
-	overflow: auto
-	@media screen and (max-width: 800px)
-		height: 1rem
-		width: 100vw
-</style>

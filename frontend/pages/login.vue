@@ -23,6 +23,12 @@ export default {
 		show_login: false,
 	}),
 
+	created() {
+		definePageMeta({
+			layout: "no-nav"
+		})
+	},
+
 	async mounted() {
 		try {
 			await $fetch("/api/v1/users/me");
@@ -43,8 +49,12 @@ export default {
 					}
 				});
 				this.error = "";
-				document.cookie =`accessToken=${res.accessToken};SameSite=Strict`;
-				await useRouter().replace("/");
+				document.cookie = `accessToken=${res.access_token};SameSite=Strict`;
+				if (res.first_login) {
+					await useRouter().replace("/setup_user");
+				} else {
+					await useRouter().replace("/");
+				}
 				location.reload();
 			} catch(e: any) {
 				this.error = e?.data?.error

@@ -7,7 +7,7 @@ use super::*;
 #[post("/api/v1/login")]
 async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
-		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{access_token}\"}}")),
+		Ok(login_result) => return HttpResponse::Ok().body(serde_json::to_string(&login_result).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }

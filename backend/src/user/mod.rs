@@ -22,6 +22,13 @@ pub struct User {
 	pub last_logon: Option<DateTime<Utc>>,
 }
 
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct LoginResult {
+	pub user_id: u32,
+	pub first_login: bool,
+	pub access_token: Option<String>,
+}
+
 impl Default for User {
 	fn default() -> Self {
 		return Self {
@@ -124,7 +131,7 @@ impl User {
 		let user_from_db = db::get_by_id(pool, &self.id.unwrap()).await?;
 	
 		let old_hashed_secret = create_hash(format!("{}{}{}", user_from_db.name, old_secret, pepper));
-		let user_id = db::login(pool, &LoginCredentials { name: user_from_db.name.clone(), secret: old_secret }, old_hashed_secret).await?;
+		let user_id = db::login(pool, &LoginCredentials { name: user_from_db.name.clone(), secret: old_secret }, old_hashed_secret).await?.user_id;
 		if user_id != self.id.unwrap() {
 			return Err(Box::new(CustomError::InvalidItem { reason: String::from("trying to update the wrong user") }));
 		}
@@ -185,9 +192,11 @@ pub async fn init(config: &Config, pool: &Pool) {
 	}
 }
 
-pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) -> Result<String, Box<dyn Error>> {
+pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) -> Result<LoginResult, Box<dyn Error>> {
 	let hashed_secret = create_hash(format!("{}{}{}", credentials.name, credentials.secret, config.pepper));
-	let user = UserLoader::new(pool).set_filter_name(credentials.name.clone(), StringFilterModes::Exact).get_first().await?;
+	let user = UserLoader::new(pool)
+		.set_filter_name(credentials.name.clone(), StringFilterModes::Exact)
+		.get_first().await?;
 
 	let user = User {
 		id: user.id,
@@ -196,10 +205,13 @@ pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) 
 		..Default::default()
 	};
 
-	db::login(pool, &credentials, hashed_secret).await?;
+	let login_result = db::login(pool, &credentials, hashed_secret).await?;
 	
 	#[allow(clippy::needless_question_mark)]
-	return Ok(access_token::add(pool, &user).await?);
+	return Ok(LoginResult {
+		access_token: Some(access_token::add(pool, &user).await?),
+		..login_result
+	});
 }
 
 fn create_hash(value_to_hash: String) -> String {
