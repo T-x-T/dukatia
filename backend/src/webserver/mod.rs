@@ -16,6 +16,7 @@ use super::dashboard;
 use super::chart;
 use super::budget;
 use super::access_token::get_user_of_token;
+use super::demo;
 
 pub struct AppState {
 	pub config: Config,
@@ -90,7 +91,8 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(budget::rest_api::get_by_id)
 			.service(budget::rest_api::get_transactions)
 			.service(budget::rest_api::post)
-			.service(budget::rest_api::put);
+			.service(budget::rest_api::put)
+			.service(demo::rest_api::insert_demo_data);
 	})
 		.bind(("0.0.0.0", api_port))?
 		.run()

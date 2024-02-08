@@ -34,6 +34,7 @@ mod chart;
 mod traits;
 mod money;
 mod budget;
+mod demo;
 
 use std::fmt;
 use std::error::Error;
