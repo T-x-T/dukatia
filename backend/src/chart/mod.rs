@@ -84,12 +84,12 @@ pub struct DataPointMonetaryMultiCurrency {
 	pub label: String,
 }
 
-pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Error>> {
-	return db::get_by_id(pool, id).await;
+pub async fn get_by_id(pool: &Pool, id: u32, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
+	return db::get_by_id(pool, id, user_id).await;
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
-	return db::get_all_charts_in_dashboard(pool, dashboard_id).await;
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+	return db::get_all_charts_in_dashboard(pool, dashboard_id, user_id).await;
 }
 
 pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {

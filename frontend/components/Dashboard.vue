@@ -65,7 +65,7 @@ export default {
 
 	methods: {
 		async update() {
-			const new_charts = await $fetch("/api/v1/dashboards/0/charts");
+			const new_charts = await $fetch(`/api/v1/dashboards/${this.dashboard_data.id}/charts`);
 			this.charts = [];
 			this.$nextTick(() => this.charts = new_charts);
 		},

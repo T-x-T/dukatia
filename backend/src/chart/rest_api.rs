@@ -7,12 +7,12 @@ use crate::webserver::{AppState, is_authorized};
 
 #[get("/api/v1/charts/{chart_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_by_id(&data.pool, chart_id.into_inner()).await {
+	match super::get_by_id(&data.pool, chart_id.into_inner(), user_id).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -20,12 +20,12 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::P
 
 #[get("/api/v1/dashboards/{dashboard_id}/charts")]
 async fn get_all_charts_in_dashboard(data: web::Data<AppState>, req: HttpRequest, dashboard_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::get_all_charts_in_dashboard(&data.pool, dashboard_id.into_inner()).await {
+	match super::get_all_charts_in_dashboard(&data.pool, dashboard_id.into_inner(), user_id).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -48,12 +48,12 @@ struct ChartOptionsQuery {
 
 #[get("/api/v1/charts/{chart_id}/data")]
 async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<ChartOptionsQuery>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let mut chart_options = match super::get_by_id(&data.pool, *chart_id).await {
+	let mut chart_options = match super::get_by_id(&data.pool, *chart_id, user_id).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"failed getting chart data: {e}\"}}")),
 	};

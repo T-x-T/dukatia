@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use super::ChartOptions;
 use crate::CustomError;
 
-pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Error>> {
+pub async fn get_by_id(pool: &Pool, id: u32, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
 	let res = pool.get()
 		.await
 		.unwrap()
@@ -18,23 +18,29 @@ pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Err
 			return Err(Box::new(CustomError::SpecifiedItemNotFound { item_type: String::from("chart"), filter: format!("id={id}") }));
 		}
 
-		return Ok(turn_row_into_chart(&res[0]));
+		let chart_options = turn_row_into_chart(&res[0]);
+
+		if chart_options.user_id != user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
+		}
+
+		return Ok(chart_options);
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	let res = pool.get()
-	.await
-	.unwrap()
-	.query(
-		"SELECT * FROM public.charts c LEFT JOIN public.dashboard_charts dc ON c.id = dc.chart_id WHERE dc.dashboard_id = $1", 
-		&[&(dashboard_id as i32)]
-	).await?;
+		.await
+		.unwrap()
+		.query(
+			"SELECT * FROM public.charts c LEFT JOIN public.dashboard_charts dc ON c.id = dc.chart_id WHERE dc.dashboard_id = $1", 
+			&[&(dashboard_id as i32)]
+		).await?;
 
 	return Ok(
 		res.into_iter()
-		.map(
-			|x| turn_row_into_chart(&x) 
-		).collect()
+		.map(|x| turn_row_into_chart(&x))
+		.filter(|x| x.user_id == user_id)
+		.collect()
 	)
 }
 
