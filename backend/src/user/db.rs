@@ -73,33 +73,35 @@ impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
 				&[&id]
 			).await?[0].get(0);
 
-		let chart_ids: Vec<i32> = client
-			.query(
-				"
-					INSERT INTO 
-						public.charts(id, user_id, chart_type, title, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y, only_positive, only_negative)
-					VALUES
-						(DEFAULT,$1,'pie','Spending per Tag in Date Range',NULL,NULL,'get_per_tag_over_time','daily',5,6,4,0,6,2,NULL,True),
-						(DEFAULT,$1,'line','Balance per Recipient over Time',NULL,NULL,'get_per_recipient_over_time','monthly',10,6,6,0,10,2,NULL,NULL),
-						(DEFAULT,$1,'line','Balance per Account over Time',NULL,NULL,'get_per_account_over_time','monthly',10,6,0,2,5,4,False,False),
-						(DEFAULT,$1,'line','Earning and spending over Time',NULL,NULL,'get_earning_spending_net_over_time','monthly',NULL,7,0,4,10,6,NULL,NULL),
-						(DEFAULT,$1,'pie','Spending per Recipient in Date Range',NULL,NULL,'get_per_recipient_over_time','daily',7,6,2,0,4,2,NULL,True),
-						(DEFAULT,$1,'line','Balance per Currency over Time',NULL,NULL,'get_per_currency_over_time','monthly',10,6,5,2,10,4,NULL,NULL),
-						(DEFAULT,$1,'table','Current Balance per Account',NULL,NULL,'get_per_account_over_time','daily',10,0,0,0,2,2,False,False)
-					RETURNING id;
-				",
-				&[&(id as i32)]
-			).await?
-			.into_iter()
-			.map(|x| x.get(0))
-			.collect();
-
-		for chart_id in chart_ids {
-			client.query(
-				"INSERT INTO public.dashboard_charts (dashboard_id, chart_id) VALUES ($1, $2);", 
-				&[&dashboard_id, &chart_id]
-			).await?;
-		};
+		if id != 0 {
+			let chart_ids: Vec<i32> = client
+				.query(
+					"
+						INSERT INTO 
+							public.charts(id, user_id, chart_type, title, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y, only_positive, only_negative)
+						VALUES
+							(DEFAULT,$1,'pie','Spending per Tag in Date Range',NULL,NULL,'get_per_tag_over_time','daily',5,6,4,0,6,2,NULL,True),
+							(DEFAULT,$1,'line','Balance per Recipient over Time',NULL,NULL,'get_per_recipient_over_time','monthly',10,6,6,0,10,2,NULL,NULL),
+							(DEFAULT,$1,'line','Balance per Account over Time',NULL,NULL,'get_per_account_over_time','monthly',10,6,0,2,5,4,False,False),
+							(DEFAULT,$1,'line','Earning and spending over Time',NULL,NULL,'get_earning_spending_net_over_time','monthly',NULL,7,0,4,10,6,NULL,NULL),
+							(DEFAULT,$1,'pie','Spending per Recipient in Date Range',NULL,NULL,'get_per_recipient_over_time','daily',7,6,2,0,4,2,NULL,True),
+							(DEFAULT,$1,'line','Balance per Currency over Time',NULL,NULL,'get_per_currency_over_time','monthly',10,6,5,2,10,4,NULL,NULL),
+							(DEFAULT,$1,'table','Current Balance per Account',NULL,NULL,'get_per_account_over_time','daily',10,0,0,0,2,2,False,False)
+						RETURNING id;
+					",
+					&[&(id as i32)]
+				).await?
+				.into_iter()
+				.map(|x| x.get(0))
+				.collect();
+	
+			for chart_id in chart_ids {
+				client.query(
+					"INSERT INTO public.dashboard_charts (dashboard_id, chart_id) VALUES ($1, $2);", 
+					&[&dashboard_id, &chart_id]
+				).await?;
+			};
+		}
 
 		return Ok(id as u32);
 	}

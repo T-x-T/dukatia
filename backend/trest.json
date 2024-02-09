@@ -38,7 +38,7 @@
 			"name": "currency",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -264,7 +264,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -284,7 +284,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -304,7 +304,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -319,7 +319,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -332,7 +332,7 @@
 			"name": "recipients",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -559,7 +559,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test of new user"
@@ -576,7 +576,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -591,7 +591,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test"
@@ -607,7 +607,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -621,7 +621,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -634,7 +634,7 @@
 			"name": "accounts",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -852,7 +852,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -870,7 +870,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -885,7 +885,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -903,7 +903,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 404
@@ -915,7 +915,7 @@
 			"name": "tags",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -1248,7 +1248,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test"
@@ -1264,7 +1264,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -1279,7 +1279,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -1293,7 +1293,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "PUT",
 					"body": {
@@ -1310,7 +1310,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -1327,7 +1327,7 @@
 					"endpoint": "/api/v1/users/me",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1342,7 +1342,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1357,7 +1357,7 @@
 					"endpoint": "/api/v1/users",
 					"method": "POST",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1376,7 +1376,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1403,7 +1403,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"before": [
 						"login_as_user"
@@ -1418,7 +1418,7 @@
 					"endpoint": "/api/v1/users/1",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1435,7 +1435,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1463,7 +1463,7 @@
 					"endpoint": "/api/v1/users/1",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1482,7 +1482,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1509,7 +1509,7 @@
 					"endpoint": "/api/v1/users/1",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1526,7 +1526,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1541,7 +1541,7 @@
 					"endpoint": "/api/v1/users/0",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1559,7 +1559,7 @@
 					"endpoint": "/api/v1/users/1",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1587,7 +1587,7 @@
 					"name": "logout returns 200",
 					"endpoint": "/api/v1/logout",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1627,7 +1627,7 @@
 					"endpoint": "/api/v1/users/me/secret",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.accessToken"
+						"accessToken": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1671,7 +1671,7 @@
 			"name": "transactions",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -2343,7 +2343,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"account_id": 0,
@@ -2374,7 +2374,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2390,7 +2390,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"account_id": 0,
@@ -2421,7 +2421,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2435,7 +2435,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -2449,7 +2449,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2463,7 +2463,7 @@
 			"name": "assets",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -3027,7 +3027,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -3045,7 +3045,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3061,7 +3061,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -3079,7 +3079,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3093,7 +3093,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3107,7 +3107,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "POST",
 					"body": [
@@ -3126,7 +3126,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "POST",
 					"body": {
@@ -3159,7 +3159,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -3172,7 +3172,7 @@
 			"name": "dashboard",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -3185,7 +3185,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"name":"Default","description":"The default Dashboard"}]
+						"body_equals": [{"id":0,"user_id":0,"name":"Default Dashboard","description":"The default Dashboard"}]
 					}
 				}
 			]
@@ -3194,7 +3194,7 @@
 			"name": "charts",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -4270,7 +4270,7 @@
 			"name": "budgets",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.accessToken"
+					"accessToken": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -4909,7 +4909,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -4938,7 +4938,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4953,7 +4953,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "edited test",
@@ -4981,7 +4981,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -4995,7 +4995,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -5009,7 +5009,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.accessToken"
+						"accessToken": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
