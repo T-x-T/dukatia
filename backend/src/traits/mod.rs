@@ -244,6 +244,7 @@ pub trait Delete {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>>;
 }
 
+#[allow(unused)]
 pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn new(pool: &'a Pool) -> Self;
 	fn get_query_parameters(&self) -> &QueryParameters;
