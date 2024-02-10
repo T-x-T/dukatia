@@ -58,7 +58,7 @@
 			<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
 				<TransactionDetails 
 					v-if="Object.keys(selectedRow).length > 0"
-					:transaction="selectedRow"
+					:prop_transaction="selectedRow"
 					:default_transaction="default_transaction"
 					@back="closeDetails"
 					@updateData="updateTable"
@@ -136,7 +136,7 @@ export default {
 		this.default_transaction = {
 			account_id: 0,
 			currency_id: 0,
-			recipient_id: 0,
+			recipient_id: "",
 			tag_ids: [],
 			status: 1,
 			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
@@ -232,7 +232,7 @@ export default {
 			await Promise.all(this.selectedRows.map(async row => {
 				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
 				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
-				transaction.recipient_id = typeof this.batchrecipient_id == "number" ? this.batchrecipient_id : transaction.recipient_id;
+				transaction.recipient_id = typeof this.batchrecipient_id == "string" ? this.batchrecipient_id : transaction.recipient_id;
 				transaction.asset_id = typeof this.batchasset_id == "number"  ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 

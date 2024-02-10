@@ -49,7 +49,7 @@ pub struct CurrencyDbWriter<'a> {
 	currency: Currency,
 }
 
-impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Currency) -> Self {
 		Self {
 			pool,

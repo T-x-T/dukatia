@@ -392,8 +392,11 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or_default().to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
 	};
 
+	let recipient = crate::recipient::RecipientLoader::new(pool).set_filter_user_id(user_id, NumberFilterModes::ExactOrAlsoNull).get_first().await?; //TODO: somehow find a fitting recipient
+
 	Transaction::default()
 		.set_account_id(body.account_id.unwrap())
+		.set_recipient_id(recipient.id)
 		.set_timestamp(body.timestamp)
 		.set_comment(comment)
 		.set_user_id(user_id)

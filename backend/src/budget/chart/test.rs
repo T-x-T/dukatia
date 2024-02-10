@@ -41,7 +41,7 @@ mod calculate_get_all_budget_utilization_overview {
 		let res = calculate_get_all_budget_utilization_overview(vec![budget1, budget2]);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -91,7 +91,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(Budget::default());
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -141,7 +141,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -191,7 +191,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -241,7 +241,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -291,7 +291,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -341,7 +341,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -391,7 +391,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -441,7 +441,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let res = calculate_get_single_budget_current_period_utilization(budget);
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -482,7 +482,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -546,7 +546,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -610,7 +610,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -674,7 +674,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -738,7 +738,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -802,7 +802,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -866,7 +866,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -930,7 +930,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),
@@ -994,7 +994,7 @@ mod calculate_get_single_budget_utilization_history {
 		));
 
 		assert_eq!(res, 
-			IntermediateChartData {
+			OldIntermediateChartData {
 				datasets: vec![
 					(0, Dataset { 
 						label: "used".to_string(),

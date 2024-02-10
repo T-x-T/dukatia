@@ -49,7 +49,7 @@ pub struct AccountDbWriter<'a> {
 	account: Account,
 }
 
-impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Account) -> Self {
 		Self {
 			pool,

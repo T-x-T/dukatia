@@ -6,13 +6,13 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
 
-use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, OldIntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{TagLoader, Tag};
 use crate::money::Money;
 use crate::transaction::Transaction;
 use crate::traits::*;
 
-pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let tags = TagLoader::new(pool).get().await?;
 
@@ -20,8 +20,8 @@ pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result
 }
 
 
-fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> IntermediateChartData {
-	let mut output = IntermediateChartData::default();
+fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> OldIntermediateChartData {
+	let mut output = OldIntermediateChartData::default();
 	let mut datasets_multi_currency: BTreeMap<u32, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
 
 	let default = DataPointMonetaryMultiCurrency::default();

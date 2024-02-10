@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="recipient.id" disabled>
+			<input type="string" v-model="recipient.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -59,7 +59,7 @@ export default {
 			let res = {} as Recipient;
 
 			try {
-				if(typeof this.recipient.id == "number") {
+				if(typeof this.recipient.id == "string" && this.recipient.id.length == 36) {
 					res = await $fetch(`/api/v1/recipients/${this.recipient.id}`, {
 						method: "PUT",
 						body: this.get_body(),

@@ -5,14 +5,14 @@ mod limit_output {
 
 	#[test]
 	fn works_with_default_input_without_limit() {
-		let res = limit_output(Vec::new(), None);
+		let res = limit_output_old(Vec::new(), None);
 
 		assert_eq!(res, Vec::new());
 	}
 
 	#[test]
 	fn works_with_default_input_with_limit() {
-		let res = limit_output(Vec::new(), Some(10));
+		let res = limit_output_old(Vec::new(), Some(10));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -31,7 +31,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(10));
+		let res = limit_output_old(input.clone(), Some(10));
 
 		assert_eq!(res, input);
 	}
@@ -50,7 +50,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), None);
+		let res = limit_output_old(input.clone(), None);
 
 		assert_eq!(res, input);
 	}
@@ -70,7 +70,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(0));
+		let res = limit_output_old(input.clone(), Some(0));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -89,7 +89,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(1));
+		let res = limit_output_old(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -110,7 +110,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(2));
+		let res = limit_output_old(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -132,7 +132,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(3));
+		let res = limit_output_old(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -155,7 +155,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(4));
+		let res = limit_output_old(input.clone(), Some(4));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -179,7 +179,7 @@ mod limit_output {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output(input.clone(), Some(5));
+		let res = limit_output_old(input.clone(), Some(5));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -196,14 +196,14 @@ mod limit_output_only_positive {
 
 	#[test]
 	fn works_with_default_input_without_limit() {
-		let res = limit_output_only_positive(Vec::new(), None);
+		let res = limit_output_only_positive_old(Vec::new(), None);
 
 		assert_eq!(res, Vec::new());
 	}
 
 	#[test]
 	fn works_with_default_input_with_limit() {
-		let res = limit_output_only_positive(Vec::new(), Some(10));
+		let res = limit_output_only_positive_old(Vec::new(), Some(10));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -222,7 +222,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), Some(10));
+		let res = limit_output_only_positive_old(input.clone(), Some(10));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -249,7 +249,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), None);
+		let res = limit_output_only_positive_old(input.clone(), None);
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -277,7 +277,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), Some(0));
+		let res = limit_output_only_positive_old(input.clone(), Some(0));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -296,7 +296,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), Some(1));
+		let res = limit_output_only_positive_old(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -317,7 +317,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), Some(2));
+		let res = limit_output_only_positive_old(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -339,7 +339,7 @@ mod limit_output_only_positive {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_positive(input.clone(), Some(3));
+		let res = limit_output_only_positive_old(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -354,14 +354,14 @@ mod limit_output_only_negative {
 
 	#[test]
 	fn works_with_default_input_without_limit() {
-		let res = limit_output_only_negative(Vec::new(), None);
+		let res = limit_output_only_negative_old(Vec::new(), None);
 
 		assert_eq!(res, Vec::new());
 	}
 
 	#[test]
 	fn works_with_default_input_with_limit() {
-		let res = limit_output_only_negative(Vec::new(), Some(10));
+		let res = limit_output_only_negative_old(Vec::new(), Some(10));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -380,7 +380,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), Some(10));
+		let res = limit_output_only_negative_old(input.clone(), Some(10));
 
 		assert_eq!(res, vec![
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
@@ -402,7 +402,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), None);
+		let res = limit_output_only_negative_old(input.clone(), None);
 
 		assert_eq!(res, vec![
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
@@ -425,7 +425,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), Some(0));
+		let res = limit_output_only_negative_old(input.clone(), Some(0));
 
 		assert_eq!(res, Vec::new());
 	}
@@ -444,7 +444,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), Some(1));
+		let res = limit_output_only_negative_old(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
@@ -465,7 +465,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), Some(2));
+		let res = limit_output_only_negative_old(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
@@ -487,7 +487,7 @@ mod limit_output_only_negative {
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
-		let res = limit_output_only_negative(input.clone(), Some(3));
+		let res = limit_output_only_negative_old(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
 			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
@@ -501,14 +501,14 @@ mod sort_output {
 
 	#[test]
 	fn works_with_default_input() {
-		let res = sort_output(IntermediateChartData::default());
+		let res = sort_output_old(OldIntermediateChartData::default());
 
 		assert_eq!(res, Vec::new());
 	}
 
 	#[test]
 	fn works_with_single_dataset() {
-		let input = IntermediateChartData {
+		let input = OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset {
 					label: String::new(), data: vec![
@@ -519,7 +519,7 @@ mod sort_output {
 				})
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = sort_output_old(input);
 
 		assert_eq!(res, vec![(0, Dataset {
 			label: String::new(), data: vec![
@@ -532,7 +532,7 @@ mod sort_output {
 
 	#[test]
 	fn works_with_many_datasets() {
-		let input = IntermediateChartData {
+		let input = OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
 				(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
@@ -545,7 +545,7 @@ mod sort_output {
 				(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = sort_output_old(input);
 
 		assert_eq!(res, vec![
 			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -562,7 +562,7 @@ mod sort_output {
 
 	#[test]
 	fn works_with_duplicates() {
-		let input = IntermediateChartData {
+		let input = OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
 				(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
@@ -575,7 +575,7 @@ mod sort_output {
 				(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = sort_output_old(input);
 
 		assert_eq!(res, vec![
 			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),

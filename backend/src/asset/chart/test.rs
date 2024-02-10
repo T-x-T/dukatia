@@ -16,7 +16,7 @@ mod calculate_get_single_asset_total_value_over_time {
 
 		let res = calculate_get_single_asset_total_value_over_time(asset, &asset_valuation_history);
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset { 
 					label: "".to_string(),
@@ -67,7 +67,7 @@ mod calculate_get_single_asset_single_value_over_time {
 
 		let res = calculate_get_single_asset_single_value_over_time(asset, &asset_valuation_history);
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset { 
 					label: "".to_string(),
@@ -118,7 +118,7 @@ mod calculate_get_single_asset_amount_over_time {
 
 		let res = calculate_get_single_asset_amount_over_time(asset, &asset_valuation_history);
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: vec![
 				(0, Dataset { 
 					label: "".to_string(),

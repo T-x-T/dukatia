@@ -1,5 +1,5 @@
 <template>
-	<div id="wrapper">
+	<div id="wrapper" v-if="tableData && Object.keys(tableData).length > 0">
 		<table>
 			<colgroup>
 				<col v-if="tableData.multiSelect" class="multiselect">
@@ -8,9 +8,8 @@
 			<thead>
 				<tr>
 					<th v-if="tableData.multiSelect"><input type="checkbox" v-model="allRowsSelected" @click="selectAllRows"></th>
-					<th v-for="(header, index) in tableData.columns" :key="index">
-						
-						<p v-if="tableData.columns[index].sortable" @click="updateSort(index)">
+					<th v-for="(header, index) in tableData.columns.filter(x => !x.hidden)" :key="index">
+						<p v-if="tableData.columns.filter(x => !x.hidden)[index].sortable" @click="updateSort(index)">
 							{{header.name}}
 							<svg v-if="currentSort.column === index && currentSort.sort == 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
 							<svg v-else-if="currentSort.column === index && currentSort.sort == 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
@@ -20,7 +19,7 @@
 							{{header.name}}
 						</p>
 
-						<div v-if="header.type == 'choice' && !tableData.columns[index].no_filter" class="columnHeaderWrapper">
+						<div v-if="header.type == 'choice' && !tableData.columns.filter(x => !x.hidden)[index].no_filter" class="columnHeaderWrapper">
 							<div>
 								<select v-model="filters[index].value" @change="filter()">
 									<option value=""></option>
@@ -50,7 +49,7 @@
 							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
-						<div v-if="header.type == 'date' && !tableData.columns[index].no_filter" class="columnHeaderWrapper">
+						<div v-if="header.type == 'date' && !tableData.columns.filter(x => !x.hidden)[index].no_filter" class="columnHeaderWrapper">
 							<div>
 								<input type="date" v-model="filters[index].start" @input="filter()">
 								-
@@ -71,7 +70,7 @@
 							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
-						<div v-if="header.type == 'number' && !tableData.columns[index].no_filter" class="columnHeaderWrapper">
+						<div v-if="header.type == 'number' && !tableData.columns.filter(x => !x.hidden)[index].no_filter" class="columnHeaderWrapper">
 							<div>
 								<input type="number" v-model="filters[index].value" @input="filter()">
 								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
@@ -98,7 +97,7 @@
 							<div v-if="openFilter === index" class="clickTarget" @click="openFilter = null"></div>
 						</div>
 
-						<div v-if="header.type == 'string' && !tableData.columns[index].no_filter" class="columnHeaderWrapper">
+						<div v-if="header.type == 'string' && !tableData.columns.filter(x => !x.hidden)[index].no_filter" class="columnHeaderWrapper">
 							<div>
 								<input v-model="filters[index].value" @input="filter()">
 								<svg @click="openFilter = index" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
@@ -132,9 +131,9 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(row, index) in rowsForDisplay" :key="index" :ref="x => x = row[0]">
-					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[index]" @change="updateSelectedRows"></td>
-					<td v-for="(cell, index) in row" :key="index" @click="$emit('rowClick', row)">{{cell}}</td>
+				<tr v-for="(row, row_index) in rowsForDisplay" :key="row_index" :ref="x => x = row[0]">
+					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[row_index]" @change="updateSelectedRows"></td>
+					<td v-for="(cell, column_index) in row" :key="column_index" @click="$emit('rowClick', tableData.rows[row_index])">{{cell}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -184,7 +183,7 @@ export default {
 	async mounted() {
 		this.update();
 
-		this.tableData.columns.forEach(c => {
+		this.tableData.columns.filter(x => !x.hidden).forEach(c => {
 			this.filters.push({
 				type: c.type,
 				option: c.type == "choice" ? "exact" : c.type == "date" ? "between" : c.type == "number" ? "exact" : "contains",
@@ -200,7 +199,22 @@ export default {
 		update() {
 			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
-			this.rowsForDisplay = this.rows;
+			
+			const hidden_columns = this.tableData.columns.filter(y => y.hidden);
+			if(hidden_columns.length === 0) {
+				this.rowsForDisplay = this.rows;
+			} else {
+				this.rowsForDisplay = this.rows.map(x => {
+					let new_row = [];
+					for(let i = 0; i < this.tableData.columns.length; i++) {
+						if (!this.tableData.columns[i].hidden) {
+							new_row.push(x[i]);
+						}
+					}
+					return new_row;
+				})
+			}
+
 			this.updateRowsCurrentPage();
 		},
 
@@ -241,7 +255,7 @@ export default {
 					sort: "desc",
 				};
 			}
-			const property_name = this.tableData.columns[this.currentSort.column].name;
+			const property_name = this.tableData.columns.filter(x => !x.hidden)[this.currentSort.column].name;
 			const direction = this.currentSort.sort;
 			this.$emit("updateSort", property_name, direction);
 		},
@@ -251,25 +265,25 @@ export default {
 			for(let i = 0; i < this.filters.length; i++) {
 				if(this.filters[i].type == "date") {
 					if(this.filters[i].start && this.filters[i].end) {
-						this.$emit("updateFilter", this.tableData.columns[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option);
 					} else {
-						this.$emit("resetFilter", this.tableData.columns[i].name);
+						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
 				}
 
 				if(this.filters[i].type == "number" || this.filters[i].type == "choice") {
 					if(typeof this.filters[i].value == "number") {
-						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
 					} else {
-						this.$emit("resetFilter", this.tableData.columns[i].name);
+						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
 				}
 
 				if(this.filters[i].type == "string") {
 					if(this.filters[i].value || this.filters[i].empty != "anything") {
-						this.$emit("updateFilter", this.tableData.columns[i].name, this.filters[i].value, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
 					} else {
-						this.$emit("resetFilter", this.tableData.columns[i].name);
+						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
 				}
 			}

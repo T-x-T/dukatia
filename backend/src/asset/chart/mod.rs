@@ -9,13 +9,13 @@ use std::collections::BTreeMap;
 
 use crate::CustomError;
 use crate::money::Money;
-use crate::chart::{Dataset, IntermediateChartData, DataPoint, ChartOptions};
+use crate::chart::{Dataset, OldIntermediateChartData, DataPoint, ChartOptions};
 use crate::traits::*;
 use super::{Asset, AssetLoader, AssetValuation, AssetValuationLoader};
 
 
 
-pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -34,7 +34,7 @@ pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartO
 	return Ok(calculate_get_single_asset_total_value_over_time(asset, &asset_valuation_history));
 }
 
-pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -53,7 +53,7 @@ pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: Chart
 	return Ok(calculate_get_single_asset_single_value_over_time(asset, &asset_valuation_history));
 }
 
-pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.asset_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("asset_id"), item_type: String::from("chart") }));
 	}
@@ -79,7 +79,7 @@ pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOption
 
 
 
-fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
+fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> OldIntermediateChartData {
 	let value_history: BTreeMap<NaiveDate, Money> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.value_per_unit.clone()))
 		.collect();
@@ -89,7 +89,7 @@ fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuatio
 		.collect();
 
 	if value_history.is_empty() || amount_history.is_empty() {
-		return IntermediateChartData::default();
+		return OldIntermediateChartData::default();
 	}	
 
 	let mut dataset = Dataset { 
@@ -128,18 +128,18 @@ fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuatio
 		current_day += Duration::days(1);
 	}
 
-	return IntermediateChartData {
+	return OldIntermediateChartData {
 		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
 	};
 }
 
-fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
+fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> OldIntermediateChartData {
 	let value_history: BTreeMap<NaiveDate, Money> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.value_per_unit.clone()))
 		.collect();
 
 	if value_history.is_empty() {
-		return IntermediateChartData::default();
+		return OldIntermediateChartData::default();
 	}	
 
 	let mut dataset = Dataset {
@@ -174,18 +174,18 @@ fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuati
 		current_day += Duration::days(1);
 	}
 
-	return IntermediateChartData {
+	return OldIntermediateChartData {
 		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
 	};
 }
 
-fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> IntermediateChartData {
+fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_history: &[AssetValuation]) -> OldIntermediateChartData {
 	let amount_history: BTreeMap<NaiveDate, f64> = asset_valuation_history.iter()
 		.map(|x| (x.timestamp.naive_utc().date(), x.amount))
 		.collect();
 
 	if amount_history.is_empty() {
-		return IntermediateChartData::default();
+		return OldIntermediateChartData::default();
 	}	
 
 	let mut dataset = Dataset {
@@ -220,7 +220,7 @@ fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_his
 		current_day += Duration::days(1);
 	}
 
-	return IntermediateChartData {
+	return OldIntermediateChartData {
 		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
 	};
 }

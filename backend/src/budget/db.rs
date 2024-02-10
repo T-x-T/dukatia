@@ -51,7 +51,7 @@ pub struct BudgetDbWriter<'a> {
 	budget: Budget,
 }
 
-impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Budget> for BudgetDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Budget) -> Self {
 		Self {
 			pool,
@@ -117,7 +117,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 }
 
 
-impl<'a> DbDeleter<'a, Budget> for BudgetDbWriter<'a> {
+impl<'a> OldDbDeleter<'a, Budget> for BudgetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.budget.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("budget")}));

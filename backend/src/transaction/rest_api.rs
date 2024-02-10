@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use crate::webserver::{AppState, is_authorized};
 use crate::asset::Asset;
 use crate::traits::*;
@@ -203,7 +204,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 #[derive(Deserialize)]
 struct TransactionPost {
 	account_id: u32,
-	recipient_id: u32,
+	recipient_id: Uuid,
 	status: u8,
 	timestamp: DateTime<Utc>,
 	comment: Option<String>,

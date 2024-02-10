@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 deadpool-postgres = "0.10.5"
-postgres-types = { version = "0.2.5", features = ["array-impls", "with-chrono-0_4"] }
+postgres-types = { version = "0.2.6", features = ["array-impls", "with-chrono-0_4", "with-uuid-0_8"] }
 tokio-postgres = "0.7.8"
 postgres-derive = "0.4.4"
 actix-web = { version = "4.5.1", default-features = false, features = ["cookies", "compress-gzip", "macros"] }
@@ -20,3 +20,4 @@ chrono = { version = "0.4.24", features = ["serde"] }
 futures-util = "0.3.28"
 futures = "0.3"
 ahash = "0.8.7"
+uuid = { version = "0.8.0", features = ["v4", "serde"] }

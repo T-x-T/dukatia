@@ -120,7 +120,7 @@ async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: Htt
 		bottom_right_y: None,
 	};
 
-	match super::get_chart_data(&data.pool, chart_options).await {
+	match super::get_chart_data_old(&data.pool, chart_options).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}

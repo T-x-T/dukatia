@@ -6,13 +6,13 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
 
-use crate::chart::{Dataset, IntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, OldIntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{CurrencyLoader, Currency};
 use crate::money::Money;
 use crate::transaction::Transaction;
 use crate::traits::*;
 
-pub async fn get_per_currency_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_per_currency_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let currencies = CurrencyLoader::new(pool).get().await?;
 
@@ -20,8 +20,8 @@ pub async fn get_per_currency_over_time(pool: &Pool, options: ChartOptions) -> R
 }
 
 
-fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Vec<Transaction>, currencies: &[Currency]) -> IntermediateChartData {
-	let mut output = IntermediateChartData::default();
+fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Vec<Transaction>, currencies: &[Currency]) -> OldIntermediateChartData {
+	let mut output = OldIntermediateChartData::default();
 	let mut datasets_monetary: BTreeMap<u32, Vec<DataPointMonetary>> = BTreeMap::new();
 
 	let default = DataPointMonetary::default();

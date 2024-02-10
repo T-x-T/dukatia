@@ -3,32 +3,44 @@ pub mod rest_api;
 pub mod chart;
 
 use serde::Serialize;
+use uuid::Uuid;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use crate::traits::*;
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Recipient {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
 	pub user_id: Option<u32>,
 	pub tag_ids: Option<Vec<u32>>,
 }
 
-impl Save for Recipient {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::RecipientDbWriter::new(pool, self).replace().await?;
-				return Ok(id)
-			},
-			None => return db::RecipientDbWriter::new(pool, self).insert().await,
-		}
+impl Default for Recipient {
+	fn default() -> Self {
+		return Self {
+			id: Uuid::new_v4(),
+			name: Default::default(),
+			user_id: Default::default(),
+			tag_ids: Default::default()
+		};
+	}
+}
+
+impl Create for Recipient {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::RecipientDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Recipient {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::RecipientDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Recipient {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 

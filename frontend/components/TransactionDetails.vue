@@ -14,8 +14,12 @@
 export default {
 	emits: ["back", "updateData"],
 
+	data: () => ({
+		transaction: {} as Transaction,
+	}),
+
 	props: {
-		transaction: {
+		prop_transaction: {
 			type: Object as PropType<Transaction>,
 			required: true,
 		},
@@ -26,9 +30,11 @@ export default {
 	},
 
 	async created() {
-		let transaction = this.transaction.id ? await $fetch(`/api/v1/transactions/${this.transaction.id}`) : structuredClone(toRaw(this.default_transaction));
-		transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
-		transaction.asset_id = transaction.asset ? transaction.asset.id : transaction.asset_id ? transaction.asset_id : undefined;
+		//let transaction = this.transaction.id ? await $fetch(`/api/v1/transactions/${this.transaction.id}`) : structuredClone(toRaw(this.default_transaction));
+		//transaction.tag_ids = Array.isArray(transaction.tag_ids) ? [...transaction.tag_ids] : [];
+		//transaction.asset_id = transaction.asset ? transaction.asset.id : transaction.asset_id ? transaction.asset_id : undefined;
+		this.transaction = this.prop_transaction;
+		this.transaction.asset_id = this.transaction.asset?.id;
 	},
 }
 </script>

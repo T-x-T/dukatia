@@ -50,7 +50,7 @@ pub struct TagDbWriter<'a> {
 	tag: Tag,
 }
 
-impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Tag> for TagDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Tag) -> Self {
 		return Self {
 			pool,
@@ -93,7 +93,7 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 	}
 }
 
-impl<'a> DbDeleter<'a, Tag> for TagDbWriter<'a> {
+impl<'a> OldDbDeleter<'a, Tag> for TagDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.tag.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("tag")}));

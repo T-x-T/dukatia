@@ -6,12 +6,12 @@ use chrono::prelude::*;
 use std::error::Error;
 
 use crate::CustomError;
-use crate::chart::{Dataset, IntermediateChartData, DataPoint, ChartOptions};
+use crate::chart::{Dataset, OldIntermediateChartData, DataPoint, ChartOptions};
 use super::{BudgetLoader, Budget, Period};
 use crate::money::Money;
 use crate::traits::*;
 
-pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>>	{
+pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>>	{
 	let budgets = BudgetLoader::new(pool)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_full().await?;
@@ -19,7 +19,7 @@ pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOpti
 	return Ok(calculate_get_all_budget_utilization_overview(budgets));
 }
 
-pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
@@ -33,7 +33,7 @@ pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: 
 	return Ok(calculate_get_single_budget_current_period_utilization(budget));
 }
 
-pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
@@ -57,12 +57,12 @@ pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options:
 	return Ok(calculate_get_single_budget_current_period_utilization(budget));
 }
 
-pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
 
-	let mut output: IntermediateChartData = IntermediateChartData::default();
+	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
 
 	let budget = BudgetLoader::new(pool)
 		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
@@ -92,8 +92,8 @@ pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOp
 
 
 
-pub fn calculate_get_all_budget_utilization_overview(budgets: Vec<Budget>) -> IntermediateChartData {
-	let mut output: IntermediateChartData = IntermediateChartData::default();
+pub fn calculate_get_all_budget_utilization_overview(budgets: Vec<Budget>) -> OldIntermediateChartData {
+	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
 
 	for budget in budgets {
 		let res = calculate_get_single_budget_current_period_utilization(budget.clone());
@@ -107,8 +107,8 @@ pub fn calculate_get_all_budget_utilization_overview(budgets: Vec<Budget>) -> In
 	return output;
 }
 
-pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) -> IntermediateChartData {
-	let mut output: IntermediateChartData = IntermediateChartData::default();
+pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) -> OldIntermediateChartData {
+	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
 
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
@@ -144,8 +144,8 @@ pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) ->
 	return output;
 }
 
-pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> IntermediateChartData {
-	let mut output: IntermediateChartData = IntermediateChartData::default();
+pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> OldIntermediateChartData {
+	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
 
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));

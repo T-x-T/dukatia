@@ -12,7 +12,7 @@ mod calculate_get_per_account_over_time {
 	fn no_data_default_chart() {
 		let res = calculate_get_per_account_over_time(&ChartOptions::default(), Vec::new(), &Vec::new());
 
-		assert_eq!(res, IntermediateChartData::default());
+		assert_eq!(res, OldIntermediateChartData::default());
 	}
 
 	#[test]
@@ -27,7 +27,7 @@ mod calculate_get_per_account_over_time {
 		];
 		let res = calculate_get_per_account_over_time(&ChartOptions::default(), transactions, &get_accounts(5));
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: [
 				(0, Dataset{label: "test_0".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "346.90€".to_string()},
@@ -59,7 +59,7 @@ mod calculate_get_per_account_over_time {
 		];
 		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: [
 				(0, Dataset{label: "test_0".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "346.90€".to_string()},
@@ -91,7 +91,7 @@ mod calculate_get_per_account_over_time {
 		];
 		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: [
 				(0, Dataset{label: "test_0".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "346.90€".to_string()},
@@ -123,7 +123,7 @@ mod calculate_get_per_account_over_time {
 		];
 		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: [
 				(0, Dataset{label: "test_0".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "346.90€".to_string()},
@@ -155,7 +155,7 @@ mod calculate_get_per_account_over_time {
 		];
 		let res = calculate_get_per_account_over_time(&chart_options, transactions, &get_accounts(5));
 
-		assert_eq!(res, IntermediateChartData {
+		assert_eq!(res, OldIntermediateChartData {
 			datasets: [
 				(0, Dataset{label: "test_0".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "346.90€".to_string()},

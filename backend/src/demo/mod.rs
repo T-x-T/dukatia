@@ -27,7 +27,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	}
 
 	for recipient in get_recipients(user_id) {
-		recipient.save(pool).await?;
+		recipient.create(pool).await?;
 	}
 
 	for asset in get_assets(user_id) {

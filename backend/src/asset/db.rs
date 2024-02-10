@@ -92,7 +92,7 @@ pub struct AssetDbWriter<'a> {
 	asset: Asset,
 }
 
-impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Asset> for AssetDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Asset) -> Self {
 		Self { 
 			pool,
@@ -193,7 +193,7 @@ pub struct AssetValuationDbWriter<'a> {
 	asset_valuation: AssetValuation,
 }
 
-impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
+impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	fn new(pool: &'a Pool, item: AssetValuation) -> Self {
 		Self { 
 			pool,
@@ -225,7 +225,7 @@ impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	}
 }
 
-impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
+impl<'a> OldDbDeleter<'a, Asset> for AssetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.asset.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));

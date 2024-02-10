@@ -21,6 +21,7 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct ChartOptions {
@@ -50,8 +51,13 @@ pub struct ChartData {
 }
 
 #[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
-pub struct IntermediateChartData {
+pub struct OldIntermediateChartData {
 	pub datasets: BTreeMap<u32, Dataset>,
+}
+
+#[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
+pub struct IntermediateChartData {
+	pub datasets: BTreeMap<Uuid, Dataset>,
 }
 
 #[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
@@ -104,9 +110,8 @@ pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
 	return db::delete(pool, chart_id).await;
 }
 
-pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+pub async fn get_chart_data_old(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
-		"get_per_recipient_over_time" => recipient::chart::get_per_recipient_over_time(pool, options.clone()).await?,
 		"get_all_budget_utilization_overview" => budget::chart::get_all_budget_utilization_overview(pool, options.clone()).await?,
 		"get_single_budget_current_period_utilization" => budget::chart::get_single_budget_current_period_utilization(pool, options.clone()).await?,
 		"get_single_budget_previous_period_utilization" => budget::chart::get_single_budget_previous_period_utilization(pool, options.clone()).await?,
@@ -122,6 +127,25 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 	};
 	
 	let limited_output: Vec<(u32, Dataset)>;
+	if options.only_positive.is_some() && options.only_positive.unwrap() {
+		limited_output = limit_output_only_positive_old(sort_output_old(output), options.max_items);
+	} else if options.only_negative.is_some() && options.only_negative.unwrap() {
+		limited_output = limit_output_only_negative_old(sort_output_old(output), options.max_items);
+	} else {
+		limited_output = limit_output_old(sort_output_old(output), options.max_items);
+	}
+	let datasets: Vec<Dataset> = limited_output.into_iter().map(|x| x.1).collect();
+
+	return Ok(ChartData {datasets});
+}
+
+pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
+	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
+		"get_per_recipient_over_time" => recipient::chart::get_per_recipient_over_time(pool, options.clone()).await?,
+		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
+	};
+	
+	let limited_output: Vec<(Uuid, Dataset)>;
 	if options.only_positive.is_some() && options.only_positive.unwrap() {
 		limited_output = limit_output_only_positive(sort_output(output), options.max_items);
 	} else if options.only_negative.is_some() && options.only_negative.unwrap() {
@@ -187,13 +211,19 @@ pub fn get_date_for_period(date_period: &str, timestamp: NaiveDate) -> NaiveDate
 	}
 }
 
-fn sort_output(input: IntermediateChartData) -> Vec<(u32, Dataset)> {
+fn sort_output_old(input: OldIntermediateChartData) -> Vec<(u32, Dataset)> {
 	let mut datasets = Vec::from_iter(input.datasets);
 	datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
 	return datasets;
 }
 
-fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+fn sort_output(input: IntermediateChartData) -> Vec<(Uuid, Dataset)> {
+	let mut datasets = Vec::from_iter(input.datasets);
+	datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
+	return datasets;
+}
+
+fn limit_output_old(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
 	let mut output: Vec<(u32, Dataset)>;
 	
 	if limit.is_some() && input.len() > limit.unwrap() as usize {
@@ -215,7 +245,7 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 	return output;
 }
 
-fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+fn limit_output_only_positive_old(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
 	let default = DataPoint::default();
 	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
 		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
@@ -226,10 +256,56 @@ fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) ->
 	return output;
 }
 
-fn limit_output_only_negative(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+fn limit_output_only_negative_old(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
 	let default = DataPoint::default();
 	input.reverse();
 	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
+		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect()
+	} else {
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).collect()
+	};
+
+	return output;
+}
+
+
+fn limit_output(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
+	let mut output: Vec<(Uuid, Dataset)>;
+	
+	if limit.is_some() && input.len() > limit.unwrap() as usize {
+		if limit.unwrap() == 1 {
+			output = input.clone().into_iter().take(1).collect();
+		} else {
+			let n_from_top = (f64::from(limit.unwrap()) / 2.0).ceil() as usize;
+			let top_limited_output: Vec<(Uuid, Dataset)> = input.clone().into_iter().take(n_from_top).collect();
+			input.reverse();
+			let mut bottom_limited_output: Vec<(Uuid, Dataset)> = input.into_iter().take(limit.unwrap() as usize - n_from_top).collect();
+			bottom_limited_output.reverse();
+			output = top_limited_output;
+			output.append(&mut bottom_limited_output);
+		}
+	} else {
+		output = input;
+	}
+
+	return output;
+}
+
+fn limit_output_only_positive(input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
+	let default = DataPoint::default();
+	let output: Vec<(Uuid, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
+	} else {
+		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).collect()
+	};
+
+	return output;
+}
+
+fn limit_output_only_negative(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
+	let default = DataPoint::default();
+	input.reverse();
+	let output: Vec<(Uuid, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
 		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect()
 	} else {
 		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).collect()

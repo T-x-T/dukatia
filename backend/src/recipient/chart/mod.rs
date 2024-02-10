@@ -5,6 +5,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
+use uuid::Uuid;
 
 use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{RecipientLoader, Recipient};
@@ -22,7 +23,7 @@ pub async fn get_per_recipient_over_time(pool: &Pool, options: ChartOptions) -> 
 
 fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: Vec<Transaction>, recipients: &[Recipient]) -> IntermediateChartData {
 	let mut output: IntermediateChartData = IntermediateChartData::default();
-	let mut datasets_multi_currency: BTreeMap<u32, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
+	let mut datasets_multi_currency: BTreeMap<Uuid, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
 
 	let default = DataPointMonetaryMultiCurrency::default();
 	for transaction in transactions {
@@ -46,7 +47,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 		}
 	}
 
-	let mut datasets: BTreeMap<u32, Vec<DataPoint>> = BTreeMap::new();
+	let mut datasets: BTreeMap<Uuid, Vec<DataPoint>> = BTreeMap::new();
 
 	for dataset in datasets_multi_currency {
 		for data_point in dataset.1 {
@@ -64,7 +65,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 	output.datasets = BTreeMap::new();
 	for dataset in datasets {
 		let name: String = recipients.iter()
-			.filter(|x| x.id.unwrap_or_default() == dataset.0)
+			.filter(|x| x.id == dataset.0)
 			.map(|x| x.name.clone())
 			.collect();
 		

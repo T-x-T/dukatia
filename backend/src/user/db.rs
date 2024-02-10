@@ -50,7 +50,7 @@ pub struct UserDbWriter<'a> {
 	user: User,
 }
 
-impl<'a> DbWriter<'a, User> for UserDbWriter<'a> {
+impl<'a> OldDbWriter<'a, User> for UserDbWriter<'a> {
 	fn new(pool: &'a Pool, item: User) -> Self {
 		return Self {
 			pool,

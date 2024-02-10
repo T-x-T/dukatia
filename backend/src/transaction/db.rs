@@ -1,5 +1,6 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use super::super::CustomError;
 use super::{Transaction, TransactionStatus, Asset, Position, TransactionSummary};
 use crate::money::Money;
@@ -87,7 +88,7 @@ pub struct TransactionDbWriter<'a> {
 	transaction: Transaction,
 }
 
-impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
+impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Transaction) -> Self {
 		Self {
 			pool,
@@ -104,7 +105,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 					&(self.transaction.user_id as i32),
 					&(self.transaction.account_id as i32),
 					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
-					&(self.transaction.recipient_id as i32),
+					&self.transaction.recipient_id,
 					&(self.transaction.status as i32),
 					&self.transaction.timestamp,
 					&self.transaction.comment
@@ -163,7 +164,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
 			&[&(self.transaction.account_id as i32),
 				&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
-				&(self.transaction.recipient_id as i32),
+				&self.transaction.recipient_id,
 				&(self.transaction.status as i32),
 				&self.transaction.timestamp,
 				&self.transaction.comment,
@@ -216,7 +217,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	}
 }
 
-impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
+impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		if self.transaction.id.is_none() {
 			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
@@ -255,7 +256,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let id: i32 = value.get(0);
 		let account_id: i32 = value.get(1);
 		let currency_id: i32 = value.get(2);
-		let recipient_id: i32 = value.get(3);
+		let recipient_id: Uuid = value.get(3);
 		let status: i32 = value.get(4);
 		let user_id: i32 = value.get(5);
 		let timestamp: chrono::DateTime<chrono::Utc> = value.get(6);
@@ -309,7 +310,7 @@ impl From<tokio_postgres::Row> for Transaction {
 			.set_user_id(user_id as u32)
 			.set_account_id(account_id as u32)
 			.set_currency_id(currency_id as u32)
-			.set_recipient_id(recipient_id as u32)
+			.set_recipient_id(recipient_id)
 			.set_status(match status {
 				0 => TransactionStatus::Withheld,
 				1 => TransactionStatus::Completed,

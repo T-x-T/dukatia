@@ -47,7 +47,7 @@ declare global {
 	}
 
 	type Recipient = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
 		tag_ids?: number[],
@@ -64,7 +64,7 @@ declare global {
 		user_id?: number,
 		currency_id?: number,
 		account_id: number,
-		recipient_id: number,
+		recipient_id: string,
 		status: TransactionStatus,
 		timestamp: string,
 		total_amount: Money,
@@ -146,9 +146,10 @@ declare global {
 	type Column = {
 		name: string,
 		type: ColumnType,
-		options?: {id?: number, name: string}[],
+		options?: {id?: number | string, name: string}[],
 		sortable?: boolean,
 		no_filter?: boolean,
+		hidden?: boolean,
 	}
 
 	type TableData = {

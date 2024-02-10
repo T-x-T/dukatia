@@ -7,6 +7,7 @@ use serde_repr::*;
 use chrono::prelude::*;
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use super::account;
 use super::asset::Asset;
 use crate::traits::*;
@@ -39,7 +40,7 @@ pub struct Transaction {
 	pub user_id: u32,
 	pub currency_id: Option<u32>,
 	pub account_id: u32,
-	pub recipient_id: u32,
+	pub recipient_id: Uuid,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
 	pub total_amount: Option<Money>,
@@ -56,7 +57,7 @@ impl Default for Transaction {
 			user_id: 0,
 			currency_id: None,
 			account_id: 0,
-			recipient_id: 0,
+			recipient_id: Uuid::nil(),
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
 			total_amount: None,
@@ -113,7 +114,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_recipient_id(mut self, recipient_id: u32) -> Self {
+	pub fn set_recipient_id(mut self, recipient_id: Uuid) -> Self {
 		self.recipient_id = recipient_id;
 		return self;
 	}
