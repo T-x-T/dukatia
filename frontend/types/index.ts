@@ -87,7 +87,7 @@ declare global {
 	}
 
 	type Budget = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
 		amount: Money,

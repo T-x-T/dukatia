@@ -4,14 +4,15 @@ mod test;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
 use std::error::Error;
+use uuid::Uuid;
 
 use crate::CustomError;
-use crate::chart::{Dataset, OldIntermediateChartData, DataPoint, ChartOptions};
+use crate::chart::{Dataset, IntermediateChartData, DataPoint, ChartOptions};
 use super::{BudgetLoader, Budget, Period};
 use crate::money::Money;
 use crate::traits::*;
 
-pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>>	{
+pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>>	{
 	let budgets = BudgetLoader::new(pool)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_full().await?;
@@ -19,13 +20,13 @@ pub async fn get_all_budget_utilization_overview(pool: &Pool, options: ChartOpti
 	return Ok(calculate_get_all_budget_utilization_overview(budgets));
 }
 
-pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
 	
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first_full()
 		.await?;
@@ -33,13 +34,13 @@ pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: 
 	return Ok(calculate_get_single_budget_current_period_utilization(budget));
 }
 
-pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
 
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
@@ -57,15 +58,15 @@ pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options:
 	return Ok(calculate_get_single_budget_current_period_utilization(budget));
 }
 
-pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
+pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
 	if options.budget_id.is_none() {
 		return Err(Box::new(CustomError::MissingProperty { property: String::from("budget_id"), item_type: String::from("chart") }));
 	}
 
-	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
+	let mut output: IntermediateChartData = IntermediateChartData::default();
 
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
@@ -76,12 +77,12 @@ pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOp
 		let local_budget = budget.clone().calculate_utilization_of_period_at(pool, period.0).await?;
 		let res = calculate_get_single_budget_utilization_history(&local_budget, period);
 
-		output.datasets.entry(0).or_default().label = "used".to_string();
-		output.datasets.entry(0).or_default().data.append(&mut res.datasets.get(&0).unwrap().data.clone());
-		output.datasets.entry(1).or_default().label = "available".to_string();
-		output.datasets.entry(1).or_default().data.append(&mut res.datasets.get(&1).unwrap().data.clone());
-		output.datasets.entry(2).or_default().label = "total".to_string();
-		output.datasets.entry(2).or_default().data.append(&mut res.datasets.get(&2).unwrap().data.clone());
+		output.datasets.entry(Uuid::from_u128(0)).or_default().label = "used".to_string();
+		output.datasets.entry(Uuid::from_u128(0)).or_default().data.append(&mut res.datasets.get(&Uuid::from_u128(0)).unwrap().data.clone());
+		output.datasets.entry(Uuid::from_u128(1)).or_default().label = "available".to_string();
+		output.datasets.entry(Uuid::from_u128(1)).or_default().data.append(&mut res.datasets.get(&Uuid::from_u128(1)).unwrap().data.clone());
+		output.datasets.entry(Uuid::from_u128(2)).or_default().label = "total".to_string();
+		output.datasets.entry(Uuid::from_u128(2)).or_default().data.append(&mut res.datasets.get(&Uuid::from_u128(2)).unwrap().data.clone());
 	}
 
 	return Ok(output);
@@ -92,28 +93,28 @@ pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOp
 
 
 
-pub fn calculate_get_all_budget_utilization_overview(budgets: Vec<Budget>) -> OldIntermediateChartData {
-	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
+pub fn calculate_get_all_budget_utilization_overview(budgets: Vec<Budget>) -> IntermediateChartData {
+	let mut output: IntermediateChartData = IntermediateChartData::default();
 
 	for budget in budgets {
 		let res = calculate_get_single_budget_current_period_utilization(budget.clone());
 
-		output.datasets.entry(0).or_default().label = "used".to_string();
-		output.datasets.entry(0).or_default().data.append(&mut res.datasets.get(&0).unwrap().data.clone());
-		output.datasets.entry(1).or_default().label = "available".to_string();
-		output.datasets.entry(1).or_default().data.append(&mut res.datasets.get(&1).unwrap().data.clone());
+		output.datasets.entry(Uuid::from_u128(0)).or_default().label = "used".to_string();
+		output.datasets.entry(Uuid::from_u128(0)).or_default().data.append(&mut res.datasets.get(&Uuid::from_u128(0)).unwrap().data.clone());
+		output.datasets.entry(Uuid::from_u128(1)).or_default().label = "available".to_string();
+		output.datasets.entry(Uuid::from_u128(1)).or_default().data.append(&mut res.datasets.get(&Uuid::from_u128(1)).unwrap().data.clone());
 	}
 
 	return output;
 }
 
-pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) -> OldIntermediateChartData {
-	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
+pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) -> IntermediateChartData {
+	let mut output: IntermediateChartData = IntermediateChartData::default();
 
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 
-	output.datasets.insert(0, 
+	output.datasets.insert(Uuid::from_u128(0), 
 		Dataset { 
 			label: "used".to_string(),
 			data: vec![
@@ -127,7 +128,7 @@ pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) ->
 		}
 	);
 
-	output.datasets.insert(1, 
+	output.datasets.insert(Uuid::from_u128(1), 
 		Dataset { 
 			label: "available".to_string(),
 			data: vec![
@@ -144,14 +145,14 @@ pub fn calculate_get_single_budget_current_period_utilization(budget: Budget) ->
 	return output;
 }
 
-pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> OldIntermediateChartData {
-	let mut output: OldIntermediateChartData = OldIntermediateChartData::default();
+pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: (DateTime<Utc>, DateTime<Utc>)) -> IntermediateChartData {
+	let mut output: IntermediateChartData = IntermediateChartData::default();
 
 	let used_amount: Money = budget.clone().used_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let available_amount: Money = budget.clone().available_amount.unwrap_or(Money::from_amount(0, budget.amount.get_minor_in_major(), budget.amount.get_symbol()));
 	let total_amount: Money = budget.clone().amount * budget.get_period_count(if budget.rollover {budget.active_from} else {period.0}, period.1);
 
-	output.datasets.insert(0, 
+	output.datasets.insert(Uuid::from_u128(0), 
 		Dataset { 
 			label: "used".to_string(),
 			data: vec![
@@ -165,7 +166,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 		}
 	);
 
-	output.datasets.insert(1, 
+	output.datasets.insert(Uuid::from_u128(1), 
 		Dataset { 
 			label: "available".to_string(),
 			data: vec![
@@ -179,7 +180,7 @@ pub fn calculate_get_single_budget_utilization_history(budget: &Budget, period: 
 		}
 	);
 
-	output.datasets.insert(2, 
+	output.datasets.insert(Uuid::from_u128(2), 
 		Dataset { 
 			label: "total".to_string(),
 			data: vec![

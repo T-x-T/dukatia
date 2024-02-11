@@ -44,8 +44,7 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::AccountId => write!(f, "account_id"),
 			FilterAndSortProperties::Comment => write!(f, "comment"),
 			FilterAndSortProperties::CurrencyId => write!(f, "currency_id"),
-			FilterAndSortProperties::Id => write!(f, "id"),
-			FilterAndSortProperties::IdUuid => write!(f, "id"),
+			FilterAndSortProperties::Id | FilterAndSortProperties::IdUuid => write!(f, "id"),
 			FilterAndSortProperties::RecipientId => write!(f, "recipient_id"),
 			FilterAndSortProperties::Status => write!(f, "status"),
 			FilterAndSortProperties::Timestamp => write!(f, "timestamp"),
@@ -771,7 +770,7 @@ pub trait DbWriter<'a, T> {
 	async fn replace(self) -> Result<(), Box<dyn Error>>;
 }
 
-pub trait DbDeleter<'a, T>: OldDbWriter<'a, T> {
+pub trait DbDeleter<'a, T>: DbWriter<'a, T> {
 	async fn delete(self) -> Result<(), Box<dyn Error>>;
 }
 

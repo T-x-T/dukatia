@@ -132,7 +132,7 @@ ALTER TABLE public.account_data
     OWNER TO postgres;
 
 GRANT ALL ON TABLE public.account_data TO postgres;
-
+--
 DROP VIEW public.recipient_data;
 
 ALTER TABLE IF EXISTS public.recipients DROP COLUMN IF EXISTS id;
@@ -149,7 +149,109 @@ CREATE OR REPLACE VIEW public.recipient_data
     r.name,
     r.user_id,
     array_agg(t.tag_id) AS tags
-   FROM recipients r
-     LEFT JOIN recipient_tags t ON r.id = t.recipient_id
+  FROM recipients r
+    LEFT JOIN recipient_tags t ON r.id = t.recipient_id
   GROUP BY r.id
   ORDER BY r.name;
+
+ALTER TABLE public.recipients
+  RENAME CONSTRAINT unique_new_id TO recipients_unique_new_id;
+
+
+
+
+
+
+ALTER TABLE IF EXISTS public.budgets
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+
+ALTER TABLE IF EXISTS public.budgets
+	ADD CONSTRAINT budgets_unique_new_id UNIQUE (new_id);
+
+ALTER TABLE IF EXISTS public.budget_filter_tags
+	ADD COLUMN new_budget_id uuid;
+
+UPDATE public.budget_filter_tags
+	SET new_budget_id = (
+		SELECT new_id FROM public.budgets WHERE id = budget_id
+	);
+
+DROP VIEW public.budget_data;
+
+ALTER TABLE IF EXISTS public.budget_filter_tags 
+	DROP COLUMN IF EXISTS budget_id;
+ALTER TABLE IF EXISTS public.budget_filter_tags
+	RENAME new_budget_id TO budget_id;
+ALTER TABLE IF EXISTS public.budget_filter_tags
+	ALTER COLUMN budget_id SET NOT NULL;
+ALTER TABLE IF EXISTS 
+	public.budget_filter_tags DROP CONSTRAINT IF EXISTS budget_id;
+ALTER TABLE IF EXISTS public.budget_filter_tags
+	ADD CONSTRAINT budget_id FOREIGN KEY (budget_id)
+	REFERENCES public.budgets (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+	
+ALTER TABLE IF EXISTS public.budget_filter_tags
+	ADD PRIMARY KEY (budget_id, tag_id);
+
+CREATE OR REPLACE VIEW public.budget_data
+ AS
+ SELECT b.id,
+    b.name,
+    b.user_id,
+    b.amount,
+    b.rollover,
+    b.period,
+    array_agg(DISTINCT bft.tag_id) AS filter_tag_ids,
+    b.active_from,
+    b.active_to,
+    c.minor_in_major,
+    c.symbol,
+    b.currency_id
+   FROM budgets b
+     LEFT JOIN budget_filter_tags bft ON b.new_id = bft.budget_id
+     LEFT JOIN currencies c ON c.id = b.currency_id
+  GROUP BY b.id, c.id
+  ORDER BY b.id;
+
+ALTER TABLE public.budget_data
+    OWNER TO postgres;
+	
+GRANT ALL ON TABLE public.budget_data TO postgres;
+
+DROP VIEW public.budget_data;
+
+ALTER TABLE IF EXISTS public.budgets DROP COLUMN IF EXISTS id;
+
+ALTER TABLE IF EXISTS public.budgets
+	RENAME new_id TO id;
+
+ALTER TABLE IF EXISTS public.budgets
+	ADD PRIMARY KEY (id);
+	
+CREATE OR REPLACE VIEW public.budget_data
+ AS
+ SELECT b.id,
+    b.name,
+    b.user_id,
+    b.amount,
+    b.rollover,
+    b.period,
+    array_agg(DISTINCT bft.tag_id) AS filter_tag_ids,
+    b.active_from,
+    b.active_to,
+    c.minor_in_major,
+    c.symbol,
+    b.currency_id
+   FROM budgets b
+     LEFT JOIN budget_filter_tags bft ON b.id = bft.budget_id
+     LEFT JOIN currencies c ON c.id = b.currency_id
+  GROUP BY b.id, c.id
+  ORDER BY b.name;
+
+ALTER TABLE public.budget_data
+    OWNER TO postgres;
+	
+GRANT ALL ON TABLE public.budget_data TO postgres;

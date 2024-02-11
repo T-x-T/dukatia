@@ -10,6 +10,7 @@ use serde_repr::Serialize_repr;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
+use uuid::Uuid;
 use crate::money::Money;
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
@@ -25,9 +26,9 @@ pub enum Period {
 	Yearly = 4,
 }
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Budget {
-	pub id: Option<u32>,
+	pub id: Uuid,
   pub name: String,
 	pub user_id: u32,
 	pub amount: Money,
@@ -42,30 +43,47 @@ pub struct Budget {
 	pub utilization: Option<f64>
 }
 
-impl Save for Budget {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::BudgetDbWriter::new(pool, self).replace().await?;
-				return Ok(id)
-			},
-			None => return db::BudgetDbWriter::new(pool, self).insert().await,
+impl Default for Budget {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			name: String::new(),
+			user_id: 0,
+			amount: Money::default(),
+			rollover: false,
+			period: Period::default(),
+			filter_tag_ids: Vec::new(),
+			currency_id: 0,
+			active_from: DateTime::default(),
+			active_to: None,
+			used_amount: None,
+			available_amount: None,
+			utilization: None
 		}
+	}
+}
+
+impl Create for Budget {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::BudgetDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Budget {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::BudgetDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Delete for Budget {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::BudgetDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Budget".to_string() }))
-		}
+		return db::BudgetDbWriter::new(pool, self).delete().await;
 	}
 }
 
 impl Budget {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 

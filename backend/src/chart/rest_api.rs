@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use crate::webserver::{AppState, is_authorized};
 
 
@@ -38,7 +39,7 @@ struct ChartOptionsQuery {
 	to_date: Option<DateTime<Utc>>,
 	date_period: Option<String>,
 	asset_id: Option<u32>,
-	budget_id: Option<u32>,
+	budget_id: Option<Uuid>,
 	max_items: Option<u32>,
 	date_range: Option<u32>,
 	only_positive: Option<bool>,
@@ -120,7 +121,7 @@ async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: Htt
 		bottom_right_y: None,
 	};
 
-	match super::get_chart_data_old(&data.pool, chart_options).await {
+	match super::get_chart_data(&data.pool, chart_options).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}

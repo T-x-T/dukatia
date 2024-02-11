@@ -4342,30 +4342,30 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1430,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1430,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
 					"name": "get single budget by id works",
-					"endpoint": "/api/v1/budgets/0?at_timestamp=2023-10-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200]]]...[[[id]]]%%%?at_timestamp=2023-10-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1430,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}
+						"body_equals": {"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"test","user_id":0,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1430,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}
 					}
 				},
 				{
 					"name": "attempting to get single budget with non existant id returns 404",
-					"endpoint": "/api/v1/budgets/5",
+					"endpoint": "/api/v1/budgets/7cd275b2-a201-4276-8fa7-afb66642dfe6",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 404,
-						"body_equals": {"error":"specified item of type budget not found with filter id=5"}
+						"body_equals": {"error":"specified item of type budget not found with filter id=7cd275b2-a201-4276-8fa7-afb66642dfe6"}
 					}
 				},
 				{
 					"name": "updating details of budget returns 200",
-					"endpoint": "/api/v1/budgets/0",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"body": {
 						"name": "edited test",
@@ -4392,7 +4392,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -4420,7 +4420,7 @@
 				},
 				{
 					"name": "deleting budget returns 200",
-					"endpoint": "/api/v1/budgets/1",
+					"endpoint": "/api/v1/budgets/%%%[[[post of another new budget returns 200]]]...[[[id]]]%%%",
 					"method": "DELETE",
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -4432,7 +4432,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -4533,7 +4533,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%","name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%","name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 5]]]...[[[id]]]%%%","name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -4542,52 +4542,34 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%","name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%","name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&at_timestamp=2023-12-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/all?filter_id=%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%","name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=exact",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=exact&at_timestamp=2023-12-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/all?filter_id=%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%&filter_mode_id=exact&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%","name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":151,"minor":58,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
 					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=not",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=not&at_timestamp=2023-12-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/all?filter_id=%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%&filter_mode_id=not&at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
-					}
-				},
-				{
-					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=less",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=less&at_timestamp=2023-12-28T12:34:56Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0}]
-					}
-				},
-				{
-					"name": "retrieval of budgets returns expected output when using filter_id and filter_mode_id=more",
-					"endpoint": "/api/v1/budgets/all?filter_id=4&filter_mode_id=more&at_timestamp=2023-12-28T12:34:56Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 2]]]...[[[id]]]%%%","name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%","name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 5]]]...[[[id]]]%%%","name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
@@ -4847,12 +4829,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":2,"name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854},{"id":3,"name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":4,"name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":3,"minor":90,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":146,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":2.5728987993138937e-2},{"id":5,"name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854}]
+						"body_equals": [{"id":"%%%[[[post of new budget returns 200]]]...[[[id]]]%%%","name":"edited test","user_id":0,"amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":2,"filter_tag_ids":[1,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":20,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 2]]]...[[[id]]]%%%","name":"test 2","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854},{"id":"%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%","name":"test 3","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":1,"active_from":"2020-02-04T12:34:56Z","active_to":null,"used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"$","is_negative":false},"available_amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"$","is_negative":false},"utilization":0},{"id":"%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%","name":"test 4","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":3,"filter_tag_ids":[1,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":3,"minor":90,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":146,"minor":68,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":2.5728987993138937e-2},{"id":"%%%[[[post of new budget returns 200 5]]]...[[[id]]]%%%","name":"test 5","user_id":0,"amount":{"major":13,"minor":78,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":false,"period":3,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":11,"minor":33,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0.17779390420899854}]
 					}
 				},
 				{
 					"name": "transactions matching budget get correctly returned",
-					"endpoint": "/api/v1/budgets/4/transactions?at_timestamp=2023-12-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%/transactions?at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4861,7 +4843,7 @@
 				},
 				{
 					"name": "set active from returns 200",
-					"endpoint": "/api/v1/budgets/4",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"body": {
 						"name": "test 4",
@@ -4884,7 +4866,7 @@
 				},
 				{
 					"name": "getting transactions of budget doesnt return transaction from before active_from",
-					"endpoint": "/api/v1/budgets/4/transactions?at_timestamp=2023-12-28T12:34:56Z",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%/transactions?at_timestamp=2023-12-28T12:34:56Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4945,12 +4927,12 @@
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":6,"name":"test","user_id":1,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1480,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
+						"body_equals": [{"id":"%%%[[[new user can post budget]]]...[[[id]]]%%%","name":"test","user_id":1,"amount":{"major":10,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"rollover":true,"period":1,"filter_tag_ids":[0,2],"currency_id":0,"active_from":"2021-02-04T12:34:56Z","active_to":"2035-02-04T12:34:56Z","used_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"available_amount":{"major":1480,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"utilization":0}]
 					}
 				},
 				{
 					"name": "new user cant modify budget of other user",
-					"endpoint": "/api/v1/budgets/7",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"before": [
 						"login_as_user"
@@ -4979,7 +4961,7 @@
 				},
 				{
 					"name": "new user cant get other users budget by id",
-					"endpoint": "/api/v1/budgets/7",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%",
 					"before": [
 						"login_as_user"
 					],
@@ -4993,7 +4975,7 @@
 				},
 				{
 					"name": "new user cant get transaction of other users budget",
-					"endpoint": "/api/v1/budgets/7/transactions",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%/transactions",
 					"before": [
 						"login_as_user"
 					],
@@ -5007,7 +4989,7 @@
 				},
 				{
 					"name": "new user cant delete other users budget by id",
-					"endpoint": "/api/v1/budgets/7",
+					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 3]]]...[[[id]]]%%%",
 					"before": [
 						"login_as_user"
 					],

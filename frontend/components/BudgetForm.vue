@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="budget.id" disabled>
+			<input type="text" v-model="budget.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -104,7 +104,7 @@ export default {
 			let res = {} as Budget;
 
 			try {
-				if(typeof this.budget.id == "number") {
+				if(typeof this.budget.id == "string" && this.budget.id.length == 36) {
 					res = await $fetch(`/api/v1/budgets/${this.budget.id}`, {
 						method: "PUT",
 						body: this.get_body(),

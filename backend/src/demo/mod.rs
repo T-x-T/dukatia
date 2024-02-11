@@ -35,7 +35,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	}
 
 	for budget in get_budgets(user_id) {
-		budget.save(pool).await?;
+		budget.create(pool).await?;
 	}
 
 	for transaction in get_transactions(user_id) {

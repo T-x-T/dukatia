@@ -34,7 +34,7 @@ pub struct ChartOptions {
 	pub filter_collection: Option<String>,
 	pub date_period: Option<String>,
 	pub asset_id: Option<u32>,
-	pub budget_id: Option<u32>,
+	pub budget_id: Option<Uuid>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
 	pub only_positive: Option<bool>,
@@ -112,10 +112,6 @@ pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
 
 pub async fn get_chart_data_old(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
-		"get_all_budget_utilization_overview" => budget::chart::get_all_budget_utilization_overview(pool, options.clone()).await?,
-		"get_single_budget_current_period_utilization" => budget::chart::get_single_budget_current_period_utilization(pool, options.clone()).await?,
-		"get_single_budget_previous_period_utilization" => budget::chart::get_single_budget_previous_period_utilization(pool, options.clone()).await?,
-		"get_single_budget_utilization_history" => budget::chart::get_single_budget_utilization_history(pool, options.clone()).await?,
 		"get_single_asset_total_value_over_time" => asset::chart::get_single_asset_total_value_over_time(pool, options.clone()).await?,
 		"get_single_asset_single_value_over_time" => asset::chart::get_single_asset_single_value_over_time(pool, options.clone()).await?,
 		"get_single_asset_amount_over_time" => asset::chart::get_single_asset_amount_over_time(pool, options.clone()).await?,
@@ -142,6 +138,10 @@ pub async fn get_chart_data_old(pool: &Pool, options: ChartOptions) -> Result<Ch
 pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
 		"get_per_recipient_over_time" => recipient::chart::get_per_recipient_over_time(pool, options.clone()).await?,
+		"get_single_budget_utilization_history" => budget::chart::get_single_budget_utilization_history(pool, options.clone()).await?,
+		"get_all_budget_utilization_overview" => budget::chart::get_all_budget_utilization_overview(pool, options.clone()).await?,
+		"get_single_budget_current_period_utilization" => budget::chart::get_single_budget_current_period_utilization(pool, options.clone()).await?,
+		"get_single_budget_previous_period_utilization" => budget::chart::get_single_budget_previous_period_utilization(pool, options.clone()).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
 	};
 	

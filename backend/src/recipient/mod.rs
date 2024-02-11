@@ -12,16 +12,16 @@ pub struct Recipient {
 	pub id: Uuid,
 	pub name: String,
 	pub user_id: Option<u32>,
-	pub tag_ids: Option<Vec<u32>>,
+	pub tag_ids: Option<Vec<u32>>, //TODO: fix nonsensical Option
 }
 
 impl Default for Recipient {
 	fn default() -> Self {
 		return Self {
 			id: Uuid::new_v4(),
-			name: Default::default(),
-			user_id: Default::default(),
-			tag_ids: Default::default()
+			name: String::new(),
+			user_id: None,
+			tag_ids: None
 		};
 	}
 }
