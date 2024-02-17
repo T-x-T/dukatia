@@ -39,7 +39,7 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number", sortable: true},
+				{name: "ID", type: "number", sortable: true, hidden: true},
 				{name: "Name", type: "string", sortable: true},
 				{name: "Description", type: "string", sortable: true},
 				{name: "Amount", type: "number", sortable: true},

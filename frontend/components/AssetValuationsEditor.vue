@@ -40,7 +40,7 @@ export default {
 	emits: ["close"],
 
 	props: {
-		assetId: Number
+		assetId: String
 	},
 
 	async created() {

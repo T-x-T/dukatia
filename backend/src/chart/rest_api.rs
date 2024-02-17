@@ -38,7 +38,7 @@ struct ChartOptionsQuery {
 	from_date: Option<DateTime<Utc>>,
 	to_date: Option<DateTime<Utc>>,
 	date_period: Option<String>,
-	asset_id: Option<u32>,
+	asset_id: Option<Uuid>,
 	budget_id: Option<Uuid>,
 	max_items: Option<u32>,
 	date_range: Option<u32>,

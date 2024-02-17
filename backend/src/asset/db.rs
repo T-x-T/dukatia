@@ -1,5 +1,6 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use crate::CustomError;
 use super::{Asset, AssetValuation};
 use crate::traits::*;
@@ -92,7 +93,7 @@ pub struct AssetDbWriter<'a> {
 	asset: Asset,
 }
 
-impl<'a> OldDbWriter<'a, Asset> for AssetDbWriter<'a> {
+impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Asset) -> Self {
 		Self { 
 			pool,
@@ -100,34 +101,29 @@ impl<'a> OldDbWriter<'a, Asset> for AssetDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
 		let client = self.pool.get().await?;
 
-		let id: i32 = client.query(
-				"INSERT INTO public.assets (id, name, description, user_id, currency_id) VALUES (DEFAULT, $1, $2, $3, $4) RETURNING id;", 
-				&[&self.asset.name, &self.asset.description, &(self.asset.user_id as i32), &(self.asset.currency_id as i32)]
-			).await?
-			[0].get(0);
+		client.query(
+				"INSERT INTO public.assets (id, name, description, user_id, currency_id) VALUES ($1, $2, $3, $4, $5)", 
+				&[&self.asset.id, &self.asset.name, &self.asset.description, &(self.asset.user_id as i32), &(self.asset.currency_id as i32)]
+			).await?;
 
 		if self.asset.tag_ids.is_some() {
 			for tag_id in self.asset.tag_ids.clone().unwrap() {
 				client.query(
 						"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
-						&[&id, &(tag_id as i32)]
+						&[&self.asset.id, &(tag_id as i32)]
 					).await?;
 			}
 		}
 
-		return Ok(id as u32);
+		return Ok(self.asset.id);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
-		if self.asset.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
-		}
-	
 		let old = super::AssetLoader::new(self.pool)
-			.set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.asset.user_id {
@@ -138,19 +134,19 @@ impl<'a> OldDbWriter<'a, Asset> for AssetDbWriter<'a> {
 	
 		client.query(
 			"UPDATE public.assets SET name=$1, description=$2 WHERE id=$3",
-			&[&self.asset.name, &self.asset.description, &(self.asset.id.unwrap() as i32)]
+			&[&self.asset.name, &self.asset.description, &self.asset.id]
 		).await?;
 	
 		client.query(
 			"DELETE FROM public.asset_tags WHERE asset_id=$1", 
-			&[&(self.asset.id.unwrap() as i32)]
+			&[&self.asset.id]
 		).await?;
 	
 		if self.asset.tag_ids.is_some() {
 			for tag_id in self.asset.tag_ids.clone().unwrap() {
 				client.query(
 						"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
-						&[&(self.asset.id.unwrap() as i32), &(tag_id as i32)]
+						&[&self.asset.id, &(tag_id as i32)]
 					).await?;
 			}
 		}
@@ -161,22 +157,20 @@ impl<'a> OldDbWriter<'a, Asset> for AssetDbWriter<'a> {
 
 impl<'a> AssetDbWriter<'a> {
 	pub async fn replace_valuation_history(self, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-		if self.asset.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
-		}
-
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+		super::AssetLoader::new(self.pool)
+			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
+			.get_first().await?;
 	
 		let client = self.pool.get().await?;
 	
 		client.query(
 			"DELETE FROM public.asset_amounts WHERE asset_id=$1",
-			&[&(self.asset.id.unwrap() as i32)]
+			&[&self.asset.id]
 		).await?;
 	
 		client.query(
 			"DELETE FROM public.asset_valuations WHERE asset_id=$1",
-			&[&(self.asset.id.unwrap() as i32)]
+			&[&self.asset.id]
 		).await?;
 	
 		for asset_valuation in asset_valuations {
@@ -202,18 +196,18 @@ impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	}
 
 	async fn insert(self) -> Result<u32, Box<dyn Error>> {
-		super::AssetLoader::new(self.pool).set_filter_id(self.asset_valuation.asset_id, NumberFilterModes::Exact).get_first().await?;
+		super::AssetLoader::new(self.pool).set_filter_id_uuid(self.asset_valuation.asset_id, NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 		
 		client.query(
 			"INSERT INTO public.asset_amounts (asset_id, timestamp, amount) VALUES ($1, $2, $3);",
-			&[&(self.asset_valuation.asset_id as i32), &self.asset_valuation.timestamp, &self.asset_valuation.amount]
+			&[&self.asset_valuation.asset_id, &self.asset_valuation.timestamp, &self.asset_valuation.amount]
 		).await?;
 		
 		client.query(
 			"INSERT INTO public.asset_valuations (asset_id, timestamp, value_per_unit) VALUES ($1, $2, $3)", 
-			&[&(self.asset_valuation.asset_id as i32), &self.asset_valuation.timestamp, &self.asset_valuation.value_per_unit.to_amount()]
+			&[&self.asset_valuation.asset_id, &self.asset_valuation.timestamp, &self.asset_valuation.value_per_unit.to_amount()]
 		).await?;
 	
 		return Ok(0);
@@ -225,14 +219,10 @@ impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	}
 }
 
-impl<'a> OldDbDeleter<'a, Asset> for AssetDbWriter<'a> {
+impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
-		if self.asset.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("asset") }));
-		}
-
 		let old = super::AssetLoader::new(self.pool)
-			.set_filter_id(self.asset.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.asset.user_id {
@@ -243,7 +233,7 @@ impl<'a> OldDbDeleter<'a, Asset> for AssetDbWriter<'a> {
 			.await?
 			.query(
 				"DELETE FROM public.assets WHERE id=$1;", 
-				&[&(self.asset.id.unwrap() as i32)]
+				&[&self.asset.id]
 			).await?;
 
 		return Ok(());
@@ -253,7 +243,7 @@ impl<'a> OldDbDeleter<'a, Asset> for AssetDbWriter<'a> {
 #[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Asset {
 	fn from(value: tokio_postgres::Row) -> Self {
-		let id: i32 = value.get(0);
+		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
 		let description: Option<String> = value.get(2);
 		let user_id: i32 = value.get(3);
@@ -269,7 +259,7 @@ impl From<tokio_postgres::Row> for Asset {
 		let symbol: String = value.get(9);
 
 		return Asset {
-			id: Some(id as u32),
+			id,
 			name,
 			description,
 			user_id: user_id as u32,
@@ -284,7 +274,7 @@ impl From<tokio_postgres::Row> for Asset {
 
 impl From<tokio_postgres::Row> for AssetValuation {
 	fn from(value: tokio_postgres::Row) -> Self {
-		let asset_id: i32 = value.get(0);
+		let asset_id: Uuid = value.get(0);
 		let timestamp: chrono::DateTime<chrono::Utc> = value.get(1);
 		let amount: f64 = value.try_get(2).unwrap_or(0.0);
 		let value_per_unit: i32 = value.try_get(3).unwrap_or(0);
@@ -292,7 +282,7 @@ impl From<tokio_postgres::Row> for AssetValuation {
 		let symbol: String = value.get(5);
 	
 		return AssetValuation {
-			asset_id: asset_id as u32,
+			asset_id,
 			value_per_unit: Money::from_amount(value_per_unit, minor_in_major as u32, symbol),
 			amount,
 			timestamp

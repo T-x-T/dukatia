@@ -6,9 +6,9 @@ use deadpool_postgres::Pool;
 use serde::{Serialize, Deserialize};
 use std::error::Error;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
-use crate::CustomError;
 use crate::money::Money;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -20,9 +20,9 @@ pub struct TotalCostOfOwnership {
 
 
 
-#[derive(Debug, Clone, Serialize, Default, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Asset {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub user_id: u32,
 	pub name: String,
 	pub description: Option<String>,
@@ -33,30 +33,43 @@ pub struct Asset {
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
 }
 
-impl Save for Asset {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::AssetDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => db::AssetDbWriter::new(pool, self).insert().await,
-		}
+impl Default for Asset {
+	fn default() -> Self {
+		return Self {
+			id: Uuid::new_v4(),
+			user_id: 0,
+			name: String::new(),
+			description: None,
+			currency_id: 0,
+			value_per_unit: None,
+			amount: None,
+			tag_ids: None,
+			total_cost_of_ownership: None,
+		};
+	}
+}
+
+impl Create for Asset {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::AssetDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Asset {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::AssetDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Delete for Asset {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::AssetDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
-		}
+		return db::AssetDbWriter::new(pool, self).delete().await;
 	}
 }
 
 impl Asset {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
@@ -98,12 +111,8 @@ impl Asset {
 	}
 
 	pub async fn get_total_cost_of_ownership(self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Self, Box<dyn Error>> {
-		if self.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }));
-		}
-
 		let transactions = TransactionLoader::new(pool)
-			.set_filter_asset_id(self.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_asset_id(self.id, NumberFilterModes::Exact)
 			.get().await?;
 		
 		return Ok(Self {
@@ -115,10 +124,7 @@ impl Asset {
 	}
 
 	pub async fn replace_valuation_history(self, pool: &Pool, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => db::AssetDbWriter::new(pool, self).replace_valuation_history(asset_valuations).await,
-			None => Err(Box::new(CustomError::MissingProperty { property: "id".to_string(), item_type: "Asset".to_string() }))
-		}
+		return db::AssetDbWriter::new(pool, self).replace_valuation_history(asset_valuations).await;
 	}
 }
 
@@ -177,7 +183,7 @@ pub struct AssetValuation {
 	pub value_per_unit: Money,
 	pub amount: f64,
 	pub timestamp: DateTime<Utc>,
-	pub asset_id: u32,
+	pub asset_id: Uuid,
 }
 
 impl Save for AssetValuation {

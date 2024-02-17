@@ -271,8 +271,16 @@ export default {
 					}
 				}
 
-				if(this.filters[i].type == "number" || this.filters[i].type == "choice") {
+				if(this.filters[i].type == "number") {
 					if(typeof this.filters[i].value == "number") {
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
+					} else {
+						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
+					}
+				}
+
+				if(this.filters[i].type == "choice") {
+					if(this.filters[i].value?.toString().length == 36 || typeof this.filters[i].value == "number") {
 						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);

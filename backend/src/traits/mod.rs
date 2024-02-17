@@ -128,11 +128,11 @@ pub struct Filters {
 	pub id: Option<(u32, NumberFilterModes)>,
 	pub id_uuid: Option<(Uuid, NumberFilterModes)>,
 	pub total_amount: Option<(i32, NumberFilterModes)>,
-	pub asset_id: Option<(u32, NumberFilterModes)>,
+	pub asset_id: Option<(Uuid, NumberFilterModes)>,
 	pub user_id: Option<(u32, NumberFilterModes)>,
 	pub currency_id: Option<(u32, NumberFilterModes)>,
 	pub account_id: Option<(u32, NumberFilterModes)>,
-	pub recipient_id: Option<(u32, NumberFilterModes)>,
+	pub recipient_id: Option<(Uuid, NumberFilterModes)>,
 	pub tag_id: Option<(u32, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
 	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
@@ -280,7 +280,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_asset_id(self, asset_id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_asset_id(self, asset_id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.asset_id = Some((asset_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
@@ -304,7 +304,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_recipient_id(self, recipient_id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_recipient_id(self, recipient_id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.recipient_id = Some((recipient_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
@@ -470,7 +470,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.asset_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.asset_id.unwrap().0));
 			i += 1;
 		}
 		
@@ -514,7 +514,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.recipient_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.recipient_id.unwrap().0));
 			i += 1;
 		}
 		

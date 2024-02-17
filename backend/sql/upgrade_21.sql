@@ -1,3 +1,5 @@
+-- Recipients
+
 ALTER TABLE IF EXISTS public.recipients
 	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
 
@@ -160,7 +162,7 @@ ALTER TABLE public.recipients
 
 
 
-
+-- Budgets
 
 ALTER TABLE IF EXISTS public.budgets
 	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
@@ -192,7 +194,6 @@ ALTER TABLE IF EXISTS public.budget_filter_tags
 	ON UPDATE CASCADE
 	ON DELETE CASCADE
 	NOT VALID;
-	
 ALTER TABLE IF EXISTS public.budget_filter_tags
 	ADD PRIMARY KEY (budget_id, tag_id);
 
@@ -255,3 +256,294 @@ ALTER TABLE public.budget_data
     OWNER TO postgres;
 	
 GRANT ALL ON TABLE public.budget_data TO postgres;
+
+
+
+
+-- Assets
+ALTER TABLE IF EXISTS public.assets
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+
+ALTER TABLE IF EXISTS public.assets
+	ADD CONSTRAINT assets_unique_new_id UNIQUE (new_id);
+
+ALTER TABLE IF EXISTS public.asset_transactions
+	ADD COLUMN new_asset_id uuid;
+
+UPDATE public.asset_transactions
+	SET new_asset_id = (
+		SELECT new_id FROM public.assets WHERE id = asset_id
+	);
+
+ALTER TABLE IF EXISTS public.asset_amounts
+	ADD COLUMN new_asset_id uuid;
+
+UPDATE public.asset_amounts
+	SET new_asset_id = (
+		SELECT new_id FROM public.assets WHERE id = asset_id
+	);
+
+ALTER TABLE IF EXISTS public.asset_valuations
+	ADD COLUMN new_asset_id uuid;
+
+UPDATE public.asset_valuations
+	SET new_asset_id = (
+		SELECT new_id FROM public.assets WHERE id = asset_id
+	);
+
+ALTER TABLE IF EXISTS public.asset_tags
+	ADD COLUMN new_asset_id uuid;
+
+UPDATE public.asset_tags
+	SET new_asset_id = (
+		SELECT new_id FROM public.assets WHERE id = asset_id
+	);
+
+DROP VIEW IF EXISTS public.asset_data;
+DROP VIEW IF EXISTS public.asset_valuation_history;
+DROP VIEW IF EXISTS public.account_data;
+DROP VIEW IF EXISTS public.transaction_data;
+
+ALTER TABLE IF EXISTS public.asset_transactions 
+	DROP COLUMN IF EXISTS asset_id;
+ALTER TABLE IF EXISTS public.asset_transactions
+	RENAME new_asset_id TO asset_id;
+ALTER TABLE IF EXISTS public.asset_transactions
+	ALTER COLUMN asset_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.asset_transactions
+	ADD CONSTRAINT asset_id FOREIGN KEY (asset_id)
+	REFERENCES public.assets (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.asset_transactions
+	ADD PRIMARY KEY (asset_id, transaction_id);
+
+ALTER TABLE IF EXISTS public.asset_amounts 
+	DROP COLUMN IF EXISTS asset_id;
+ALTER TABLE IF EXISTS public.asset_amounts
+	RENAME new_asset_id TO asset_id;
+ALTER TABLE IF EXISTS public.asset_amounts
+	ALTER COLUMN asset_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.asset_amounts
+	ADD CONSTRAINT asset_id FOREIGN KEY (asset_id)
+	REFERENCES public.assets (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.asset_amounts
+	ADD PRIMARY KEY (asset_id, timestamp);
+
+ALTER TABLE IF EXISTS public.asset_valuations 
+	DROP COLUMN IF EXISTS asset_id;
+ALTER TABLE IF EXISTS public.asset_valuations
+	RENAME new_asset_id TO asset_id;
+ALTER TABLE IF EXISTS public.asset_valuations
+	ALTER COLUMN asset_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.asset_valuations
+	ADD CONSTRAINT asset_id FOREIGN KEY (asset_id)
+	REFERENCES public.assets (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.asset_valuations
+	ADD PRIMARY KEY (asset_id, timestamp);
+
+ALTER TABLE IF EXISTS public.asset_tags 
+	DROP COLUMN IF EXISTS asset_id;
+ALTER TABLE IF EXISTS public.asset_tags
+	RENAME new_asset_id TO asset_id;
+ALTER TABLE IF EXISTS public.asset_tags
+	ALTER COLUMN asset_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.asset_tags
+	ADD CONSTRAINT asset_id FOREIGN KEY (asset_id)
+	REFERENCES public.assets (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.asset_tags
+	ADD PRIMARY KEY (asset_id, tag_id);
+
+CREATE OR REPLACE VIEW public.asset_data
+    AS
+     SELECT a.new_id,
+    a.name,
+    a.description,
+    a.user_id,
+    a.currency_id,
+    array_agg(t.tag_id) AS tags,
+        CASE
+            WHEN aa.amount IS NULL THEN 0::double precision
+            ELSE aa.amount
+        END AS amount,
+        CASE
+            WHEN av.value_per_unit IS NULL THEN 0
+            ELSE av.value_per_unit
+        END AS value_per_unit,
+   	c.minor_in_major,
+	c.symbol
+   FROM assets a
+     LEFT JOIN asset_amounts aa ON a.new_id = aa.asset_id AND aa."timestamp" = (( SELECT max(asset_amounts."timestamp") AS max
+           FROM asset_amounts
+          WHERE asset_amounts.asset_id = a.new_id
+          GROUP BY asset_amounts.asset_id))
+     LEFT JOIN asset_valuations av ON a.new_id = av.asset_id AND av."timestamp" = (( SELECT max(asset_valuations."timestamp") AS max
+           FROM asset_valuations
+          WHERE asset_valuations.asset_id = a.new_id
+          GROUP BY asset_valuations.asset_id))
+     LEFT JOIN asset_tags t ON a.new_id = t.asset_id
+	 LEFT JOIN currencies c ON a.currency_id = c.id
+  GROUP BY a.new_id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
+  ORDER BY a.new_id;
+
+ALTER TABLE public.asset_data
+  OWNER TO postgres;
+
+GRANT ALL ON TABLE public.asset_data TO postgres;
+
+CREATE OR REPLACE VIEW public.transaction_data
+ AS
+ SELECT tr.id,
+    tr.account_id,
+    tr.currency_id,
+    tr.recipient_id,
+    tr.status,
+    tr.user_id,
+    tr."timestamp",
+    tr.comment,
+    array_agg(t.tag_id) AS tags,
+    a.new_id AS asset_id,
+    a.name AS asset_name,
+    a.description AS asset_description,
+    ( SELECT array_agg(p.id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_ids,
+    ( SELECT array_agg(p.amount) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_amounts,
+    ( SELECT array_agg(p.comment) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_comments,
+    ( SELECT array_agg(p.tag_id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_tag_ids,
+    ( SELECT sum(p.amount) AS sum
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS total_amount,
+    c.minor_in_major,
+    c.symbol
+   FROM transactions tr
+     LEFT JOIN transaction_tags t ON tr.id = t.transaction_id
+     LEFT JOIN asset_transactions at ON at.transaction_id = tr.id
+     LEFT JOIN assets a ON a.new_id = at.asset_id
+     LEFT JOIN currencies c ON c.id = tr.currency_id
+  GROUP BY tr.id, a.new_id, a.name, a.description, c.minor_in_major, c.symbol
+  ORDER BY tr.id;
+
+ALTER TABLE public.transaction_data
+    OWNER TO postgres;
+
+GRANT ALL ON TABLE public.transaction_data TO postgres;
+
+CREATE OR REPLACE VIEW public.account_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.default_currency_id,
+    a.user_id,
+    array_agg(DISTINCT t.tag_id) AS tags,
+    sum(tr.total_amount)::bigint AS balance
+   FROM accounts a
+     LEFT JOIN account_tags t ON a.id = t.account_id
+     LEFT JOIN transaction_data tr ON a.id = tr.account_id
+  GROUP BY a.id
+  ORDER BY a.id;
+
+ALTER TABLE public.account_data
+    OWNER TO postgres;
+
+GRANT ALL ON TABLE public.account_data TO postgres;
+
+CREATE OR REPLACE VIEW public.asset_valuation_history
+ AS
+ SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
+    COALESCE(aa."timestamp", av."timestamp") AS "timestamp",
+    aa.amount,
+    av.value_per_unit,
+    c.minor_in_major,
+    c.symbol
+   FROM asset_amounts aa
+     FULL JOIN asset_valuations av ON aa.asset_id = av.asset_id AND aa."timestamp" = av."timestamp"
+     LEFT JOIN assets a ON aa.asset_id = a.new_id
+     LEFT JOIN currencies c ON a.currency_id = c.id
+  ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
+
+ALTER TABLE public.asset_valuation_history
+    OWNER TO postgres;
+
+GRANT ALL ON TABLE public.asset_valuation_history TO postgres;
+
+DROP VIEW IF EXISTS public.asset_data;
+DROP VIEW IF EXISTS public.asset_valuation_history;
+
+ALTER TABLE IF EXISTS public.assets DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.assets
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.assets
+	ADD PRIMARY KEY (id);
+
+CREATE OR REPLACE VIEW public.asset_data
+    AS
+     SELECT a.id,
+    a.name,
+    a.description,
+    a.user_id,
+    a.currency_id,
+    array_agg(t.tag_id) AS tags,
+        CASE
+            WHEN aa.amount IS NULL THEN 0::double precision
+            ELSE aa.amount
+        END AS amount,
+        CASE
+            WHEN av.value_per_unit IS NULL THEN 0
+            ELSE av.value_per_unit
+        END AS value_per_unit,
+   	c.minor_in_major,
+	c.symbol
+   FROM assets a
+     LEFT JOIN asset_amounts aa ON a.id = aa.asset_id AND aa."timestamp" = (( SELECT max(asset_amounts."timestamp") AS max
+           FROM asset_amounts
+          WHERE asset_amounts.asset_id = a.id
+          GROUP BY asset_amounts.asset_id))
+     LEFT JOIN asset_valuations av ON a.id = av.asset_id AND av."timestamp" = (( SELECT max(asset_valuations."timestamp") AS max
+           FROM asset_valuations
+          WHERE asset_valuations.asset_id = a.id
+          GROUP BY asset_valuations.asset_id))
+     LEFT JOIN asset_tags t ON a.id = t.asset_id
+	 LEFT JOIN currencies c ON a.currency_id = c.id
+  GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
+  ORDER BY a.name;
+
+ALTER TABLE public.asset_data
+  OWNER TO postgres;
+
+GRANT ALL ON TABLE public.asset_data TO postgres;
+
+CREATE OR REPLACE VIEW public.asset_valuation_history
+ AS
+ SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
+    COALESCE(aa."timestamp", av."timestamp") AS "timestamp",
+    aa.amount,
+    av.value_per_unit,
+    c.minor_in_major,
+    c.symbol
+   FROM asset_amounts aa
+     FULL JOIN asset_valuations av ON aa.asset_id = av.asset_id AND aa."timestamp" = av."timestamp"
+     LEFT JOIN assets a ON aa.asset_id = a.id
+     LEFT JOIN currencies c ON a.currency_id = c.id
+  ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
+
+ALTER TABLE public.asset_valuation_history
+    OWNER TO postgres;
+
+GRANT ALL ON TABLE public.asset_valuation_history TO postgres;

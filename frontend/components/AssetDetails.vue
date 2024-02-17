@@ -53,7 +53,7 @@
 		<div v-if="showAssetValuationEditor">
 			<Popup @close="closeAssetValuationEditor">
 				<AssetValuationsEditor
-					v-if="asset && Number.isInteger(asset.id)"
+					v-if="asset?.id?.length === 36"
 					:assetId="asset.id"
 					@close="closeAssetValuationEditor"
 				/>

@@ -21,7 +21,7 @@ declare global {
 	}
 
 	type Asset = {
-		id?: number,
+		id?: string,
 		user_id: number,
 		name: string,
 		description?: string,
@@ -74,7 +74,7 @@ declare global {
 		account?: Account,
 		currency?: Currency,
 		recipient?: Recipient,
-		asset_id?: number,
+		asset_id?: string,
 		positions: Position[],
 		timestamp_string?: string,
 	}
@@ -226,7 +226,7 @@ declare global {
 		title: string,
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",
-		asset_id?: number,
+		asset_id?: string,
 		filter_collection: string,
 		max_items?: number,
 		date_range: number,
@@ -246,7 +246,7 @@ declare global {
 		sort_direction?: "asc" | "desc",
 		filter_id?: number,
 		filter_mode_id?: string,
-		filter_asset_id?: number,
+		filter_asset_id?: string,
 		filter_mode_asset_id?: string,
 		filter_user_id?: number,
 		filter_mode_user_id?: string,

@@ -233,7 +233,7 @@ export default {
 				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
 				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = typeof this.batchrecipient_id == "string" ? this.batchrecipient_id : transaction.recipient_id;
-				transaction.asset_id = typeof this.batchasset_id == "number"  ? this.batchasset_id : transaction.asset_id;
+				transaction.asset_id = typeof this.batchasset_id == "string"  ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {
@@ -426,7 +426,7 @@ export default {
 
 			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
-			if(Number.isInteger(this.query_parameters.filter_asset_id)) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
+			if(this.query_parameters.filter_asset_id) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
 			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;
 			if(Number.isInteger(this.query_parameters.filter_user_id)) url += `&filter_user_id=${this.query_parameters.filter_user_id}`;
 			if(this.query_parameters.filter_mode_user_id) url += `&filter_mode_user_id=${this.query_parameters.filter_mode_user_id}`;
@@ -434,7 +434,7 @@ export default {
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
 			if(Number.isInteger(this.query_parameters.filter_account_id)) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
 			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
-			if(Number.isInteger(this.query_parameters.filter_recipient_id)) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
+			if(this.query_parameters.filter_recipient_id) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
 			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;

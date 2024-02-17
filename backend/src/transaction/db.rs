@@ -124,12 +124,12 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			}
 		}
 
-		if self.transaction.asset.is_some() && self.transaction.asset.clone().unwrap().id.is_some() {
+		if self.transaction.asset.is_some() {
 			self.pool.get()
 				.await?
 				.query(
 					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-				&[&transaction_id, &(self.transaction.asset.clone().unwrap().id.unwrap() as i32)]
+				&[&transaction_id, &self.transaction.asset.clone().unwrap().id]
 			).await?;
 		}
 
@@ -194,10 +194,10 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			&[&(self.transaction.id.unwrap() as i32)]
 		).await?;
 	
-		if self.transaction.asset.is_some() && self.transaction.asset.clone().unwrap().id.is_some() {
+		if self.transaction.asset.is_some() {
 			client.query(
 					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-				&[&(self.transaction.id.unwrap() as i32), &(self.transaction.asset.clone().unwrap().id.unwrap() as i32)]
+				&[&(self.transaction.id.unwrap() as i32), &self.transaction.asset.clone().unwrap().id]
 			).await?;
 		}
 	
@@ -266,7 +266,7 @@ impl From<tokio_postgres::Row> for Transaction {
 			.into_iter()
 			.map(|x: i32| x as u32)
 			.collect();
-		let asset_id: Option<i32> = value.get(9);
+		let asset_id: Option<Uuid> = value.get(9);
 		let asset_name: Option<String> = value.get(10);
 		let asset_description: Option<String> = value.get(11);
 		let transaction_position_ids: Vec<Option<i32>> = value.get(12);
@@ -280,7 +280,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let mut asset: Option<Asset> = None;
 		if asset_id.is_some() {
 			asset = Some(Asset {
-				id: Some(asset_id.unwrap() as u32),
+				id: asset_id.unwrap(),
 				name: asset_name.unwrap(),
 				description: asset_description,
 				user_id: user_id as u32,

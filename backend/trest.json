@@ -2483,30 +2483,30 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%","user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "get single asset by id works",
-					"endpoint": "/api/v1/assets/0",
+					"endpoint": "/api/v1/assets/%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":0,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}
+						"body_equals": {"id":"%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%","user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}
 					}
 				},
 				{
 					"name": "attempting to get single asset with non existant id returns 404",
-					"endpoint": "/api/v1/assets/2",
+					"endpoint": "/api/v1/assets/ec1a88a8-84ff-4b73-946c-062233c9e84b",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 404,
-						"body_equals": {"error":"specified item of type asset not found with filter id=2"}
+						"body_equals": {"error":"specified item of type asset not found with filter id=ec1a88a8-84ff-4b73-946c-062233c9e84b"}
 					}
 				},
 				{
 					"name": "updating details of asset returns 200",
-					"endpoint": "/api/v1/assets/0",
+					"endpoint": "/api/v1/assets/%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"body": {
 						"name":"edited test",
@@ -2523,7 +2523,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"name":"edited test","description":"edited description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%","user_id":0,"name":"edited test","description":"edited description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
@@ -2531,7 +2531,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test2",
+						"name": "test 1",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2541,7 +2541,7 @@
 				},
 				{
 					"name": "deleting asset returns 200",
-					"endpoint": "/api/v1/assets/0",
+					"endpoint": "/api/v1/assets/%%%[[[post of new asset returns 200 1]]]...[[[id]]]%%%",
 					"method": "DELETE",
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -2553,12 +2553,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "post of valuation returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2577,16 +2577,16 @@
 				},
 				{
 					"name": "valuation got correctly saved 1",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1}]
+						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}]
 					}
 				},
 				{
 					"name": "post of valuation with cost returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2612,11 +2612,11 @@
 				},
 				{
 					"name": "valuation got correctly saved 2",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":1}]
+						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}]
 					}
 				},
 				{
@@ -2630,7 +2630,7 @@
 				},
 				{
 					"name": "post of valuation with account_id returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2663,12 +2663,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
 					"name": "post of valuation with account_id and cost returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2699,12 +2699,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
 					"name": "post of valuation with account_id, cost and lower amount returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2735,12 +2735,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
 					"name": "post of valuation with account_id, cost and amount_change returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2771,12 +2771,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
 					"name": "post of valuation with account_id, cost and negative amount_change returns 200",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -2807,21 +2807,21 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-24T11:22:00Z","total_amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":4,"amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
+						"body_equals": [{"id":0,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":0,"amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":1,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":1,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":2,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":2,"amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},{"id":3,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":3,"amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},{"id":4,"user_id":0,"currency_id":0,"account_id":0,"recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-24T11:22:00Z","total_amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":null,"amount":null,"tag_ids":null,"total_cost_of_ownership":null},"positions":[{"id":4,"amount":{"major":11,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]}]
 					}
 				},
 				{
 					"name": "valuation got correctly saved 3",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-20T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":30.0,"timestamp":"2023-03-21T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-22T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-23T11:22:00Z","asset_id":1},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-24T11:22:00Z","asset_id":1}]
+						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-20T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":30.0,"timestamp":"2023-03-21T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-22T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-23T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-24T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}]
 					}
 				},
 				{
 					"name": "replacing asset valuation history returns 200",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"method": "POST",
 					"body": [
 						{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":20.0,"timestamp":"2023-03-20T12:22:00Z"},
@@ -2834,14 +2834,14 @@
 				},
 				{
 					"name": "valuation got correctly overwritten",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
 						"body_equals": [
-							{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":20.0,"timestamp":"2023-03-20T12:22:00Z","asset_id":1},
-							{"value_per_unit":{"major": 1,"minor": 25,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z","asset_id":1},
-							{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":10.0,"timestamp":"2023-03-22T14:22:00Z","asset_id":1}
+							{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":20.0,"timestamp":"2023-03-20T12:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},
+							{"value_per_unit":{"major": 1,"minor": 25,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":-30.0,"timestamp":"2023-03-21T13:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},
+							{"value_per_unit":{"major": 1,"minor": 23,"minor_in_major": 100,"symbol": "€","is_negative": false},"amount":10.0,"timestamp":"2023-03-22T14:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}
 						]
 					}
 				},
@@ -2850,7 +2850,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test",
+						"name": "test 2",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2863,7 +2863,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test",
+						"name": "test 3",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2876,7 +2876,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test",
+						"name": "test 4",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2889,7 +2889,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test",
+						"name": "test 5",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2902,7 +2902,7 @@
 					"endpoint": "/api/v1/assets",
 					"method": "POST",
 					"body": {
-						"name": "test",
+						"name": "test 6",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -2916,7 +2916,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 3]]]...[[[id]]]%%%","user_id":0,"name":"test 3","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%","user_id":0,"name":"test 4","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 5]]]...[[[id]]]%%%","user_id":0,"name":"test 5","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 6]]]...[[[id]]]%%%","user_id":0,"name":"test 6","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
@@ -2925,79 +2925,34 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 3]]]...[[[id]]]%%%","user_id":0,"name":"test 3","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%","user_id":0,"name":"test 4","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id",
-					"endpoint": "/api/v1/assets/all?filter_id=4",
+					"endpoint": "/api/v1/assets/all?filter_id=%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%","user_id":0,"name":"test 4","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=exact",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=exact",
+					"endpoint": "/api/v1/assets/all?filter_id=%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%&filter_mode_id=exact",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%","user_id":0,"name":"test 4","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=not",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=not&timestamp=2023-11-27T11:22:00.000Z",
+					"endpoint": "/api/v1/assets/all?filter_id=%%%[[[post of new asset returns 200 4]]]...[[[id]]]%%%&filter_mode_id=not&timestamp=2023-11-27T11:22:00.000Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
-					}
-				},
-				{
-					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=less",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=less&timestamp=2023-11-27T11:22:00.000Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
-					}
-				},
-				{
-					"name": "retrieval of assets returns expected output when using filter_id and filter_mode_id=more",
-					"endpoint": "/api/v1/assets/all?filter_id=4&filter_mode_id=more&timestamp=2023-11-27T11:22:00.000Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null},{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0.0,"tag_ids":[],"total_cost_of_ownership":null}]
-					}
-				},
-				{
-					"name": "retrieval of assets returns expected output when using sort_property=id",
-					"endpoint": "/api/v1/assets/all?sort_property=id&timestamp=2023-11-27T11:22:00.000Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}}]
-					}
-				},
-				{
-					"name": "retrieval of assets returns expected output when using sort_property=id and sort_direction=DESC",
-					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=DESC&timestamp=2023-11-27T11:22:00.000Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}}]
-					}
-				},
-				{
-					"name": "retrieval of assets returns expected output when using sort_property=id and sort_direction=ASC",
-					"endpoint": "/api/v1/assets/all?sort_property=id&sort_direction=ASC&timestamp=2023-11-27T11:22:00.000Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [{"id":1,"user_id":0,"name":"test2","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}},{"id":2,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":3,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":4,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":5,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":6,"user_id":0,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":0,"name":"test 1","description":"description","currency_id":0,"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"tag_ids":[],"total_cost_of_ownership":{"total":{"major":4,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"monthly":{"major":0,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":false},"yearly":{"major":3,"minor":65,"minor_in_major":100,"symbol":"€","is_negative":false}}},{"id":"%%%[[[post of new asset returns 200 2]]]...[[[id]]]%%%","user_id":0,"name":"test 2","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 3]]]...[[[id]]]%%%","user_id":0,"name":"test 3","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 5]]]...[[[id]]]%%%","user_id":0,"name":"test 5","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null},{"id":"%%%[[[post of new asset returns 200 6]]]...[[[id]]]%%%","user_id":0,"name":"test 6","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
@@ -3024,7 +2979,7 @@
 						"accessToken": "$login_as_user.access_token"
 					},
 					"body": {
-						"name": "test",
+						"name": "test 7",
 						"description": "description",
 						"currency_id": 0
 					},
@@ -3044,12 +2999,12 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"id":7,"user_id":1,"name":"test","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
+						"body_equals": [{"id":"%%%[[[new user can post asset]]]...[[[id]]]%%%","user_id":1,"name":"test 7","description":"description","currency_id":0,"value_per_unit":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":0,"tag_ids":[],"total_cost_of_ownership":null}]
 					}
 				},
 				{
 					"name": "new user cant modify asset of other user",
-					"endpoint": "/api/v1/assets/1",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"before": [
 						"login_as_user"
@@ -3068,7 +3023,7 @@
 				},
 				{
 					"name": "new user cant get other users asset by id",
-					"endpoint": "/api/v1/assets/1",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%",
 					"before": [
 						"login_as_user"
 					],
@@ -3082,7 +3037,7 @@
 				},
 				{
 					"name": "new user cant get valuation history of other users asset by id",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"before": [
 						"login_as_user"
 					],
@@ -3096,7 +3051,7 @@
 				},
 				{
 					"name": "new user cant replace valuation history for other users asset",
-					"endpoint": "/api/v1/assets/1/valuation_history",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuation_history",
 					"before": [
 						"login_as_user"
 					],
@@ -3115,7 +3070,7 @@
 				},
 				{
 					"name": "new user cant post valuation for other users asset",
-					"endpoint": "/api/v1/assets/1/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"before": [
 						"login_as_user"
 					],
@@ -3148,7 +3103,7 @@
 				},
 				{
 					"name": "new user cant delete other users asset",
-					"endpoint": "/api/v1/assets/1",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%",
 					"before": [
 						"login_as_user"
 					],
