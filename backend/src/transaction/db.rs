@@ -88,7 +88,7 @@ pub struct TransactionDbWriter<'a> {
 	transaction: Transaction,
 }
 
-impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
+impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Transaction) -> Self {
 		Self {
 			pool,
@@ -96,12 +96,13 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
-		let transaction_id: i32 = self.pool.get()
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
+		self.pool.get()
 			.await?
 			.query(
-				"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7) RETURNING id;",
+				"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
 				&[
+					&self.transaction.id,
 					&(self.transaction.user_id as i32),
 					&self.transaction.account_id,
 					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
@@ -110,8 +111,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 					&self.transaction.timestamp,
 					&self.transaction.comment
 				])
-				.await?
-				[0].get(0);
+				.await?;
 		
 		if self.transaction.tag_ids.is_some() {
 			for tag_id in self.transaction.tag_ids.clone().unwrap() {
@@ -119,7 +119,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 					.await?
 					.query(
 						"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-						&[&transaction_id, &(tag_id as i32)]
+						&[&self.transaction.id, &(tag_id as i32)]
 					).await?;
 			}
 		}
@@ -129,7 +129,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				.await?
 				.query(
 					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-				&[&transaction_id, &self.transaction.asset.clone().unwrap().id]
+				&[&self.transaction.id, &self.transaction.asset.clone().unwrap().id]
 			).await?;
 		}
 
@@ -138,20 +138,16 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				.await?
 				.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&transaction_id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 
-		return Ok(transaction_id as u32);
+		return Ok(self.transaction.id);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
-		if self.transaction.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
-		}
-	
 		let old = super::TransactionLoader::new(self.pool)
-			.set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_id_uuid(self.transaction.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.transaction.user_id {
@@ -168,14 +164,14 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				&(self.transaction.status as i32),
 				&self.transaction.timestamp,
 				&self.transaction.comment,
-				&(self.transaction.id.unwrap() as i32)
+				&self.transaction.id,
 			]
 		)
 		.await?;
 		
 		client.query(
 			"DELETE FROM public.transaction_tags WHERE transaction_id=$1;",
-			&[&(self.transaction.id.unwrap() as i32)]
+			&[&self.transaction.id]
 		)
 		.await?;
 	
@@ -183,7 +179,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			for tag_id in self.transaction.tag_ids.clone().unwrap() {
 				client.query(
 					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-					&[&(self.transaction.id.unwrap() as i32), &(tag_id as i32)]
+					&[&self.transaction.id, &(tag_id as i32)]
 				)
 				.await?;
 			}
@@ -191,25 +187,25 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	
 		client.query(
 			"DELETE FROM public.asset_transactions WHERE transaction_id=$1;",
-			&[&(self.transaction.id.unwrap() as i32)]
+			&[&self.transaction.id]
 		).await?;
 	
 		if self.transaction.asset.is_some() {
 			client.query(
 					"INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES ($1, $2);", 
-				&[&(self.transaction.id.unwrap() as i32), &self.transaction.asset.clone().unwrap().id]
+				&[&self.transaction.id, &self.transaction.asset.clone().unwrap().id]
 			).await?;
 		}
 	
 		client.query(
 			"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
-			&[&(self.transaction.id.unwrap() as i32)]
+			&[&self.transaction.id]
 		).await?;
 	
 		for position in self.transaction.positions {
 			client.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&(self.transaction.id.unwrap() as i32), &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 	
@@ -217,14 +213,10 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	}
 }
 
-impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
+impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
-		if self.transaction.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("transaction") }));
-		}
-
 		let old = super::TransactionLoader::new(self.pool)
-			.set_filter_id(self.transaction.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_id_uuid(self.transaction.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.transaction.user_id {
@@ -235,7 +227,7 @@ impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 			.await?
 			.query(
 				"DELETE FROM public.transactions WHERE id=$1;", 
-				&[&(self.transaction.id.unwrap() as i32)]
+				&[&self.transaction.id]
 			)
 			.await?;
 
@@ -243,7 +235,7 @@ impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 				.await?
 				.query(
 				"DELETE FROM public.transaction_positions WHERE transaction_id=$1;", 
-				&[&(self.transaction.id.unwrap() as i32)]
+				&[&self.transaction.id]
 			).await?;
 
 		return Ok(());
@@ -253,7 +245,7 @@ impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 #[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Transaction {
 	fn from(value: tokio_postgres::Row) -> Transaction {
-		let id: i32 = value.get(0);
+		let id: Uuid = value.get(0);
 		let account_id: Uuid = value.get(1);
 		let currency_id: i32 = value.get(2);
 		let recipient_id: Uuid = value.get(3);
@@ -306,7 +298,7 @@ impl From<tokio_postgres::Row> for Transaction {
 			}).collect();
 
 		return Transaction::default()
-			.set_id(id as u32)
+			.set_id(id)
 			.set_user_id(user_id as u32)
 			.set_account_id(account_id)
 			.set_currency_id(currency_id as u32)

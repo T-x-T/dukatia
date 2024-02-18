@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="transaction.id" disabled>
+			<input type="string" v-model="transaction.id" disabled>
 		</label>
 
 		<div class="label_wrapper">
@@ -164,7 +164,7 @@ export default {
 			let res = {} as Budget;
 
 			try {
-				if(typeof this.transaction.id == "number") {
+				if(typeof this.transaction.id == "string" && this.transaction.id.length == 36) {
 					res = await $fetch(`/api/v1/transactions/${this.transaction.id}`, {
 						method: "PUT",
 						body: this.get_body(),

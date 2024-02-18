@@ -3,7 +3,7 @@
 		<table>
 			<colgroup>
 				<col v-if="tableData.multiSelect" class="multiselect">
-				<col v-for="(header, index) in tableData.columns" :key="index" :class="header.type">
+				<col v-for="(header, index) in tableData.columns.filter(x => !x.hidden)" :key="index" :class="header.type">
 			</colgroup>
 			<thead>
 				<tr>

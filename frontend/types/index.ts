@@ -60,7 +60,7 @@ declare global {
 		parent_id?: number,
 	}
 	type Transaction = {
-		id?: number,
+		id?: string,
 		user_id?: number,
 		currency_id?: number,
 		account_id: string,

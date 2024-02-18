@@ -12,7 +12,7 @@ struct RequestParameters {
 	max_results: Option<u32>,
 	sort_property: Option<String>,
 	sort_direction: Option<String>,
-	filter_id: Option<u32>,
+	filter_id: Option<Uuid>,
 	filter_mode_id: Option<String>,
 	filter_total_amount: Option<i32>,
 	filter_mode_total_amount: Option<String>,
@@ -71,7 +71,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters { 
-		id: request_parameters.filter_id.map(|x| {
+		id_uuid: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
@@ -130,7 +130,7 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters { 
-		id: request_parameters.filter_id.map(|x| {
+		id_uuid: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
@@ -178,14 +178,14 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/transactions/{transaction_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
-		.set_filter_id(*transaction_id, NumberFilterModes::Exact)
+		.set_filter_id_uuid(*transaction_id, NumberFilterModes::Exact)
 		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first().await;
 
@@ -236,10 +236,10 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
 		.set_positions(body.positions.clone())
-		.save(&data.pool).await;
+		.create(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
 		Err(e) => {
 			if e.to_string().starts_with("no item of type unknown found") {
 				return HttpResponse::BadRequest().body(format!("{{\"error\":\"specified item of type account not found with filter id={}\"}}", body.account_id));
@@ -251,7 +251,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 }
 
 #[put("/api/v1/transactions/{transaction_id}")]
-async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<u32>) -> impl Responder {
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -274,10 +274,10 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
 		.set_positions(body.positions.clone())
-		.save(&data.pool).await;
+		.update(&data.pool).await;
 
 		match result {
-			Ok(_) => return HttpResponse::Ok().body(""),
+			Ok(()) => return HttpResponse::Ok().body(""),
 			Err(e) => {
 				if e.to_string().starts_with("you can only access items you own") {
 					return HttpResponse::NotFound().body("");
@@ -289,7 +289,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 }
 
 #[delete("/api/v1/transactions/{transaction_id}")]
-async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
+async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))

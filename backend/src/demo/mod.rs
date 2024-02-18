@@ -39,7 +39,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	}
 
 	for transaction in get_transactions(user_id) {
-		transaction.save(pool).await?;
+		transaction.create(pool).await?;
 	}
 
 	return Ok(());

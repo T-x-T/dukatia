@@ -5,6 +5,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
+use uuid::Uuid;
 
 use crate::chart::{Dataset, OldIntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{CurrencyLoader, Currency};

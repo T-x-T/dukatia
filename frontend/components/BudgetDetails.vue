@@ -125,7 +125,7 @@ export default {
 							sort: "desc"
 						},
 						columns: [
-							{name: "ID", type: "number", sortable: false, no_filter: true},
+							{name: "ID", type: "number", sortable: false, no_filter: true, hidden: true},
 							{name: "Account", type: "string", sortable: false, no_filter: true},
 							{name: "Recipient", type: "string", sortable: false, no_filter: true},
 							{name: "Asset", type: "string", sortable: false, no_filter: true},

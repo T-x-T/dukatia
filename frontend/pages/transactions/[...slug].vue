@@ -126,7 +126,7 @@ export default {
 		if (useRoute().path.split("/")[2] == "new") {
 			this.$nextTick(() => this.newTransaction());
 		} else if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(Number(useRoute().path.split("/")[2]))) {
-			const id = Number(useRoute().path.split("/")[2]);
+			const id = useRoute().path.split("/")[2];
 			if(this.transactions.filter(x => x.id === id).length === 0) {
 				this.transactions.push(await $fetch(`/api/v1/transactions/${id}`));
 			}
@@ -134,7 +134,7 @@ export default {
 		}
 
 		this.default_transaction = {
-			account_id: 0,
+			account_id: "",
 			currency_id: 0,
 			recipient_id: "",
 			tag_ids: [],
@@ -181,7 +181,7 @@ export default {
 						sort: "desc"
 					},
 					columns: [
-						{name: "ID", type: "number", sortable: true},
+						{name: "ID", type: "number", sortable: true, hidden: true},
 						{name: "Account", type: "choice", sortable: true, options: this.accounts.map(x => ({id: x.id, name: x.name}))},
 						{name: "Recipient", type: "choice", sortable: true, options: this.recipients.map(x => ({id: x.id, name: x.name}))},
 						{name: "Asset", type: "choice", options: this.assets.map(x => ({id: x.id, name: x.name}))},
@@ -201,7 +201,7 @@ export default {
 			this.openDetailPage(row[0]);
 		},
 
-		openDetailPage(transaction_id: number) {
+		openDetailPage(transaction_id: string) {
 			const transaction = this.transactions.filter(x => x.id === transaction_id)[0];
 			this.selectedRow = {...transaction, timestamp: transaction.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
@@ -231,9 +231,9 @@ export default {
 			if(!this.selectedRows) return;
 			await Promise.all(this.selectedRows.map(async row => {
 				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
-				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
+				transaction.account_id = typeof this.batchaccount_id == "string" ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = typeof this.batchrecipient_id == "string" ? this.batchrecipient_id : transaction.recipient_id;
-				transaction.asset_id = typeof this.batchasset_id == "string"  ? this.batchasset_id : transaction.asset_id;
+				transaction.asset_id = typeof this.batchasset_id == "string" ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {
@@ -424,7 +424,7 @@ export default {
 				&sort_property=${this.query_parameters.sort_property}
 				&sort_direction=${this.query_parameters.sort_direction}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_id) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(this.query_parameters.filter_asset_id) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
 			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;

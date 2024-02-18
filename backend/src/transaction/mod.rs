@@ -22,7 +22,7 @@ pub enum TransactionStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Position {
-	pub id: Option<u32>,
+	pub id: Option<u32>, //TODO: dont forget this
 	pub amount: Money,
 	pub comment: Option<String>,
 	pub tag_id: Option<u32>,
@@ -36,7 +36,7 @@ pub struct TransactionSummary {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Transaction {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub user_id: u32,
 	pub currency_id: Option<u32>,
 	pub account_id: Uuid,
@@ -53,7 +53,7 @@ pub struct Transaction {
 impl Default for Transaction {
 	fn default() -> Self {
 		Self { 
-			id: None,
+			id: Uuid::new_v4(),
 			user_id: 0,
 			currency_id: None,
 			account_id: Uuid::nil(),
@@ -69,33 +69,37 @@ impl Default for Transaction {
 	}
 }
 
-impl Save for Transaction {
-	async fn save(mut self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		let account = account::AccountLoader::new(pool).set_filter_id_uuid(self.account_id, NumberFilterModes::Exact).get_first().await?;
+impl Create for Transaction {
+	async fn create(mut self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		let account = account::AccountLoader::new(pool)
+			.set_filter_id_uuid(self.account_id, NumberFilterModes::Exact)
+			.get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 
-		match self.id {
-			Some(id) => {
-				db::TransactionDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::TransactionDbWriter::new(pool, self).insert().await
-		}
+		return db::TransactionDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Transaction {
+	async fn update(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		let account = account::AccountLoader::new(pool)
+			.set_filter_id_uuid(self.account_id, NumberFilterModes::Exact)
+			.get_first().await?;
+		self = self.set_currency_id(account.default_currency_id);
+
+		return db::TransactionDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Delete for Transaction {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
-		}
+		return db::TransactionDbWriter::new(pool, self).delete().await;
 	}
 }
 
 impl Transaction {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 

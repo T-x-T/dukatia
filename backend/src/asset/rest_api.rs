@@ -406,7 +406,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 			amount,
 			..Default::default()
 		}])
-		.save(pool).await?;
+		.create(pool).await?;
 
 	return Ok(());
 }
