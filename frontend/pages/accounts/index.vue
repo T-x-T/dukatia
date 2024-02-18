@@ -36,7 +36,7 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
+				{name: "ID", type: "string", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Currency", type: "choice", options: currencies.map(x => ({id: x.id, name: x.name}))},
 				{name: "Tags", type: "choice", options: (tags.map(x => ({id: x.id, name: x.name})))},

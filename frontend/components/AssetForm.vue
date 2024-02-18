@@ -2,7 +2,7 @@
 	<div id="wrapper">
 		<label>
 			ID:
-			<input type="number" v-model="asset.id" disabled>
+			<input type="string" v-model="asset.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -86,7 +86,7 @@ export default {
 			let res = {} as Asset;
 
 			try {
-				if(typeof this.asset.id == "number") {
+				if(typeof this.asset.id == "string" && this.asset.id.length == 36) {
 					res = await $fetch(`/api/v1/assets/${this.asset.id}`, {
 						method: "PUT",
 						body: this.get_body(),

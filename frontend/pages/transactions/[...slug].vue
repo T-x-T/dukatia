@@ -432,7 +432,7 @@ export default {
 			if(this.query_parameters.filter_mode_user_id) url += `&filter_mode_user_id=${this.query_parameters.filter_mode_user_id}`;
 			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
-			if(Number.isInteger(this.query_parameters.filter_account_id)) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
+			if(this.query_parameters.filter_account_id) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
 			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
 			if(this.query_parameters.filter_recipient_id) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;

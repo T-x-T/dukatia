@@ -103,7 +103,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7) RETURNING id;",
 				&[
 					&(self.transaction.user_id as i32),
-					&(self.transaction.account_id as i32),
+					&self.transaction.account_id,
 					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
 					&self.transaction.recipient_id,
 					&(self.transaction.status as i32),
@@ -162,7 +162,7 @@ impl<'a> OldDbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	
 		client.query(
 			"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
-			&[&(self.transaction.account_id as i32),
+			&[&self.transaction.account_id,
 				&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
 				&self.transaction.recipient_id,
 				&(self.transaction.status as i32),
@@ -254,7 +254,7 @@ impl<'a> OldDbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 impl From<tokio_postgres::Row> for Transaction {
 	fn from(value: tokio_postgres::Row) -> Transaction {
 		let id: i32 = value.get(0);
-		let account_id: i32 = value.get(1);
+		let account_id: Uuid = value.get(1);
 		let currency_id: i32 = value.get(2);
 		let recipient_id: Uuid = value.get(3);
 		let status: i32 = value.get(4);
@@ -308,7 +308,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		return Transaction::default()
 			.set_id(id as u32)
 			.set_user_id(user_id as u32)
-			.set_account_id(account_id as u32)
+			.set_account_id(account_id)
 			.set_currency_id(currency_id as u32)
 			.set_recipient_id(recipient_id)
 			.set_status(match status {

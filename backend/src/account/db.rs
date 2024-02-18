@@ -1,5 +1,6 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use super::super::CustomError;
 use super::Account;
 use crate::traits::*;
@@ -49,7 +50,7 @@ pub struct AccountDbWriter<'a> {
 	account: Account,
 }
 
-impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
+impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Account) -> Self {
 		Self {
 			pool,
@@ -57,31 +58,26 @@ impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
 		let client = self.pool.get().await?;
-		let id: i32 = client
+		client
 			.query(
-				"INSERT INTO public.accounts (id, name, default_currency_id, user_id) VALUES (DEFAULT, $1, $2, $3) RETURNING id;",
-				&[&self.account.name, &(self.account.default_currency_id as i32), &(self.account.user_id as i32)]
+				"INSERT INTO public.accounts (id, name, default_currency_id, user_id) VALUES ($1, $2, $3, $4);",
+				&[&self.account.id, &self.account.name, &(self.account.default_currency_id as i32), &(self.account.user_id as i32)]
 			)
-			.await?
-			 [0].get(0);
+			.await?;
 			 
 		if self.account.tag_ids.is_some() {
 			for tag_id in self.account.clone().tag_ids.unwrap() {
-				client.query("INSERT INTO public.account_tags (account_id, tag_id) VALUES ($1, $2);", &[&id, &(tag_id as i32)]).await?;
+				client.query("INSERT INTO public.account_tags (account_id, tag_id) VALUES ($1, $2);", &[&self.account.id, &(tag_id as i32)]).await?;
 			}
 		}
-		return Ok(id as u32);
+		return Ok(self.account.id);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
-		if self.account.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("account") }));
-		}
-	
 		let old = super::AccountLoader::new(self.pool)
-			.set_filter_id(self.account.id.unwrap(), NumberFilterModes::Exact)
+			.set_filter_id_uuid(self.account.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.account.user_id {
@@ -92,13 +88,13 @@ impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
 	
 		client.query(
 			"UPDATE public.accounts SET name=$1, default_currency_id=$2 WHERE id=$3;",
-			&[&self.account.name, &(self.account.default_currency_id as i32), &(self.account.id.unwrap() as i32)]
+			&[&self.account.name, &(self.account.default_currency_id as i32), &self.account.id]
 		)
 		.await?;
 	
 		client.query(
 			"DELETE FROM public.account_tags WHERE account_id=$1;",
-			&[&(self.account.id.unwrap() as i32)]
+			&[&self.account.id]
 		)
 		.await?;
 	
@@ -106,7 +102,7 @@ impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
 			for tag_id in self.account.tag_ids.clone().unwrap() {
 				client.query(
 					"INSERT INTO public.account_tags (account_id, tag_id) VALUES ($1, $2);",
-					&[&(self.account.id.unwrap() as i32), &(tag_id as i32)]
+					&[&self.account.id, &(tag_id as i32)]
 				)
 				.await?;
 			}
@@ -119,7 +115,7 @@ impl<'a> OldDbWriter<'a, Account> for AccountDbWriter<'a> {
 #[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Account {
 	fn from(value: tokio_postgres::Row) -> Self {
-		let id: i32 = value.get(0);
+		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
 		let default_currency_id: i32 = value.get(2);
 		let user_id: i32 = value.try_get(3).unwrap_or(0);
@@ -132,7 +128,7 @@ impl From<tokio_postgres::Row> for Account {
 		let balance: Option<i64> = value.get(5);
 	
 		return Account {
-			id: Some(id as u32),
+			id,
 			name,
 			default_currency_id: default_currency_id as u32,
 			user_id: user_id as u32,

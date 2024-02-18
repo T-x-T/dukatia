@@ -131,7 +131,7 @@ pub struct Filters {
 	pub asset_id: Option<(Uuid, NumberFilterModes)>,
 	pub user_id: Option<(u32, NumberFilterModes)>,
 	pub currency_id: Option<(u32, NumberFilterModes)>,
-	pub account_id: Option<(u32, NumberFilterModes)>,
+	pub account_id: Option<(Uuid, NumberFilterModes)>,
 	pub recipient_id: Option<(Uuid, NumberFilterModes)>,
 	pub tag_id: Option<(u32, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
@@ -298,7 +298,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_account_id(self, account_id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_account_id(self, account_id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.account_id = Some((account_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
@@ -503,7 +503,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.account_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.account_id.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.account_id.unwrap().0));
 			i += 1;
 		}
 		

@@ -39,7 +39,7 @@ pub struct Transaction {
 	pub id: Option<u32>,
 	pub user_id: u32,
 	pub currency_id: Option<u32>,
-	pub account_id: u32,
+	pub account_id: Uuid,
 	pub recipient_id: Uuid,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
@@ -56,7 +56,7 @@ impl Default for Transaction {
 			id: None,
 			user_id: 0,
 			currency_id: None,
-			account_id: 0,
+			account_id: Uuid::nil(),
 			recipient_id: Uuid::nil(),
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
@@ -71,7 +71,7 @@ impl Default for Transaction {
 
 impl Save for Transaction {
 	async fn save(mut self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		let account = account::AccountLoader::new(pool).set_filter_id(self.account_id, NumberFilterModes::Exact).get_first().await?;
+		let account = account::AccountLoader::new(pool).set_filter_id_uuid(self.account_id, NumberFilterModes::Exact).get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 
 		match self.id {
@@ -109,7 +109,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_account_id(mut self, account_id: u32) -> Self {
+	pub fn set_account_id(mut self, account_id: Uuid) -> Self {
 		self.account_id = account_id;
 		return self;
 	}

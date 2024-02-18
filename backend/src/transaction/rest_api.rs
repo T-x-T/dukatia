@@ -20,7 +20,7 @@ struct RequestParameters {
 	filter_mode_asset_id: Option<String>,
 	filter_currency_id: Option<u32>,
 	filter_mode_currency_id: Option<String>,
-	filter_account_id: Option<u32>,
+	filter_account_id: Option<Uuid>,
 	filter_mode_account_id: Option<String>,
 	filter_recipient_id: Option<Uuid>,
 	filter_mode_recipient_id: Option<String>,
@@ -203,7 +203,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 
 #[derive(Deserialize)]
 struct TransactionPost {
-	account_id: u32,
+	account_id: Uuid,
 	recipient_id: Uuid,
 	status: u8,
 	timestamp: DateTime<Utc>,

@@ -254,7 +254,7 @@ struct AssetValuationPost {
 	timestamp: DateTime<Utc>,
 	cost: Option<Money>,
 	total_value: Option<Money>,
-	account_id: Option<u32>,
+	account_id: Option<Uuid>,
 }
 
 #[post("/api/v1/assets/{asset_id}/valuation_history")]

@@ -2,26 +2,27 @@
 mod test;
 
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
 
-use crate::chart::{Dataset, OldIntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, IntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{AccountLoader, Account};
 use crate::money::Money;
 use crate::transaction::Transaction;
 use crate::traits::*;
 
-pub async fn get_per_account_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
+pub async fn get_per_account_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let accounts = AccountLoader::new(pool).get().await?;
 
 	return Ok(calculate_get_per_account_over_time(&options, transactions, &accounts));
 }
 
-fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec<Transaction>, accounts: &[Account]) -> OldIntermediateChartData {
-	let mut output = OldIntermediateChartData::default();
-	let mut datasets_monetary: BTreeMap<u32, Vec<DataPointMonetary>> = BTreeMap::new();
+fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec<Transaction>, accounts: &[Account]) -> IntermediateChartData {
+	let mut output = IntermediateChartData::default();
+	let mut datasets_monetary: BTreeMap<Uuid, Vec<DataPointMonetary>> = BTreeMap::new();
 
 	let default = DataPointMonetary::default();
 	for transaction in transactions {
@@ -46,7 +47,7 @@ fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec
 		}
 	}
 
-	let mut datasets: BTreeMap<u32, Vec<DataPoint>> = BTreeMap::new();
+	let mut datasets: BTreeMap<Uuid, Vec<DataPoint>> = BTreeMap::new();
 
 	for dataset in datasets_monetary {
 		for data_point in dataset.1 {
@@ -64,7 +65,7 @@ fn calculate_get_per_account_over_time(options: &ChartOptions, transactions: Vec
 	output.datasets = BTreeMap::new();
 	for dataset in datasets {
 		let name: String = accounts.iter()
-			.filter(|x| x.id.unwrap_or_default() == dataset.0)
+			.filter(|x| x.id == dataset.0)
 			.map(|x| x.name.clone())
 			.collect();
 

@@ -19,7 +19,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	}
 
 	for account in get_accounts(user_id) {
-		account.save(pool).await?;
+		account.create(pool).await?;
 	}
 
 	for tag in get_tags(user_id) {

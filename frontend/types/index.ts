@@ -2,7 +2,7 @@ export default {};
 
 declare global {
 	type Account = {
-		id?: number,
+		id?: string,
 		name: string,
 		default_currency_id?: number,
 		user_id?: number,
@@ -63,7 +63,7 @@ declare global {
 		id?: number,
 		user_id?: number,
 		currency_id?: number,
-		account_id: number,
+		account_id: string,
 		recipient_id: string,
 		status: TransactionStatus,
 		timestamp: string,
@@ -252,7 +252,7 @@ declare global {
 		filter_mode_user_id?: string,
 		filter_currency_id?: number,
 		filter_mode_currency_id?: string,
-		filter_account_id?: number,
+		filter_account_id?: string,
 		filter_mode_account_id?: string,
 		filter_recipient_id?: number,
 		filter_mode_recipient_id?: string,

@@ -5,11 +5,12 @@ pub mod chart;
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Account {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
 	pub default_currency_id: u32,
 	pub user_id: u32,
@@ -17,21 +18,34 @@ pub struct Account {
 	pub balance: Option<i64>,
 }
 
-impl Save for Account {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::AccountDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::AccountDbWriter::new(pool, self).insert().await,
+impl Default for Account {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			name: String::new(),
+			default_currency_id: 0,
+			user_id: 0,
+			tag_ids: None, 
+			balance: None
 		}
 	}
 }
 
+impl Create for Account {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::AccountDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Account {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::AccountDbWriter::new(pool, self).replace().await;
+	}
+}
+
 impl Account {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
