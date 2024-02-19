@@ -818,3 +818,81 @@ CREATE INDEX transaction_positions_index_transaction_id
   (transaction_id ASC NULLS LAST)
   WITH (deduplicate_items=True)
   TABLESPACE pg_default;
+
+
+
+
+-- Positions
+ALTER TABLE IF EXISTS public.transaction_positions
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.transaction_positions
+	ADD CONSTRAINT transaction_positions_unique_new_id UNIQUE (new_id);
+
+
+DROP VIEW IF EXISTS public.account_data;
+DROP VIEW IF EXISTS public.transaction_data;
+
+ALTER TABLE IF EXISTS public.transaction_positions DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.transaction_positions
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.transaction_positions
+	ADD PRIMARY KEY (id);
+
+CREATE OR REPLACE VIEW public.transaction_data
+ AS
+ SELECT tr.id,
+    tr.account_id,
+    tr.currency_id,
+    tr.recipient_id,
+    tr.status,
+    tr.user_id,
+    tr."timestamp",
+    tr.comment,
+    array_agg(t.tag_id) AS tags,
+    a.id AS asset_id,
+    a.name AS asset_name,
+    a.description AS asset_description,
+    ( SELECT array_agg(p.id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_ids,
+    ( SELECT array_agg(p.amount) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_amounts,
+    ( SELECT array_agg(p.comment) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_comments,
+    ( SELECT array_agg(p.tag_id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_tag_ids,
+    ( SELECT sum(p.amount) AS sum
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS total_amount,
+    c.minor_in_major,
+    c.symbol
+   FROM transactions tr
+     LEFT JOIN transaction_tags t ON tr.id = t.transaction_id
+     LEFT JOIN asset_transactions at ON at.transaction_id = tr.id
+     LEFT JOIN assets a ON a.id = at.asset_id
+     LEFT JOIN currencies c ON c.id = tr.currency_id
+  GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
+  ORDER BY tr."timestamp" DESC, tr.comment;
+ALTER TABLE public.transaction_data
+    OWNER TO postgres;
+GRANT ALL ON TABLE public.transaction_data TO postgres;
+
+CREATE OR REPLACE VIEW public.account_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.default_currency_id,
+    a.user_id,
+    array_agg(DISTINCT t.tag_id) AS tags,
+    sum(tr.total_amount)::bigint AS balance
+   FROM accounts a
+     LEFT JOIN account_tags t ON a.id = t.account_id
+     LEFT JOIN transaction_data tr ON a.id = tr.account_id
+  GROUP BY a.id
+  ORDER BY a.name;
+ALTER TABLE public.account_data
+    OWNER TO postgres;
+GRANT ALL ON TABLE public.account_data TO postgres;

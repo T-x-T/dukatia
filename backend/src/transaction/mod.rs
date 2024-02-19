@@ -20,12 +20,23 @@ pub enum TransactionStatus {
 	Completed = 1,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Position {
-	pub id: Option<u32>, //TODO: dont forget this
+	pub id: Uuid,
 	pub amount: Money,
 	pub comment: Option<String>,
 	pub tag_id: Option<u32>,
+}
+
+impl Default for Position {
+	fn default() -> Self {
+		return Self { 
+			id: Uuid::new_v4(),
+			amount: Money::default(),
+			comment: None,
+			tag_id: None,
+		};
+	}
 }
 
 #[derive(Debug, Clone, Serialize)]

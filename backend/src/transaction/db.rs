@@ -137,8 +137,8 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 			self.pool.get()
 				.await?
 				.query(
-					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES ($1, $2, $3, $4, $5);", 
+					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 
@@ -204,8 +204,8 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 	
 		for position in self.transaction.positions {
 			client.query(
-					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES (DEFAULT, $1, $2, $3, $4);", 
-					&[&self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES ($1, $2, $3, $4, $5);", 
+					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
 				).await?;
 		}
 	
@@ -261,7 +261,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let asset_id: Option<Uuid> = value.get(9);
 		let asset_name: Option<String> = value.get(10);
 		let asset_description: Option<String> = value.get(11);
-		let transaction_position_ids: Vec<Option<i32>> = value.get(12);
+		let transaction_position_ids: Vec<Uuid> = value.get(12);
 		let transaction_position_amounts: Vec<Option<i32>> = value.get(13);
 		let transaction_position_comments: Vec<Option<String>> = value.get(14);
 		let transaction_position_tag_ids: Vec<Option<i32>> = value.get(15);
@@ -286,11 +286,10 @@ impl From<tokio_postgres::Row> for Transaction {
 
 		let positions: Vec<Position> = transaction_position_ids
 			.into_iter()
-			.flatten()
 			.enumerate()
 			.map(|(i, transaction_position_id)| {
 				Position {
-					id: Some(transaction_position_id as u32),
+					id: transaction_position_id,
 					amount: Money::from_amount(transaction_position_amounts[i].unwrap(), minor_in_major as u32, symbol.clone()),
 					comment: transaction_position_comments[i].clone(),
 					tag_id: transaction_position_tag_ids[i].map(|x| x as u32),

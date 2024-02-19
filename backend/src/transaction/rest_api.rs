@@ -201,7 +201,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 	}
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Debug)]
 struct TransactionPost {
 	account_id: Uuid,
 	recipient_id: Uuid,
@@ -210,7 +210,14 @@ struct TransactionPost {
 	comment: Option<String>,
 	tag_ids: Option<Vec<u32>>,
 	asset_id: Option<Uuid>,
-	positions: Vec<super::Position>,
+	positions: Vec<PositionPost>,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+struct PositionPost {
+	amount: super::Money,
+	comment: Option<String>,
+	tag_id: Option<u32>,
 }
 
 #[post("/api/v1/transactions")]
@@ -235,7 +242,18 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		.set_comment_opt(body.comment.clone())
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
+		.set_positions(
+			body.positions
+				.clone()
+				.into_iter()
+				.map(|x| super::Position {
+					amount: x.amount,
+					comment: x.comment,
+					tag_id: x.tag_id,
+					..Default::default()
+				})
+				.collect()
+			)
 		.create(&data.pool).await;
 
 	match result {
@@ -273,7 +291,18 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		.set_comment_opt(body.comment.clone())
 		.set_tag_ids_opt(body.tag_ids.clone())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
+		.set_positions(
+			body.positions
+				.clone()
+				.into_iter()
+				.map(|x| super::Position {
+					amount: x.amount,
+					comment: x.comment,
+					tag_id: x.tag_id,
+					..Default::default()
+				})
+				.collect()
+			)
 		.update(&data.pool).await;
 
 		match result {
