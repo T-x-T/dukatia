@@ -896,3 +896,16 @@ CREATE OR REPLACE VIEW public.account_data
 ALTER TABLE public.account_data
     OWNER TO postgres;
 GRANT ALL ON TABLE public.account_data TO postgres;
+
+
+
+-- access_tokens
+ALTER TABLE IF EXISTS public.access_tokens
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.access_tokens
+	ADD CONSTRAINT access_tokens_unique_new_id UNIQUE (new_id);
+ALTER TABLE IF EXISTS public.access_tokens DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.access_tokens
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.access_tokens
+	ADD PRIMARY KEY (id);
