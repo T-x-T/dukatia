@@ -1,7 +1,6 @@
 mod db;
 pub mod rest_api;
 
-
 #[cfg(test)]
 mod test;
 
@@ -23,9 +22,9 @@ use deadpool_postgres::Pool;
 use chrono::prelude::*;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ChartOptions {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub user_id: u32,
 	pub chart_type: String,
 	pub title: String,
@@ -43,6 +42,31 @@ pub struct ChartOptions {
 	pub top_left_y: Option<u32>,
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
+}
+
+impl Default for ChartOptions {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			user_id: 0,
+			chart_type: String::new(),
+			title: String::new(),
+			filter_from: None,
+			filter_to: None,
+			filter_collection: None,
+			date_period: None,
+			asset_id: None,
+			budget_id: None,
+			max_items: None,
+			date_range: None,
+			only_positive: None,
+			only_negative: None,
+			top_left_x: None,
+			top_left_y: None,
+			bottom_right_x: None,
+			bottom_right_y: None
+		}		 
+	}
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -90,7 +114,7 @@ pub struct DataPointMonetaryMultiCurrency {
 	pub label: String,
 }
 
-pub async fn get_by_id(pool: &Pool, id: u32, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
+pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
 	return db::get_by_id(pool, id, user_id).await;
 }
 
@@ -106,7 +130,7 @@ pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Err
 	return db::update(pool, chart).await;
 }
 
-pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
+pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
 	return db::delete(pool, chart_id).await;
 }
 

@@ -190,7 +190,7 @@ export default {
 		},
 
 		async save(chart: ChartOptions) {
-			if(Number.isInteger(chart.id)) {
+			if(typeof chart.id == "string" && chart.id.length == 36) {
 				await $fetch(`/api/v1/charts/${chart.id}`, {
 					method: "PUT", body: {
 						...chart,

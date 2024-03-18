@@ -7,7 +7,7 @@ use crate::webserver::{AppState, is_authorized};
 
 
 #[get("/api/v1/charts/{chart_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -48,7 +48,7 @@ struct ChartOptionsQuery {
 }
 
 #[get("/api/v1/charts/{chart_id}/data")]
-async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>, options: web::Query<ChartOptionsQuery>) -> impl Responder {
+async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<Uuid>, options: web::Query<ChartOptionsQuery>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -101,7 +101,7 @@ async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: Htt
 	};
 
 	let chart_options = super::ChartOptions {
-		id: None,
+		id: Uuid::nil(),
 		user_id,
 		chart_type: String::new(),
 		title: options.filter_collection.clone().unwrap_or_default(),
@@ -153,7 +153,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 	};
 	let body = body.into_inner();
 	let chart = super::ChartOptions {
-		id: None,
+		id: Uuid::new_v4(),
 		user_id,
 		chart_type: body.chart_type,
 		title: body.title,
@@ -180,14 +180,14 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 }
 
 #[put("/api/v1/charts/{chart_id}")]
-async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>, chart_id: web::Path<u32>) -> impl Responder {
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartPost>, chart_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 	let body = body.into_inner();
 	let chart = super::ChartOptions {
-		id: Some(chart_id.into_inner()),
+		id: *chart_id,
 		user_id,
 		chart_type: body.chart_type,
 		title: body.title,
@@ -214,7 +214,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 }
 
 #[delete("/api/v1/charts/{chart_id}")]
-async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<u32>) -> impl Responder {
+async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<Uuid>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))

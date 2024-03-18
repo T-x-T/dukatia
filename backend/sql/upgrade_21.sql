@@ -909,3 +909,38 @@ ALTER TABLE IF EXISTS public.access_tokens
 	RENAME new_id TO id;
 ALTER TABLE IF EXISTS public.access_tokens
 	ADD PRIMARY KEY (id);
+
+
+
+-- charts
+ALTER TABLE IF EXISTS public.charts
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.charts
+	ADD CONSTRAINT charts_unique_new_id UNIQUE (new_id);
+
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD COLUMN new_chart_id uuid;
+UPDATE public.dashboard_charts
+	SET new_chart_id = (
+		SELECT new_id FROM public.charts WHERE id = chart_id
+	);
+ALTER TABLE IF EXISTS public.dashboard_charts 
+	DROP COLUMN IF EXISTS chart_id;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	RENAME new_chart_id TO chart_id;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ALTER COLUMN chart_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD CONSTRAINT chart_id FOREIGN KEY (chart_id)
+	REFERENCES public.charts (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD PRIMARY KEY (chart_id, dashboard_id);
+
+ALTER TABLE IF EXISTS public.charts DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.charts
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.charts
+	ADD PRIMARY KEY (id);

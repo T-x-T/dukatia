@@ -221,7 +221,7 @@ declare global {
 	}
 
 	type ChartOptions = {
-		id?: number,
+		id?: string,
 		chart_type: "table" | "pie" | "line",
 		title: string,
 		text_template?: string,
