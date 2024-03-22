@@ -28,13 +28,13 @@ pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: u32) -> Result<ChartOptio
 		return Ok(chart_options);
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	let res = pool.get()
 		.await
 		.unwrap()
 		.query(
 			"SELECT * FROM public.charts c LEFT JOIN public.dashboard_charts dc ON c.id = dc.chart_id WHERE dc.dashboard_id = $1", 
-			&[&(dashboard_id as i32)]
+			&[&dashboard_id]
 		).await?;
 
 	return Ok(

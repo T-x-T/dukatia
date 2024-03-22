@@ -944,3 +944,38 @@ ALTER TABLE IF EXISTS public.charts
 	RENAME new_id TO id;
 ALTER TABLE IF EXISTS public.charts
 	ADD PRIMARY KEY (id);
+
+
+
+-- dashboards
+ALTER TABLE IF EXISTS public.dashboards
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.dashboards
+	ADD CONSTRAINT dashboards_unique_new_id UNIQUE (new_id);
+
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD COLUMN new_dashboard_id uuid;
+UPDATE public.dashboard_charts
+	SET new_dashboard_id = (
+		SELECT new_id FROM public.dashboards WHERE id = dashboard_id
+	);
+ALTER TABLE IF EXISTS public.dashboard_charts 
+	DROP COLUMN IF EXISTS dashboard_id;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	RENAME new_dashboard_id TO dashboard_id;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ALTER COLUMN dashboard_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD CONSTRAINT dashboard_id FOREIGN KEY (dashboard_id)
+	REFERENCES public.dashboards (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+	NOT VALID;
+ALTER TABLE IF EXISTS public.dashboard_charts
+	ADD PRIMARY KEY (chart_id, dashboard_id);
+
+ALTER TABLE IF EXISTS public.dashboards DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.dashboards
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.dashboards
+	ADD PRIMARY KEY (id);
