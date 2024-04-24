@@ -6,7 +6,7 @@ declare global {
 		name: string,
 		default_currency_id?: number,
 		user_id?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		default_currency?: Currency,
 		balance?: number,
 	}
@@ -28,7 +28,7 @@ declare global {
 		currency_id: number,
 		value_per_unit?: Money,
 		amount?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		currency?: Currency,
 		total_cost_of_ownership?: TotalCostOfOwnership,
 	}
@@ -50,14 +50,14 @@ declare global {
 		id?: string,
 		name: string,
 		user_id?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 	}
 
 	type Tag = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
-		parent_id?: number,
+		parent_id?: string,
 	}
 	type Transaction = {
 		id?: string,
@@ -69,7 +69,7 @@ declare global {
 		timestamp: string,
 		total_amount: Money,
 		comment?: string,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		asset?: Asset,
 		account?: Account,
 		currency?: Currency,
@@ -83,7 +83,7 @@ declare global {
 		id?: number,
 		amount: Money,
 		comment?: string,
-		tag_id?: number,
+		tag_id?: string,
 	}
 
 	type Budget = {
@@ -93,7 +93,7 @@ declare global {
 		amount: Money,
 		rollover: boolean,
 		period: number,
-		filter_tag_ids: number[],
+		filter_tag_ids: string[],
 		currency_id: number,
 		active_from: Date,
 		active_to?: Date,
@@ -117,8 +117,8 @@ declare global {
 	}
 
 	type SelectData = {
-		options: {id: number, name: string}[],
-		selected?: number[],
+		options: {id: number | string, name: string}[],
+		selected?: number[] | string[],
 		label: string,
 		openTop?: boolean
 	}
@@ -256,7 +256,7 @@ declare global {
 		filter_mode_account_id?: string,
 		filter_recipient_id?: number,
 		filter_mode_recipient_id?: string,
-		filter_tag_id?: number,
+		filter_tag_id?: string,
 		filter_mode_tag_id?: string,
 		filter_total_amount?: number,
 		filter_mode_total_amount?: string,
@@ -283,7 +283,7 @@ declare global {
 		filter_mode_value_per_unit?: string,
 		filter_rollover?: boolean,
 		filter_mode_rollover?: string,
-		filter_filter_tag_id?: number,
+		filter_filter_tag_id?: string,
 		filter_mode_filter_tag_id?: string,
 		filter_lower_active_from?: Date,
 		filter_upper_active_from?: Date,

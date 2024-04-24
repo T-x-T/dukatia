@@ -34,7 +34,7 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
+				{name: "ID", type: "number", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Parent", type: "choice", options: tags.map(x => ({id: x.id, name: x.name}))},
 			],
@@ -126,9 +126,9 @@ export default {
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_id) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
-			if(Number.isInteger(this.query_parameters.filter_parent_id)) url += `&filter_parent_id=${this.query_parameters.filter_parent_id}`;
+			if(this.query_parameters.filter_parent_id) url += `&filter_parent_id=${this.query_parameters.filter_parent_id}`;
 			if(this.query_parameters.filter_mode_parent_id) url += `&filter_mode_parent_id=${this.query_parameters.filter_mode_parent_id}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;

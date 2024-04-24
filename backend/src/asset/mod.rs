@@ -29,7 +29,7 @@ pub struct Asset {
 	pub currency_id: u32,
 	pub value_per_unit: Option<Money>,
 	pub amount: Option<f64>,
-	pub tag_ids: Option<Vec<u32>>,
+	pub tag_ids: Vec<Uuid>,
 	pub total_cost_of_ownership: Option<TotalCostOfOwnership>,
 }
 
@@ -43,7 +43,7 @@ impl Default for Asset {
 			currency_id: 0,
 			value_per_unit: None,
 			amount: None,
-			tag_ids: None,
+			tag_ids: Vec::new(),
 			total_cost_of_ownership: None,
 		};
 	}
@@ -99,13 +99,7 @@ impl Asset {
 		return self;
 	}
 
-	#[allow(dead_code)]
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

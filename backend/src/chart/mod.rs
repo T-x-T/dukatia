@@ -137,7 +137,6 @@ pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
 pub async fn get_chart_data_old(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
 		"get_per_currency_over_time" => currency::chart::get_per_currency_over_time(pool, options.clone()).await?,
-		"get_per_tag_over_time" => tag::chart::get_per_tag_over_time(pool, options.clone()).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
 	};
 	
@@ -166,6 +165,7 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 		"get_single_asset_amount_over_time" => asset::chart::get_single_asset_amount_over_time(pool, options.clone()).await?,
 		"get_per_account_over_time" => account::chart::get_per_account_over_time(pool, options.clone()).await?,
 		"get_earning_spending_net_over_time" => transaction::chart::get_earning_spending_net_over_time(pool, options.clone()).await?,
+		"get_per_tag_over_time" => tag::chart::get_per_tag_over_time(pool, options.clone()).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
 	};
 	

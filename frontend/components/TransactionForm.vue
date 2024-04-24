@@ -30,7 +30,7 @@
 		<InputMultiSelect
 			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
 			:selectData="tags_select_data"
-			@update="(selected: number[]) => {tags_manually_changed = true; transaction.tag_ids = selected}"
+			@update="(selected: string[]) => {tags_manually_changed = true; transaction.tag_ids = selected}"
 			style="margin-right: 5px;"
 		/>
 		<button tabindex="-1" @click="show_tag_form = true">+</button>
@@ -151,10 +151,10 @@ export default {
 		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.accounts = await $fetch("/api/v1/accounts/all");
 
-		if(typeof this.transaction.id !== "number") {
-			this.update_tags_using_recipient();
-		} else {
+		if(typeof this.transaction.id == "string" && this.transaction.id.length == 36) {
 			this.update_tags_select_data();
+		} else {
+			this.update_tags_using_recipient();
 		}
 		(this.$refs.first_input as any).focus();
 	},
@@ -210,7 +210,10 @@ export default {
 		update_tags_using_recipient() {
 			if(this.tags_manually_changed) return;
 			const recipient = this.recipients.filter(x => x.id === this.transaction.recipient_id)[0];
-			this.transaction.tag_ids = structuredClone(toRaw(recipient.tag_ids));
+			if (recipient) {
+				this.transaction.tag_ids = structuredClone(toRaw(recipient.tag_ids));
+			};
+		
 			this.update_tags_select_data();
 		},
 
@@ -218,7 +221,7 @@ export default {
 			this.tags_select_data = null;
 			this.$nextTick(() => {
 				this.tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (x.id?.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.transaction.tag_ids,
 					label: "Tags:"
 				}
@@ -234,7 +237,7 @@ export default {
 				status: this.transaction.status,
 				timestamp: new Date(this.transaction.timestamp_string as any),
 				comment: this.transaction.comment,
-				tag_ids: Array.isArray(this.transaction.tag_ids) && typeof this.transaction.tag_ids[0] == "number" ? this.transaction.tag_ids : undefined,
+				tag_ids: Array.isArray(this.transaction.tag_ids) && this.transaction.tag_ids[0]?.length == 36 ? this.transaction.tag_ids : undefined,
 				positions: this.transaction.positions,
 			};
 		},

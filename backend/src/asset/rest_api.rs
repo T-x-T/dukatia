@@ -26,7 +26,7 @@ struct RequestParameters {
 	filter_mode_amount: Option<String>,
 	filter_value_per_unit: Option<u32>,
 	filter_mode_value_per_unit: Option<String>,
-	filter_tag_id: Option<u32>,
+	filter_tag_id: Option<Uuid>,
 	filter_mode_tag_id: Option<String>,
 	timestamp: Option<DateTime<Utc>>,
 }
@@ -134,7 +134,7 @@ struct AssetPost {
 	name: String,
 	description: Option<String>,
 	currency_id: u32,
-	tag_ids: Option<Vec<u32>>,
+	tag_ids: Option<Vec<Uuid>>,
 }
 
 #[post("/api/v1/assets")]
@@ -148,7 +148,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 		.set_name(body.name.clone())
 		.set_description_opt(body.description.clone())
 		.set_currency_id(body.currency_id)
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_user_id(user_id)
 		.create(&data.pool).await;
 
@@ -170,7 +170,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		.set_name(body.name.clone())
 		.set_description_opt(body.description.clone())
 		.set_currency_id(body.currency_id)
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_user_id(user_id)
 		.update(&data.pool).await;
 

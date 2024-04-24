@@ -7,13 +7,13 @@ use std::collections::BTreeMap;
 use chrono::prelude::*;
 use uuid::Uuid;
 
-use crate::chart::{Dataset, OldIntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{TagLoader, Tag};
 use crate::money::Money;
 use crate::transaction::Transaction;
 use crate::traits::*;
 
-pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result<OldIntermediateChartData, Box<dyn Error>> {
+pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result<IntermediateChartData, Box<dyn Error>> {
 	let transactions = get_relevant_time_sorted_transactions(pool, &options, false).await?;
 	let tags = TagLoader::new(pool).get().await?;
 
@@ -21,13 +21,13 @@ pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result
 }
 
 
-fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> OldIntermediateChartData {
-	let mut output = OldIntermediateChartData::default();
-	let mut datasets_multi_currency: BTreeMap<u32, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
+fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> IntermediateChartData {
+	let mut output = IntermediateChartData::default();
+	let mut datasets_multi_currency: BTreeMap<Uuid, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
 
 	let default = DataPointMonetaryMultiCurrency::default();
 	for transaction in transactions {
-		for tag_id in transaction.tag_ids.unwrap_or_default() {
+		for tag_id in transaction.tag_ids {
 			let mut data_point = datasets_multi_currency.entry(tag_id).or_default().last().unwrap_or(&default).clone();
 			let transaction_total_amount = transaction.total_amount.clone().unwrap();
 			data_point.value.insert(transaction.currency_id.unwrap_or_default(), data_point.value.get(&transaction.currency_id.unwrap_or_default()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount);
@@ -49,7 +49,7 @@ fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Tra
 		}
 	}
 
-	let mut datasets: BTreeMap<u32, Vec<DataPoint>> = BTreeMap::new();
+	let mut datasets: BTreeMap<Uuid, Vec<DataPoint>> = BTreeMap::new();
 
 	for dataset in datasets_multi_currency {
 		for data_point in dataset.1 {
@@ -67,7 +67,7 @@ fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Tra
 	output.datasets = BTreeMap::new();
 	for dataset in datasets {
 		let name: String = tags.iter()
-			.filter(|x| x.id.unwrap_or_default() == dataset.0)
+			.filter(|x| x.id == dataset.0)
 			.map(|x| x.name.clone())
 			.collect();
 		

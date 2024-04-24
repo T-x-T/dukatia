@@ -68,14 +68,13 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 			)
 			.await?;
 	
-		if self.recipient.tag_ids.is_some() {
-			for tag_id in self.recipient.clone().tag_ids.unwrap() {
-				client.query(
-					"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
-					&[&self.recipient.id, &(tag_id as i32)]
-				).await?;
-			}
+		for tag_id in self.recipient.clone().tag_ids {
+			client.query(
+				"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
+				&[&self.recipient.id, &tag_id]
+			).await?;
 		}
+		
 		return Ok(self.recipient.id);
 	}
 
@@ -114,13 +113,11 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 				&[&self.recipient.id]
 			).await?;
 	
-		if self.recipient.tag_ids.is_some() {
-			for tag_id in self.recipient.tag_ids.clone().unwrap() {
-				client.query(
-					"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
-					&[&self.recipient.id, &(tag_id as i32)]
-				).await?;
-			}
+		for tag_id in self.recipient.tag_ids.clone() {
+			client.query(
+				"INSERT INTO public.recipient_tags (recipient_id, tag_id) VALUES ($1, $2);",
+				&[&self.recipient.id, &tag_id]
+			).await?;
 		}
 	
 		return Ok(());
@@ -133,18 +130,13 @@ impl From<tokio_postgres::Row> for Recipient {
 		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
 		let user_id: Option<i32> = value.get(2);
-		let tag_ids = value
-			.try_get(3)
-			.unwrap_or(Vec::new())
-			.into_iter()
-			.map(|x: i32| x as u32)
-			.collect();
+		let tag_ids: Vec<Uuid> = value.try_get(3).unwrap_or_default();
 		
 		return Recipient {
 			id,
 			name,
 			user_id: user_id.map(|x| x as u32),
-			tag_ids: Some(tag_ids),
+			tag_ids,
 		};
 	}
 }

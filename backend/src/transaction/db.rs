@@ -113,15 +113,13 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				])
 				.await?;
 		
-		if self.transaction.tag_ids.is_some() {
-			for tag_id in self.transaction.tag_ids.clone().unwrap() {
-				self.pool.get()
-					.await?
-					.query(
-						"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-						&[&self.transaction.id, &(tag_id as i32)]
-					).await?;
-			}
+		for tag_id in self.transaction.tag_ids.clone() {
+			self.pool.get()
+				.await?
+				.query(
+					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
+					&[&self.transaction.id, &tag_id]
+				).await?;
 		}
 
 		if self.transaction.asset.is_some() {
@@ -138,7 +136,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				.await?
 				.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES ($1, $2, $3, $4, $5);", 
-					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id]
 				).await?;
 		}
 
@@ -175,14 +173,12 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		)
 		.await?;
 	
-		if self.transaction.tag_ids.is_some() {
-			for tag_id in self.transaction.tag_ids.clone().unwrap() {
-				client.query(
-					"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
-					&[&self.transaction.id, &(tag_id as i32)]
-				)
-				.await?;
-			}
+		for tag_id in self.transaction.tag_ids.clone() {
+			client.query(
+				"INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES ($1, $2);",
+				&[&self.transaction.id, &tag_id]
+			)
+			.await?;
 		}
 	
 		client.query(
@@ -205,7 +201,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		for position in self.transaction.positions {
 			client.query(
 					"INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES ($1, $2, $3, $4, $5);", 
-					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id.map(|x| x as i32)]
+					&[&position.id, &self.transaction.id, &position.amount.to_amount(), &position.comment, &position.tag_id]
 				).await?;
 		}
 	
@@ -253,18 +249,14 @@ impl From<tokio_postgres::Row> for Transaction {
 		let user_id: i32 = value.get(5);
 		let timestamp: chrono::DateTime<chrono::Utc> = value.get(6);
 		let comment: Option<String> = value.get(7);
-		let tag_ids: Vec<u32> = value.try_get(8)
-			.unwrap_or(Vec::new())
-			.into_iter()
-			.map(|x: i32| x as u32)
-			.collect();
+		let tag_ids: Vec<Uuid> = value.try_get(8).unwrap_or_default();
 		let asset_id: Option<Uuid> = value.get(9);
 		let asset_name: Option<String> = value.get(10);
 		let asset_description: Option<String> = value.get(11);
 		let transaction_position_ids: Vec<Uuid> = value.get(12);
 		let transaction_position_amounts: Vec<Option<i32>> = value.get(13);
 		let transaction_position_comments: Vec<Option<String>> = value.get(14);
-		let transaction_position_tag_ids: Vec<Option<i32>> = value.get(15);
+		let transaction_position_tag_ids: Vec<Option<Uuid>> = value.get(15);
 		let total_amount: i64 = value.get(16);
 		let minor_in_major: i32 = value.get(17);
 		let symbol: String = value.get(18);
@@ -279,7 +271,7 @@ impl From<tokio_postgres::Row> for Transaction {
 				currency_id: currency_id as u32,
 				value_per_unit: None,
 				amount: None,
-				tag_ids: None,
+				tag_ids: Vec::new(),
 				total_cost_of_ownership: None,
 			});
 		}
@@ -292,7 +284,7 @@ impl From<tokio_postgres::Row> for Transaction {
 					id: transaction_position_id,
 					amount: Money::from_amount(transaction_position_amounts[i].unwrap(), minor_in_major as u32, symbol.clone()),
 					comment: transaction_position_comments[i].clone(),
-					tag_id: transaction_position_tag_ids[i].map(|x| x as u32),
+					tag_id: transaction_position_tag_ids[i],
 				}
 			}).collect();
 

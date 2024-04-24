@@ -14,7 +14,7 @@ pub struct Account {
 	pub name: String,
 	pub default_currency_id: u32,
 	pub user_id: u32,
-	pub tag_ids: Option<Vec<u32>>,
+	pub tag_ids: Vec<Uuid>,
 	pub balance: Option<i64>,
 }
 
@@ -25,7 +25,7 @@ impl Default for Account {
 			name: String::new(),
 			default_currency_id: 0,
 			user_id: 0,
-			tag_ids: None, 
+			tag_ids: Vec::new(), 
 			balance: None
 		}
 	}
@@ -64,13 +64,7 @@ impl Account {
 		return self;
 	}
 
-	#[allow(dead_code)]
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

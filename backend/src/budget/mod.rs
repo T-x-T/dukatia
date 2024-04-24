@@ -34,7 +34,7 @@ pub struct Budget {
 	pub amount: Money,
 	pub rollover: bool,
 	pub period: Period,
-	pub filter_tag_ids: Vec<u32>,
+	pub filter_tag_ids: Vec<Uuid>,
 	pub currency_id: u32,
 	pub active_from: DateTime<Utc>,
 	pub active_to: Option<DateTime<Utc>>,
@@ -112,7 +112,7 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_filter_tag_ids(mut self, filter_tag_ids: Vec<u32>) -> Self {
+	pub fn set_filter_tag_ids(mut self, filter_tag_ids: Vec<Uuid>) -> Self {
 		self.filter_tag_ids = filter_tag_ids;
 		return self;
 	}
@@ -210,7 +210,7 @@ impl Budget {
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let mut transactions: Vec<Transaction> = Vec::new();
 
-		let mut retrieved_tag_ids: Vec<u32> = Vec::new();
+		let mut retrieved_tag_ids: Vec<Uuid> = Vec::new();
 
 		for tag_id in &self.filter_tag_ids {
 			transactions.append(
@@ -222,7 +222,7 @@ impl Budget {
 					.get()
 					.await?
 					.into_iter()
-					.filter(|transaction| !transaction.tag_ids.clone().unwrap_or_default().iter().any(|tag_id| retrieved_tag_ids.contains(tag_id)))
+					.filter(|transaction| !transaction.tag_ids.clone().iter().any(|tag_id| retrieved_tag_ids.contains(tag_id)))
 					.collect()
 			);
 

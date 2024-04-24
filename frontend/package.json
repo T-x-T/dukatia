@@ -9,7 +9,7 @@
     "start": "npx nuxi start"
   },
   "devDependencies": {
-    "nuxt": "^3.4.3",
+    "nuxt": "^3.11.2",
     "@nuxtjs/color-mode": "^3.2.0",
     "chart.js": "^4.2.1",
     "chartjs-adapter-date-fns": "^3.0.0",

@@ -23,7 +23,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	}
 
 	for tag in get_tags(user_id) {
-		tag.save(pool).await?;
+		tag.create(pool).await?;
 	}
 
 	for recipient in get_recipients(user_id) {

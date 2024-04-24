@@ -72,7 +72,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		for tag_id in &self.budget.filter_tag_ids {
 			client.query(
 				"INSERT INTO public.budget_filter_tags (budget_id, tag_id) VALUES ($1, $2);",
-				&[&self.budget.id, &(*tag_id as i32)]
+				&[&self.budget.id, &tag_id]
 			).await?;
 		}
 	
@@ -104,7 +104,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 			for tag_id in &self.budget.filter_tag_ids {
 				client.query(
 					"INSERT INTO public.budget_filter_tags (budget_id, tag_id) VALUES ($1, $2);",
-					&[&self.budget.id, &(*tag_id as i32)]
+					&[&self.budget.id, &tag_id]
 				).await?;
 			}
 	
@@ -140,12 +140,7 @@ impl From<tokio_postgres::Row> for Budget {
 		let amount: i32 = value.get(3);
 		let rollover: bool = value.get(4);
 		let period: i32 = value.get(5);
-		let filter_tag_ids = value
-			.try_get(6)
-			.unwrap_or(Vec::new())
-			.into_iter()
-			.map(|x: i32| x as u32)
-			.collect();
+		let filter_tag_ids: Vec<Uuid> = value.try_get(6).unwrap_or_default();
 		let active_from: DateTime<Utc> = value.get(7);
 		let active_to: Option<DateTime<Utc>> = value.get(8);
 		let minor_in_major: i32 = value.get(9);

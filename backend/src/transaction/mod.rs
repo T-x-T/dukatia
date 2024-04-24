@@ -25,7 +25,7 @@ pub struct Position {
 	pub id: Uuid,
 	pub amount: Money,
 	pub comment: Option<String>,
-	pub tag_id: Option<u32>,
+	pub tag_id: Option<Uuid>,
 }
 
 impl Default for Position {
@@ -56,7 +56,7 @@ pub struct Transaction {
 	pub timestamp: DateTime<Utc>,
 	pub total_amount: Option<Money>,
 	pub comment: Option<String>,
-	pub tag_ids: Option<Vec<u32>>,
+	pub tag_ids: Vec<Uuid>,
 	pub asset: Option<Asset>,
 	pub positions: Vec<Position>,
 }
@@ -73,7 +73,7 @@ impl Default for Transaction {
 			timestamp: Utc::now(),
 			total_amount: None,
 			comment: None,
-			tag_ids: None,
+			tag_ids: Vec::new(),
 			asset: None,
 			positions: Vec::new(),
 		}
@@ -154,12 +154,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

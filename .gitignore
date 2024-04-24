@@ -8,3 +8,4 @@ old_backend
 .vscode
 .output
 backend/latest*
+.obsidian

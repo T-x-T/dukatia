@@ -1,6 +1,7 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
 use chrono::prelude::*;
+use uuid::Uuid;
 use super::super::CustomError;
 use super::{User, LoginCredentials};
 use crate::traits::*;
@@ -67,14 +68,14 @@ impl<'a> OldDbWriter<'a, User> for UserDbWriter<'a> {
 			).await?
 			[0].get(0);
 
-		let dashboard_id: i32 = client
+		let dashboard_id: Uuid = client
 			.query(
 				"INSERT INTO public.dashboards(id, user_id, name, description) VALUES (DEFAULT, $1, 'Default Dashboard', 'The default Dashboard') RETURNING id;",
 				&[&id]
 			).await?[0].get(0);
 
 		if id != 0 {
-			let chart_ids: Vec<i32> = client
+			let chart_ids: Vec<Uuid> = client
 				.query(
 					"
 						INSERT INTO 

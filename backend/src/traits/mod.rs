@@ -133,13 +133,13 @@ pub struct Filters {
 	pub currency_id: Option<(u32, NumberFilterModes)>,
 	pub account_id: Option<(Uuid, NumberFilterModes)>,
 	pub recipient_id: Option<(Uuid, NumberFilterModes)>,
-	pub tag_id: Option<(u32, NumberFilterModes)>,
+	pub tag_id: Option<(Uuid, NumberFilterModes)>,
 	pub comment: Option<(String, StringFilterModes)>,
 	pub time_range: Option<(DateTime<Utc>, DateTime<Utc>, TimeRangeFilterModes)>,
 	pub name: Option<(String, StringFilterModes)>,
 	pub symbol: Option<(String, StringFilterModes)>,
 	pub minor_in_major: Option<(u32, NumberFilterModes)>,
-	pub parent_id: Option<(u32, NumberFilterModes)>,
+	pub parent_id: Option<(Uuid, NumberFilterModes)>,
 	pub balance: Option<(i64, NumberFilterModes)>,
 	pub default_currency_id: Option<(u32, NumberFilterModes)>,
 	pub description: Option<(String, StringFilterModes)>,
@@ -310,7 +310,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_tag_id(self, tag_id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_tag_id(self, tag_id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.tag_id = Some((tag_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
@@ -346,7 +346,7 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 		return self.set_query_parameters(query_parameters);
 	}
 
-	fn set_filter_parent_id(self, parent_id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_parent_id(self, parent_id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.parent_id = Some((parent_id, filter_mode));
 		return self.set_query_parameters(query_parameters);
@@ -536,7 +536,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.parent_id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.parent_id.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.parent_id.unwrap().0));
 			i += 1;
 		}
 
@@ -604,7 +604,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			};
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.tag_id.unwrap().0 as i32));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.tag_id.unwrap().0));
 			i += 1;
 		}
 		

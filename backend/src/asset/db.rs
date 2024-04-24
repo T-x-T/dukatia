@@ -109,13 +109,11 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 				&[&self.asset.id, &self.asset.name, &self.asset.description, &(self.asset.user_id as i32), &(self.asset.currency_id as i32)]
 			).await?;
 
-		if self.asset.tag_ids.is_some() {
-			for tag_id in self.asset.tag_ids.clone().unwrap() {
-				client.query(
-						"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
-						&[&self.asset.id, &(tag_id as i32)]
-					).await?;
-			}
+		for tag_id in self.asset.tag_ids.clone() {
+			client.query(
+				"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
+				&[&self.asset.id, &tag_id]
+			).await?;
 		}
 
 		return Ok(self.asset.id);
@@ -142,13 +140,11 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 			&[&self.asset.id]
 		).await?;
 	
-		if self.asset.tag_ids.is_some() {
-			for tag_id in self.asset.tag_ids.clone().unwrap() {
-				client.query(
-						"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
-						&[&self.asset.id, &(tag_id as i32)]
-					).await?;
-			}
+		for tag_id in self.asset.tag_ids.clone() {
+			client.query(
+				"INSERT INTO public.asset_tags (asset_id, tag_id) VALUES ($1, $2);",
+				&[&self.asset.id, &tag_id]
+			).await?;
 		}
 	
 		return Ok(());
@@ -248,11 +244,7 @@ impl From<tokio_postgres::Row> for Asset {
 		let description: Option<String> = value.get(2);
 		let user_id: i32 = value.get(3);
 		let currency_id: i32 = value.get(4);
-		let tag_ids: Vec<u32> = value.try_get(5)
-			.unwrap_or(Vec::new())
-			.into_iter()
-			.map(|x: i32| x as u32)
-			.collect();
+		let tag_ids: Vec<Uuid> = value.try_get(5).unwrap_or_default();
 		let amount: f64 = value.try_get(6).unwrap_or(0.0);
 		let value_per_unit: i32 = value.try_get(7).unwrap_or(0);
 		let minor_in_major: i32 = value.get(8);
@@ -264,7 +256,7 @@ impl From<tokio_postgres::Row> for Asset {
 			description,
 			user_id: user_id as u32,
 			currency_id: currency_id as u32,
-			tag_ids: Some(tag_ids),
+			tag_ids,
 			value_per_unit: Some(Money::from_amount(value_per_unit, minor_in_major as u32, symbol)),
 			amount: Some(amount),
 			total_cost_of_ownership: None,

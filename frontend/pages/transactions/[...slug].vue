@@ -117,7 +117,7 @@ export default {
 		this.updateTransactions();
 	
 		this.selectData = {
-			options: [...this.tags.map(x => ({id: x.id ? x.id : -1, name: x.name}))],
+			options: [...this.tags.map(x => ({id: x.id?.length == 36 ? x.id : "", name: x.name}))],
 			selected: undefined,
 			label: "Tags:",
 			openTop: true
@@ -458,7 +458,7 @@ export default {
 				new Date(new Date(x.timestamp).valueOf() - (new Date(x.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
 				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 				x.comment,
-				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+				this.tags.filter(y => x.tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			];
 		}
 	}

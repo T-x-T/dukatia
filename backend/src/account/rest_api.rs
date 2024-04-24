@@ -14,7 +14,7 @@ struct RequestParameters {
 	filter_mode_name: Option<String>,
 	filter_currency_id: Option<u32>,
 	filter_mode_currency_id: Option<String>,
-	filter_tag_id: Option<u32>,
+	filter_tag_id: Option<Uuid>,
 	filter_mode_tag_id: Option<String>,
 	filter_balance: Option<i64>,
 	filter_mode_balance: Option<String>,
@@ -91,7 +91,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web:
 struct AccountPost {
 	name: String,
 	default_currency_id: u32,
-	tag_ids: Option<Vec<u32>>,
+	tag_ids: Option<Vec<Uuid>>,
 }
 
 #[post("/api/v1/accounts")]
@@ -105,7 +105,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accou
 		.set_user_id(user_id)
 		.set_name(body.name.clone())
 		.set_default_currency_id(body.default_currency_id)
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.create(&data.pool).await;
 
 	match result {
@@ -126,7 +126,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Accoun
 		.set_user_id(user_id)
 		.set_name(body.name.clone())
 		.set_default_currency_id(body.default_currency_id)
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.update(&data.pool).await;
 
 		match result {

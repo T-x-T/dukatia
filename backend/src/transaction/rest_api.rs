@@ -24,7 +24,7 @@ struct RequestParameters {
 	filter_mode_account_id: Option<String>,
 	filter_recipient_id: Option<Uuid>,
 	filter_mode_recipient_id: Option<String>,
-	filter_tag_id: Option<u32>,
+	filter_tag_id: Option<Uuid>,
 	filter_mode_tag_id: Option<String>,
 	filter_comment: Option<String>,
 	filter_mode_comment: Option<String>,
@@ -208,7 +208,7 @@ struct TransactionPost {
 	status: u8,
 	timestamp: DateTime<Utc>,
 	comment: Option<String>,
-	tag_ids: Option<Vec<u32>>,
+	tag_ids: Option<Vec<Uuid>>,
 	asset_id: Option<Uuid>,
 	positions: Vec<PositionPost>,
 }
@@ -217,7 +217,7 @@ struct TransactionPost {
 struct PositionPost {
 	amount: super::Money,
 	comment: Option<String>,
-	tag_id: Option<u32>,
+	tag_id: Option<Uuid>,
 }
 
 #[post("/api/v1/transactions")]
@@ -240,7 +240,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		})
 		.set_timestamp(body.timestamp)
 		.set_comment_opt(body.comment.clone())
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_asset_opt(asset)	
 		.set_positions(
 			body.positions
@@ -289,7 +289,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		})
 		.set_timestamp(body.timestamp)
 		.set_comment_opt(body.comment.clone())
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_asset_opt(asset)	
 		.set_positions(
 			body.positions

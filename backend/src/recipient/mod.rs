@@ -12,7 +12,7 @@ pub struct Recipient {
 	pub id: Uuid,
 	pub name: String,
 	pub user_id: Option<u32>,
-	pub tag_ids: Option<Vec<u32>>, //TODO: fix nonsensical Option
+	pub tag_ids: Vec<Uuid>,
 }
 
 impl Default for Recipient {
@@ -21,7 +21,7 @@ impl Default for Recipient {
 			id: Uuid::new_v4(),
 			name: String::new(),
 			user_id: None,
-			tag_ids: None
+			tag_ids: Vec::new()
 		};
 	}
 }
@@ -60,13 +60,7 @@ impl Recipient {
 		return self;
 	}
 
-	#[allow(dead_code)]
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}
