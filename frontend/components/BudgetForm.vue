@@ -49,7 +49,7 @@
 		<InputMultiSelect
 			v-if="filter_tags_select_data && Object.keys(filter_tags_select_data).length > 0"
 			:selectData="filter_tags_select_data"
-			@update="(selected: number[]) => budget.filter_tag_ids = selected"
+			@update="(selected: string[]) => budget.filter_tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 
@@ -139,7 +139,7 @@ export default {
 			this.filter_tags_select_data = null;
 			this.$nextTick(() => {
 				this.filter_tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (typeof x.id == "string" && x.id.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.budget.filter_tag_ids,
 					label: "Tags:"
 				}

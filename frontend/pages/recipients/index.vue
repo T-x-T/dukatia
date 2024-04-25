@@ -42,7 +42,7 @@ export default {
 			rows: recipients.map(x => ([
 				x.id,
 				x.name,
-				tags.filter(y => x.tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]))
 		};
 	},
@@ -118,7 +118,7 @@ export default {
 			this.tableData.rows = recipients.map(x => ([
 				x.id,
 				x.name,
-				tags.filter(y => x.tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]))
 		},
 

@@ -71,7 +71,7 @@ export default {
 				`${x.used_amount === undefined ? "" : x.used_amount.major >= 0 && x.used_amount.is_negative ? "-" : ""}${x.used_amount === undefined ? "0": x.used_amount.major}.${(x.used_amount === undefined ? 0 : x.used_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.available_amount === undefined ? "" : x.available_amount.major >= 0 && x.available_amount.is_negative ? "-" : ""}${x.available_amount === undefined ? "0": x.available_amount.major}.${(x.available_amount === undefined ? 0 : x.available_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				((x.utilization ? x.utilization : 0) * 100).toFixed(2) + "%",
-				tags.filter(y => x.filter_tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.filter_tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]))
 		};
 	},
@@ -211,7 +211,7 @@ export default {
 				`${x.used_amount === undefined ? "" : x.used_amount.major >= 0 && x.used_amount.is_negative ? "-" : ""}${x.used_amount === undefined ? "0": x.used_amount.major}.${(x.used_amount === undefined ? 0 : x.used_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.available_amount === undefined ? "" : x.available_amount.major >= 0 && x.available_amount.is_negative ? "-" : ""}${x.available_amount === undefined ? "0": x.available_amount.major}.${(x.available_amount === undefined ? 0 : x.available_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				((x.utilization ? x.utilization : 0) * 100).toFixed(2) + "%",
-				tags.filter(y => x.filter_tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.filter_tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]));
 		},
 

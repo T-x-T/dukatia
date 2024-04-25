@@ -198,7 +198,7 @@ export default {
 					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.total.major ? x.total_cost_of_ownership?.total.major : 0) >= 0 && x.total_cost_of_ownership?.total.is_negative ? "-" : ""}${x.total_cost_of_ownership?.total.major}.${x.total_cost_of_ownership?.total.minor.toString().padStart(x.total_cost_of_ownership?.total.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.total.symbol}` : "",
 					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.monthly.major ? x.total_cost_of_ownership?.monthly.major : 0) >= 0 && x.total_cost_of_ownership?.monthly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.monthly.major}.${x.total_cost_of_ownership?.monthly.minor.toString().padStart(x.total_cost_of_ownership?.monthly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.monthly.symbol}` : "",
 					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.yearly.major ? x.total_cost_of_ownership?.yearly.major : 0) >= 0 && x.total_cost_of_ownership?.yearly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.yearly.major}.${x.total_cost_of_ownership?.yearly.minor.toString().padStart(x.total_cost_of_ownership?.yearly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.yearly.symbol}` : "",
-					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+					tags.filter(y => x.tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 				];
 		}
 	},

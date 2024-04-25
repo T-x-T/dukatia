@@ -13,7 +13,7 @@
 		<InputMultiSelect
 			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
 			:selectData="tags_select_data"
-			@update="(selected: number[]) => recipient.tag_ids = selected"
+			@update="(selected: string[]) => recipient.tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 
@@ -91,7 +91,7 @@ export default {
 			this.tags_select_data = null;
 			this.$nextTick(() => {
 				this.tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (typeof x.id == "string" && x.id.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.recipient.tag_ids,
 					label: "Tags:"
 				}

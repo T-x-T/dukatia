@@ -46,7 +46,7 @@ export default {
 				x.id,
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
-				tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
+				tags.filter(t => x.tag_ids?.includes(typeof t.id == "string" && t.id.length == 36 ? t.id : "")).map(t => t.name).join(", "),
 				`${Number(x.balance) / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]))
 		};
@@ -145,7 +145,7 @@ export default {
 				x.id,
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
-				tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
+				tags.filter(t => x.tag_ids?.includes(typeof t.id == "string" && t.id.length == 36 ? t.id : "")).map(t => t.name).join(", "),
 				`${typeof x.balance == "number" ? x.balance : 0 / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]));
 		},
