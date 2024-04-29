@@ -44,8 +44,8 @@ export default {
 			const parts = line.split(",");
 
 			return {
-				account_id: Number(parts[0]),
-				recipient_id: Number(parts[1]),
+				account_id: parts[0],
+				recipient_id: parts[1],
 				status: 1,
 				timestamp: new Date(parts[2]),
 				comment: parts[3],
