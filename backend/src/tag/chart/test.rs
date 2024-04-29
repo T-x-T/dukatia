@@ -2,7 +2,7 @@ use super::*;
 use crate::chart::*;
 
 fn get_tags(n: u32) -> Vec<Tag> {
-	return (0..n).into_iter().map(|x| Tag {id: Uuid::from_u128(x.into()), name: format!("test_{x}"), user_id: 0, parent_id: None}).collect();
+	return (0..n).into_iter().map(|x| Tag {id: Uuid::from_u128(x.into()), name: format!("test_{x}"), user_id: Uuid::from_u128(0), parent_id: None}).collect();
 }
 
 mod calculate_get_per_tag_over_time {

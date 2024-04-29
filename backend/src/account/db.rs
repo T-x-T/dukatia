@@ -63,7 +63,7 @@ impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 		client
 			.query(
 				"INSERT INTO public.accounts (id, name, default_currency_id, user_id) VALUES ($1, $2, $3, $4);",
-				&[&self.account.id, &self.account.name, &(self.account.default_currency_id as i32), &(self.account.user_id as i32)]
+				&[&self.account.id, &self.account.name, &(self.account.default_currency_id as i32), &self.account.user_id]
 			)
 			.await?;
 			 
@@ -115,7 +115,7 @@ impl From<tokio_postgres::Row> for Account {
 		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
 		let default_currency_id: i32 = value.get(2);
-		let user_id: i32 = value.try_get(3).unwrap_or(0);
+		let user_id: Uuid = value.get(3);
 		let tag_ids: Vec<Uuid> = value.try_get(4).unwrap_or_default();
 		let balance: Option<i64> = value.get(5);
 	
@@ -123,7 +123,7 @@ impl From<tokio_postgres::Row> for Account {
 			id,
 			name,
 			default_currency_id: default_currency_id as u32,
-			user_id: user_id as u32,
+			user_id,
 			tag_ids,
 			balance,
 		};

@@ -2,6 +2,7 @@ use actix_web::{dev::Service as _, web, App, HttpServer, HttpRequest, middleware
 use std::error::Error;
 use futures_util::future::FutureExt;
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 
 use super::CustomError;
 use super::config::Config;
@@ -99,7 +100,7 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 		.await;
 }
 
-pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
+pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<Uuid, Box<dyn Error>> {
 	if req.cookie("accessToken").is_none() {
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }

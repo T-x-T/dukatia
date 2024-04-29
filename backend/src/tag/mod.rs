@@ -13,7 +13,7 @@ use crate::traits::*;
 pub struct Tag {
 	pub id: Uuid,
 	pub name: String,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub parent_id: Option<Uuid>,
 }
 
@@ -22,7 +22,7 @@ impl Default for Tag {
 		return Self {
 			id: Uuid::new_v4(),
 			name: String::new(),
-			user_id: 0,
+			user_id: Uuid::nil(),
 			parent_id: None,
 		};
 	}
@@ -95,7 +95,7 @@ impl Tag {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}

@@ -11,7 +11,7 @@ use crate::traits::*;
 pub struct Recipient {
 	pub id: Uuid,
 	pub name: String,
-	pub user_id: Option<u32>,
+	pub user_id: Option<Uuid>,
 	pub tag_ids: Vec<Uuid>,
 }
 
@@ -49,14 +49,8 @@ impl Recipient {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = Some(user_id);
-		return self;
-	}
-
-	#[allow(dead_code)]
-	pub fn set_user_id_opt(mut self, user_id: Option<u32>) -> Self {
-		self.user_id = user_id;
 		return self;
 	}
 

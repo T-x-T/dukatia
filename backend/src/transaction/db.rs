@@ -103,7 +103,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 				"INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
 				&[
 					&self.transaction.id,
-					&(self.transaction.user_id as i32),
+					&self.transaction.user_id,
 					&self.transaction.account_id,
 					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
 					&self.transaction.recipient_id,
@@ -246,7 +246,7 @@ impl From<tokio_postgres::Row> for Transaction {
 		let currency_id: i32 = value.get(2);
 		let recipient_id: Uuid = value.get(3);
 		let status: i32 = value.get(4);
-		let user_id: i32 = value.get(5);
+		let user_id: Uuid = value.get(5);
 		let timestamp: chrono::DateTime<chrono::Utc> = value.get(6);
 		let comment: Option<String> = value.get(7);
 		let tag_ids: Vec<Uuid> = value.try_get(8).unwrap_or_default();
@@ -267,7 +267,7 @@ impl From<tokio_postgres::Row> for Transaction {
 				id: asset_id.unwrap(),
 				name: asset_name.unwrap(),
 				description: asset_description,
-				user_id: user_id as u32,
+				user_id,
 				currency_id: currency_id as u32,
 				value_per_unit: None,
 				amount: None,
@@ -290,7 +290,7 @@ impl From<tokio_postgres::Row> for Transaction {
 
 		return Transaction::default()
 			.set_id(id)
-			.set_user_id(user_id as u32)
+			.set_user_id(user_id)
 			.set_account_id(account_id)
 			.set_currency_id(currency_id as u32)
 			.set_recipient_id(recipient_id)

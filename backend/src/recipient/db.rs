@@ -64,7 +64,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 		client
 			.query(
 				"INSERT INTO public.recipients (id, name, user_id) VALUES ($1, $2, $3);",
-				&[&self.recipient.id, &self.recipient.name, &(self.recipient.user_id.unwrap_or(0) as i32)]
+				&[&self.recipient.id, &self.recipient.name, &self.recipient.user_id]
 			)
 			.await?;
 	
@@ -129,13 +129,13 @@ impl From<tokio_postgres::Row> for Recipient {
 	fn from(value: tokio_postgres::Row) -> Self {
 		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
-		let user_id: Option<i32> = value.get(2);
+		let user_id: Option<Uuid> = value.get(2);
 		let tag_ids: Vec<Uuid> = value.try_get(3).unwrap_or_default();
 		
 		return Recipient {
 			id,
 			name,
-			user_id: user_id.map(|x| x as u32),
+			user_id,
 			tag_ids,
 		};
 	}

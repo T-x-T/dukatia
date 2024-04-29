@@ -1,19 +1,20 @@
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use super::super::CustomError;
 
-pub async fn add(pool: &Pool, user_id: u32, access_token: &String) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, user_id: Uuid, access_token: &String) -> Result<(), Box<dyn Error>> {
 	pool.get()
 		.await?
 		.query(
 			"INSERT INTO public.access_tokens (id, user_id, token) VALUES (DEFAULT, $1, $2);",
-			&[&(user_id as i32), &access_token]
+			&[&user_id, &access_token]
 		)
 		.await?;
 	return Ok(());
 }
 
-pub async fn get_user_of_token(pool: &Pool, access_token: &String, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
+pub async fn get_user_of_token(pool: &Pool, access_token: &String, session_expiry_days: u32) -> Result<Uuid, Box<dyn Error>> {
 	let res = pool.get().await?
 		.query("SELECT user_id FROM public.access_tokens WHERE token=$1 AND created_at >= NOW() - ($2 || ' days')::interval;", &[access_token, &(session_expiry_days.to_string())])
 		.await?;
@@ -22,15 +23,15 @@ pub async fn get_user_of_token(pool: &Pool, access_token: &String, session_expir
 		return Err(Box::new(CustomError::SpecifiedItemNotFound{item_type: String::from("user"), filter: String::from("access_token")}));
 	}
 
-	let user_id: i32 = res[0].get(0);
-	return Ok(user_id as u32);
+	let user_id: Uuid = res[0].get(0);
+	return Ok(user_id);
 }
 
-pub async fn delete_token(pool: &Pool, user_id: u32, access_token: &String) -> Result<(), Box<dyn Error>> {
+pub async fn delete_token(pool: &Pool, user_id: Uuid, access_token: &String) -> Result<(), Box<dyn Error>> {
 	let res = pool
 		.get()
 		.await?
-		.query("DELETE FROM public.access_tokens WHERE user_id=$1 AND token=$2 RETURNING *", &[&(user_id as i32), &access_token])
+		.query("DELETE FROM public.access_tokens WHERE user_id=$1 AND token=$2 RETURNING *", &[&user_id, &access_token])
 		.await?;
 
 	if res.len() != 1 {

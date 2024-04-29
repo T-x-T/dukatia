@@ -48,7 +48,6 @@ async fn main() -> std::io::Result<()> {
 
   let pool = postgres::get_connection(&config).await;
 
-  user::init(&config, &pool).await;
   initialize_webserver(config, pool).await?;
   
   return Ok(());

@@ -30,7 +30,7 @@ pub enum Period {
 pub struct Budget {
 	pub id: Uuid,
   pub name: String,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub amount: Money,
 	pub rollover: bool,
 	pub period: Period,
@@ -48,7 +48,7 @@ impl Default for Budget {
 		Self {
 			id: Uuid::new_v4(),
 			name: String::new(),
-			user_id: 0,
+			user_id: Uuid::nil(),
 			amount: Money::default(),
 			rollover: false,
 			period: Period::default(),
@@ -92,7 +92,7 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}

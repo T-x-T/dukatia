@@ -65,7 +65,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		client
 			.query(
 				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period, currency_id, active_from, active_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
-				&[&self.budget.id, &self.budget.name, &(self.budget.user_id as i32), &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to]
+				&[&self.budget.id, &self.budget.name, &self.budget.user_id, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to]
 			)
 			.await?;
 	
@@ -136,7 +136,7 @@ impl From<tokio_postgres::Row> for Budget {
 	fn from(value: tokio_postgres::Row) -> Self {
 		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
-		let user_id: i32 = value.get(2);
+		let user_id: Uuid = value.get(2);
 		let amount: i32 = value.get(3);
 		let rollover: bool = value.get(4);
 		let period: i32 = value.get(5);
@@ -150,7 +150,7 @@ impl From<tokio_postgres::Row> for Budget {
 		return Budget {
 			id,
 			name,
-			user_id: user_id as u32,
+			user_id,
 			amount: Money::from_amount(amount, minor_in_major as u32, symbol),
 			rollover,
 			period: match period {

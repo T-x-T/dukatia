@@ -2,7 +2,7 @@ use super::*;
 use crate::chart::*;
 
 fn get_recipients(n: u32) -> Vec<Recipient> {
-	return (0..n).into_iter().map(|x| Recipient {id: Uuid::from_u128(x as u128), name: format!("test_{x}"), user_id: Some(0), tag_ids: Vec::new()}).collect();
+	return (0..n).into_iter().map(|x| Recipient {id: Uuid::from_u128(x as u128), name: format!("test_{x}"), user_id: Some(Uuid::from_u128(0)), tag_ids: Vec::new()}).collect();
 }
 
 mod calculate_get_per_recipient_over_time {

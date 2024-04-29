@@ -6,6 +6,7 @@ use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use sha2::{Sha512, Digest};
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use super::Config;
 use super::access_token;
 use super::CustomError;
@@ -13,7 +14,7 @@ use crate::traits::*;
 
 #[derive(Serialize, Debug, Clone, Deserialize)]
 pub struct User {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
 	pub secret: Option<String>,
 	pub encrypted_secret: Option<String>,
@@ -22,9 +23,9 @@ pub struct User {
 	pub last_logon: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Default, Clone, Serialize)]
 pub struct LoginResult {
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub first_login: bool,
 	pub access_token: Option<String>,
 }
@@ -32,7 +33,7 @@ pub struct LoginResult {
 impl Default for User {
 	fn default() -> Self {
 		return Self {
-			id: None,
+			id: Uuid::new_v4(),
 			name: String::new(),
 			secret: None,
 			encrypted_secret: None,
@@ -49,21 +50,21 @@ pub struct LoginCredentials {
 	pub secret: String,
 }
 
-impl Save for User {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::UserDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::UserDbWriter::new(pool, self).insert().await,
-		};
+impl Create for User {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::UserDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for User {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::UserDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl User {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
@@ -128,11 +129,11 @@ impl User {
 	}
 
 	pub async fn update_secret(self, pool: &Pool, pepper: &str, old_secret: String, new_secret: String) -> Result<(), Box<dyn Error>> {
-		let user_from_db = db::get_by_id(pool, &self.id.unwrap()).await?;
+		let user_from_db = db::get_by_id(pool, &self.id).await?;
 	
 		let old_hashed_secret = create_hash(format!("{}{}{}", user_from_db.name, old_secret, pepper));
 		let user_id = db::login(pool, &LoginCredentials { name: user_from_db.name.clone(), secret: old_secret }, old_hashed_secret).await?.user_id;
-		if user_id != self.id.unwrap() {
+		if user_id != self.id {
 			return Err(Box::new(CustomError::InvalidItem { reason: String::from("trying to update the wrong user") }));
 		}
 	
@@ -143,7 +144,7 @@ impl User {
 	}
 
 	pub async fn logout(self, pool: &Pool, access_token: String) -> Result<(), Box<dyn Error>> {
-		return access_token::delete_token(pool, self.id.unwrap(), &access_token).await;
+		return access_token::delete_token(pool, self.id, &access_token).await;
 	}
 }
 
@@ -179,17 +180,19 @@ impl<'a> Loader<'a, User> for UserLoader<'a> {
 }
 
 pub async fn init(config: &Config, pool: &Pool) {
-	if UserLoader::new(pool).get().await.expect("failed to get user count in user::init").is_empty() {	
-		let hashed_secret = create_hash(format!("{}{}{}", config.admin_username.clone(), config.admin_password.clone(), config.pepper));
+	let user = UserLoader::new(pool).get_first().await.expect("failed to get dummy user in user::init");
+	let hashed_secret = create_hash(format!("{}{}{}", config.admin_username.clone(), config.admin_password.clone(), config.pepper));
 
-		User::default()
-			.set_name(config.admin_username.clone())
-			.set_encrypted_secret(hashed_secret)
-			.set_superuser(true)
-			.save(pool)
-			.await
-			.expect("failed to add initial admin user to db");
-	}
+	User::default()
+		.set_id(user.id)
+		.set_name(config.admin_username.clone())
+		.set_encrypted_secret(hashed_secret)
+		.set_superuser(true)
+		.update(pool)
+		.await
+		.expect("failed to add initial admin user to db");
+
+	db::insert_charts_and_stuff(pool, &user).await.expect("failed to insert charts and stuff for admin user");
 }
 
 pub async fn login(config: &Config, pool: &Pool, credentials: LoginCredentials) -> Result<LoginResult, Box<dyn Error>> {

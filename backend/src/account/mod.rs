@@ -13,7 +13,7 @@ pub struct Account {
 	pub id: Uuid,
 	pub name: String,
 	pub default_currency_id: u32,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub tag_ids: Vec<Uuid>,
 	pub balance: Option<i64>,
 }
@@ -24,7 +24,7 @@ impl Default for Account {
 			id: Uuid::new_v4(),
 			name: String::new(),
 			default_currency_id: 0,
-			user_id: 0,
+			user_id: Uuid::nil(),
 			tag_ids: Vec::new(), 
 			balance: None
 		}
@@ -59,7 +59,7 @@ impl Account {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}

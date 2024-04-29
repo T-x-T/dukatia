@@ -9,7 +9,7 @@ mod calculate_get_all_budget_utilization_overview {
 		let budget1 = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -25,7 +25,7 @@ mod calculate_get_all_budget_utilization_overview {
 		let budget2 = Budget {
 			id: Uuid::from_u128(1),
 			name: "test2".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "$".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -125,7 +125,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -175,7 +175,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -225,7 +225,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -275,7 +275,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -325,7 +325,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -375,7 +375,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -425,7 +425,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -527,7 +527,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -591,7 +591,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -655,7 +655,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -719,7 +719,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -783,7 +783,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -847,7 +847,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -911,7 +911,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
@@ -975,7 +975,7 @@ mod calculate_get_single_budget_utilization_history {
 		let budget = Budget {
 			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: true,
 			period: Period::Monthly,

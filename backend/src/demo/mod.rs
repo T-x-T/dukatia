@@ -1,6 +1,7 @@
 pub mod rest_api;
 
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use std::error::Error;
 use crate::CustomError;
 use crate::traits::*;
@@ -13,7 +14,7 @@ use crate::asset::Asset;
 use crate::budget::{Budget, Period};
 use crate::transaction::{Transaction, Position, TransactionStatus};
 
-pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn Error>> {
+pub async fn insert_demo_data(pool: &Pool, user_id: Uuid) -> Result<(), Box<dyn Error>> {
 	if user_has_data(pool, user_id).await? {
 		return Err(Box::new(CustomError::InvalidActionForItem { action: "create demo data for user with preexisting data".to_string(), item_type: "user".to_string() }));
 	}
@@ -45,7 +46,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: u32) -> Result<(), Box<dyn E
 	return Ok(());
 }
 
-async fn user_has_data(pool: &Pool, user_id: u32) -> Result<bool, Box<dyn Error>> {
+async fn user_has_data(pool: &Pool, user_id: Uuid) -> Result<bool, Box<dyn Error>> {
 	if crate::account::AccountLoader::new(pool)
 		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first().await.is_ok() {
@@ -85,7 +86,7 @@ async fn user_has_data(pool: &Pool, user_id: u32) -> Result<bool, Box<dyn Error>
 	return Ok(false);
 }
 
-fn get_accounts(user_id: u32) -> Vec<Account> {
+fn get_accounts(user_id: Uuid) -> Vec<Account> {
 	return vec![
 		Account {name: "Main street bank".to_string(), default_currency_id: 0, user_id, ..Default::default()},
 		Account {name: "US of Banks".to_string(), default_currency_id: 1, user_id, ..Default::default()},
@@ -93,7 +94,7 @@ fn get_accounts(user_id: u32) -> Vec<Account> {
 	];
 }
 
-fn get_tags(user_id: u32) -> Vec<Tag> {
+fn get_tags(user_id: Uuid) -> Vec<Tag> {
 	return vec![
 		Tag {name: "Housing".to_string(), user_id, ..Default::default()},
 		Tag {name: "Transportation".to_string(), user_id, ..Default::default()},
@@ -104,7 +105,7 @@ fn get_tags(user_id: u32) -> Vec<Tag> {
 	];
 }
 
-fn get_recipients(user_id: u32) -> Vec<Recipient> {
+fn get_recipients(user_id: Uuid) -> Vec<Recipient> {
 	return vec![
 		Recipient {name: "Landlord inc".to_string(), user_id: Some(user_id), ..Default::default()},
 		Recipient {name: "Car dealerzz".to_string(), user_id: Some(user_id), ..Default::default()},
@@ -126,7 +127,7 @@ fn get_recipients(user_id: u32) -> Vec<Recipient> {
 	];
 }
 
-fn get_assets(user_id: u32) -> Vec<Asset> {
+fn get_assets(user_id: Uuid) -> Vec<Asset> {
 	return vec![
 		Asset {name: "Banana Computers inc".to_string(), user_id, ..Default::default()},
 		Asset {name: "All universe ETF".to_string(), user_id, ..Default::default()},
@@ -134,7 +135,7 @@ fn get_assets(user_id: u32) -> Vec<Asset> {
 	];
 }
 
-fn get_budgets(user_id: u32) -> Vec<Budget> {
+fn get_budgets(user_id: Uuid) -> Vec<Budget> {
 	return vec![
 		Budget {name: "Waste".to_string(), user_id, amount: Money::from_amount(100_000, 100, "€".to_string()), period: Period::Monthly, currency_id: 0, ..Default::default()},
 		Budget {name: "Electronics".to_string(), user_id, amount: Money::from_amount(200_000, 100, "€".to_string()), period: Period::Yearly, currency_id: 0, ..Default::default()},
@@ -142,7 +143,7 @@ fn get_budgets(user_id: u32) -> Vec<Budget> {
 	];
 }
 
-fn get_transactions(user_id: u32) -> Vec<Transaction> {
+fn get_transactions(user_id: Uuid) -> Vec<Transaction> {
 	return vec![
 		Transaction {user_id, currency_id: Some(0), status: TransactionStatus::Completed, timestamp: chrono::Utc::now(), positions: vec![Position {amount: Money::from_amount(150_000, 100, "€".to_string()), ..Default::default()}], ..Default::default()},
 	];

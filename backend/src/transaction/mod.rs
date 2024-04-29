@@ -48,7 +48,7 @@ pub struct TransactionSummary {
 #[derive(Debug, Clone, Serialize)]
 pub struct Transaction {
 	pub id: Uuid,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub currency_id: Option<u32>,
 	pub account_id: Uuid,
 	pub recipient_id: Uuid,
@@ -65,7 +65,7 @@ impl Default for Transaction {
 	fn default() -> Self {
 		Self { 
 			id: Uuid::new_v4(),
-			user_id: 0,
+			user_id: Uuid::nil(),
 			currency_id: None,
 			account_id: Uuid::nil(),
 			recipient_id: Uuid::nil(),
@@ -114,7 +114,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}

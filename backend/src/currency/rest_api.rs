@@ -93,7 +93,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curre
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+	match crate::user::UserLoader::new(&data.pool).set_filter_id_uuid(user_id, NumberFilterModes::Exact).get_first().await {
     Ok(user) => {
 			if !user.superuser {
 				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to create new currencies\"}");
@@ -121,7 +121,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curren
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+	match crate::user::UserLoader::new(&data.pool).set_filter_id_uuid(user_id, NumberFilterModes::Exact).get_first().await {
     Ok(user) => {
 			if !user.superuser {
 				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to update existing currencies\"}");

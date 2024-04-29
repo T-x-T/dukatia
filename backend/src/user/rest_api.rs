@@ -33,7 +33,7 @@ async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -48,9 +48,18 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder 
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match UserLoader::new(&data.pool).get().await {
+	let users = UserLoader::new(&data.pool)
+		.set_query_parameters(
+			QueryParameters::default()
+				.set_sort_property_opt(Some(FilterAndSortProperties::Name))
+				.set_sort_direction_opt(Some(SortDirection::Asc))
+			)
+		.get()
+		.await;
+
+	match users {
 		Ok(res) => {
-			let user: Vec<&User> = res.iter().filter(|x| x.id.unwrap() == user_id).collect();
+			let user: Vec<&User> = res.iter().filter(|x| x.id == user_id).collect();
 			
 			if user.first().unwrap().superuser {
 				return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap())
@@ -77,7 +86,7 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(user) => {
@@ -87,7 +96,7 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 						.set_superuser(body.superuser)
 						.set_secret(body.secret.clone())
 						.encrypt_secret(&data.config.pepper)
-						.save(&data.pool)
+						.create(&data.pool)
 						.await {
 							Ok(_) => return HttpResponse::Ok().body(""),
 							Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
@@ -108,20 +117,20 @@ struct PutUserBody {
 }
 
 #[put("/api/v1/users/{req_user_id}")]
-async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<u32>) -> impl Responder {
+async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(user) => {
 				if user.superuser {
 					match UserLoader::new(&data.pool)
-						.set_filter_id(*req_user_id, NumberFilterModes::Exact)
+						.set_filter_id_uuid(*req_user_id, NumberFilterModes::Exact)
 						.get_first()
 						.await {
 							Ok(mut user_to_edit) => {
@@ -135,14 +144,14 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 								}
 
 								if body.active.is_some() {
-									if user_to_edit.id.unwrap() == user_id {
+									if user_to_edit.id == user_id {
 										return HttpResponse::BadRequest().body("{\"error\":\"you cant disable yourself!\"}")
 									}
 
 									user_to_edit.set_active_mut(body.active.unwrap());
 								}
 
-								match user_to_edit.save(&data.pool).await {
+								match user_to_edit.update(&data.pool).await {
 									Ok(_) => return HttpResponse::Ok().body(""),
 									Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 								}
@@ -171,7 +180,7 @@ async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, r
 	};
 
 	let user = match UserLoader::new(&data.pool)
-		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(x) => x,

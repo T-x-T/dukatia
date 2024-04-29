@@ -25,7 +25,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Serialize)]
 pub struct ChartOptions {
 	pub id: Uuid,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub chart_type: String,
 	pub title: String,
 	pub filter_from: Option<DateTime<Utc>>,
@@ -48,7 +48,7 @@ impl Default for ChartOptions {
 	fn default() -> Self {
 		Self {
 			id: Uuid::new_v4(),
-			user_id: 0,
+			user_id: Uuid::nil(),
 			chart_type: String::new(),
 			title: String::new(),
 			filter_from: None,
@@ -114,11 +114,11 @@ pub struct DataPointMonetaryMultiCurrency {
 	pub label: String,
 }
 
-pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
+pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: Uuid) -> Result<ChartOptions, Box<dyn Error>> {
 	return db::get_by_id(pool, id, user_id).await;
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: Uuid) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	return db::get_all_charts_in_dashboard(pool, dashboard_id, user_id).await;
 }
 

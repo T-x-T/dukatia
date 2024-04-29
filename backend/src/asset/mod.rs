@@ -23,7 +23,7 @@ pub struct TotalCostOfOwnership {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Asset {
 	pub id: Uuid,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub name: String,
 	pub description: Option<String>,
 	pub currency_id: u32,
@@ -37,7 +37,7 @@ impl Default for Asset {
 	fn default() -> Self {
 		return Self {
 			id: Uuid::new_v4(),
-			user_id: 0,
+			user_id: Uuid::nil(),
 			name: String::new(),
 			description: None,
 			currency_id: 0,
@@ -73,7 +73,7 @@ impl Asset {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}

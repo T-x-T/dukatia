@@ -1277,3 +1277,333 @@ ALTER TABLE IF EXISTS public.tags
 	RENAME new_id TO id;
 ALTER TABLE IF EXISTS public.tags
 	ADD PRIMARY KEY (id);
+
+
+
+-- users
+
+-- first insert admin user if no users exist
+INSERT INTO public.users (name, secret, permissions, superuser, active, last_logon)
+  SELECT 'default', '', NULL, true, true, NULL
+  WHERE NOT EXISTS (SELECT * FROM public.users);
+
+ALTER TABLE IF EXISTS public.users
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.users
+	ADD CONSTRAINT users_unique_new_id UNIQUE (new_id);
+
+DROP VIEW public.account_data;
+DROP VIEW public.asset_data;
+DROP VIEW public.budget_data;
+DROP VIEW public.recipient_data;
+DROP VIEW public.transaction_data;
+
+ALTER TABLE IF EXISTS public.access_tokens
+	ADD COLUMN new_user_id uuid;
+UPDATE public.access_tokens
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.access_tokens 
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.access_tokens
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.access_tokens
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.access_tokens
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.accounts
+	ADD COLUMN new_user_id uuid;
+ALTER TABLE IF EXISTS public.accounts
+  DROP CONSTRAINT IF EXISTS user_id;
+UPDATE public.accounts
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.accounts
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.accounts
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.accounts
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.accounts
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.assets
+	ADD COLUMN new_user_id uuid;
+UPDATE public.assets
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.assets
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.assets
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.assets
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.assets
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.budgets
+	ADD COLUMN new_user_id uuid;
+UPDATE public.budgets
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.budgets
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.budgets
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.budgets
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.budgets
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.charts
+	ADD COLUMN new_user_id uuid;
+UPDATE public.charts
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.charts
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.charts
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.charts
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.charts
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.dashboards
+	ADD COLUMN new_user_id uuid;
+UPDATE public.dashboards
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.dashboards
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.dashboards
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.dashboards
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.dashboards
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.recipients
+	ADD COLUMN new_user_id uuid;
+UPDATE public.recipients
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.recipients
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.recipients
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.recipients
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.tags
+	ADD COLUMN new_user_id uuid;
+UPDATE public.tags
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.tags
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.tags
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.tags
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.tags
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.transactions
+	ADD COLUMN new_user_id uuid;
+UPDATE public.transactions
+	SET new_user_id = (
+		SELECT new_id FROM public.users WHERE id = user_id
+	);
+ALTER TABLE IF EXISTS public.transactions
+	DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS public.transactions
+	RENAME new_user_id TO user_id;
+ALTER TABLE IF EXISTS public.transactions
+	ALTER COLUMN user_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.transactions
+	ADD CONSTRAINT user_id FOREIGN KEY (user_id)
+	REFERENCES public.users (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.users DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.users
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.users
+	ADD PRIMARY KEY (id);
+
+
+CREATE OR REPLACE VIEW public.transaction_data
+ AS
+ SELECT tr.id,
+    tr.account_id,
+    tr.currency_id,
+    tr.recipient_id,
+    tr.status,
+    tr.user_id,
+    tr."timestamp",
+    tr.comment,
+    array_agg(t.tag_id) AS tags,
+    a.id AS asset_id,
+    a.name AS asset_name,
+    a.description AS asset_description,
+    ( SELECT array_agg(p.id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_ids,
+    ( SELECT array_agg(p.amount) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_amounts,
+    ( SELECT array_agg(p.comment) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_comments,
+    ( SELECT array_agg(p.tag_id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_tag_ids,
+    ( SELECT sum(p.amount) AS sum
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS total_amount,
+    c.minor_in_major,
+    c.symbol
+   FROM transactions tr
+     LEFT JOIN transaction_tags t ON tr.id = t.transaction_id
+     LEFT JOIN asset_transactions at ON at.transaction_id = tr.id
+     LEFT JOIN assets a ON a.id = at.asset_id
+     LEFT JOIN currencies c ON c.id = tr.currency_id
+  GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
+  ORDER BY tr."timestamp" DESC, tr.comment;
+
+ALTER TABLE public.transaction_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.account_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.default_currency_id,
+    a.user_id,
+    array_agg(DISTINCT t.tag_id) AS tags,
+    sum(tr.total_amount)::bigint AS balance
+   FROM accounts a
+     LEFT JOIN account_tags t ON a.id = t.account_id
+     LEFT JOIN transaction_data tr ON a.id = tr.account_id
+  GROUP BY a.id
+  ORDER BY a.name;
+
+ALTER TABLE public.account_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.asset_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.description,
+    a.user_id,
+    a.currency_id,
+    array_agg(t.tag_id) AS tags,
+        CASE
+            WHEN aa.amount IS NULL THEN 0::double precision
+            ELSE aa.amount
+        END AS amount,
+        CASE
+            WHEN av.value_per_unit IS NULL THEN 0
+            ELSE av.value_per_unit
+        END AS value_per_unit,
+    c.minor_in_major,
+    c.symbol
+   FROM assets a
+     LEFT JOIN asset_amounts aa ON a.id = aa.asset_id AND aa."timestamp" = (( SELECT max(asset_amounts."timestamp") AS max
+           FROM asset_amounts
+          WHERE asset_amounts.asset_id = a.id
+          GROUP BY asset_amounts.asset_id))
+     LEFT JOIN asset_valuations av ON a.id = av.asset_id AND av."timestamp" = (( SELECT max(asset_valuations."timestamp") AS max
+           FROM asset_valuations
+          WHERE asset_valuations.asset_id = a.id
+          GROUP BY asset_valuations.asset_id))
+     LEFT JOIN asset_tags t ON a.id = t.asset_id
+     LEFT JOIN currencies c ON a.currency_id = c.id
+  GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
+  ORDER BY a.name;
+
+ALTER TABLE public.asset_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.budget_data
+ AS
+ SELECT b.id,
+    b.name,
+    b.user_id,
+    b.amount,
+    b.rollover,
+    b.period,
+    array_agg(DISTINCT bft.tag_id) AS filter_tag_ids,
+    b.active_from,
+    b.active_to,
+    c.minor_in_major,
+    c.symbol,
+    b.currency_id
+   FROM budgets b
+     LEFT JOIN budget_filter_tags bft ON b.id = bft.budget_id
+     LEFT JOIN currencies c ON c.id = b.currency_id
+  GROUP BY b.id, c.id
+  ORDER BY b.name;
+
+ALTER TABLE public.budget_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.recipient_data
+ AS
+ SELECT r.id,
+    r.name,
+    r.user_id,
+    array_agg(t.tag_id) AS tags
+   FROM recipients r
+     LEFT JOIN recipient_tags t ON r.id = t.recipient_id
+  GROUP BY r.id
+  ORDER BY r.name;
+
+ALTER TABLE public.recipient_data
+    OWNER TO postgres;

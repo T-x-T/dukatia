@@ -356,7 +356,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	}
 }
 
-async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: Uuid, user_id: u32) -> Result<(), Box<dyn Error>> {
+async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: Uuid, user_id: Uuid) -> Result<(), Box<dyn Error>> {
 	let asset = super::AssetLoader::new(pool)
 		.set_filter_id_uuid(asset_id, NumberFilterModes::Exact)
 		.get_first().await?;

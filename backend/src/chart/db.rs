@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::ChartOptions;
 use crate::CustomError;
 
-pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: u32) -> Result<ChartOptions, Box<dyn Error>> {
+pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: Uuid) -> Result<ChartOptions, Box<dyn Error>> {
 	let res = pool.get()
 		.await
 		.unwrap()
@@ -28,7 +28,7 @@ pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: u32) -> Result<ChartOptio
 		return Ok(chart_options);
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: Uuid) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
 	let res = pool.get()
 		.await
 		.unwrap()
@@ -46,7 +46,7 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_i
 }
 
 pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
-	let user_id: i32 = chart.user_id as i32;
+	let user_id: Uuid = chart.user_id;
 	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
 	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
 	let top_left_x: Option<i32> = chart.top_left_x.map(|x| x as i32);
@@ -98,26 +98,26 @@ pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
 }
 
 fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
-	let user_id: i32 = row.get(0);
-	let chart_type: String = row.get(1);
-	let title: String = row.get(2);
-	let filter_from: Option<DateTime<Utc>> = row.get(3);
-	let filter_to: Option<DateTime<Utc>> = row.get(4);
-	let filter_collection: Option<String> = row.get(5);
-	let date_period: Option<String> = row.get(6);
-	let max_items: Option<i32> = row.get(7);
-	let date_range: Option<i32> = row.get(8);
-	let top_left_x: Option<i32> = row.get(9);
-	let top_left_y: Option<i32> = row.get(10);
-	let bottom_right_x: Option<i32> = row.get(11);
-	let bottom_right_y: Option<i32> = row.get(12);
-	let only_positive: Option<bool> = row.get(13);
-	let only_negative: Option<bool> = row.get(14);
-	let id: Uuid = row.get(15);
+	let chart_type: String = row.get(0);
+	let title: String = row.get(1);
+	let filter_from: Option<DateTime<Utc>> = row.get(2);
+	let filter_to: Option<DateTime<Utc>> = row.get(3);
+	let filter_collection: Option<String> = row.get(4);
+	let date_period: Option<String> = row.get(5);
+	let max_items: Option<i32> = row.get(6);
+	let date_range: Option<i32> = row.get(7);
+	let top_left_x: Option<i32> = row.get(8);
+	let top_left_y: Option<i32> = row.get(9);
+	let bottom_right_x: Option<i32> = row.get(10);
+	let bottom_right_y: Option<i32> = row.get(11);
+	let only_positive: Option<bool> = row.get(12);
+	let only_negative: Option<bool> = row.get(13);
+	let id: Uuid = row.get(14);
+	let user_id: Uuid = row.get(15);
 	
 	return ChartOptions {
 		id,
-		user_id: user_id as u32,
+		user_id,
 		chart_type,
 		title,
 		filter_from,
