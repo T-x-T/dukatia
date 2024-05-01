@@ -20,7 +20,7 @@ pub async fn insert_demo_data(pool: &Pool, user_id: Uuid) -> Result<(), Box<dyn 
 		return Err(Box::new(CustomError::InvalidActionForItem { action: "create demo data for user with preexisting data".to_string(), item_type: "user".to_string() }));
 	}
 
-	let currencies = currency::CurrencyLoader::new(&pool).get().await?;
+	let currencies = currency::CurrencyLoader::new(pool).get().await?;
 
 	for account in get_accounts(user_id, &currencies) {
 		account.create(pool).await?;

@@ -152,7 +152,7 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 								}
 
 								match user_to_edit.update(&data.pool).await {
-									Ok(_) => return HttpResponse::Ok().body(""),
+									Ok(()) => return HttpResponse::Ok().body(""),
 									Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 								}
 							},

@@ -138,7 +138,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curren
 				.update(&data.pool).await;
 	
 			match result {
-				Ok(_) => return HttpResponse::Ok().body(""),
+				Ok(()) => return HttpResponse::Ok().body(""),
 				Err(e) => {
 					if e.to_string().starts_with("no item of type unknown found") {
 						return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type currency not found with filter id={currency_id}\"}}"));
