@@ -80,7 +80,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::RecipientLoader::new(self.pool)
-			.set_filter_id_uuid(self.recipient.id, NumberFilterModes::Exact)
+			.set_filter_id(self.recipient.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		match old.user_id {
@@ -91,7 +91,7 @@ impl<'a> DbWriter<'a, Recipient> for RecipientDbWriter<'a> {
 			},
 			None => {
 				let old_user = crate::user::UserLoader::new(self.pool)
-					.set_filter_id_uuid(self.recipient.id, NumberFilterModes::Exact)
+					.set_filter_id(self.recipient.id, NumberFilterModes::Exact)
 					.get_first().await?;
 
 				if !old_user.superuser {

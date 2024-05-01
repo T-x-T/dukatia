@@ -180,8 +180,8 @@ pub struct AssetValuation {
 	pub asset_id: Uuid,
 }
 
-impl Save for AssetValuation {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
+impl Create for AssetValuation {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
 		let valuation_history = AssetValuationLoader::new(pool).set_filter_asset_id(self.asset_id, NumberFilterModes::Exact).get().await?;
 		let newer_than_input: Vec<&AssetValuation> = valuation_history.iter()
 			.filter(
@@ -218,7 +218,7 @@ impl Save for AssetValuation {
 
 		db::AssetDbWriter::new(pool, Asset::default().set_id(self.asset_id)).replace_valuation_history(new_asset_valuations).await?;
 
-		return Ok(0);
+		return Ok(self.asset_id);
 	}
 }
 

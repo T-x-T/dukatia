@@ -21,7 +21,7 @@ pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartO
 	}
 
 	let asset = AssetLoader::new(pool)
-		.set_filter_id_uuid(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
@@ -40,7 +40,7 @@ pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: Chart
 	}
 
 	let asset = AssetLoader::new(pool)
-		.set_filter_id_uuid(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
@@ -59,7 +59,7 @@ pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOption
 	}
 
 	let asset = AssetLoader::new(pool)
-		.set_filter_id_uuid(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;

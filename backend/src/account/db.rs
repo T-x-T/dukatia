@@ -76,7 +76,7 @@ impl<'a> DbWriter<'a, Account> for AccountDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::AccountLoader::new(self.pool)
-			.set_filter_id_uuid(self.account.id, NumberFilterModes::Exact)
+			.set_filter_id(self.account.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.account.user_id {

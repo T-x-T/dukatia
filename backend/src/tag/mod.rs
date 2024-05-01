@@ -60,7 +60,7 @@ impl Tag {
 			return true;
 		}
 
-		if TagLoader::new(pool).set_filter_id_uuid(self.parent_id.unwrap(), NumberFilterModes::Exact).get_first().await.is_err() {
+		if TagLoader::new(pool).set_filter_id(self.parent_id.unwrap(), NumberFilterModes::Exact).get_first().await.is_err() {
 			return false;
 		}
 
@@ -70,7 +70,7 @@ impl Tag {
 			if next_parent_id_to_check == self.id {
 				return false;
 			}
-			let next_tag = TagLoader::new(pool).set_filter_id_uuid(next_parent_id_to_check, NumberFilterModes::Exact).get_first().await;
+			let next_tag = TagLoader::new(pool).set_filter_id(next_parent_id_to_check, NumberFilterModes::Exact).get_first().await;
 			if next_tag.is_err() {
 				break;
 			}

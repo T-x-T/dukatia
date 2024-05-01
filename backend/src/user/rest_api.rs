@@ -33,7 +33,7 @@ async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -86,7 +86,7 @@ async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: Htt
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(user) => {
@@ -124,13 +124,13 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 	};
 
 	match UserLoader::new(&data.pool)
-		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(user) => {
 				if user.superuser {
 					match UserLoader::new(&data.pool)
-						.set_filter_id_uuid(*req_user_id, NumberFilterModes::Exact)
+						.set_filter_id(*req_user_id, NumberFilterModes::Exact)
 						.get_first()
 						.await {
 							Ok(mut user_to_edit) => {
@@ -180,7 +180,7 @@ async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, r
 	};
 
 	let user = match UserLoader::new(&data.pool)
-		.set_filter_id_uuid(user_id, NumberFilterModes::Exact)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await {
 			Ok(x) => x,

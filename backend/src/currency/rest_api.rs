@@ -27,7 +27,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters {
-		id_uuid: request_parameters.filter_id.map(|x| {
+		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
@@ -67,7 +67,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web
 	};
 
 	let result = super::CurrencyLoader::new(&data.pool)
-		.set_filter_id_uuid(*currency_id, NumberFilterModes::Exact)
+		.set_filter_id(*currency_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {
@@ -96,7 +96,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curre
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match crate::user::UserLoader::new(&data.pool).set_filter_id_uuid(user_id, NumberFilterModes::Exact).get_first().await {
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
     Ok(user) => {
 			if !user.superuser {
 				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to create new currencies\"}");
@@ -124,7 +124,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Curren
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match crate::user::UserLoader::new(&data.pool).set_filter_id_uuid(user_id, NumberFilterModes::Exact).get_first().await {
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
     Ok(user) => {
 			if !user.superuser {
 				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to update existing currencies\"}");

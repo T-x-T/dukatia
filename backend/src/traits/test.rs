@@ -305,66 +305,6 @@ mod db_reader {
 		}
 
 		#[test]
-		fn filter_id_exact() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Exact));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_exact_or_also_null() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::ExactOrAlsoNull));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE (id IS NULL OR id=$1)");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_not() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Not));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_less() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Less));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_more() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::More));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
 		fn filter_total_amount_exact() {
 			let mut filters = Filters::default();
 			filters.total_amount = Some((10, NumberFilterModes::Exact));
@@ -1574,8 +1514,7 @@ mod db_reader {
 					sort_property: Some(FilterAndSortProperties::Id),
 					sort_direction: Some(SortDirection::Asc),
 					filters: Filters {
-						id: Some((1, NumberFilterModes::Exact)),
-						id_uuid: Some((Uuid::nil(), NumberFilterModes::Exact)),
+						id: Some((Uuid::nil(), NumberFilterModes::Exact)),
 						total_amount: Some((2, NumberFilterModes::Exact)),
 						asset_id: Some((Uuid::from_u128(3), NumberFilterModes::Exact)),
 						user_id: Some((Uuid::from_u128(4), NumberFilterModes::Exact)),
@@ -1604,8 +1543,8 @@ mod db_reader {
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
-			assert_eq!(res_string, " WHERE id=$1 AND id=$2 AND total_amount=$3 AND asset_id=$4 AND user_id=$5 AND currency_id=$6 AND account_id=$7 AND recipient_id=$8 AND minor_in_major=$9 AND parent_id=$10 AND default_currency_id=$11 AND balance=$12 AND amount=$13 AND amount=$14 AND value_per_unit=$15 AND $16 = ANY(tags) AND rollover=$17 AND comment ILIKE $18 AND name ILIKE $19 AND symbol ILIKE $20 AND description ILIKE $21 AND timestamp BETWEEN $22 AND $23 AND active_from BETWEEN $24 AND $25 AND active_to NOT BETWEEN $26 AND $27 ORDER BY id ASC OFFSET $28 LIMIT $29");
-			assert_eq!(format!("{res_values:?}"), "[1, 00000000-0000-0000-0000-000000000000, 2, 00000000-0000-0000-0000-000000000003, 00000000-0000-0000-0000-000000000004, 00000000-0000-0000-0000-000000000005, 00000000-0000-0000-0000-000000000006, 00000000-0000-0000-0000-000000000007, 12, 00000000-0000-0000-0000-00000000000d, 00000000-0000-0000-0000-00000000000f, 14, 17.5, 17, 18, 00000000-0000-0000-0000-000000000008, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
+			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND amount=$13 AND value_per_unit=$14 AND $15 = ANY(tags) AND rollover=$16 AND comment ILIKE $17 AND name ILIKE $18 AND symbol ILIKE $19 AND description ILIKE $20 AND timestamp BETWEEN $21 AND $22 AND active_from BETWEEN $23 AND $24 AND active_to NOT BETWEEN $25 AND $26 ORDER BY id ASC OFFSET $27 LIMIT $28");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-000000000000, 2, 00000000-0000-0000-0000-000000000003, 00000000-0000-0000-0000-000000000004, 00000000-0000-0000-0000-000000000005, 00000000-0000-0000-0000-000000000006, 00000000-0000-0000-0000-000000000007, 12, 00000000-0000-0000-0000-00000000000d, 00000000-0000-0000-0000-00000000000f, 14, 17.5, 17, 18, 00000000-0000-0000-0000-000000000008, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
 		}
 	}
 }

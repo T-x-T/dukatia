@@ -146,7 +146,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::TransactionLoader::new(self.pool)
-			.set_filter_id_uuid(self.transaction.id, NumberFilterModes::Exact)
+			.set_filter_id(self.transaction.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.transaction.user_id {
@@ -213,7 +213,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 impl<'a> DbDeleter<'a, Transaction> for TransactionDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		let old = super::TransactionLoader::new(self.pool)
-			.set_filter_id_uuid(self.transaction.id, NumberFilterModes::Exact)
+			.set_filter_id(self.transaction.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.transaction.user_id {

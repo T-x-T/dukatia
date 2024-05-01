@@ -83,7 +83,7 @@ impl Default for Transaction {
 impl Create for Transaction {
 	async fn create(mut self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
 		let account = account::AccountLoader::new(pool)
-			.set_filter_id_uuid(self.account_id, NumberFilterModes::Exact)
+			.set_filter_id(self.account_id, NumberFilterModes::Exact)
 			.get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 
@@ -94,7 +94,7 @@ impl Create for Transaction {
 impl Update for Transaction {
 	async fn update(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		let account = account::AccountLoader::new(pool)
-			.set_filter_id_uuid(self.account_id, NumberFilterModes::Exact)
+			.set_filter_id(self.account_id, NumberFilterModes::Exact)
 			.get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 

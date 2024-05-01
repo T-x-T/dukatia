@@ -81,7 +81,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::BudgetLoader::new(self.pool)
-			.set_filter_id_uuid(self.budget.id, NumberFilterModes::Exact)
+			.set_filter_id(self.budget.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.budget.user_id {
@@ -116,7 +116,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 impl<'a> DbDeleter<'a, Budget> for BudgetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		let old = super::BudgetLoader::new(self.pool)
-			.set_filter_id_uuid(self.budget.id, NumberFilterModes::Exact)
+			.set_filter_id(self.budget.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.budget.user_id {

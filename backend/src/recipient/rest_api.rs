@@ -25,7 +25,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters {
-		id_uuid: request_parameters.filter_id.map(|x| {
+		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
@@ -61,7 +61,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, recipient_id: we
 	};
 
 	let result = super::RecipientLoader::new(&data.pool)
-		.set_filter_id_uuid(*recipient_id, NumberFilterModes::Exact)
+		.set_filter_id(*recipient_id, NumberFilterModes::Exact)
 		.set_filter_user_id(user_id, NumberFilterModes::ExactOrAlsoNull)
 		.get_first().await;
 

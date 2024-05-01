@@ -70,7 +70,7 @@ impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {	
-		super::CurrencyLoader::new(self.pool).set_filter_id_uuid(self.currency.id, NumberFilterModes::Exact).get_first().await?;
+		super::CurrencyLoader::new(self.pool).set_filter_id(self.currency.id, NumberFilterModes::Exact).get_first().await?;
 	
 		self.pool.get()
 			.await

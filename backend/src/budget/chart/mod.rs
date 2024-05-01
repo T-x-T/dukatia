@@ -26,7 +26,7 @@ pub async fn get_single_budget_current_period_utilization(pool: &Pool, options: 
 	}
 	
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first_full()
 		.await?;
@@ -40,7 +40,7 @@ pub async fn get_single_budget_previous_period_utilization(pool: &Pool, options:
 	}
 
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
@@ -66,7 +66,7 @@ pub async fn get_single_budget_utilization_history(pool: &Pool, options: ChartOp
 	let mut output: IntermediateChartData = IntermediateChartData::default();
 
 	let budget = BudgetLoader::new(pool)
-		.set_filter_id_uuid(options.budget_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_id(options.budget_id.unwrap(), NumberFilterModes::Exact)
 		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;

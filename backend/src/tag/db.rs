@@ -71,7 +71,7 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::TagLoader::new(self.pool)
-			.set_filter_id_uuid(self.tag.id, NumberFilterModes::Exact)
+			.set_filter_id(self.tag.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.tag.user_id {
@@ -93,7 +93,7 @@ impl<'a> DbWriter<'a, Tag> for TagDbWriter<'a> {
 impl<'a> DbDeleter<'a, Tag> for TagDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		let old = super::TagLoader::new(self.pool)
-			.set_filter_id_uuid(self.tag.id, NumberFilterModes::Exact)
+			.set_filter_id(self.tag.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.tag.user_id {

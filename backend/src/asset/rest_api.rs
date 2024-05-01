@@ -65,7 +65,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters {
-		id_uuid: request_parameters.filter_id.map(|x| {
+		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		name: request_parameters.filter_name.clone().map(|x| {
@@ -113,7 +113,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::P
 	};
 
 	let result = super::AssetLoader::new(&data.pool)
-		.set_filter_id_uuid(*asset_id, NumberFilterModes::Exact)
+		.set_filter_id(*asset_id, NumberFilterModes::Exact)
 		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first_at(request_parameters.timestamp.unwrap_or(Utc::now())).await;
 
@@ -223,7 +223,7 @@ async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpR
 	};
 
 	let asset = super::AssetLoader::new(&data.pool)
-		.set_filter_id_uuid(*asset_id, NumberFilterModes::Exact)
+		.set_filter_id(*asset_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match asset {
@@ -265,7 +265,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 	};
 
 	let asset = super::AssetLoader::new(&data.pool)
-		.set_filter_id_uuid(*asset_id, NumberFilterModes::Exact)
+		.set_filter_id(*asset_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match asset {
@@ -315,7 +315,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 	};
 
 	let asset = super::AssetLoader::new(&data.pool)
-		.set_filter_id_uuid(asset_id, NumberFilterModes::Exact)
+		.set_filter_id(asset_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match asset {
@@ -358,7 +358,7 @@ async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::
 
 async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_id: Uuid, user_id: Uuid) -> Result<(), Box<dyn Error>> {
 	let asset = super::AssetLoader::new(pool)
-		.set_filter_id_uuid(asset_id, NumberFilterModes::Exact)
+		.set_filter_id(asset_id, NumberFilterModes::Exact)
 		.get_first().await?;
 
 	super::AssetValuation {
@@ -366,7 +366,7 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		amount: body.amount.unwrap(),
 		timestamp: body.timestamp,
 		asset_id,
-	}.save(pool).await?;
+	}.create(pool).await?;
 
 	if body.account_id.is_none() {
 		return Ok(());

@@ -71,7 +71,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters { 
-		id_uuid: request_parameters.filter_id.map(|x| {
+		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
@@ -130,7 +130,7 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 
 	let filters = Filters { 
-		id_uuid: request_parameters.filter_id.map(|x| {
+		id: request_parameters.filter_id.map(|x| {
 			(x, request_parameters.filter_mode_id.clone().unwrap_or_default().into())
 		}),
 		total_amount: request_parameters.filter_total_amount.map(|x| {
@@ -185,7 +185,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
-		.set_filter_id_uuid(*transaction_id, NumberFilterModes::Exact)
+		.set_filter_id(*transaction_id, NumberFilterModes::Exact)
 		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first().await;
 

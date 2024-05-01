@@ -121,7 +121,7 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
 		let old = super::AssetLoader::new(self.pool)
-			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
+			.set_filter_id(self.asset.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.asset.user_id {
@@ -154,7 +154,7 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 impl<'a> AssetDbWriter<'a> {
 	pub async fn replace_valuation_history(self, asset_valuations: Vec<AssetValuation>) -> Result<(), Box<dyn Error>> {
 		super::AssetLoader::new(self.pool)
-			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
+			.set_filter_id(self.asset.id, NumberFilterModes::Exact)
 			.get_first().await?;
 	
 		let client = self.pool.get().await?;
@@ -183,7 +183,7 @@ pub struct AssetValuationDbWriter<'a> {
 	asset_valuation: AssetValuation,
 }
 
-impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
+impl<'a> DbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 	fn new(pool: &'a Pool, item: AssetValuation) -> Self {
 		Self { 
 			pool,
@@ -191,8 +191,8 @@ impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
-		super::AssetLoader::new(self.pool).set_filter_id_uuid(self.asset_valuation.asset_id, NumberFilterModes::Exact).get_first().await?;
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
+		super::AssetLoader::new(self.pool).set_filter_id(self.asset_valuation.asset_id, NumberFilterModes::Exact).get_first().await?;
 	
 		let client = self.pool.get().await?;
 		
@@ -206,7 +206,7 @@ impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 			&[&self.asset_valuation.asset_id, &self.asset_valuation.timestamp, &self.asset_valuation.value_per_unit.to_amount()]
 		).await?;
 	
-		return Ok(0);
+		return Ok(self.asset_valuation.asset_id);
 	}
 
 	#[allow(clippy::unused_async)]
@@ -218,7 +218,7 @@ impl<'a> OldDbWriter<'a, AssetValuation> for AssetValuationDbWriter<'a> {
 impl<'a> DbDeleter<'a, Asset> for AssetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
 		let old = super::AssetLoader::new(self.pool)
-			.set_filter_id_uuid(self.asset.id, NumberFilterModes::Exact)
+			.set_filter_id(self.asset.id, NumberFilterModes::Exact)
 			.get_first().await?;
 
 		if old.user_id != self.asset.user_id {

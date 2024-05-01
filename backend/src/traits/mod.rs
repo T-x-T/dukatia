@@ -16,7 +16,6 @@ pub enum FilterAndSortProperties {
 	Comment,
 	CurrencyId,
 	Id,
-	IdUuid,
 	RecipientId,
 	Status,
 	Timestamp,
@@ -44,7 +43,7 @@ impl std::fmt::Display for FilterAndSortProperties {
 			FilterAndSortProperties::AccountId => write!(f, "account_id"),
 			FilterAndSortProperties::Comment => write!(f, "comment"),
 			FilterAndSortProperties::CurrencyId => write!(f, "currency_id"),
-			FilterAndSortProperties::Id | FilterAndSortProperties::IdUuid => write!(f, "id"),
+			FilterAndSortProperties::Id => write!(f, "id"),
 			FilterAndSortProperties::RecipientId => write!(f, "recipient_id"),
 			FilterAndSortProperties::Status => write!(f, "status"),
 			FilterAndSortProperties::Timestamp => write!(f, "timestamp"),
@@ -125,8 +124,7 @@ impl QueryParameters {
 
 #[derive(Debug, Default, Clone)]
 pub struct Filters {
-	pub id: Option<(u32, NumberFilterModes)>,
-	pub id_uuid: Option<(Uuid, NumberFilterModes)>,
+	pub id: Option<(Uuid, NumberFilterModes)>,
 	pub total_amount: Option<(i32, NumberFilterModes)>,
 	pub asset_id: Option<(Uuid, NumberFilterModes)>,
 	pub user_id: Option<(Uuid, NumberFilterModes)>,
@@ -238,11 +236,6 @@ impl From<String> for TimeRangeFilterModes {
 }
 
 
-
-pub trait Save {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>>;
-}
-
 pub trait Create {
 	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>>;
 }
@@ -262,15 +255,9 @@ pub trait Loader<'a, T: Clone>: Sized + Clone {
 	fn set_query_parameters(self, query_parameters: QueryParameters) -> Self;
 	async fn get(self) -> Result<Vec<T>, Box<dyn Error>>;
 	
-	fn set_filter_id(self, id: u32, filter_mode: NumberFilterModes) -> Self {
+	fn set_filter_id(self, id: Uuid, filter_mode: NumberFilterModes) -> Self {
 		let mut query_parameters = self.get_query_parameters().clone();
 		query_parameters.filters.id = Some((id, filter_mode));
-		return self.set_query_parameters(query_parameters);
-	}
-	
-	fn set_filter_id_uuid(self, id: Uuid, filter_mode: NumberFilterModes) -> Self {
-		let mut query_parameters = self.get_query_parameters().clone();
-		query_parameters.filters.id_uuid = Some((id, filter_mode));
 		return self.set_query_parameters(query_parameters);
 	}
 	
@@ -437,18 +424,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.id.unwrap().1, where_or_and, &property_name, i).as_str());
 
 			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0 as i32));
-			i += 1;
-		}
-
-		if self.get_query_parameters().filters.id_uuid.is_some() {
-			let property_name = get_property_name("id", &table_name);
-			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
-
-			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.id_uuid.unwrap().1, where_or_and, &property_name, i).as_str());
-
-			first_where_clause = false;
-			parameter_values.push(Box::new(self.get_query_parameters().filters.id_uuid.unwrap().0));
+			parameter_values.push(Box::new(self.get_query_parameters().filters.id.unwrap().0));
 			i += 1;
 		}
 
@@ -754,15 +730,6 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 	}
 }
 
-pub trait OldDbWriter<'a, T> {
-	fn new(pool: &'a Pool, item: T) -> Self;
-	async fn insert(self) -> Result<u32, Box<dyn Error>>;
-	async fn replace(self) -> Result<(), Box<dyn Error>>;
-}
-
-pub trait OldDbDeleter<'a, T>: OldDbWriter<'a, T> {
-	async fn delete(self) -> Result<(), Box<dyn Error>>;
-}
 
 pub trait DbWriter<'a, T> {
 	fn new(pool: &'a Pool, item: T) -> Self;
