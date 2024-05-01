@@ -1,7 +1,7 @@
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use std::error::Error;
 use super::Currency;
-use crate::CustomError;
 use crate::traits::*;
 
 #[derive(Debug)]
@@ -49,7 +49,7 @@ pub struct CurrencyDbWriter<'a> {
 	currency: Currency,
 }
 
-impl<'a> OldDbWriter<'a, Currency> for CurrencyDbWriter<'a> {
+impl<'a> DbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 	fn new(pool: &'a Pool, item: Currency) -> Self {
 		Self {
 			pool,
@@ -57,31 +57,27 @@ impl<'a> OldDbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
-		let id: i32 = self.pool.get()
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
+		self.pool.get()
 			.await
 			.unwrap()
 			.query(
-				"INSERT INTO public.currencies (id, name, minor_in_major, symbol) VALUES (DEFAULT, $1, $2, $3) RETURNING id;", 
-				&[&self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol])
-			.await?[0].get(0);
+				"INSERT INTO public.currencies (id, name, minor_in_major, symbol) VALUES ($1, $2, $3, $4);", 
+				&[&self.currency.id, &self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol])
+			.await?;
 
-		return Ok(id as u32);
+		return Ok(self.currency.id);
 	}
 
-	async fn replace(self) -> Result<(), Box<dyn Error>> {
-		if self.currency.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty { property: String::from("id"), item_type: String::from("currency") }));
-		}
-	
-		super::CurrencyLoader::new(self.pool).set_filter_id(self.currency.id.unwrap(), NumberFilterModes::Exact).get_first().await?;
+	async fn replace(self) -> Result<(), Box<dyn Error>> {	
+		super::CurrencyLoader::new(self.pool).set_filter_id_uuid(self.currency.id, NumberFilterModes::Exact).get_first().await?;
 	
 		self.pool.get()
 			.await
 			.unwrap()
 			.query(
 				"UPDATE public.currencies SET name=$1, minor_in_major=$2, symbol=$3 WHERE id=$4", 
-				&[&self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol, &(self.currency.id.unwrap() as i32)])
+				&[&self.currency.name, &(self.currency.minor_in_major as i32), &self.currency.symbol, &self.currency.id])
 			.await?;
 	
 		return Ok(());
@@ -90,13 +86,13 @@ impl<'a> OldDbWriter<'a, Currency> for CurrencyDbWriter<'a> {
 
 impl From<tokio_postgres::Row> for Currency {
 	fn from(value: tokio_postgres::Row) -> Self {
-		let id: i32 = value.get(0);
-		let name: String = value.get(1);
-		let minor_in_major: i32 = value.get(2);
-		let symbol: String = value.get(3);
+		let name: String = value.get(0);
+		let minor_in_major: i32 = value.get(1);
+		let symbol: String = value.get(2);
+		let id: Uuid = value.get(3);
 
 		return Self {
-			id: Some(id as u32),
+			id,
 			name,
 			minor_in_major: minor_in_major as u32,
 			symbol,

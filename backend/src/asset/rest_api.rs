@@ -133,7 +133,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::P
 struct AssetPost {
 	name: String,
 	description: Option<String>,
-	currency_id: u32,
+	currency_id: Uuid,
 	tag_ids: Option<Vec<Uuid>>,
 }
 

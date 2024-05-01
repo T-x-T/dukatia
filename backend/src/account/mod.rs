@@ -12,7 +12,7 @@ use crate::traits::*;
 pub struct Account {
 	pub id: Uuid,
 	pub name: String,
-	pub default_currency_id: u32,
+	pub default_currency_id: Uuid,
 	pub user_id: Uuid,
 	pub tag_ids: Vec<Uuid>,
 	pub balance: Option<i64>,
@@ -23,7 +23,7 @@ impl Default for Account {
 		Self {
 			id: Uuid::new_v4(),
 			name: String::new(),
-			default_currency_id: 0,
+			default_currency_id: Uuid::nil(),
 			user_id: Uuid::nil(),
 			tag_ids: Vec::new(), 
 			balance: None
@@ -54,7 +54,7 @@ impl Account {
 		return self;
 	}
 
-	pub fn set_default_currency_id(mut self, default_currency_id: u32) -> Self {
+	pub fn set_default_currency_id(mut self, default_currency_id: Uuid) -> Self {
 		self.default_currency_id = default_currency_id;
 		return self;
 	}

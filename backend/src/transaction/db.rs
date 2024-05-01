@@ -70,7 +70,8 @@ impl<'a> TransactionDbReader<'a> {
 					FROM transaction_data tr
 						LEFT JOIN currencies c ON tr.currency_id = c.id
 					{}
-					GROUP BY tr.currency_id, c.symbol, c.minor_in_major;"
+					GROUP BY tr.currency_id, c.symbol, c.minor_in_major, c.name
+					ORDER BY c.name ASC;"
 				, parameters.0).as_str(), parameter_values.as_slice()
 			).await?
 		  .into_iter()
@@ -105,7 +106,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 					&self.transaction.id,
 					&self.transaction.user_id,
 					&self.transaction.account_id,
-					&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::add") as i32),
+					&self.transaction.currency_id.expect("no currency_id passed into transaction::db::add"),
 					&self.transaction.recipient_id,
 					&(self.transaction.status as i32),
 					&self.transaction.timestamp,
@@ -157,7 +158,7 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		client.query(
 			"UPDATE public.transactions SET account_id=$1, currency_id=$2, recipient_id=$3, status=$4, timestamp=$5, comment=$6 WHERE id=$7;", 
 			&[&self.transaction.account_id,
-				&(self.transaction.currency_id.expect("no currency_id passed into transaction::db::update") as i32),
+				&self.transaction.currency_id.expect("no currency_id passed into transaction::db::update"),
 				&self.transaction.recipient_id,
 				&(self.transaction.status as i32),
 				&self.transaction.timestamp,
@@ -243,7 +244,7 @@ impl From<tokio_postgres::Row> for Transaction {
 	fn from(value: tokio_postgres::Row) -> Transaction {
 		let id: Uuid = value.get(0);
 		let account_id: Uuid = value.get(1);
-		let currency_id: i32 = value.get(2);
+		let currency_id: Uuid = value.get(2);
 		let recipient_id: Uuid = value.get(3);
 		let status: i32 = value.get(4);
 		let user_id: Uuid = value.get(5);
@@ -268,7 +269,7 @@ impl From<tokio_postgres::Row> for Transaction {
 				name: asset_name.unwrap(),
 				description: asset_description,
 				user_id,
-				currency_id: currency_id as u32,
+				currency_id,
 				value_per_unit: None,
 				amount: None,
 				tag_ids: Vec::new(),
@@ -292,7 +293,7 @@ impl From<tokio_postgres::Row> for Transaction {
 			.set_id(id)
 			.set_user_id(user_id)
 			.set_account_id(account_id)
-			.set_currency_id(currency_id as u32)
+			.set_currency_id(currency_id)
 			.set_recipient_id(recipient_id)
 			.set_status(match status {
 				0 => TransactionStatus::Withheld,

@@ -12,7 +12,7 @@ struct RequestParameters {
 	filter_mode_id: Option<String>,
 	filter_name: Option<String>,
 	filter_mode_name: Option<String>,
-	filter_currency_id: Option<u32>,
+	filter_currency_id: Option<Uuid>,
 	filter_mode_currency_id: Option<String>,
 	filter_tag_id: Option<Uuid>,
 	filter_mode_tag_id: Option<String>,
@@ -90,7 +90,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, account_id: web:
 #[derive(Deserialize)]
 struct AccountPost {
 	name: String,
-	default_currency_id: u32,
+	default_currency_id: Uuid,
 	tag_ids: Option<Vec<Uuid>>,
 }
 

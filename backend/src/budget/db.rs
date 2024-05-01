@@ -65,7 +65,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		client
 			.query(
 				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period, currency_id, active_from, active_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
-				&[&self.budget.id, &self.budget.name, &self.budget.user_id, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to]
+				&[&self.budget.id, &self.budget.name, &self.budget.user_id, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &self.budget.currency_id, &self.budget.active_from, &self.budget.active_to]
 			)
 			.await?;
 	
@@ -92,7 +92,7 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		
 		client.query(
 				"UPDATE public.budgets SET name=$1, amount=$2, rollover=$3, period=$4, currency_id=$5, active_from=$6, active_to=$7 WHERE id=$8;",
-				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to, &self.budget.id]
+				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &self.budget.currency_id, &self.budget.active_from, &self.budget.active_to, &self.budget.id]
 			)
 			.await?;
 		
@@ -145,7 +145,7 @@ impl From<tokio_postgres::Row> for Budget {
 		let active_to: Option<DateTime<Utc>> = value.get(8);
 		let minor_in_major: i32 = value.get(9);
 		let symbol: String = value.get(10);
-		let currency_id: i32 = value.get(11);
+		let currency_id: Uuid = value.get(11);
 		
 		return Budget {
 			id,
@@ -164,7 +164,7 @@ impl From<tokio_postgres::Row> for Budget {
 			filter_tag_ids,
 			active_from,
 			active_to,
-			currency_id: currency_id as u32,
+			currency_id,
 			used_amount: None,
 			available_amount: None,
 			utilization: None,

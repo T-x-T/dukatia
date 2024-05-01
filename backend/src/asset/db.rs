@@ -106,7 +106,7 @@ impl<'a> DbWriter<'a, Asset> for AssetDbWriter<'a> {
 
 		client.query(
 				"INSERT INTO public.assets (id, name, description, user_id, currency_id) VALUES ($1, $2, $3, $4, $5)", 
-				&[&self.asset.id, &self.asset.name, &self.asset.description, &self.asset.user_id, &(self.asset.currency_id as i32)]
+				&[&self.asset.id, &self.asset.name, &self.asset.description, &self.asset.user_id, &self.asset.currency_id]
 			).await?;
 
 		for tag_id in self.asset.tag_ids.clone() {
@@ -243,7 +243,7 @@ impl From<tokio_postgres::Row> for Asset {
 		let name: String = value.get(1);
 		let description: Option<String> = value.get(2);
 		let user_id: Uuid = value.get(3);
-		let currency_id: i32 = value.get(4);
+		let currency_id: Uuid = value.get(4);
 		let tag_ids: Vec<Uuid> = value.try_get(5).unwrap_or_default();
 		let amount: f64 = value.try_get(6).unwrap_or(0.0);
 		let value_per_unit: i32 = value.try_get(7).unwrap_or(0);
@@ -255,7 +255,7 @@ impl From<tokio_postgres::Row> for Asset {
 			name,
 			description,
 			user_id,
-			currency_id: currency_id as u32,
+			currency_id,
 			tag_ids,
 			value_per_unit: Some(Money::from_amount(value_per_unit, minor_in_major as u32, symbol)),
 			amount: Some(amount),

@@ -13,13 +13,16 @@ use crate::recipient::Recipient;
 use crate::asset::Asset;
 use crate::budget::{Budget, Period};
 use crate::transaction::{Transaction, Position, TransactionStatus};
+use crate::currency;
 
 pub async fn insert_demo_data(pool: &Pool, user_id: Uuid) -> Result<(), Box<dyn Error>> {
 	if user_has_data(pool, user_id).await? {
 		return Err(Box::new(CustomError::InvalidActionForItem { action: "create demo data for user with preexisting data".to_string(), item_type: "user".to_string() }));
 	}
 
-	for account in get_accounts(user_id) {
+	let currencies = currency::CurrencyLoader::new(&pool).get().await?;
+
+	for account in get_accounts(user_id, &currencies) {
 		account.create(pool).await?;
 	}
 
@@ -35,11 +38,11 @@ pub async fn insert_demo_data(pool: &Pool, user_id: Uuid) -> Result<(), Box<dyn 
 		asset.create(pool).await?;
 	}
 
-	for budget in get_budgets(user_id) {
+	for budget in get_budgets(user_id, &currencies) {
 		budget.create(pool).await?;
 	}
 
-	for transaction in get_transactions(user_id) {
+	for transaction in get_transactions(user_id, &currencies) {
 		transaction.create(pool).await?;
 	}
 
@@ -86,11 +89,14 @@ async fn user_has_data(pool: &Pool, user_id: Uuid) -> Result<bool, Box<dyn Error
 	return Ok(false);
 }
 
-fn get_accounts(user_id: Uuid) -> Vec<Account> {
+fn get_accounts(user_id: Uuid, currencies: &[currency::Currency]) -> Vec<Account> {
+	let first_currency = currencies.iter().filter(|c| c.symbol == "€").last().unwrap_or(currencies.first().unwrap());
+	let second_currency = currencies.iter().filter(|c| c.symbol == "$").last().unwrap_or(currencies.get(1).unwrap());
+
 	return vec![
-		Account {name: "Main street bank".to_string(), default_currency_id: 0, user_id, ..Default::default()},
-		Account {name: "US of Banks".to_string(), default_currency_id: 1, user_id, ..Default::default()},
-		Account {name: "PayBuddy".to_string(), default_currency_id: 0, user_id, ..Default::default()},
+		Account {name: "Main street bank".to_string(), default_currency_id: first_currency.id, user_id, ..Default::default()},
+		Account {name: "US of Banks".to_string(), default_currency_id: second_currency.id, user_id, ..Default::default()},
+		Account {name: "PayBuddy".to_string(), default_currency_id: first_currency.id, user_id, ..Default::default()},
 	];
 }
 
@@ -135,16 +141,20 @@ fn get_assets(user_id: Uuid) -> Vec<Asset> {
 	];
 }
 
-fn get_budgets(user_id: Uuid) -> Vec<Budget> {
+fn get_budgets(user_id: Uuid, currencies: &[currency::Currency]) -> Vec<Budget> {
+	let first_currency = currencies.iter().filter(|c| c.symbol == "€").last().unwrap_or(currencies.first().unwrap());
+
 	return vec![
-		Budget {name: "Waste".to_string(), user_id, amount: Money::from_amount(100_000, 100, "€".to_string()), period: Period::Monthly, currency_id: 0, ..Default::default()},
-		Budget {name: "Electronics".to_string(), user_id, amount: Money::from_amount(200_000, 100, "€".to_string()), period: Period::Yearly, currency_id: 0, ..Default::default()},
-		Budget {name: "Food".to_string(), user_id, amount: Money::from_amount(15_000, 100, "€".to_string()), period: Period::Weekly, currency_id: 0, ..Default::default()},
+		Budget {name: "Waste".to_string(), user_id, amount: Money::from_amount(100_000, 100, "€".to_string()), period: Period::Monthly, currency_id: first_currency.id, ..Default::default()},
+		Budget {name: "Electronics".to_string(), user_id, amount: Money::from_amount(200_000, 100, "€".to_string()), period: Period::Yearly, currency_id: first_currency.id, ..Default::default()},
+		Budget {name: "Food".to_string(), user_id, amount: Money::from_amount(15_000, 100, "€".to_string()), period: Period::Weekly, currency_id: first_currency.id, ..Default::default()},
 	];
 }
 
-fn get_transactions(user_id: Uuid) -> Vec<Transaction> {
+fn get_transactions(user_id: Uuid, currencies: &[currency::Currency]) -> Vec<Transaction> {
+	let first_currency = currencies.iter().filter(|c| c.symbol == "€").last().unwrap_or(currencies.first().unwrap());
+
 	return vec![
-		Transaction {user_id, currency_id: Some(0), status: TransactionStatus::Completed, timestamp: chrono::Utc::now(), positions: vec![Position {amount: Money::from_amount(150_000, 100, "€".to_string()), ..Default::default()}], ..Default::default()},
+		Transaction {user_id, currency_id: Some(first_currency.id), status: TransactionStatus::Completed, timestamp: chrono::Utc::now(), positions: vec![Position {amount: Money::from_amount(150_000, 100, "€".to_string()), ..Default::default()}], ..Default::default()},
 	];
 }

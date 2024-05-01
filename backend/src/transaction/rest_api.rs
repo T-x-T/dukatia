@@ -18,7 +18,7 @@ struct RequestParameters {
 	filter_mode_total_amount: Option<String>,
 	filter_asset_id: Option<Uuid>,
 	filter_mode_asset_id: Option<String>,
-	filter_currency_id: Option<u32>,
+	filter_currency_id: Option<Uuid>,
 	filter_mode_currency_id: Option<String>,
 	filter_account_id: Option<Uuid>,
 	filter_mode_account_id: Option<String>,

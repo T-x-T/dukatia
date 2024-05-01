@@ -4,7 +4,7 @@ declare global {
 	type Account = {
 		id?: string,
 		name: string,
-		default_currency_id?: number,
+		default_currency_id?: string,
 		user_id?: number,
 		tag_ids?: string[],
 		default_currency?: Currency,
@@ -25,7 +25,7 @@ declare global {
 		user_id: number,
 		name: string,
 		description?: string,
-		currency_id: number,
+		currency_id: string,
 		value_per_unit?: Money,
 		amount?: number,
 		tag_ids?: string[],
@@ -40,7 +40,7 @@ declare global {
 	}
 
 	type Currency = {
-		id?: number,
+		id?: string,
 		name: string,
 		minor_in_major: number,
 		symbol: string,
@@ -62,7 +62,7 @@ declare global {
 	type Transaction = {
 		id?: string,
 		user_id?: number,
-		currency_id?: number,
+		currency_id?: string,
 		account_id: string,
 		recipient_id: string,
 		status: TransactionStatus,
@@ -94,7 +94,7 @@ declare global {
 		rollover: boolean,
 		period: number,
 		filter_tag_ids: string[],
-		currency_id: number,
+		currency_id: string,
 		active_from: Date,
 		active_to?: Date,
 		active_from_string?: string,
@@ -250,7 +250,7 @@ declare global {
 		filter_mode_asset_id?: string,
 		filter_user_id?: number,
 		filter_mode_user_id?: string,
-		filter_currency_id?: number,
+		filter_currency_id?: string,
 		filter_mode_currency_id?: string,
 		filter_account_id?: string,
 		filter_mode_account_id?: string,

@@ -35,7 +35,7 @@ pub struct Budget {
 	pub rollover: bool,
 	pub period: Period,
 	pub filter_tag_ids: Vec<Uuid>,
-	pub currency_id: u32,
+	pub currency_id: Uuid,
 	pub active_from: DateTime<Utc>,
 	pub active_to: Option<DateTime<Utc>>,
 	pub used_amount: Option<Money>,
@@ -53,7 +53,7 @@ impl Default for Budget {
 			rollover: false,
 			period: Period::default(),
 			filter_tag_ids: Vec::new(),
-			currency_id: 0,
+			currency_id: Uuid::nil(),
 			active_from: DateTime::default(),
 			active_to: None,
 			used_amount: None,
@@ -117,7 +117,7 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+	pub fn set_currency_id(mut self, currency_id: Uuid) -> Self {
 		self.currency_id = currency_id;
 		return self;
 	}

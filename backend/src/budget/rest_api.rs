@@ -27,7 +27,7 @@ struct RequestParameters {
 	filter_lower_active_to: Option<DateTime<Utc>>,
 	filter_upper_active_to: Option<DateTime<Utc>>,
 	filter_mode_active_to: Option<String>,
-	filter_currency_id: Option<u32>,
+	filter_currency_id: Option<Uuid>,
 	filter_mode_currency_id: Option<String>,
 	at_timestamp: Option<DateTime<Utc>>,
 }
@@ -157,7 +157,7 @@ struct BudgetPost {
 	period: u8,
 	amount: Money,
 	filter_tag_ids: Vec<Uuid>,
-	currency_id: u32,
+	currency_id: Uuid,
 	active_from: DateTime<Utc>,
 	active_to: Option<DateTime<Utc>>,
 }

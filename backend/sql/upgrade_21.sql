@@ -1607,3 +1607,237 @@ CREATE OR REPLACE VIEW public.recipient_data
 
 ALTER TABLE public.recipient_data
     OWNER TO postgres;
+
+
+
+-- currency
+ALTER TABLE IF EXISTS public.currencies
+	ADD COLUMN new_id uuid NOT NULL DEFAULT gen_random_uuid();
+ALTER TABLE IF EXISTS public.currencies
+	ADD CONSTRAINT currencies_unique_new_id UNIQUE (new_id);
+
+DROP VIEW public.account_data;
+DROP VIEW public.transaction_data;
+DROP VIEW public.budget_data;
+DROP VIEW public.asset_valuation_history;
+DROP VIEW public.asset_data;
+
+ALTER TABLE IF EXISTS public.accounts
+	ADD COLUMN new_default_currency_id uuid;
+UPDATE public.accounts
+	SET new_default_currency_id = (
+		SELECT new_id FROM public.currencies WHERE id = default_currency_id
+	);
+ALTER TABLE IF EXISTS public.accounts
+	DROP COLUMN IF EXISTS default_currency_id;
+ALTER TABLE IF EXISTS public.accounts
+	RENAME new_default_currency_id TO default_currency_id;
+ALTER TABLE IF EXISTS public.accounts
+	ALTER COLUMN default_currency_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.accounts
+	ADD CONSTRAINT default_currency_id FOREIGN KEY (default_currency_id)
+	REFERENCES public.currencies (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.transactions
+	ADD COLUMN new_currency_id uuid;
+UPDATE public.transactions
+	SET new_currency_id = (
+		SELECT new_id FROM public.currencies WHERE id = currency_id
+	);
+ALTER TABLE IF EXISTS public.transactions
+	DROP COLUMN IF EXISTS currency_id;
+ALTER TABLE IF EXISTS public.transactions
+	RENAME new_currency_id TO currency_id;
+ALTER TABLE IF EXISTS public.transactions
+	ALTER COLUMN currency_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.transactions
+	ADD CONSTRAINT currency_id FOREIGN KEY (currency_id)
+	REFERENCES public.currencies (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.budgets
+	ADD COLUMN new_currency_id uuid;
+UPDATE public.budgets
+	SET new_currency_id = (
+		SELECT new_id FROM public.currencies WHERE id = currency_id
+	);
+ALTER TABLE IF EXISTS public.budgets
+	DROP COLUMN IF EXISTS currency_id;
+ALTER TABLE IF EXISTS public.budgets
+	RENAME new_currency_id TO currency_id;
+ALTER TABLE IF EXISTS public.budgets
+	ALTER COLUMN currency_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.budgets
+	ADD CONSTRAINT currency_id FOREIGN KEY (currency_id)
+	REFERENCES public.currencies (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+ALTER TABLE IF EXISTS public.assets
+	ADD COLUMN new_currency_id uuid;
+UPDATE public.assets
+	SET new_currency_id = (
+		SELECT new_id FROM public.currencies WHERE id = currency_id
+	);
+ALTER TABLE IF EXISTS public.assets
+	DROP COLUMN IF EXISTS currency_id;
+ALTER TABLE IF EXISTS public.assets
+	RENAME new_currency_id TO currency_id;
+ALTER TABLE IF EXISTS public.assets
+	ALTER COLUMN currency_id SET NOT NULL;
+ALTER TABLE IF EXISTS public.assets
+	ADD CONSTRAINT currency_id FOREIGN KEY (currency_id)
+	REFERENCES public.currencies (new_id) MATCH SIMPLE
+	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	NOT VALID;
+
+
+
+ALTER TABLE IF EXISTS public.currencies DROP COLUMN IF EXISTS id;
+ALTER TABLE IF EXISTS public.currencies
+	RENAME new_id TO id;
+ALTER TABLE IF EXISTS public.currencies
+	ADD PRIMARY KEY (id);
+
+
+
+CREATE OR REPLACE VIEW public.transaction_data
+ AS
+ SELECT tr.id,
+    tr.account_id,
+    tr.currency_id,
+    tr.recipient_id,
+    tr.status,
+    tr.user_id,
+    tr."timestamp",
+    tr.comment,
+    array_agg(t.tag_id) AS tags,
+    a.id AS asset_id,
+    a.name AS asset_name,
+    a.description AS asset_description,
+    ( SELECT array_agg(p.id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_ids,
+    ( SELECT array_agg(p.amount) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_amounts,
+    ( SELECT array_agg(p.comment) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_comments,
+    ( SELECT array_agg(p.tag_id) AS array_agg
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS transaction_position_tag_ids,
+    ( SELECT sum(p.amount) AS sum
+           FROM transaction_positions p
+          WHERE p.transaction_id = tr.id) AS total_amount,
+    c.minor_in_major,
+    c.symbol
+   FROM transactions tr
+     LEFT JOIN transaction_tags t ON tr.id = t.transaction_id
+     LEFT JOIN asset_transactions at ON at.transaction_id = tr.id
+     LEFT JOIN assets a ON a.id = at.asset_id
+     LEFT JOIN currencies c ON c.id = tr.currency_id
+  GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
+  ORDER BY tr."timestamp" DESC, tr.comment;
+
+ALTER TABLE public.transaction_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.account_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.default_currency_id,
+    a.user_id,
+    array_agg(DISTINCT t.tag_id) AS tags,
+    sum(tr.total_amount)::bigint AS balance
+   FROM accounts a
+     LEFT JOIN account_tags t ON a.id = t.account_id
+     LEFT JOIN transaction_data tr ON a.id = tr.account_id
+  GROUP BY a.id
+  ORDER BY a.name;
+
+ALTER TABLE public.account_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.budget_data
+ AS
+ SELECT b.id,
+    b.name,
+    b.user_id,
+    b.amount,
+    b.rollover,
+    b.period,
+    array_agg(DISTINCT bft.tag_id) AS filter_tag_ids,
+    b.active_from,
+    b.active_to,
+    c.minor_in_major,
+    c.symbol,
+    b.currency_id
+   FROM budgets b
+     LEFT JOIN budget_filter_tags bft ON b.id = bft.budget_id
+     LEFT JOIN currencies c ON c.id = b.currency_id
+  GROUP BY b.id, c.id
+  ORDER BY b.name;
+
+ALTER TABLE public.budget_data
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.asset_valuation_history
+ AS
+ SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
+    COALESCE(aa."timestamp", av."timestamp") AS "timestamp",
+    aa.amount,
+    av.value_per_unit,
+    c.minor_in_major,
+    c.symbol
+   FROM asset_amounts aa
+     FULL JOIN asset_valuations av ON aa.asset_id = av.asset_id AND aa."timestamp" = av."timestamp"
+     LEFT JOIN assets a ON aa.asset_id = a.id
+     LEFT JOIN currencies c ON a.currency_id = c.id
+  ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
+
+ALTER TABLE public.asset_valuation_history
+    OWNER TO postgres;
+
+CREATE OR REPLACE VIEW public.asset_data
+ AS
+ SELECT a.id,
+    a.name,
+    a.description,
+    a.user_id,
+    a.currency_id,
+    array_agg(t.tag_id) AS tags,
+        CASE
+            WHEN aa.amount IS NULL THEN 0::double precision
+            ELSE aa.amount
+        END AS amount,
+        CASE
+            WHEN av.value_per_unit IS NULL THEN 0
+            ELSE av.value_per_unit
+        END AS value_per_unit,
+    c.minor_in_major,
+    c.symbol
+   FROM assets a
+     LEFT JOIN asset_amounts aa ON a.id = aa.asset_id AND aa."timestamp" = (( SELECT max(asset_amounts."timestamp") AS max
+           FROM asset_amounts
+          WHERE asset_amounts.asset_id = a.id
+          GROUP BY asset_amounts.asset_id))
+     LEFT JOIN asset_valuations av ON a.id = av.asset_id AND av."timestamp" = (( SELECT max(asset_valuations."timestamp") AS max
+           FROM asset_valuations
+          WHERE asset_valuations.asset_id = a.id
+          GROUP BY asset_valuations.asset_id))
+     LEFT JOIN asset_tags t ON a.id = t.asset_id
+     LEFT JOIN currencies c ON a.currency_id = c.id
+  GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
+  ORDER BY a.name;
+
+ALTER TABLE public.asset_data
+    OWNER TO postgres;

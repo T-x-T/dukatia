@@ -29,7 +29,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 	for transaction in transactions {
 		let mut data_point = datasets_multi_currency.entry(transaction.recipient_id).or_default().last().unwrap_or(&default).clone();
 		let transaction_total_amount = transaction.total_amount.unwrap();
-		data_point.value.insert(transaction.currency_id.unwrap_or_default(), data_point.value.get(&transaction.currency_id.unwrap_or_default()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount);
+		data_point.value.insert(transaction.currency_id.unwrap(), data_point.value.get(&transaction.currency_id.unwrap()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount);
 
 		let timestamp: NaiveDate = get_date_for_period(options.date_period.clone().unwrap_or_default().as_str(), transaction.timestamp.date_naive());
 

@@ -26,7 +26,7 @@ pub struct Asset {
 	pub user_id: Uuid,
 	pub name: String,
 	pub description: Option<String>,
-	pub currency_id: u32,
+	pub currency_id: Uuid,
 	pub value_per_unit: Option<Money>,
 	pub amount: Option<f64>,
 	pub tag_ids: Vec<Uuid>,
@@ -40,7 +40,7 @@ impl Default for Asset {
 			user_id: Uuid::nil(),
 			name: String::new(),
 			description: None,
-			currency_id: 0,
+			currency_id: Uuid::nil(),
 			value_per_unit: None,
 			amount: None,
 			tag_ids: Vec::new(),
@@ -94,7 +94,7 @@ impl Asset {
 		return self;
 	}
 
-	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+	pub fn set_currency_id(mut self, currency_id: Uuid) -> Self {
 		self.currency_id = currency_id;
 		return self;
 	}

@@ -135,7 +135,7 @@ export default {
 
 		this.default_transaction = {
 			account_id: "",
-			currency_id: 0,
+			currency_id: undefined,
 			recipient_id: "",
 			tag_ids: [],
 			status: 1,
@@ -143,18 +143,18 @@ export default {
 			total_amount: {
 				major: 0,
 				minor: 0,
-				minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
-				symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+				minor_in_major: this.currencies[0].minor_in_major,
+				symbol: this.currencies[0].symbol,
 				is_negative: false,
 			},
 			comment: "",
-			currency: structuredClone(toRaw(this.currencies.filter(x => x.id == 0)[0])),
+			currency: structuredClone(toRaw(this.currencies[0])),
 			positions: [{
 				amount: {
 					major: 0,
 					minor: 0,
-					minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
-					symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+					minor_in_major: this.currencies[0].minor_in_major,
+					symbol: this.currencies[0].symbol,
 					is_negative: false,
 				},
 				comment: "",

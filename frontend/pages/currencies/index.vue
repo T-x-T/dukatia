@@ -34,7 +34,7 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
+				{name: "ID", type: "string", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Symbol", type: "string"},
 				{name: "Minor in major", type: "number"},
@@ -138,7 +138,7 @@ export default {
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_id) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(Number.isInteger(this.query_parameters.filter_minor_in_major)) url += `&filter_minor_in_major=${this.query_parameters.filter_minor_in_major}`;
 			if(this.query_parameters.filter_mode_minor_in_major) url += `&filter_mode_minor_in_major=${this.query_parameters.filter_mode_minor_in_major}`;

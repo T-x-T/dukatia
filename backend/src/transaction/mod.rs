@@ -49,7 +49,7 @@ pub struct TransactionSummary {
 pub struct Transaction {
 	pub id: Uuid,
 	pub user_id: Uuid,
-	pub currency_id: Option<u32>,
+	pub currency_id: Option<Uuid>,
 	pub account_id: Uuid,
 	pub recipient_id: Uuid,
 	pub status: TransactionStatus,
@@ -119,7 +119,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+	pub fn set_currency_id(mut self, currency_id: Uuid) -> Self {
 		self.currency_id = Some(currency_id);
 		return self;
 	}
