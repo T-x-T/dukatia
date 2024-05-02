@@ -4875,19 +4875,6 @@
 					}
 				},
 				{
-					"name": "transactions matching budget get correctly returned",
-					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%/transactions?at_timestamp=2023-12-28T12:34:56Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [
-							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-11-25T11:22:00Z","total_amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"this is a comment","tag_ids":["%%%[[[post tag id 0]]]...[[[id]]]%%%"],"asset":null,"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"a","tag_id":null}]},
-							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-10-25T11:22:00Z","total_amount":{"major":-1,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"this is a comment","tag_ids":["%%%[[[post tag id 1]]]...[[[id]]]%%%"],"asset":null,"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-1,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"a","tag_id":null}]}
-						]
-					},
-					"skip": true
-				},
-				{
 					"name": "set active from returns 200",
 					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%",
 					"method": "PUT",
@@ -4909,18 +4896,6 @@
 					"expected_outcome": {
 						"status_code_equals": 200
 					}
-				},
-				{
-					"name": "getting transactions of budget doesnt return transaction from before active_from",
-					"endpoint": "/api/v1/budgets/%%%[[[post of new budget returns 200 4]]]...[[[id]]]%%%/transactions?at_timestamp=2023-12-28T12:34:56Z",
-					"method": "GET",
-					"expected_outcome": {
-						"status_code_equals": 200,
-						"body_equals": [
-							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-11-25T11:22:00Z","total_amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"this is a comment","tag_ids":["%%%[[[post tag id 0]]]...[[[id]]]%%%"],"asset":null,"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-2,"minor":45,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"a","tag_id":null}]}
-						]
-					},
-					"skip": true
 				},
 				{
 					"name": "add new user works",
