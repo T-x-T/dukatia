@@ -119,6 +119,7 @@ async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req: Htt
 		top_left_y: None,
 		bottom_right_x: None,
 		bottom_right_y: None,
+		dashboard_id: None,
 	};
 
 	match super::get_chart_data(&data.pool, chart_options).await {
@@ -143,6 +144,7 @@ struct ChartPost {
 	top_left_y: Option<u32>,
 	bottom_right_x: Option<u32>,
 	bottom_right_y: Option<u32>,
+	dashboard_id: Option<Uuid>,
 }
 
 #[post("/api/v1/charts")]
@@ -171,10 +173,11 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Chart
 		top_left_y: body.top_left_y,
 		bottom_right_x: body.bottom_right_x,
 		bottom_right_y: body.bottom_right_y,
+		dashboard_id: body.dashboard_id,
 	};
 
 	match super::add(&data.pool, &chart).await {
-		Ok(()) => return HttpResponse::Ok().body(""),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
@@ -205,6 +208,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<ChartP
 		top_left_y: body.top_left_y,
 		bottom_right_x: body.bottom_right_x,
 		bottom_right_y: body.bottom_right_y,
+		dashboard_id: body.dashboard_id,
 	};
 
 	match super::update(&data.pool, &chart).await {

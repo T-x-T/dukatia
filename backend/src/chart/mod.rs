@@ -42,6 +42,7 @@ pub struct ChartOptions {
 	pub top_left_y: Option<u32>,
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
+	pub dashboard_id: Option<Uuid>,
 }
 
 impl Default for ChartOptions {
@@ -64,7 +65,8 @@ impl Default for ChartOptions {
 			top_left_x: None,
 			top_left_y: None,
 			bottom_right_x: None,
-			bottom_right_y: None
+			bottom_right_y: None,
+			dashboard_id: None,
 		}		 
 	}
 }
@@ -117,7 +119,7 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_i
 	return db::get_all_charts_in_dashboard(pool, dashboard_id, user_id).await;
 }
 
-pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Error>> {
 	return db::add(pool, chart).await;
 }
 

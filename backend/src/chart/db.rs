@@ -45,7 +45,7 @@ pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_i
 	)
 }
 
-pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Error>> {
 	let user_id: Uuid = chart.user_id;
 	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
 	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
@@ -63,9 +63,11 @@ pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>
 		&[&chart.id, &user_id, &chart.chart_type, &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection, &chart.date_period, &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y, &chart.only_positive, &chart.only_negative]
 	).await?;
 
-	client.query("INSERT INTO public.dashboard_charts (dashboard_id, chart_id) VALUES ($1, $2)", &[&0i32, &chart.id]).await?;
+	if chart.dashboard_id.is_some() {
+		client.query("INSERT INTO public.dashboard_charts (dashboard_id, chart_id) VALUES ($1, $2)", &[&chart.dashboard_id.unwrap(), &chart.id]).await?;
+	}
 
-	return Ok(());
+	return Ok(chart.id);
 }
 
 pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
@@ -134,5 +136,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 		bottom_right_y: bottom_right_y.map(|x| x as u32),
 		only_positive,
 		only_negative,
+		dashboard_id: None,
 	};
 }

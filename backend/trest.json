@@ -3171,6 +3171,50 @@
 			},
 			"tests": [
 				{
+					"name": "get current user",
+					"endpoint": "/api/v1/users/me",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "get euro",
+					"endpoint": "/api/v1/currencies/all?max_results=1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":"%%%ANY_UUID%%%","name":"Euro","minor_in_major":100,"symbol":"€"}]
+					}
+				},
+				{
+					"name": "get usd",
+					"endpoint": "/api/v1/currencies/all?skip_results=1",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":"%%%ANY_UUID%%%","name":"USD","minor_in_major":100,"symbol":"$"}]
+					}
+				},
+				{
+					"name": "retrieval of all recipients works",
+					"endpoint": "/api/v1/recipients/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":"%%%ANY_UUID%%%","name":"Default","user_id":null,"tag_ids":[]}]
+					}
+				},
+				{
+					"name": "retrieval of all accounts works",
+					"endpoint": "/api/v1/accounts/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [{"id":"%%%ANY_UUID%%%","name":"Default","default_currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","tag_ids":[],"balance":null}]
+					}
+				},
+				{
 					"name": "adding pie chart using filter_collection get_per_recipient_over_time returns 200",
 					"endpoint": "/api/v1/charts",
 					"method": "POST",
@@ -3185,11 +3229,11 @@
 				},
 				{
 					"name": "pie chart using filter_collection get_per_recipient_over_time got created correctly",
-					"endpoint": "/api/v1/charts/10",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":10,"user_id":0,"chart_type":"pie","title":"Spending per recipient in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per recipient in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3207,11 +3251,11 @@
 				},
 				{
 					"name": "pie chart using filter_collection get_per_tag_over_time got created correctly",
-					"endpoint": "/api/v1/charts/11",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":11,"user_id":0,"chart_type":"pie","title":"Spending per tag in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_tag_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per tag in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_tag_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3230,11 +3274,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_per_recipient_over_time got created correctly",
-					"endpoint": "/api/v1/charts/12",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":12,"user_id":0,"chart_type":"line","title":"Spending per recipient over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per recipient over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3253,11 +3297,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_per_account_over_time got created correctly",
-					"endpoint": "/api/v1/charts/13",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":13,"user_id":0,"chart_type":"line","title":"Spending per account over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_account_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per account over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_account_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3276,11 +3320,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_per_currency_over_time got created correctly",
-					"endpoint": "/api/v1/charts/14",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":14,"user_id":0,"chart_type":"line","title":"Spending per currency over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_currency_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per currency over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_currency_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3299,11 +3343,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_earning_spending_net_over_time got created correctly",
-					"endpoint": "/api/v1/charts/15",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":15,"user_id":0,"chart_type":"line","title":"Earning and spending over time","filter_from":null,"filter_to":null,"filter_collection":"get_earning_spending_net_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Earning and spending over time","filter_from":null,"filter_to":null,"filter_collection":"get_earning_spending_net_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3322,11 +3366,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_single_asset_total_value_over_time got created correctly",
-					"endpoint": "/api/v1/charts/16",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_total_value_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":16,"user_id":0,"chart_type":"line","title":"Total value over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_total_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_total_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Total value over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_total_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3345,11 +3389,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_single_asset_single_value_over_time got created correctly",
-					"endpoint": "/api/v1/charts/17",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_single_value_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":17,"user_id":0,"chart_type":"line","title":"Value over time per single unit","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_single_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_single_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Value over time per single unit","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_single_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 				{
@@ -3368,11 +3412,11 @@
 				},
 				{
 					"name": "line chart using filter_collection get_single_asset_amount_over_time got created correctly",
-					"endpoint": "/api/v1/charts/18",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":18,"user_id":0,"chart_type":"line","title":"Amount over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Amount over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
 					}
 				},
 
@@ -3404,16 +3448,16 @@
 				},
 				{
 					"name": "chart with all options got created correctly",
-					"endpoint": "/api/v1/charts/19",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":19,"user_id":0,"chart_type":"line","title":"test","filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"only_positive":true,"only_negative":false,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4}
+						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"test","filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"only_positive":true,"only_negative":false,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4,"dashboard_id":null}
 					}
 				},
 				{
 					"name": "modifying chart with all options returns 200",
-					"endpoint": "/api/v1/charts/19",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"body": {
 						"chart_type": "pie",
@@ -3437,16 +3481,16 @@
 				},
 				{
 					"name": "chart with all options modified got created correctly",
-					"endpoint": "/api/v1/charts/19",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":19,"user_id":0,"chart_type":"pie","title":"test2","filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"get_per_tag_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"only_positive":false,"only_negative":true,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7}
+						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"test2","filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"get_per_tag_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"only_positive":false,"only_negative":true,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7,"dashboard_id":null}
 					}
 				},
 				{
 					"name": "deleting chart returns 200",
-					"endpoint": "/api/v1/charts/19",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
 					"method": "DELETE",
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -3454,11 +3498,11 @@
 				},
 				{
 					"name": "deleted chart isnt there anymore",
-					"endpoint": "/api/v1/charts/19",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error":"specified item of type chart not found with filter id=19"}
+						"body_equals": {"error":"%%%ANY_STRING%%%"}
 					}
 				},
 
@@ -3498,18 +3542,6 @@
 					}
 				},
 				{
-					"name": "post of new account with Euro Currency returns 200",
-					"endpoint": "/api/v1/accounts",
-					"method": "POST",
-					"body": {
-						"name": "euro",
-						"default_currency_id": "%%%[[[get euro]]]...[[[id]]]%%%"
-					},
-					"expected_outcome": {
-						"status_code_equals": 200
-					}
-				},
-				{
 					"name": "post of new account with USD Currency returns 200",
 					"endpoint": "/api/v1/accounts",
 					"method": "POST",
@@ -3530,9 +3562,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
-						"recipient_id": 0,
+						"recipient_id": "%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3556,10 +3588,10 @@
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
-						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
-						"recipient_id": 1,
+						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0,1],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%","%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3584,10 +3616,10 @@
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
-						"account_id": 2,
-						"recipient_id": 1,
+						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [1],
+						"tag_ids": ["%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3611,43 +3643,43 @@
 
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time returns correct output",
-					"endpoint": "/api/v1/charts/1/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time returns correct output",
-					"endpoint": "/api/v1/charts/2/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time returns correct output",
-					"endpoint": "/api/v1/charts/3/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_account_over_time returns correct output",
-					"endpoint": "/api/v1/charts/4/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"2023-03-25","value":10.0,"label":"10.00$"}]},{"label":"euro","data":[{"name":null,"timestamp":"2023-03-25","value":-0.45,"label":"-0.45€"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"2023-03-25","value":10.0,"label":"10.00$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_currency_over_time returns correct output",
-					"endpoint": "/api/v1/charts/5/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3656,7 +3688,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3672,9 +3704,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
-						"recipient_id": 0,
+						"recipient_id": "%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "1923-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3699,9 +3731,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
-						"recipient_id": 1,
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0,1],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%","%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "1923-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3725,10 +3757,10 @@
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
-						"account_id": 2,
-						"recipient_id": 1,
+						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [1],
+						"tag_ids": ["%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "1923-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3753,9 +3785,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
-						"recipient_id": 0,
+						"recipient_id": "%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2123-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3780,9 +3812,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
-						"recipient_id": 1,
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0,1],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%","%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2123-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3806,10 +3838,10 @@
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
-						"account_id": 2,
-						"recipient_id": 1,
+						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [1],
+						"tag_ids": ["%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2123-03-25T11:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3834,56 +3866,56 @@
 
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/1/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.45,"label":"124.45€"},{"name":null,"timestamp":"2123-03-25","value":125.45,"label":"125.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"1.55€ 13.00$"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"3.55€ 16.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.45,"label":"124.45€"},{"name":null,"timestamp":"2123-03-25","value":125.45,"label":"125.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"15.00$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"20.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/2/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00€"},{"name":null,"timestamp":"2023-03-25","value":126.0,"label":"126.00€"},{"name":null,"timestamp":"2123-03-25","value":129.0,"label":"129.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"1.55€ 13.00$"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"3.55€ 16.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"2.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":126.0,"label":"2.00$ 124.00€"},{"name":null,"timestamp":"2123-03-25","value":129.0,"label":"4.00$ 125.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"15.00$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"20.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/3/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.45,"label":"124.45€"},{"name":null,"timestamp":"2123-03-25","value":125.45,"label":"125.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"1.55€ 13.00$"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"3.55€ 16.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.45,"label":"124.45€"},{"name":null,"timestamp":"2123-03-25","value":125.45,"label":"125.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":14.55,"label":"15.00$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":19.55,"label":"20.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_account_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/4/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.45,"label":"124.45€"},{"name":null,"timestamp":"2123-03-25","value":125.45,"label":"125.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00$"},{"name":null,"timestamp":"2023-03-25","value":13.0,"label":"13.00$"},{"name":null,"timestamp":"2123-03-25","value":16.0,"label":"16.00$"}]},{"label":"euro","data":[{"name":null,"timestamp":"1923-03-25","value":2.0,"label":"2.00€"},{"name":null,"timestamp":"2023-03-25","value":1.55,"label":"1.55€"},{"name":null,"timestamp":"2123-03-25","value":3.55,"label":"3.55€"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.0,"label":"124.00€"},{"name":null,"timestamp":"2123-03-25","value":125.0,"label":"125.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":15.0,"label":"15.00$"},{"name":null,"timestamp":"2123-03-25","value":20.0,"label":"20.00$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_currency_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/5/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Euro","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00€"},{"name":null,"timestamp":"2023-03-25","value":126.0,"label":"126.00€"},{"name":null,"timestamp":"2123-03-25","value":129.0,"label":"129.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00$"},{"name":null,"timestamp":"2023-03-25","value":13.0,"label":"13.00$"},{"name":null,"timestamp":"2123-03-25","value":16.0,"label":"16.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Euro","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":124.0,"label":"124.00€"},{"name":null,"timestamp":"2123-03-25","value":125.0,"label":"125.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":15.0,"label":"15.00$"},{"name":null,"timestamp":"2123-03-25","value":20.0,"label":"20.00$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time returns correct output with more transactions",
-					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":133.45,"label":"123.45€ 10.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":133.0,"label":"123.00€ 10.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.45,"label":"-0.45€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":133.45,"label":"123.45€ 10.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":133.0,"label":"123.00€ 10.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.45,"label":"-0.45€"}]}]}
 					}
 				},
 
@@ -3891,43 +3923,43 @@
 
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/1/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/2/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/3/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"-0.45€ 10.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"test","data":[{"name":null,"timestamp":"2023-03-25","value":9.55,"label":"10.00$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_account_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/4/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.45,"label":"123.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"2023-03-25","value":10.0,"label":"10.00$"}]},{"label":"euro","data":[{"name":null,"timestamp":"2023-03-25","value":-0.45,"label":"-0.45€"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"2023-03-25","value":123.0,"label":"123.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"2023-03-25","value":10.0,"label":"10.00$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_currency_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/5/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3936,7 +3968,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time within date range returns correct output",
-					"endpoint": "/api/v1/charts/6/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z&date_period=daily",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?from_date=2022-05-01T15:16:01.900Z&to_date=2024-05-01T15:16:01.900Z&date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -3952,9 +3984,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
-						"recipient_id": 0,
+						"recipient_id": "%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T12:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -3979,9 +4011,9 @@
 					"method": "POST",
 					"body": {
 						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
-						"recipient_id": 1,
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [0,1],
+						"tag_ids": ["%%%[[[post of new tag returns 200]]]...[[[id]]]%%%","%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T12:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -4006,10 +4038,10 @@
 					"endpoint": "/api/v1/transactions",
 					"method": "POST",
 					"body": {
-						"account_id": 2,
-						"recipient_id": 1,
+						"account_id": "%%%[[[post of new account with USD Currency returns 200]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%",
 						"status": 1,
-						"tag_ids": [1],
+						"tag_ids": ["%%%[[[post of second new tag returns 200]]]...[[[id]]]%%%"],
 						"timestamp": "2023-03-25T12:22:00.000Z",
 						"comment": "this is a comment",
 						"positions": [
@@ -4033,72 +4065,72 @@
 
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_recipient_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/1/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"1.10€ 23.00$"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"3.10€ 26.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"24.55$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"29.55$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of pie chart using filter_collection get_per_tag_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/2/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00€"},{"name":null,"timestamp":"2023-03-25","value":249.0,"label":"249.00€"},{"name":null,"timestamp":"2123-03-25","value":252.0,"label":"252.00€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"1.10€ 23.00$"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"3.10€ 26.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"2.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":249.0,"label":"247.45€ 1.55$"},{"name":null,"timestamp":"2123-03-25","value":252.0,"label":"3.55$ 248.45€"}]},{"label":"tag2","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"24.55$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"29.55$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_recipient_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/3/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"2.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"1.10€ 23.00$"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"3.10€ 26.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"test","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.1,"label":"24.55$ -0.45€"},{"name":null,"timestamp":"2123-03-25","value":29.1,"label":"29.55$ -0.45€"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_account_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/4/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00$"},{"name":null,"timestamp":"2023-03-25","value":23.0,"label":"23.00$"},{"name":null,"timestamp":"2123-03-25","value":26.0,"label":"26.00$"}]},{"label":"euro","data":[{"name":null,"timestamp":"1923-03-25","value":2.0,"label":"2.00€"},{"name":null,"timestamp":"2023-03-25","value":1.1,"label":"1.10€"},{"name":null,"timestamp":"2123-03-25","value":3.1,"label":"3.10€"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.45,"label":"247.45€"},{"name":null,"timestamp":"2123-03-25","value":248.45,"label":"248.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.55,"label":"24.55$"},{"name":null,"timestamp":"2123-03-25","value":29.55,"label":"29.55$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_per_currency_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/5/data",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%/data",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Euro","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00€"},{"name":null,"timestamp":"2023-03-25","value":249.0,"label":"249.00€"},{"name":null,"timestamp":"2123-03-25","value":252.0,"label":"252.00€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00$"},{"name":null,"timestamp":"2023-03-25","value":23.0,"label":"23.00$"},{"name":null,"timestamp":"2123-03-25","value":26.0,"label":"26.00$"}]}]}
+						"body_equals": {"datasets":[{"label":"Euro","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.45,"label":"247.45€"},{"name":null,"timestamp":"2123-03-25","value":248.45,"label":"248.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.55,"label":"24.55$"},{"name":null,"timestamp":"2123-03-25","value":29.55,"label":"29.55$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_earning_spending_net_over_time with multiple transactions on one day returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":266.0,"label":"246.00€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.9,"label":"-0.90€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":266.0,"label":"246.45€ 19.55$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.9,"label":"-0.45€ -0.45$"}]}]}
 					}
 				},
 
 
 				{
 					"name": "retrieval of pie chart get_per_tag_over_time using option max_items returns correct output",
-					"endpoint": "/api/v1/charts/2/data?max_items=1",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%/data?max_items=1",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"3.00€"},{"name":null,"timestamp":"2023-03-25","value":249.0,"label":"249.00€"},{"name":null,"timestamp":"2123-03-25","value":252.0,"label":"252.00€"}]}]}
+						"body_equals": {"datasets":[{"label":"tag1","data":[{"name":null,"timestamp":"1923-03-25","value":3.0,"label":"2.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":249.0,"label":"247.45€ 1.55$"},{"name":null,"timestamp":"2123-03-25","value":252.0,"label":"3.55$ 248.45€"}]}]}
 					}
 				},
 				{
-					"name": "retrieval of pie chart get_per_recipients_over_time using option max_items returns correct output",
-					"endpoint": "/api/v1/charts/1/data?max_items=1",
+					"name": "retrieval of pie chart get_per_recipient_over_time using option max_items returns correct output",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%/data?max_items=1",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4107,49 +4139,49 @@
 				},
 				{
 					"name": "retrieval of line chart using option max_items returns correct output",
-					"endpoint": "/api/v1/charts/4/data?max_items=2",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%/data?max_items=2",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.9,"label":"247.90€"},{"name":null,"timestamp":"2123-03-25","value":248.9,"label":"248.90€"}]},{"label":"euro","data":[{"name":null,"timestamp":"1923-03-25","value":2.0,"label":"2.00€"},{"name":null,"timestamp":"2023-03-25","value":1.1,"label":"1.10€"},{"name":null,"timestamp":"2123-03-25","value":3.1,"label":"3.10€"}]}]}
+						"body_equals": {"datasets":[{"label":"Default","data":[{"name":null,"timestamp":"1923-03-25","value":1.0,"label":"1.00€"},{"name":null,"timestamp":"2023-03-25","value":247.45,"label":"247.45€"},{"name":null,"timestamp":"2123-03-25","value":248.45,"label":"248.45€"}]},{"label":"USD","data":[{"name":null,"timestamp":"1923-03-25","value":5.0,"label":"5.00$"},{"name":null,"timestamp":"2023-03-25","value":24.55,"label":"24.55$"},{"name":null,"timestamp":"2123-03-25","value":29.55,"label":"29.55$"}]}]}
 					}
 				},
 
 
 				{
 					"name": "retrieval of line chart with date_period daily returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=daily",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=daily",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-25","value":266.0,"label":"246.00€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.9,"label":"-0.90€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-25","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-25","value":266.0,"label":"246.45€ 19.55$"},{"name":null,"timestamp":"2123-03-25","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-25","value":-0.9,"label":"-0.45€ -0.45$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart with date_period monthly returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=monthly",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=monthly",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-03-01","value":266.0,"label":"246.00€ 20.00$"},{"name":null,"timestamp":"2123-03-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-01","value":-0.9,"label":"-0.90€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-03-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-03-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-03-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-03-01","value":266.0,"label":"246.45€ 19.55$"},{"name":null,"timestamp":"2123-03-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-03-01","value":-0.9,"label":"-0.45€ -0.45$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart with date_period quarterly returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=quarterly",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=quarterly",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-01-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-01-01","value":266.0,"label":"246.00€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-01-01","value":-0.9,"label":"-0.90€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-01-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-01-01","value":266.0,"label":"246.45€ 19.55$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-01-01","value":-0.9,"label":"-0.45€ -0.45$"}]}]}
 					}
 				},
 				{
 					"name": "retrieval of line chart with date_period yearly returns correct output",
-					"endpoint": "/api/v1/charts/6/data?date_period=yearly",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%/data?date_period=yearly",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-01-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"3.00€ 3.00$"},{"name":null,"timestamp":"2023-01-01","value":266.0,"label":"246.00€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"3.00€ 3.00$"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-01-01","value":-0.9,"label":"-0.90€"}]}]}
+						"body_equals": {"datasets":[{"label":"Earning","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-01-01","value":266.9,"label":"246.90€ 20.00$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Net","data":[{"name":null,"timestamp":"1923-01-01","value":6.0,"label":"5.00$ 1.00€"},{"name":null,"timestamp":"2023-01-01","value":266.0,"label":"246.45€ 19.55$"},{"name":null,"timestamp":"2123-01-01","value":6.0,"label":"5.00$ 1.00€"}]},{"label":"Spending","data":[{"name":null,"timestamp":"2023-01-01","value":-0.9,"label":"-0.45€ -0.45$"}]}]}
 					}
 				},
 
@@ -4170,7 +4202,7 @@
 				},
 				{
 					"name": "post of first valuation returns 200",
-					"endpoint": "/api/v1/assets/0/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of new asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -4189,7 +4221,7 @@
 				},
 				{
 					"name": "post of second valuation returns 200",
-					"endpoint": "/api/v1/assets/0/valuations",
+					"endpoint": "/api/v1/assets/%%%[[[post of new asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
 					"body": {
 						"value_per_unit": {
@@ -4208,7 +4240,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_single_asset_total_value_over_time returns correct output two valuations",
-					"endpoint": "/api/v1/charts/16/data?asset_id=0",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_total_value_over_time returns 200]]]...[[[id]]]%%%/data?asset_id=%%%[[[post of new asset returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4217,7 +4249,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_single_asset_single_value_over_time returns correct output two valuations",
-					"endpoint": "/api/v1/charts/17/data?asset_id=0",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_single_value_over_time returns 200]]]...[[[id]]]%%%/data?asset_id=%%%[[[post of new asset returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4226,7 +4258,7 @@
 				},
 				{
 					"name": "retrieval of line chart using filter_collection get_single_asset_amount_over_time returns correct output two valuations",
-					"endpoint": "/api/v1/charts/18/data?asset_id=0",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%/data?asset_id=%%%[[[post of new asset returns 200]]]...[[[id]]]%%%",
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
