@@ -133,7 +133,7 @@
 			<tbody>
 				<tr v-for="(row, row_index) in rowsForDisplay" :key="row_index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[row_index]" @change="updateSelectedRows"></td>
-					<td v-for="(cell, column_index) in row" :key="column_index" @click="$emit('rowClick', tableData.rows[row_index])">{{cell}}</td>
+					<td v-for="(cell, column_index) in row" :key="column_index" @click="$emit('rowClick', tableData.rows[row_index])" :class="columnsForDisplay[column_index]?.type != 'number' ? '' : parseInt(cell) < 0 ? 'negative' : parseInt(cell) > 0 ? 'positive' : 'zero'">{{cell}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -163,6 +163,7 @@ export default {
 		currentSort: {} as TableSort,
 		filters: [] as TableFilter[],
 		rowsForDisplay: [] as Row[],
+		columnsForDisplay: [] as Column[],
 		selectedRows: [] as boolean[],
 		openFilter: null as number | null,
 		allRowsSelected: false,
@@ -200,6 +201,8 @@ export default {
 			this.tableData = structuredClone(toRaw(this.tableDataProp));
 			this.rows = this.tableData.rows;
 			
+			this.columnsForDisplay = this.tableData.columns.filter(y => !y.hidden);
+
 			const hidden_columns = this.tableData.columns.filter(y => y.hidden);
 			if(hidden_columns.length === 0) {
 				this.rowsForDisplay = this.rows;

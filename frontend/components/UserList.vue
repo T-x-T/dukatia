@@ -87,7 +87,7 @@ export default {
 					sort: "asc"
 				},
 				columns: [
-					{name: "ID", type: "number", no_filter: true},
+					{name: "ID", type: "string", no_filter: true},
 					{name: "Name", type: "string", no_filter: true},
 					{name: "Type", type: "string", no_filter: true},
 					{name: "Status", type: "string", no_filter: true},
