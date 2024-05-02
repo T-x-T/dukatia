@@ -34,10 +34,10 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 		let timestamp: NaiveDate = get_date_for_period(options.date_period.clone().unwrap_or_default().as_str(), transaction.timestamp.date_naive());
 
 		let mut data_point_values: Vec<&Money> = data_point.value.values().collect();
-		data_point_values.sort_by(|a, b| b.to_string().cmp(&a.to_string()));
+		data_point_values.sort_by_key(|b| std::cmp::Reverse(b.to_string()));
 
 		if timestamp == data_point.timestamp.unwrap_or_default() {
-			datasets_multi_currency.entry(transaction.recipient_id).or_default().last_mut().unwrap().label = data_point_values.into_iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" ");
+			datasets_multi_currency.entry(transaction.recipient_id).or_default().last_mut().unwrap().label = data_point_values.into_iter().map(std::string::ToString::to_string).collect::<Vec<String>>().join(" ");
 			datasets_multi_currency.entry(transaction.recipient_id).or_default().last_mut().unwrap().value = data_point.value;
 		} else {
 			datasets_multi_currency.entry(transaction.recipient_id).or_default().push(
@@ -45,7 +45,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 					name: None,
 					timestamp: Some(timestamp),
 					value: data_point.value.clone(),
-					label: data_point_values.into_iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "),
+					label: data_point_values.into_iter().map(std::string::ToString::to_string).collect::<Vec<String>>().join(" "),
 				}
 			);
 		}

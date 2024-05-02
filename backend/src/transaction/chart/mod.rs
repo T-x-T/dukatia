@@ -35,9 +35,9 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 			if timestamp == data_point_earning.timestamp.unwrap_or_default() {
 				data_point_earning.value.insert(transaction.currency_id.unwrap_or_default(), data_point_earning.value.get(&transaction.currency_id.unwrap_or_default()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount.clone());
 				let mut sorted_datapoint: Vec<Money> = data_point_earning.value.values().cloned().collect();
-				sorted_datapoint.sort_by(|a, b| b.to_string().cmp(&a.to_string()));
+				sorted_datapoint.sort_by_key(|x| std::cmp::Reverse(x.to_string()));
 				
-				datasets_monetary.entry(Uuid::from_u128(0)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" ");
+				datasets_monetary.entry(Uuid::from_u128(0)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(std::string::ToString::to_string).collect::<Vec<String>>().join(" ");
 				datasets_monetary.entry(Uuid::from_u128(0)).or_default().last_mut().unwrap().value = data_point_earning.value;
 			} else {
 				datasets_monetary.entry(Uuid::from_u128(0)).or_default().push(
@@ -55,9 +55,9 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 			if timestamp == data_point_spending.timestamp.unwrap_or_default() {
 				data_point_spending.value.insert(transaction.currency_id.unwrap_or_default(), data_point_spending.value.get(&transaction.currency_id.unwrap_or_default()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount.clone());
 				let mut sorted_datapoint: Vec<Money> = data_point_spending.value.values().cloned().collect();
-				sorted_datapoint.sort_by(|a, b| b.to_string().cmp(&a.to_string()));
+				sorted_datapoint.sort_by_key(|x| std::cmp::Reverse(x.to_string()));
 				
-				datasets_monetary.entry(Uuid::from_u128(1)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" ");
+				datasets_monetary.entry(Uuid::from_u128(1)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(std::string::ToString::to_string).collect::<Vec<String>>().join(" ");
 				datasets_monetary.entry(Uuid::from_u128(1)).or_default().last_mut().unwrap().value = data_point_spending.value;
 			} else {
 				datasets_monetary.entry(Uuid::from_u128(1)).or_default().push(
@@ -74,9 +74,9 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 		if timestamp == data_point_net.timestamp.unwrap_or_default() {
 			data_point_net.value.insert(transaction.currency_id.unwrap_or_default(), data_point_net.value.get(&transaction.currency_id.unwrap_or_default()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount);
 			let mut sorted_datapoint: Vec<Money> = data_point_net.value.values().cloned().collect();
-			sorted_datapoint.sort_by(|a, b| b.to_string().cmp(&a.to_string()));
+			sorted_datapoint.sort_by_key(|x| std::cmp::Reverse(x.to_string()));
 			
-			datasets_monetary.entry(Uuid::from_u128(2)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" ");
+			datasets_monetary.entry(Uuid::from_u128(2)).or_default().last_mut().unwrap().label = sorted_datapoint.iter().map(std::string::ToString::to_string).collect::<Vec<String>>().join(" ");
 			datasets_monetary.entry(Uuid::from_u128(2)).or_default().last_mut().unwrap().value = data_point_net.value;
 		} else {
 			datasets_monetary.entry(Uuid::from_u128(2)).or_default().push(
