@@ -67,16 +67,7 @@ export default {
 		filter_tags_select_data: {} as SelectData | null,
 		tags: [] as Tag[],
 		currencies: [] as Currency[],
-		default_budget: {
-			id: undefined,
-			name: "",
-			amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
-			rollover: false,
-			period: 2,
-			filter_tag_ids: [],
-			currency_id: 0,
-			active_from: new Date(),
-		} as Budget,
+		default_budget: {} as Budget,
 	}),
 
 	emits: ["back", "data_saved"],
@@ -89,12 +80,25 @@ export default {
 	},
 
 	async mounted() {
-		this.budget = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_budget));
-		this.budget.active_from_string = new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
-		this.budget.active_to_string = this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : undefined,
-		
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
+
+		this.default_budget = {
+			id: undefined,
+			name: "",
+			amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
+			rollover: false,
+			period: 2,
+			filter_tag_ids: [],
+			currency_id: this.currencies[0].id,
+			active_from: new Date(),
+		} as Budget
+		
+		this.budget = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_budget));
+		
+		this.budget.active_from_string = new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
+		this.budget.active_to_string = this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : undefined;
+
 		this.update_filter_tags_select_data();
 		(this.$refs.first_input as any).focus();
 	},

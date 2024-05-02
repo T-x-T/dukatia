@@ -134,9 +134,9 @@ export default {
 		}
 
 		this.default_transaction = {
-			account_id: "",
-			currency_id: undefined,
-			recipient_id: "",
+			account_id: this.accounts[0].id,
+			currency_id: this.accounts[0].default_currency_id,
+			recipient_id: this.recipients[0].id,
 			tag_ids: [],
 			status: 1,
 			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),

@@ -22,7 +22,7 @@ declare global {
 
 	type Asset = {
 		id?: string,
-		user_id: number,
+		user_id?: number,
 		name: string,
 		description?: string,
 		currency_id: string,
@@ -63,8 +63,8 @@ declare global {
 		id?: string,
 		user_id?: number,
 		currency_id?: string,
-		account_id: string,
-		recipient_id: string,
+		account_id?: string,
+		recipient_id?: string,
 		status: TransactionStatus,
 		timestamp: string,
 		total_amount: Money,
