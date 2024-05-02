@@ -22,8 +22,8 @@ export default {
 		query_parameters: {
 			skip_results: 0,
 			max_results: 50,
-			sort_property: "id",
-			sort_direction: "asc",
+			sort_property: "amount",
+			sort_direction: "desc",
 		} as QueryParameters,
 		tags: {} as Tag[],
 	}),
@@ -35,8 +35,8 @@ export default {
 		this.tableData = {
 			multiSelect: false,
 			defaultSort: {
-				column: 0,
-				sort: "asc"
+				column: 2,
+				sort: "desc"
 			},
 			columns: [
 				{name: "ID", type: "number", sortable: true, hidden: true},
