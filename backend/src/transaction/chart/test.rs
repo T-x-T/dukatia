@@ -26,7 +26,7 @@ mod calculate_get_earning_spending_net_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "Earning".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 10.0, label: "10.00$".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 3).unwrap()), value: 20.0, label: "20.00€".to_string()},
 				]}),
@@ -35,8 +35,8 @@ mod calculate_get_earning_spending_net_over_time {
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 4).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
 				(Uuid::from_u128(2), Dataset{label: "Net".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: -113.45, label: "-123.45€ 10.00$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: -113.45, label: "10.00$ -123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 3).unwrap()), value: 20.00, label: "20.00€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 4).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
@@ -62,7 +62,7 @@ mod calculate_get_earning_spending_net_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "Earning".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 10.0, label: "10.00$".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 3).unwrap()), value: 20.0, label: "20.00€".to_string()},
 				]}),
@@ -71,8 +71,8 @@ mod calculate_get_earning_spending_net_over_time {
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 4).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
 				(Uuid::from_u128(2), Dataset{label: "Net".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: -113.45, label: "-123.45€ 10.00$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: -113.45, label: "10.00$ -123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 3).unwrap()), value: 20.00, label: "20.00€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 4).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
@@ -98,7 +98,7 @@ mod calculate_get_earning_spending_net_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "Earning".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 3, 1).unwrap()), value: 20.0, label: "20.00€".to_string()},
 				]}),
@@ -107,8 +107,8 @@ mod calculate_get_earning_spending_net_over_time {
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
 				(Uuid::from_u128(2), Dataset{label: "Net".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: -113.45, label: "-123.45€ 10.00$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: -113.45, label: "10.00$ -123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 3, 1).unwrap()), value: 20.00, label: "20.00€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
@@ -134,7 +134,7 @@ mod calculate_get_earning_spending_net_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "Earning".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 7, 1).unwrap()), value: 20.0, label: "20.00€".to_string()},
 				]}),
@@ -143,8 +143,8 @@ mod calculate_get_earning_spending_net_over_time {
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 10, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
 				(Uuid::from_u128(2), Dataset{label: "Net".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: -113.45, label: "-123.45€ 10.00$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: -113.45, label: "10.00$ -123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 7, 1).unwrap()), value: 20.00, label: "20.00€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 10, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
@@ -170,7 +170,7 @@ mod calculate_get_earning_spending_net_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "Earning".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2022, 1, 1).unwrap()), value: 20.0, label: "20.00€".to_string()},
 				]}),
@@ -179,8 +179,8 @@ mod calculate_get_earning_spending_net_over_time {
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2023, 1, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),
 				(Uuid::from_u128(2), Dataset{label: "Net".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: -113.45, label: "-123.45€ 10.00$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.90, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: -113.45, label: "10.00$ -123.45€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2022, 1, 1).unwrap()), value: 20.00, label: "20.00€".to_string()},
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2023, 1, 1).unwrap()), value: -21.00, label: "-21.00$".to_string()},
 				]}),

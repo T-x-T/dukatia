@@ -30,8 +30,8 @@ mod calculate_get_per_recipient_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "test_0".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 223.45, label: "0.00€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 223.45, label: "223.45$ 0.00€".to_string()},
 				]}),
 				(Uuid::from_u128(1), Dataset{label: "test_1".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 10.0, label: "10.00$".to_string()},
@@ -63,8 +63,8 @@ mod calculate_get_per_recipient_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "test_0".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 223.45, label: "0.00€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 223.45, label: "223.45$ 0.00€".to_string()},
 				]}),
 				(Uuid::from_u128(1), Dataset{label: "test_1".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 2).unwrap()), value: 10.0, label: "10.00$".to_string()},
@@ -96,8 +96,8 @@ mod calculate_get_per_recipient_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "test_0".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: 223.45, label: "0.00€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: 223.45, label: "223.45$ 0.00€".to_string()},
 				]}),
 				(Uuid::from_u128(1), Dataset{label: "test_1".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 2, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
@@ -129,8 +129,8 @@ mod calculate_get_per_recipient_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "test_0".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: 223.45, label: "0.00€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: 223.45, label: "223.45$ 0.00€".to_string()},
 				]}),
 				(Uuid::from_u128(1), Dataset{label: "test_1".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 4, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
@@ -162,8 +162,8 @@ mod calculate_get_per_recipient_over_time {
 		assert_eq!(res, IntermediateChartData {
 			datasets: [
 				(Uuid::from_u128(0), Dataset{label: "test_0".to_string(), data: vec![
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "123.45€ 223.45$".to_string()},
-					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: 223.45, label: "0.00€ 223.45$".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2020, 1, 1).unwrap()), value: 346.9, label: "223.45$ 123.45€".to_string()},
+					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: 223.45, label: "223.45$ 0.00€".to_string()},
 				]}),
 				(Uuid::from_u128(1), Dataset{label: "test_1".to_string(), data: vec![
 					DataPoint {name: None, timestamp: Some(NaiveDate::from_ymd_opt(2021, 1, 1).unwrap()), value: 10.0, label: "10.00$".to_string()},
