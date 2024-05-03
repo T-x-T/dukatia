@@ -7,14 +7,14 @@ mod calculate_get_all_budget_utilization_overview {
 	#[test]
 	fn two_budgets() {
 		let budget1 = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(50, 100, "€".to_string())),
@@ -23,14 +23,14 @@ mod calculate_get_all_budget_utilization_overview {
 		};
 
 		let budget2 = Budget {
-			id: Some(1),
+			id: Uuid::from_u128(1),
 			name: "test2".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "$".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 1,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(1),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(5_000, 100, "$".to_string())),
@@ -43,7 +43,7 @@ mod calculate_get_all_budget_utilization_overview {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -60,7 +60,7 @@ mod calculate_get_all_budget_utilization_overview {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -93,7 +93,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -104,7 +104,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -123,14 +123,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn less_than_one_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(50, 100, "€".to_string())),
@@ -143,7 +143,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -154,7 +154,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -173,14 +173,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn fifty_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(5_000, 100, "€".to_string())),
@@ -193,7 +193,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -204,7 +204,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -223,14 +223,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn almost_hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(9_999, 100, "€".to_string())),
@@ -243,7 +243,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -254,7 +254,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -273,14 +273,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(10_000, 100, "€".to_string())),
@@ -293,7 +293,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -304,7 +304,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -323,14 +323,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn over_hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(15_000, 100, "€".to_string())),
@@ -343,7 +343,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -354,7 +354,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -373,14 +373,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn negative_used_amount() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(-5_000, 100, "€".to_string())),
@@ -393,7 +393,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -404,7 +404,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -423,14 +423,14 @@ mod calculate_get_single_budget_current_period_utilization {
 	#[test]
 	fn negative_available_amount() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(15_000, 100, "€".to_string())),
@@ -443,7 +443,7 @@ mod calculate_get_single_budget_current_period_utilization {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -454,7 +454,7 @@ mod calculate_get_single_budget_current_period_utilization {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -484,7 +484,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -495,7 +495,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -506,7 +506,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -525,14 +525,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn less_than_one_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(50, 100, "€".to_string())),
@@ -548,7 +548,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -559,7 +559,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -570,7 +570,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -589,14 +589,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn fifty_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(5_000, 100, "€".to_string())),
@@ -612,7 +612,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -623,7 +623,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -634,7 +634,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -653,14 +653,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn almost_hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(9_999, 100, "€".to_string())),
@@ -676,7 +676,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -687,7 +687,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -698,7 +698,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -717,14 +717,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(10_000, 100, "€".to_string())),
@@ -740,7 +740,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -751,7 +751,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -762,7 +762,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -781,14 +781,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn over_hundred_percent_utilization() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(15_000, 100, "€".to_string())),
@@ -804,7 +804,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -815,7 +815,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -826,7 +826,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -845,14 +845,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn negative_used_amount() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(-5_000, 100, "€".to_string())),
@@ -868,7 +868,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -879,7 +879,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -890,7 +890,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -909,14 +909,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn negative_available_amount() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: false,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: chrono::Utc::now(),
 			active_to: None,
 			used_amount: Some(Money::from_amount(15_000, 100, "€".to_string())),
@@ -932,7 +932,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -943,7 +943,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -954,7 +954,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 
@@ -973,14 +973,14 @@ mod calculate_get_single_budget_utilization_history {
 	#[test]
 	fn rollover_enabled() {
 		let budget = Budget {
-			id: Some(0),
+			id: Uuid::from_u128(0),
 			name: "test".to_string(),
-			user_id: 0,
+			user_id: Uuid::from_u128(0),
 			amount: Money::from_amount(10_000, 100, "€".to_string()),
 			rollover: true,
 			period: Period::Monthly,
-			filter_tag_ids: vec![0],
-			currency_id: 0,
+			filter_tag_ids: vec![Uuid::from_u128(0)],
+			currency_id: Uuid::from_u128(0),
 			active_from: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(),
 			active_to: Some(DateTime::parse_from_str("2024-09-15 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into()),
 			used_amount: Some(Money::from_amount(5_000, 100, "€".to_string())),
@@ -996,7 +996,7 @@ mod calculate_get_single_budget_utilization_history {
 		assert_eq!(res, 
 			IntermediateChartData {
 				datasets: vec![
-					(0, Dataset { 
+					(Uuid::from_u128(0), Dataset { 
 						label: "used".to_string(),
 						data: vec![
 							DataPoint { 
@@ -1007,7 +1007,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(1, Dataset { 
+					(Uuid::from_u128(1), Dataset { 
 						label: "available".to_string(),
 						data: vec![
 							DataPoint { 
@@ -1018,7 +1018,7 @@ mod calculate_get_single_budget_utilization_history {
 							},
 						] 
 					}),
-					(2, Dataset { 
+					(Uuid::from_u128(2), Dataset { 
 						label: "total".to_string(),
 						data: vec![
 							DataPoint { 

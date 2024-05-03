@@ -1,6 +1,7 @@
 use deadpool_postgres::Pool;
 use chrono::{DateTime, Utc};
 use std::error::Error;
+use uuid::Uuid;
 use super::super::CustomError;
 use super::{Budget, Period};
 use crate::money::Money;
@@ -59,50 +60,51 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 		}
 	}
 
-	async fn insert(self) -> Result<u32, Box<dyn Error>> {
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
 		let client = self.pool.get().await.unwrap();
-		let id: i32 = client
+		client
 			.query(
-				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period, currency_id, active_from, active_to) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
-				&[&self.budget.name, &(self.budget.user_id as i32), &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to]
+				"INSERT INTO public.budgets (id, name, user_id, amount, rollover, period, currency_id, active_from, active_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
+				&[&self.budget.id, &self.budget.name, &self.budget.user_id, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &self.budget.currency_id, &self.budget.active_from, &self.budget.active_to]
 			)
-			.await?
-			[0].get(0);
+			.await?;
 	
 		for tag_id in &self.budget.filter_tag_ids {
 			client.query(
 				"INSERT INTO public.budget_filter_tags (budget_id, tag_id) VALUES ($1, $2);",
-				&[&id, &(*tag_id as i32)]
+				&[&self.budget.id, &tag_id]
 			).await?;
 		}
 	
-		return Ok(id as u32);
+		return Ok(self.budget.id);
 	}
 
 	async fn replace(self) -> Result<(), Box<dyn Error>> {
-		if self.budget.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("budget")}));
+		let old = super::BudgetLoader::new(self.pool)
+			.set_filter_id(self.budget.id, NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.budget.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
-	
-		super::BudgetLoader::new(self.pool).get().await?;
 	
 		let client = self.pool.get().await?;
 		
 		client.query(
 				"UPDATE public.budgets SET name=$1, amount=$2, rollover=$3, period=$4, currency_id=$5, active_from=$6, active_to=$7 WHERE id=$8;",
-				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &(self.budget.currency_id as i32), &self.budget.active_from, &self.budget.active_to, &(self.budget.id.unwrap() as i32)]
+				&[&self.budget.name, &(self.budget.amount.to_amount()), &self.budget.rollover, &(self.budget.period as i32), &self.budget.currency_id, &self.budget.active_from, &self.budget.active_to, &self.budget.id]
 			)
 			.await?;
 		
 		client.query(
 				"DELETE FROM public.budget_filter_tags WHERE budget_id=$1",
-				&[&(self.budget.id.unwrap() as i32)]
+				&[&self.budget.id]
 			).await?;
 	
 			for tag_id in &self.budget.filter_tag_ids {
 				client.query(
 					"INSERT INTO public.budget_filter_tags (budget_id, tag_id) VALUES ($1, $2);",
-					&[&(self.budget.id.unwrap() as i32), &(*tag_id as i32)]
+					&[&self.budget.id, &tag_id]
 				).await?;
 			}
 	
@@ -113,13 +115,17 @@ impl<'a> DbWriter<'a, Budget> for BudgetDbWriter<'a> {
 
 impl<'a> DbDeleter<'a, Budget> for BudgetDbWriter<'a> {
 	async fn delete(self) -> Result<(), Box<dyn Error>> {
-		if self.budget.id.is_none() {
-			return Err(Box::new(CustomError::MissingProperty{property: String::from("id"), item_type: String::from("budget")}));
+		let old = super::BudgetLoader::new(self.pool)
+			.set_filter_id(self.budget.id, NumberFilterModes::Exact)
+			.get_first().await?;
+
+		if old.user_id != self.budget.user_id {
+			return Err(Box::new(CustomError::UserIsntOwner));
 		}
 
 		self.pool.get()
 			.await?
-			.query("DELETE FROM public.budgets WHERE id=$1;", &[&(self.budget.id.unwrap() as i32)]).await?;
+			.query("DELETE FROM public.budgets WHERE id=$1;", &[&self.budget.id]).await?;
 	
 		return Ok(());
 	}
@@ -128,28 +134,23 @@ impl<'a> DbDeleter<'a, Budget> for BudgetDbWriter<'a> {
 #[allow(clippy::unwrap_or_default)]
 impl From<tokio_postgres::Row> for Budget {
 	fn from(value: tokio_postgres::Row) -> Self {
-		let id: i32 = value.get(0);
+		let id: Uuid = value.get(0);
 		let name: String = value.get(1);
-		let user_id: i32 = value.get(2);
+		let user_id: Uuid = value.get(2);
 		let amount: i32 = value.get(3);
 		let rollover: bool = value.get(4);
 		let period: i32 = value.get(5);
-		let filter_tag_ids = value
-			.try_get(6)
-			.unwrap_or(Vec::new())
-			.into_iter()
-			.map(|x: i32| x as u32)
-			.collect();
+		let filter_tag_ids: Vec<Uuid> = value.try_get(6).unwrap_or_default();
 		let active_from: DateTime<Utc> = value.get(7);
 		let active_to: Option<DateTime<Utc>> = value.get(8);
 		let minor_in_major: i32 = value.get(9);
 		let symbol: String = value.get(10);
-		let currency_id: i32 = value.get(11);
+		let currency_id: Uuid = value.get(11);
 		
 		return Budget {
-			id: Some(id as u32),
+			id,
 			name,
-			user_id: user_id as u32,
+			user_id,
 			amount: Money::from_amount(amount, minor_in_major as u32, symbol),
 			rollover,
 			period: match period {
@@ -163,7 +164,7 @@ impl From<tokio_postgres::Row> for Budget {
 			filter_tag_ids,
 			active_from,
 			active_to,
-			currency_id: currency_id as u32,
+			currency_id,
 			used_amount: None,
 			available_amount: None,
 			utilization: None,

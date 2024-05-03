@@ -5,33 +5,47 @@ pub mod chart;
 use serde::Serialize;
 use std::error::Error;
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 use crate::traits::*;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Account {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
-	pub default_currency_id: u32,
-	pub user_id: u32,
-	pub tag_ids: Option<Vec<u32>>,
+	pub default_currency_id: Uuid,
+	pub user_id: Uuid,
+	pub tag_ids: Vec<Uuid>,
 	pub balance: Option<i64>,
 }
 
-impl Save for Account {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::AccountDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::AccountDbWriter::new(pool, self).insert().await,
+impl Default for Account {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			name: String::new(),
+			default_currency_id: Uuid::nil(),
+			user_id: Uuid::nil(),
+			tag_ids: Vec::new(), 
+			balance: None
 		}
 	}
 }
 
+impl Create for Account {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::AccountDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Account {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::AccountDbWriter::new(pool, self).replace().await;
+	}
+}
+
 impl Account {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
@@ -40,23 +54,17 @@ impl Account {
 		return self;
 	}
 
-	pub fn set_default_currency_id(mut self, default_currency_id: u32) -> Self {
+	pub fn set_default_currency_id(mut self, default_currency_id: Uuid) -> Self {
 		self.default_currency_id = default_currency_id;
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}
 
-	#[allow(dead_code)]
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

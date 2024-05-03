@@ -2,9 +2,11 @@
 	<div>
 		<div v-if="chart_utilization_overview" class="gridItem line_chart">
 			<h3>Current period utilization overview</h3>
-			<ChartBar
-				:bar="chart_utilization_overview"
-			/>
+			<div class="actual_chart">
+				<ChartBar
+					:bar="chart_utilization_overview"
+				/>
+			</div>
 		</div>
 		<button id="add" class="green" @click="newBudget">Add</button>
 		<CustomTable
@@ -44,10 +46,10 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
+				{name: "ID", type: "number", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Currency", type: "choice", options: currencies.map(x => ({id: x.id, name: x.name}))},
-				{name: "Rollover", type: "string"},
+				{name: "Rollover", type: "string", no_filter: true}, //TODO: Reenable filtering when bool filters are a thing
 				{name: "Period", type: "choice", no_filter: true, options: [{id: 0, name: "Daily"}, {id: 1, name: "Weekly"}, {id: 2, name: "Monthly"}, {id: 3, name: "Quarterly"}, {id: 4, name: "Yearly"}]},
 				{name: "Active from", type: "date"},
 				{name: "Active to", type: "date"},
@@ -69,7 +71,7 @@ export default {
 				`${x.used_amount === undefined ? "" : x.used_amount.major >= 0 && x.used_amount.is_negative ? "-" : ""}${x.used_amount === undefined ? "0": x.used_amount.major}.${(x.used_amount === undefined ? 0 : x.used_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.available_amount === undefined ? "" : x.available_amount.major >= 0 && x.available_amount.is_negative ? "-" : ""}${x.available_amount === undefined ? "0": x.available_amount.major}.${(x.available_amount === undefined ? 0 : x.available_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				((x.utilization ? x.utilization : 0) * 100).toFixed(2) + "%",
-				tags.filter(y => x.filter_tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.filter_tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]))
 		};
 	},
@@ -150,7 +152,7 @@ export default {
 					this.query_parameters.filter_mode_name = undefined;
 					break;
 				}
-				case "amount": {
+				case "total amount": {
 					this.query_parameters.filter_amount = undefined;
 					this.query_parameters.filter_mode_amount = undefined;
 					break;
@@ -177,7 +179,7 @@ export default {
 					this.query_parameters.filter_mode_active_to = undefined;
 					break;
 				}
-				case "currency_id": {
+				case "currency": {
 					this.query_parameters.filter_currency_id = undefined;
 					this.query_parameters.filter_mode_currency_id = undefined;
 					break;
@@ -209,7 +211,7 @@ export default {
 				`${x.used_amount === undefined ? "" : x.used_amount.major >= 0 && x.used_amount.is_negative ? "-" : ""}${x.used_amount === undefined ? "0": x.used_amount.major}.${(x.used_amount === undefined ? 0 : x.used_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				`${x.available_amount === undefined ? "" : x.available_amount.major >= 0 && x.available_amount.is_negative ? "-" : ""}${x.available_amount === undefined ? "0": x.available_amount.major}.${(x.available_amount === undefined ? 0 : x.available_amount.minor).toString().padStart(x.amount.minor_in_major.toString().length - 1, "0")}${x.amount.symbol}`,
 				((x.utilization ? x.utilization : 0) * 100).toFixed(2) + "%",
-				tags.filter(y => x.filter_tag_ids?.includes(Number.isInteger(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+				tags.filter(y => x.filter_tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			]));
 		},
 
@@ -218,15 +220,15 @@ export default {
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_id) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
-			if(Number.isInteger(this.query_parameters.filter_amount)) url += `&filter_amount=${this.query_parameters.filter_amount}`;
+			if(Number.isInteger(this.query_parameters.filter_amount)) url += `&filter_amount=${this.query_parameters.filter_amount as number * 100}`; //TODO: not using minor_in_major
 			if(this.query_parameters.filter_mode_amount) url += `&filter_mode_amount=${this.query_parameters.filter_mode_amount}`;
 			if(this.query_parameters.filter_rollover) url += `&filter_rollover=${this.query_parameters.filter_rollover}`;
 			if(this.query_parameters.filter_mode_rollover) url += `&filter_mode_rollover=${this.query_parameters.filter_mode_rollover}`;
-			if(Number.isInteger(this.query_parameters.filter_filter_tag_id)) url += `&filter_filter_tag_id=${this.query_parameters.filter_filter_tag_id}`;
+			if(this.query_parameters.filter_filter_tag_id) url += `&filter_filter_tag_id=${this.query_parameters.filter_filter_tag_id}`;
 			if(this.query_parameters.filter_mode_filter_tag_id) url += `&filter_mode_filter_tag_id=${this.query_parameters.filter_mode_filter_tag_id}`;
 			if(this.query_parameters.filter_lower_active_from) url += `&filter_lower_active_from=${new Date(this.query_parameters.filter_lower_active_from).toISOString()}`;
 			if(this.query_parameters.filter_upper_active_from) url += `&filter_upper_active_from=${new Date(this.query_parameters.filter_upper_active_from).toISOString()}`;
@@ -234,7 +236,7 @@ export default {
 			if(this.query_parameters.filter_lower_active_to) url += `&filter_lower_active_to=${new Date(this.query_parameters.filter_lower_active_to).toISOString()}`;
 			if(this.query_parameters.filter_upper_active_to) url += `&filter_upper_active_to=${new Date(this.query_parameters.filter_upper_active_to).toISOString()}`;
 			if(this.query_parameters.filter_mode_active_to) url += `&filter_mode_active_to=${this.query_parameters.filter_mode_active_to}`;
-			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
+			if(this.query_parameters.filter_currency_id) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
 
 			return url;
@@ -252,12 +254,10 @@ h3
 div.gridItem
 	padding: 10px
 
-div.pie_chart
-	width: 20em
-	height: 20em
-
 div.line_chart
 	width: 60em
+
+div.actual_chart
 	height: 20em
 
 button#add

@@ -19,7 +19,7 @@ export default {
 		if(useRoute().path.split("/")[2] == "new") {
 			this.loaded = true;
 		} else {
-			const id = Number(useRoute().path.split("/")[2]);
+			const id = useRoute().path.split("/")[2];
 			this.accountData = await $fetch(`/api/v1/accounts/${id}`) as Account;
 			this.loaded = true;
 		}

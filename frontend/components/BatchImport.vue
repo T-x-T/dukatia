@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<p>Batch import Transactions</p>
+		<h3>Batch import Transactions</h3>
 		<p>Format:<br>account_id,recipient_id,timestamp,comment,major_amount,minor_amount<br>(No headers)</p>
 		<input type="file" accept=".csv" @change="load_data">
 		<br>
@@ -44,8 +44,8 @@ export default {
 			const parts = line.split(",");
 
 			return {
-				account_id: Number(parts[0]),
-				recipient_id: Number(parts[1]),
+				account_id: parts[0],
+				recipient_id: parts[1],
 				status: 1,
 				timestamp: new Date(parts[2]),
 				comment: parts[3],

@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="currency.id" disabled>
+			<input type="string" v-model="currency.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -57,7 +57,7 @@ export default {
 			let res = {} as Currency;
 
 			try {
-				if(typeof this.currency.id == "number") {
+				if(typeof this.currency.id == "string" && this.currency.id.length == 36) {
 					res = await $fetch(`/api/v1/currencies/${this.currency.id}`, {
 						method: "PUT",
 						body: this.get_body(),

@@ -3,13 +3,14 @@ pub mod rest_api;
 pub mod chart;
 
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use crate::traits::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Currency {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
 	pub minor_in_major: u32,
 	pub symbol: String,
@@ -18,7 +19,7 @@ pub struct Currency {
 impl Default for Currency {
 	fn default() -> Self {
 		Self {
-			id: None,
+			id: Uuid::new_v4(),
 			name: String::new(),
 			minor_in_major: 100,
 			symbol: String::new(),
@@ -26,21 +27,21 @@ impl Default for Currency {
 	}
 }
 
-impl Save for Currency {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {		
-		match self.id {
-			Some(id) => {
-				db::CurrencyDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::CurrencyDbWriter::new(pool, self).insert().await,
-		}
+impl Create for Currency {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::CurrencyDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Currency {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::CurrencyDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Currency {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 

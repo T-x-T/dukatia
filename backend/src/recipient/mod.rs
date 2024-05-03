@@ -3,32 +3,44 @@ pub mod rest_api;
 pub mod chart;
 
 use serde::Serialize;
+use uuid::Uuid;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use crate::traits::*;
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Recipient {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub name: String,
-	pub user_id: Option<u32>,
-	pub tag_ids: Option<Vec<u32>>,
+	pub user_id: Option<Uuid>,
+	pub tag_ids: Vec<Uuid>,
 }
 
-impl Save for Recipient {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::RecipientDbWriter::new(pool, self).replace().await?;
-				return Ok(id)
-			},
-			None => return db::RecipientDbWriter::new(pool, self).insert().await,
-		}
+impl Default for Recipient {
+	fn default() -> Self {
+		return Self {
+			id: Uuid::new_v4(),
+			name: String::new(),
+			user_id: None,
+			tag_ids: Vec::new()
+		};
+	}
+}
+
+impl Create for Recipient {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::RecipientDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Recipient {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::RecipientDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Recipient {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
@@ -37,24 +49,12 @@ impl Recipient {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = Some(user_id);
 		return self;
 	}
 
-	#[allow(dead_code)]
-	pub fn set_user_id_opt(mut self, user_id: Option<u32>) -> Self {
-		self.user_id = user_id;
-		return self;
-	}
-
-	#[allow(dead_code)]
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

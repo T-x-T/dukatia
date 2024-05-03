@@ -2,7 +2,7 @@
 	<div id="wrapper">
 		<label>
 			ID:
-			<input type="number" v-model="asset.id" disabled>
+			<input type="string" v-model="asset.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -33,7 +33,7 @@
 		<InputMultiSelect
 			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
 			:selectData="tags_select_data"
-			@update="(selected: number[]) => asset.tag_ids = selected"
+			@update="(selected: string[]) => asset.tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 
@@ -51,16 +51,7 @@ export default {
 		tags_select_data: {} as SelectData | null,
 		tags: [] as Tag[],
 		currencies: [] as Currency[],
-		default_asset: {
-			id: undefined,
-			name: "",
-			description: "",
-			amount: 0,
-			value_per_unit: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
-			currency_id: 0,
-			tag_ids: [],
-			user_id: 0,
-		} as Asset,
+		default_asset: {} as Asset,
 	}),
 
 	emits: ["back", "data_saved"],
@@ -73,10 +64,21 @@ export default {
 	},
 
 	async mounted() {
-		this.asset = this.data && Object.keys(this.data).length > 0 ? structuredClone(toRaw(this.data)) : structuredClone(toRaw(this.default_asset));
-
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
+		
+		this.default_asset = {
+			id: undefined,
+			name: "",
+			description: "",
+			amount: 0,
+			value_per_unit: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
+			currency_id: this.currencies[0].id,
+			tag_ids: [],
+		} as Asset
+
+		this.asset = this.data && Object.keys(this.data).length > 0 ? structuredClone(toRaw(this.data)) : structuredClone(toRaw(this.default_asset));
+
 		this.update_tags_select_data();
 		(this.$refs.first_input as any).focus();
 	},
@@ -86,7 +88,7 @@ export default {
 			let res = {} as Asset;
 
 			try {
-				if(typeof this.asset.id == "number") {
+				if(typeof this.asset.id == "string" && this.asset.id.length == 36) {
 					res = await $fetch(`/api/v1/assets/${this.asset.id}`, {
 						method: "PUT",
 						body: this.get_body(),
@@ -120,7 +122,7 @@ export default {
 			this.tags_select_data = null;
 			this.$nextTick(() => {
 				this.tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (typeof x.id == "string" && x.id.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.asset.tag_ids,
 					label: "Tags:"
 				}

@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="budget.id" disabled>
+			<input type="text" v-model="budget.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -49,7 +49,7 @@
 		<InputMultiSelect
 			v-if="filter_tags_select_data && Object.keys(filter_tags_select_data).length > 0"
 			:selectData="filter_tags_select_data"
-			@update="(selected: number[]) => budget.filter_tag_ids = selected"
+			@update="(selected: string[]) => budget.filter_tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 
@@ -67,16 +67,7 @@ export default {
 		filter_tags_select_data: {} as SelectData | null,
 		tags: [] as Tag[],
 		currencies: [] as Currency[],
-		default_budget: {
-			id: undefined,
-			name: "",
-			amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
-			rollover: false,
-			period: 2,
-			filter_tag_ids: [],
-			currency_id: 0,
-			active_from: new Date(),
-		} as Budget,
+		default_budget: {} as Budget,
 	}),
 
 	emits: ["back", "data_saved"],
@@ -89,12 +80,25 @@ export default {
 	},
 
 	async mounted() {
-		this.budget = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_budget));
-		this.budget.active_from_string = new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8),
-		this.budget.active_to_string = this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : undefined,
-		
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
+
+		this.default_budget = {
+			id: undefined,
+			name: "",
+			amount: {major: 0, minor: 0, minor_in_major: 100, symbol: "€"},
+			rollover: false,
+			period: 2,
+			filter_tag_ids: [],
+			currency_id: this.currencies[0].id,
+			active_from: new Date(),
+		} as Budget
+		
+		this.budget = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_budget));
+		
+		this.budget.active_from_string = new Date(new Date(this.budget.active_from).valueOf() - (new Date(this.budget.active_from).getTimezoneOffset() * 60000)).toISOString().slice(0, -8);
+		this.budget.active_to_string = this.budget.active_to ? new Date(new Date(this.budget.active_to).valueOf() - (new Date(this.budget.active_to).getTimezoneOffset() * 60000)).toISOString().slice(0, -8) : undefined;
+
 		this.update_filter_tags_select_data();
 		(this.$refs.first_input as any).focus();
 	},
@@ -104,7 +108,7 @@ export default {
 			let res = {} as Budget;
 
 			try {
-				if(typeof this.budget.id == "number") {
+				if(typeof this.budget.id == "string" && this.budget.id.length == 36) {
 					res = await $fetch(`/api/v1/budgets/${this.budget.id}`, {
 						method: "PUT",
 						body: this.get_body(),
@@ -139,7 +143,7 @@ export default {
 			this.filter_tags_select_data = null;
 			this.$nextTick(() => {
 				this.filter_tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (typeof x.id == "string" && x.id.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.budget.filter_tag_ids,
 					label: "Tags:"
 				}

@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use crate::webserver::{AppState, is_authorized};
 use crate::asset::Asset;
 use crate::traits::*;
@@ -11,21 +12,19 @@ struct RequestParameters {
 	max_results: Option<u32>,
 	sort_property: Option<String>,
 	sort_direction: Option<String>,
-	filter_id: Option<u32>,
+	filter_id: Option<Uuid>,
 	filter_mode_id: Option<String>,
 	filter_total_amount: Option<i32>,
 	filter_mode_total_amount: Option<String>,
-	filter_asset_id: Option<u32>,
+	filter_asset_id: Option<Uuid>,
 	filter_mode_asset_id: Option<String>,
-	filter_user_id: Option<u32>,
-	filter_mode_user_id: Option<String>,
-	filter_currency_id: Option<u32>,
+	filter_currency_id: Option<Uuid>,
 	filter_mode_currency_id: Option<String>,
-	filter_account_id: Option<u32>,
+	filter_account_id: Option<Uuid>,
 	filter_mode_account_id: Option<String>,
-	filter_recipient_id: Option<u32>,
+	filter_recipient_id: Option<Uuid>,
 	filter_mode_recipient_id: Option<String>,
-	filter_tag_id: Option<u32>,
+	filter_tag_id: Option<Uuid>,
 	filter_mode_tag_id: Option<String>,
 	filter_comment: Option<String>,
 	filter_mode_comment: Option<String>,
@@ -37,7 +36,7 @@ struct RequestParameters {
 //TODO: test filters and sorting for properties other than id
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -81,9 +80,6 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		asset_id: request_parameters.filter_asset_id.map(|x| {
 			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or_default().into())
 		}),
-		user_id: request_parameters.filter_user_id.map(|x| {
-			(x, request_parameters.filter_mode_user_id.clone().unwrap_or_default().into())
-		}),
 		currency_id: request_parameters.filter_currency_id.map(|x| {
 			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
@@ -104,6 +100,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or_default().into())
 			})
 		}),
+		user_id: Some((user_id, NumberFilterModes::Exact)),
 		..Default::default()
 	};
 
@@ -127,7 +124,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 //TODO: test filters and sorting for properties other than id
 #[get("/api/v1/transactions/summary")]
 async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -141,9 +138,6 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		}),
 		asset_id: request_parameters.filter_asset_id.map(|x| {
 			(x, request_parameters.filter_mode_asset_id.clone().unwrap_or_default().into())
-		}),
-		user_id: request_parameters.filter_user_id.map(|x| {
-			(x, request_parameters.filter_mode_user_id.clone().unwrap_or_default().into())
 		}),
 		currency_id: request_parameters.filter_currency_id.map(|x| {
 			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
@@ -165,6 +159,7 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 				(x, y, request_parameters.filter_mode_time_range.clone().unwrap_or_default().into())
 			})
 		}),
+		user_id: Some((user_id, NumberFilterModes::Exact)),
 		..Default::default()
 	};
 
@@ -183,14 +178,15 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/transactions/{transaction_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::TransactionLoader::new(&data.pool)
 		.set_filter_id(*transaction_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first().await;
 
 	match result {
@@ -205,16 +201,23 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: 
 	}
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Debug)]
 struct TransactionPost {
-	account_id: u32,
-	recipient_id: u32,
+	account_id: Uuid,
+	recipient_id: Uuid,
 	status: u8,
 	timestamp: DateTime<Utc>,
 	comment: Option<String>,
-	tag_ids: Option<Vec<u32>>,
-	asset_id: Option<u32>,
-	positions: Vec<super::Position>,
+	tag_ids: Option<Vec<Uuid>>,
+	asset_id: Option<Uuid>,
+	positions: Vec<PositionPost>,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+struct PositionPost {
+	amount: super::Money,
+	comment: Option<String>,
+	tag_id: Option<Uuid>,
 }
 
 #[post("/api/v1/transactions")]
@@ -237,13 +240,24 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 		})
 		.set_timestamp(body.timestamp)
 		.set_comment_opt(body.comment.clone())
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
-		.save(&data.pool).await;
+		.set_positions(
+			body.positions
+				.clone()
+				.into_iter()
+				.map(|x| super::Position {
+					amount: x.amount,
+					comment: x.comment,
+					tag_id: x.tag_id,
+					..Default::default()
+				})
+				.collect()
+			)
+		.create(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+		Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
 		Err(e) => {
 			if e.to_string().starts_with("no item of type unknown found") {
 				return HttpResponse::BadRequest().body(format!("{{\"error\":\"specified item of type account not found with filter id={}\"}}", body.account_id));
@@ -255,7 +269,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 }
 
 #[put("/api/v1/transactions/{transaction_id}")]
-async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<u32>) -> impl Responder {
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -275,30 +289,54 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		})
 		.set_timestamp(body.timestamp)
 		.set_comment_opt(body.comment.clone())
-		.set_tag_ids_opt(body.tag_ids.clone())
+		.set_tag_ids(body.tag_ids.clone().unwrap_or_default())
 		.set_asset_opt(asset)	
-		.set_positions(body.positions.clone())
-		.save(&data.pool).await;
+		.set_positions(
+			body.positions
+				.clone()
+				.into_iter()
+				.map(|x| super::Position {
+					amount: x.amount,
+					comment: x.comment,
+					tag_id: x.tag_id,
+					..Default::default()
+				})
+				.collect()
+			)
+		.update(&data.pool).await;
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+		match result {
+			Ok(()) => return HttpResponse::Ok().body(""),
+			Err(e) => {
+				if e.to_string().starts_with("you can only access items you own") {
+					return HttpResponse::NotFound().body("");
+				}
+	
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+			},
+		}
 }
 
 #[delete("/api/v1/transactions/{transaction_id}")]
-async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::Transaction::default()
 		.set_id(*transaction_id)
+		.set_user_id(user_id)
 		.delete(&data.pool).await;
 
-	return match result {
-		Ok(()) => HttpResponse::Ok().body(""),
-		Err(e) => HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	};
+		match result {
+			Ok(()) => return HttpResponse::Ok().body(""),
+			Err(e) => {
+				if e.to_string().starts_with("you can only access items you own") {
+					return HttpResponse::NotFound().body("");
+				}
+	
+				return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+			},
+		}
 }

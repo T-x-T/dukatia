@@ -25,7 +25,7 @@ export default {
 		dropdown: false,
 		sortedSelectData: {} as SelectData,
 		filteredSelectData: {} as SelectData,
-		optionStates: [] as boolean[],
+		optionStates: {} as any,
 		searchTerm: ""
 	}),
 
@@ -49,7 +49,7 @@ export default {
 			this.sortedSelectData.options.sort((a, b) => this.sortStrings(a.name, b.name));
 			
 			if(this.selectData.selected) {
-				this.optionStates = [];
+				this.optionStates = {};
 				this.selectData.selected.forEach(x => this.optionStates[x] = true);
 			}
 			this.updateDisplayText();
@@ -97,9 +97,18 @@ export default {
 			}
 		},
 
-		toggleOption(id: number) {
+		toggleOption(id: number | string) {
 			this.optionStates[id] = !this.optionStates[id];
-			this.$emit("update", this.optionStates.map((x, i) => this.selectData.options.filter(y => x && y.id === i)[0]?.id).filter(x => typeof x == "number"));
+			
+			const formatted_option_states = Object.entries(this.optionStates).map((res: any) => {
+				const id = res[0];
+				const value: boolean = res[1];
+				return this.selectData.options.filter(y => value && y.id === id)[0]?.id;
+			}).filter((x: any) => {
+				return typeof x == "number" || x?.length == 36
+			});
+			
+			this.$emit("update", formatted_option_states);
 			this.updateDisplayText();
 		},
 

@@ -1,6 +1,7 @@
 use actix_web::{get, post, put, delete, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use super::Period;
 use crate::money::Money;
 use crate::webserver::{AppState, is_authorized};
@@ -10,7 +11,7 @@ use crate::traits::*;
 struct RequestParameters {
 	skip_results: Option<u32>,
 	max_results: Option<u32>,
-	filter_id: Option<u32>,
+	filter_id: Option<Uuid>,
 	filter_mode_id: Option<String>,
 	filter_name: Option<String>,
 	filter_mode_name: Option<String>,
@@ -18,7 +19,7 @@ struct RequestParameters {
 	filter_mode_amount: Option<String>,
 	filter_rollover: Option<bool>,
 	filter_mode_rollover: Option<String>,
-	filter_filter_tag_id: Option<u32>,
+	filter_filter_tag_id: Option<Uuid>,
 	filter_mode_filter_tag_id: Option<String>,
 	filter_lower_active_from: Option<DateTime<Utc>>,
 	filter_upper_active_from: Option<DateTime<Utc>>,
@@ -26,7 +27,7 @@ struct RequestParameters {
 	filter_lower_active_to: Option<DateTime<Utc>>,
 	filter_upper_active_to: Option<DateTime<Utc>>,
 	filter_mode_active_to: Option<String>,
-	filter_currency_id: Option<u32>,
+	filter_currency_id: Option<Uuid>,
 	filter_mode_currency_id: Option<String>,
 	at_timestamp: Option<DateTime<Utc>>,
 }
@@ -34,7 +35,7 @@ struct RequestParameters {
 //TODO: test filters for properties other than id
 #[get("/api/v1/budgets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
@@ -68,6 +69,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 		currency_id: request_parameters.filter_currency_id.map(|x| {
 			(x, request_parameters.filter_mode_currency_id.clone().unwrap_or_default().into())
 		}),
+		user_id: Some((user_id, NumberFilterModes::ExactOrAlsoNull)),
 		..Default::default()
 	};
 
@@ -87,14 +89,15 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/budgets/{budget_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first_full_at(request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 	match result {
@@ -110,20 +113,21 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 }
 
 #[get("/api/v1/budgets/{budget_id}/transactions")]
-async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let budget = super::BudgetLoader::new(&data.pool)
 		.set_filter_id(*budget_id, NumberFilterModes::Exact)
+		.set_filter_user_id(user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await;
 
 	match budget {
 		Ok(budget) => {
-			let transactions = budget.get_transactions_of_period_at(&data.pool, Utc::now()).await;
+			let transactions = budget.get_transactions_of_period_at(&data.pool, request_parameters.at_timestamp.unwrap_or(Utc::now())).await;
 
 			match transactions {
 				Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -152,8 +156,8 @@ struct BudgetPost {
 	rollover: bool,
 	period: u8,
 	amount: Money,
-	filter_tag_ids: Vec<u32>,
-	currency_id: u32,
+	filter_tag_ids: Vec<Uuid>,
+	currency_id: Uuid,
 	active_from: DateTime<Utc>,
 	active_to: Option<DateTime<Utc>>,
 }
@@ -182,16 +186,16 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budge
 		.set_currency_id(body.currency_id)
 		.set_active_from(body.active_from)
 		.set_active_to_opt(body.active_to)
-		.save(&data.pool).await;
+		.create(&data.pool).await;
 
 	match result {
-		Ok(res) => return HttpResponse::Ok().body(format!("{{\"id\":{res}}}")),
+		Ok(res) => return HttpResponse::Ok().body(format!("{{\"id\":\"{res}\"}}")),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }
 
 #[put("/api/v1/budgets/{budget_id}")]
-async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<BudgetPost>, budget_id: web::Path<u32>) -> impl Responder {
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<BudgetPost>, budget_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -215,27 +219,48 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budget
 		.set_currency_id(body.currency_id)
 		.set_active_from(body.active_from)
 		.set_active_to_opt(body.active_to)
-		.save(&data.pool).await;
+		.update(&data.pool).await;
 
 	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Ok(()) => return HttpResponse::Ok().body(""),
+		Err(e) => {
+			if e.to_string().starts_with("you can only access items you own") {
+				return HttpResponse::NotFound().body("");
+			}
+
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }
 
 #[delete("/api/v1/budgets/{budget_id}")]
-async fn delete(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<u32>) -> impl Responder {
-	let _ = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn delete(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
 	let result = super::Budget::default()
 		.set_id(*budget_id)
+		.set_user_id(user_id)
 		.delete(&data.pool).await;
 
 	match result {
 		Ok(()) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => {
+			if e.to_string().starts_with("you can only access items you own") {
+				return HttpResponse::NotFound().body("");
+			}
+
+			if e.to_string().starts_with("no item of type unknown found") {
+				return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type budget not found with filter id={budget_id}\"}}"));
+			}
+
+			return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"))
+		},
 	}
 }

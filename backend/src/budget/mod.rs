@@ -10,6 +10,7 @@ use serde_repr::Serialize_repr;
 use std::error::Error;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
+use uuid::Uuid;
 use crate::money::Money;
 use crate::transaction::{Transaction, TransactionLoader};
 use crate::traits::*;
@@ -25,16 +26,16 @@ pub enum Period {
 	Yearly = 4,
 }
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Budget {
-	pub id: Option<u32>,
+	pub id: Uuid,
   pub name: String,
-	pub user_id: u32,
+	pub user_id: Uuid,
 	pub amount: Money,
 	pub rollover: bool,
 	pub period: Period,
-	pub filter_tag_ids: Vec<u32>,
-	pub currency_id: u32,
+	pub filter_tag_ids: Vec<Uuid>,
+	pub currency_id: Uuid,
 	pub active_from: DateTime<Utc>,
 	pub active_to: Option<DateTime<Utc>>,
 	pub used_amount: Option<Money>,
@@ -42,30 +43,47 @@ pub struct Budget {
 	pub utilization: Option<f64>
 }
 
-impl Save for Budget {
-	async fn save(self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		match self.id {
-			Some(id) => {
-				db::BudgetDbWriter::new(pool, self).replace().await?;
-				return Ok(id)
-			},
-			None => return db::BudgetDbWriter::new(pool, self).insert().await,
+impl Default for Budget {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			name: String::new(),
+			user_id: Uuid::nil(),
+			amount: Money::default(),
+			rollover: false,
+			period: Period::default(),
+			filter_tag_ids: Vec::new(),
+			currency_id: Uuid::nil(),
+			active_from: DateTime::default(),
+			active_to: None,
+			used_amount: None,
+			available_amount: None,
+			utilization: None
 		}
+	}
+}
+
+impl Create for Budget {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		return db::BudgetDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Budget {
+	async fn update(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		return db::BudgetDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Delete for Budget {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::BudgetDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Budget".to_string() }))
-		}
+		return db::BudgetDbWriter::new(pool, self).delete().await;
 	}
 }
 
 impl Budget {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
@@ -74,7 +92,7 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}
@@ -94,12 +112,12 @@ impl Budget {
 		return self;
 	}
 
-	pub fn set_filter_tag_ids(mut self, filter_tag_ids: Vec<u32>) -> Self {
+	pub fn set_filter_tag_ids(mut self, filter_tag_ids: Vec<Uuid>) -> Self {
 		self.filter_tag_ids = filter_tag_ids;
 		return self;
 	}
 
-	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+	pub fn set_currency_id(mut self, currency_id: Uuid) -> Self {
 		self.currency_id = currency_id;
 		return self;
 	}
@@ -177,14 +195,22 @@ impl Budget {
 
 	pub async fn get_transactions_of_period_at(&self, pool: &Pool, timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let period = self.get_period_at_timestamp(timestamp);
+		let mut date_range = period;
+
+		if date_range.0 < self.active_from {
+			date_range.0 = self.active_from;
+		}
+		if self.active_to.is_some() && date_range.1 > self.active_to.unwrap() {
+			date_range.1 = self.active_to.unwrap();
+		}
 		
-		return self.get_transactions(pool, period.0, period.1).await;
+		return self.get_transactions(pool, date_range.0, date_range.1).await;
 	}
 
 	pub async fn get_transactions(&self, pool: &Pool, from_timestamp: DateTime<Utc>, to_timestamp: DateTime<Utc>) -> Result<Vec<Transaction>, Box<dyn Error>> {
 		let mut transactions: Vec<Transaction> = Vec::new();
 
-		let mut retrieved_tag_ids: Vec<u32> = Vec::new();
+		let mut retrieved_tag_ids: Vec<Uuid> = Vec::new();
 
 		for tag_id in &self.filter_tag_ids {
 			transactions.append(
@@ -192,10 +218,11 @@ impl Budget {
 					.set_filter_tag_id(*tag_id, NumberFilterModes::Exact)
 					.set_filter_time_range(from_timestamp, to_timestamp, TimeRangeFilterModes::Between)
 					.set_filter_currency_id(self.currency_id, NumberFilterModes::Exact)
+					.set_filter_user_id(self.user_id, NumberFilterModes::Exact)
 					.get()
 					.await?
 					.into_iter()
-					.filter(|transaction| !transaction.tag_ids.clone().unwrap_or_default().iter().any(|tag_id| retrieved_tag_ids.contains(tag_id)))
+					.filter(|transaction| !transaction.tag_ids.clone().iter().any(|tag_id| retrieved_tag_ids.contains(tag_id)))
 					.collect()
 			);
 

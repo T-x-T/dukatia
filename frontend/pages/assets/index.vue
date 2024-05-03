@@ -22,8 +22,8 @@ export default {
 		query_parameters: {
 			skip_results: 0,
 			max_results: 50,
-			sort_property: "id",
-			sort_direction: "asc",
+			sort_property: "amount",
+			sort_direction: "desc",
 		} as QueryParameters,
 		tags: {} as Tag[],
 	}),
@@ -35,11 +35,11 @@ export default {
 		this.tableData = {
 			multiSelect: false,
 			defaultSort: {
-				column: 0,
-				sort: "asc"
+				column: 2,
+				sort: "desc"
 			},
 			columns: [
-				{name: "ID", type: "number", sortable: true},
+				{name: "ID", type: "number", sortable: true, hidden: true},
 				{name: "Name", type: "string", sortable: true},
 				{name: "Description", type: "string", sortable: true},
 				{name: "Amount", type: "number", sortable: true},
@@ -177,7 +177,7 @@ export default {
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
 			if(this.query_parameters.filter_description) url += `&filter_description=${this.query_parameters.filter_description}`;
 			if(this.query_parameters.filter_mode_description) url += `&filter_mode_description=${this.query_parameters.filter_mode_description}`;
-			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_tag_id) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
 
 			return url;
@@ -195,10 +195,10 @@ export default {
 					Math.round(x.amount * 10000 + Number.EPSILON) / 10000,
 					`${x.value_per_unit.major >= 0 && x.value_per_unit.is_negative ? "-" : ""}${x.value_per_unit.major}.${x.value_per_unit.minor.toString().padStart(x.value_per_unit.minor_in_major.toString().length - 1, "0")}${x.value_per_unit.symbol}`,
 					`${((((x.value_per_unit.major * x.value_per_unit.minor_in_major) + x.value_per_unit.minor) * x.amount) / 100).toFixed(2)}${x.value_per_unit.symbol}`,
-					`${(x.total_cost_of_ownership?.total.major ? x.total_cost_of_ownership?.total.major : 0) >= 0 && x.total_cost_of_ownership?.total.is_negative ? "-" : ""}${x.total_cost_of_ownership?.total.major}.${x.total_cost_of_ownership?.total.minor.toString().padStart(x.total_cost_of_ownership?.total.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.total.symbol}`,
-					`${(x.total_cost_of_ownership?.monthly.major ? x.total_cost_of_ownership?.monthly.major : 0) >= 0 && x.total_cost_of_ownership?.monthly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.monthly.major}.${x.total_cost_of_ownership?.monthly.minor.toString().padStart(x.total_cost_of_ownership?.monthly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.monthly.symbol}`,
-					`${(x.total_cost_of_ownership?.yearly.major ? x.total_cost_of_ownership?.yearly.major : 0) >= 0 && x.total_cost_of_ownership?.yearly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.yearly.major}.${x.total_cost_of_ownership?.yearly.minor.toString().padStart(x.total_cost_of_ownership?.yearly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.yearly.symbol}`,
-					tags.filter(y => x.tag_ids?.includes(Number.isFinite(y.id) ? Number(y.id) : -1)).map(y => y.name).join(", ")
+					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.total.major ? x.total_cost_of_ownership?.total.major : 0) >= 0 && x.total_cost_of_ownership?.total.is_negative ? "-" : ""}${x.total_cost_of_ownership?.total.major}.${x.total_cost_of_ownership?.total.minor.toString().padStart(x.total_cost_of_ownership?.total.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.total.symbol}` : "",
+					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.monthly.major ? x.total_cost_of_ownership?.monthly.major : 0) >= 0 && x.total_cost_of_ownership?.monthly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.monthly.major}.${x.total_cost_of_ownership?.monthly.minor.toString().padStart(x.total_cost_of_ownership?.monthly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.monthly.symbol}` : "",
+					x.total_cost_of_ownership ? `${(x.total_cost_of_ownership?.yearly.major ? x.total_cost_of_ownership?.yearly.major : 0) >= 0 && x.total_cost_of_ownership?.yearly.is_negative ? "-" : ""}${x.total_cost_of_ownership?.yearly.major}.${x.total_cost_of_ownership?.yearly.minor.toString().padStart(x.total_cost_of_ownership?.yearly.minor_in_major.toString().length - 1, "0")}${x.total_cost_of_ownership?.yearly.symbol}` : "",
+					tags.filter(y => x.tag_ids?.includes(typeof y.id == "string" && y.id.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 				];
 		}
 	},

@@ -305,54 +305,6 @@ mod db_reader {
 		}
 
 		#[test]
-		fn filter_id_exact() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Exact));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_not() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Not));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_less() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::Less));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
-		fn filter_id_more() {
-			let mut filters = Filters::default();
-			filters.id = Some((10, NumberFilterModes::More));
-			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
-	
-			let (res_string, res_values) = test.get_formatted_query_parameters(None);
-			
-			assert_eq!(res_string, " WHERE id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
-		}
-
-		#[test]
 		fn filter_total_amount_exact() {
 			let mut filters = Filters::default();
 			filters.total_amount = Some((10, NumberFilterModes::Exact));
@@ -361,6 +313,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE total_amount=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_total_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.total_amount = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (total_amount IS NULL OR total_amount=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -403,241 +367,301 @@ mod db_reader {
 		#[test]
 		fn filter_asset_id_exact() {
 			let mut filters = Filters::default();
-			filters.asset_id = Some((10, NumberFilterModes::Exact));
+			filters.asset_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE asset_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
+		}
+
+		#[test]
+		fn filter_asset_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.asset_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (asset_id IS NULL OR asset_id=$1)");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_asset_id_not() {
 			let mut filters = Filters::default();
-			filters.asset_id = Some((10, NumberFilterModes::Not));
+			filters.asset_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE asset_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_asset_id_less() {
 			let mut filters = Filters::default();
-			filters.asset_id = Some((10, NumberFilterModes::Less));
+			filters.asset_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE asset_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_asset_id_more() {
 			let mut filters = Filters::default();
-			filters.asset_id = Some((10, NumberFilterModes::More));
+			filters.asset_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE asset_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_user_id_exact() {
 			let mut filters = Filters::default();
-			filters.user_id = Some((10, NumberFilterModes::Exact));
+			filters.user_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE user_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
+		}
+
+		#[test]
+		fn filter_user_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.user_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (user_id IS NULL OR user_id=$1)");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_user_id_not() {
 			let mut filters = Filters::default();
-			filters.user_id = Some((10, NumberFilterModes::Not));
+			filters.user_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE user_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_user_id_less() {
 			let mut filters = Filters::default();
-			filters.user_id = Some((10, NumberFilterModes::Less));
+			filters.user_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE user_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_user_id_more() {
 			let mut filters = Filters::default();
-			filters.user_id = Some((10, NumberFilterModes::More));
+			filters.user_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE user_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_currency_id_exact() {
 			let mut filters = Filters::default();
-			filters.currency_id = Some((10, NumberFilterModes::Exact));
+			filters.currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE currency_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
+		}
+
+		#[test]
+		fn filter_currency_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.currency_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (currency_id IS NULL OR currency_id=$1)");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_currency_id_not() {
 			let mut filters = Filters::default();
-			filters.currency_id = Some((10, NumberFilterModes::Not));
+			filters.currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE currency_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_currency_id_less() {
 			let mut filters = Filters::default();
-			filters.currency_id = Some((10, NumberFilterModes::Less));
+			filters.currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE currency_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_currency_id_more() {
 			let mut filters = Filters::default();
-			filters.currency_id = Some((10, NumberFilterModes::More));
+			filters.currency_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE currency_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_account_id_exact() {
 			let mut filters = Filters::default();
-			filters.account_id = Some((10, NumberFilterModes::Exact));
+			filters.account_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE account_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
+		}
+
+		#[test]
+		fn filter_account_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.account_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (account_id IS NULL OR account_id=$1)");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_account_id_not() {
 			let mut filters = Filters::default();
-			filters.account_id = Some((10, NumberFilterModes::Not));
+			filters.account_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE account_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_account_id_less() {
 			let mut filters = Filters::default();
-			filters.account_id = Some((10, NumberFilterModes::Less));
+			filters.account_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE account_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_account_id_more() {
 			let mut filters = Filters::default();
-			filters.account_id = Some((10, NumberFilterModes::More));
+			filters.account_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE account_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_recipient_id_exact() {
 			let mut filters = Filters::default();
-			filters.recipient_id = Some((10, NumberFilterModes::Exact));
+			filters.recipient_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE recipient_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
+		}
+
+		#[test]
+		fn filter_recipient_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.recipient_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (recipient_id IS NULL OR recipient_id=$1)");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_recipient_id_not() {
 			let mut filters = Filters::default();
-			filters.recipient_id = Some((10, NumberFilterModes::Not));
+			filters.recipient_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE recipient_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_recipient_id_less() {
 			let mut filters = Filters::default();
-			filters.recipient_id = Some((10, NumberFilterModes::Less));
+			filters.recipient_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE recipient_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
 		fn filter_recipient_id_more() {
 			let mut filters = Filters::default();
-			filters.recipient_id = Some((10, NumberFilterModes::More));
+			filters.recipient_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE recipient_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), format!("[{}]", Uuid::from_u128(10)));
 		}
 
 		#[test]
@@ -649,6 +673,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE minor_in_major=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_minor_in_major_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.minor_in_major = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (minor_in_major IS NULL OR minor_in_major=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -691,97 +727,121 @@ mod db_reader {
 		#[test]
 		fn filter_parent_id_exact() {
 			let mut filters = Filters::default();
-			filters.parent_id = Some((10, NumberFilterModes::Exact));
+			filters.parent_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE parent_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
+		}
+
+		#[test]
+		fn filter_parent_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.parent_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (parent_id IS NULL OR parent_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_parent_id_not() {
 			let mut filters = Filters::default();
-			filters.parent_id = Some((10, NumberFilterModes::Not));
+			filters.parent_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE parent_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_parent_id_less() {
 			let mut filters = Filters::default();
-			filters.parent_id = Some((10, NumberFilterModes::Less));
+			filters.parent_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE parent_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_parent_id_more() {
 			let mut filters = Filters::default();
-			filters.parent_id = Some((10, NumberFilterModes::More));
+			filters.parent_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE parent_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_default_currency_id_exact() {
 			let mut filters = Filters::default();
-			filters.default_currency_id = Some((10, NumberFilterModes::Exact));
+			filters.default_currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE default_currency_id=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
+		}
+
+		#[test]
+		fn filter_default_currency_id_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.default_currency_id = Some((Uuid::from_u128(10), NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (default_currency_id IS NULL OR default_currency_id=$1)");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_default_currency_id_not() {
 			let mut filters = Filters::default();
-			filters.default_currency_id = Some((10, NumberFilterModes::Not));
+			filters.default_currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE default_currency_id!=$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_default_currency_id_less() {
 			let mut filters = Filters::default();
-			filters.default_currency_id = Some((10, NumberFilterModes::Less));
+			filters.default_currency_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE default_currency_id<$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_default_currency_id_more() {
 			let mut filters = Filters::default();
-			filters.default_currency_id = Some((10, NumberFilterModes::More));
+			filters.default_currency_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE default_currency_id>$1");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
@@ -793,6 +853,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE balance=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_balance_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.balance = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (balance IS NULL OR balance=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -845,6 +917,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_float_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.float_amount = Some((10.5, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (amount IS NULL OR amount=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10.5]");
+		}
+
+		#[test]
 		fn filter_float_amount_not() {
 			let mut filters = Filters::default();
 			filters.float_amount = Some((10.5, NumberFilterModes::Not));
@@ -889,6 +973,18 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE amount=$1");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
+		fn filter_int_amount_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.int_amount = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (amount IS NULL OR amount=$1)");
 			assert_eq!(format!("{res_values:?}"), "[10]");
 		}
 
@@ -941,6 +1037,18 @@ mod db_reader {
 		}
 
 		#[test]
+		fn filter_value_per_unit_exact_or_also_null() {
+			let mut filters = Filters::default();
+			filters.value_per_unit = Some((10, NumberFilterModes::ExactOrAlsoNull));
+			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
+	
+			let (res_string, res_values) = test.get_formatted_query_parameters(None);
+			
+			assert_eq!(res_string, " WHERE (value_per_unit IS NULL OR value_per_unit=$1)");
+			assert_eq!(format!("{res_values:?}"), "[10]");
+		}
+
+		#[test]
 		fn filter_value_per_unit_not() {
 			let mut filters = Filters::default();
 			filters.value_per_unit = Some((10, NumberFilterModes::Not));
@@ -979,49 +1087,49 @@ mod db_reader {
 		#[test]
 		fn filter_tag_id_exact() {
 			let mut filters = Filters::default();
-			filters.tag_id = Some((10, NumberFilterModes::Exact));
+			filters.tag_id = Some((Uuid::from_u128(10), NumberFilterModes::Exact));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE $1 = ANY(tags)");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_tag_id_not() {
 			let mut filters = Filters::default();
-			filters.tag_id = Some((10, NumberFilterModes::Not));
+			filters.tag_id = Some((Uuid::from_u128(10), NumberFilterModes::Not));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE NOT $1 = ANY(tags)");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_tag_id_less() {
 			let mut filters = Filters::default();
-			filters.tag_id = Some((10, NumberFilterModes::Less));
+			filters.tag_id = Some((Uuid::from_u128(10), NumberFilterModes::Less));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE $1 > ANY(tags)");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
 		fn filter_tag_id_more() {
 			let mut filters = Filters::default();
-			filters.tag_id = Some((10, NumberFilterModes::More));
+			filters.tag_id = Some((Uuid::from_u128(10), NumberFilterModes::More));
 			let test = get_db_reader(QueryParameters { max_results: None, skip_results: None, sort_property: None, sort_direction: None, filters });
 	
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE $1 < ANY(tags)");
-			assert_eq!(format!("{res_values:?}"), "[10]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-00000000000a]");
 		}
 
 		#[test]
@@ -1406,22 +1514,22 @@ mod db_reader {
 					sort_property: Some(FilterAndSortProperties::Id),
 					sort_direction: Some(SortDirection::Asc),
 					filters: Filters {
-						id: Some((1, NumberFilterModes::Exact)),
+						id: Some((Uuid::nil(), NumberFilterModes::Exact)),
 						total_amount: Some((2, NumberFilterModes::Exact)),
-						asset_id: Some((3, NumberFilterModes::Exact)),
-						user_id: Some((4, NumberFilterModes::Exact)),
-						currency_id: Some((5, NumberFilterModes::Exact)),
-						account_id: Some((6, NumberFilterModes::Exact)),
-						recipient_id: Some((7, NumberFilterModes::Exact)),
-						tag_id: Some((8, NumberFilterModes::Exact)),
+						asset_id: Some((Uuid::from_u128(3), NumberFilterModes::Exact)),
+						user_id: Some((Uuid::from_u128(4), NumberFilterModes::Exact)),
+						currency_id: Some((Uuid::from_u128(5), NumberFilterModes::Exact)),
+						account_id: Some((Uuid::from_u128(6), NumberFilterModes::Exact)),
+						recipient_id: Some((Uuid::from_u128(7), NumberFilterModes::Exact)),
+						tag_id: Some((Uuid::from_u128(8), NumberFilterModes::Exact)),
 						comment: Some(("9".to_string(), StringFilterModes::Exact)),
 						time_range: Some((DateTime::<Utc>::MIN_UTC, DateTime::<Utc>::MAX_UTC, TimeRangeFilterModes::Between)),
 						name: Some(("10".to_string(), StringFilterModes::Exact)),
 						symbol: Some(("11".to_string(), StringFilterModes::Exact)),
 						minor_in_major: Some((12, NumberFilterModes::Exact)),
-						parent_id: Some((13, NumberFilterModes::Exact)),
+						parent_id: Some((Uuid::from_u128(13), NumberFilterModes::Exact)),
 						balance: Some((14, NumberFilterModes::Exact)),
-						default_currency_id: Some((15, NumberFilterModes::Exact)),
+						default_currency_id: Some((Uuid::from_u128(15), NumberFilterModes::Exact)),
 						description: Some(("16".to_string(), StringFilterModes::Exact)),
 						float_amount: Some((17.5, NumberFilterModes::Exact)),
 						int_amount: Some((17, NumberFilterModes::Exact)),
@@ -1436,7 +1544,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND amount=$13 AND value_per_unit=$14 AND $15 = ANY(tags) AND rollover=$16 AND comment ILIKE $17 AND name ILIKE $18 AND symbol ILIKE $19 AND description ILIKE $20 AND timestamp BETWEEN $21 AND $22 AND active_from BETWEEN $23 AND $24 AND active_to NOT BETWEEN $25 AND $26 ORDER BY id ASC OFFSET $27 LIMIT $28");
-			assert_eq!(format!("{res_values:?}"), "[1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 14, 17.5, 17, 18, 8, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-000000000000, 2, 00000000-0000-0000-0000-000000000003, 00000000-0000-0000-0000-000000000004, 00000000-0000-0000-0000-000000000005, 00000000-0000-0000-0000-000000000006, 00000000-0000-0000-0000-000000000007, 12, 00000000-0000-0000-0000-00000000000d, 00000000-0000-0000-0000-00000000000f, 14, 17.5, 17, 18, 00000000-0000-0000-0000-000000000008, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
 		}
 	}
 }

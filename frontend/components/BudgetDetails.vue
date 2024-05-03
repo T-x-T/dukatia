@@ -11,21 +11,27 @@
 
 			<div v-if="chart_utilization_current_period" class="gridItem pie_chart">
 				<h3>Current Period</h3>
-				<ChartPie
-					:pie="chart_utilization_current_period"
-				/>
+				<div class="actual_chart">
+					<ChartPie
+						:pie="chart_utilization_current_period"
+					/>
+				</div>
 			</div>
 			<div v-if="chart_utilization_previous_period" class="gridItem pie_chart">
 				<h3>Previous Period</h3>
-				<ChartPie
-					:pie="chart_utilization_previous_period"
-				/>
+				<div class="actual_chart">
+					<ChartPie
+						:pie="chart_utilization_previous_period"
+					/>
+				</div>
 			</div>
 			<div v-if="chart_utilization_history" class="gridItem line_chart">
 				<h3>Utilization History</h3>
-				<ChartLine
-					:line="chart_utilization_history"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="chart_utilization_history"
+					/>
+				</div>
 			</div>
 			<div v-if="Object.keys(table_data).length > 0" class="gridItem">
 				<h3>Transactions in current Period</h3>
@@ -63,7 +69,8 @@ export default {
 
 	methods: {
 		async reload(res?: any) {
-			console.log(res)
+			if(res?.id) (this.budget as Budget).id = res.id;
+
 			if(!this.budget || Object.keys(this.budget).length === 0) {
 				console.error("this.budget isnt defined in BudgetDetails.vue reload method");
 				return;
@@ -118,7 +125,7 @@ export default {
 							sort: "desc"
 						},
 						columns: [
-							{name: "ID", type: "number", sortable: false, no_filter: true},
+							{name: "ID", type: "number", sortable: false, no_filter: true, hidden: true},
 							{name: "Account", type: "string", sortable: false, no_filter: true},
 							{name: "Recipient", type: "string", sortable: false, no_filter: true},
 							{name: "Asset", type: "string", sortable: false, no_filter: true},
@@ -135,7 +142,7 @@ export default {
 							new Date(new Date(x.timestamp).valueOf() - (new Date(x.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
 							`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 							x.comment,
-							tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+							tags.filter(y => x.tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 						]))
 					};
 				});
@@ -171,9 +178,10 @@ div.gridItem
 
 div.pie_chart
 	width: 20em
-	height: 20em
 
 div.line_chart
 	width: 60em
+
+div.actual_chart
 	height: 20em
 </style>

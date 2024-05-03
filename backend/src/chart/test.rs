@@ -19,16 +19,16 @@ mod limit_output {
 
 	#[test]
 	fn returns_full_input_when_limit_larger() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(10));
@@ -38,16 +38,16 @@ mod limit_output {
 
 	#[test]
 	fn returns_full_input_when_limit_none() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), None);
@@ -58,16 +58,16 @@ mod limit_output {
 
 	#[test]
 	fn works_with_limit_0() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(0));
@@ -77,116 +77,116 @@ mod limit_output {
 
 	#[test]
 	fn works_with_limit_1() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_2() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_3() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_4() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(4));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_5() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output(input.clone(), Some(5));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 }
@@ -210,71 +210,71 @@ mod limit_output_only_positive {
 
 	#[test]
 	fn returns_full_input_when_limit_larger() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), Some(10));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn returns_full_input_when_limit_none() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), None);
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
 		]);
 	}
 
 
 	#[test]
 	fn works_with_limit_0() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), Some(0));
@@ -284,67 +284,67 @@ mod limit_output_only_positive {
 
 	#[test]
 	fn works_with_limit_1() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_2() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_3() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_positive(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
 		]);
 	}
 }
@@ -368,61 +368,61 @@ mod limit_output_only_negative {
 
 	#[test]
 	fn returns_full_input_when_limit_larger() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), Some(10));
 
 		assert_eq!(res, vec![
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn returns_full_input_when_limit_none() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), None);
 
 		assert_eq!(res, vec![
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
 		]);
 	}
 
 
 	#[test]
 	fn works_with_limit_0() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), Some(0));
@@ -432,66 +432,66 @@ mod limit_output_only_negative {
 
 	#[test]
 	fn works_with_limit_1() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), Some(1));
 
 		assert_eq!(res, vec![
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_2() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), Some(2));
 
 		assert_eq!(res, vec![
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
 		]);
 	}
 
 	#[test]
 	fn works_with_limit_3() {
-		let input: Vec<(u32, Dataset)> = vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+		let input: Vec<(Uuid, Dataset)> = vec![
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		];
 
 		let res = limit_output_only_negative(input.clone(), Some(3));
 
 		assert_eq!(res, vec![
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
 		]);
 	}
 }
@@ -510,7 +510,7 @@ mod sort_output {
 	fn works_with_single_dataset() {
 		let input = IntermediateChartData {
 			datasets: vec![
-				(0, Dataset {
+				(Uuid::from_u128(0), Dataset {
 					label: String::new(), data: vec![
 						DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},
 						DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},
@@ -521,7 +521,7 @@ mod sort_output {
 		};
 		let res = sort_output(input);
 
-		assert_eq!(res, vec![(0, Dataset {
+		assert_eq!(res, vec![(Uuid::from_u128(0), Dataset {
 			label: String::new(), data: vec![
 				DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},
 				DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},
@@ -534,29 +534,29 @@ mod sort_output {
 	fn works_with_many_datasets() {
 		let input = IntermediateChartData {
 			datasets: vec![
-				(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-				(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-				(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-				(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-				(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-				(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-				(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-				(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-				(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+				(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+				(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+				(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+				(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+				(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+				(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+				(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+				(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+				(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
 		let res = sort_output(input);
 
 		assert_eq!(res, vec![
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 
@@ -564,29 +564,29 @@ mod sort_output {
 	fn works_with_duplicates() {
 		let input = IntermediateChartData {
 			datasets: vec![
-				(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-				(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-				(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-				(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-				(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
-				(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-				(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-				(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-				(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+				(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+				(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+				(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+				(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+				(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+				(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+				(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+				(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+				(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
 		let res = sort_output(input);
 
 		assert_eq!(res, vec![
-			(2, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(5, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
-			(1, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
-			(7, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
-			(8, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
-			(6, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
-			(0, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
-			(3, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
-			(4, Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
+			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
+			(Uuid::from_u128(1), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 400.0, label: String::new()}]}),
+			(Uuid::from_u128(7), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()}]}),
+			(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
+			(Uuid::from_u128(6), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.1, label: String::new()}]}),
+			(Uuid::from_u128(0), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 100.0, label: String::new()}]}),
+			(Uuid::from_u128(3), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -50.0, label: String::new()}]}),
+			(Uuid::from_u128(4), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 500.0, label: String::new()},DataPoint {name: None, timestamp: None, value: -90.0, label: String::new()}]}),
 		]);
 	}
 }

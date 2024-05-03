@@ -26,28 +26,34 @@
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total value over time</h3>
-				<ChartLine
-					:line="asset_total_value_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_total_value_chart"
+					/>
+				</div>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total value over time of single item</h3>
-				<ChartLine
-					:line="asset_single_value_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_single_value_chart"
+					/>
+				</div>
 			</div>
 			<div v-if="asset?.id !== undefined && renderCharts" class="gridItem chart">
 				<h3>Total amount over time</h3>
-				<ChartLine
-					:line="asset_amount_chart"
-				/>
+				<div class="actual_chart">
+					<ChartLine
+						:line="asset_amount_chart"
+					/>
+				</div>
 			</div>
 		</div>
 
 		<div v-if="showAssetValuationEditor">
 			<Popup @close="closeAssetValuationEditor">
 				<AssetValuationsEditor
-					v-if="asset && Number.isInteger(asset.id)"
+					v-if="asset?.id?.length === 36"
 					:assetId="asset.id"
 					@close="closeAssetValuationEditor"
 				/>
@@ -96,12 +102,13 @@ export default {
 		},
 
 		async reload(res?: any) {
+			if (res?.id) (this.asset as Asset).id = res.id;
+			
 			if(!this.asset || Object.keys(this.asset).length === 0) {
 				console.error("this.asset isnt defined in AssetDetails.vue reload method");
 				return;
 			}
 
-			if (res?.id) (this.asset as Asset).id = res.id;
 			this.asset = await $fetch(`/api/v1/assets/${(this.asset as Asset).id}`);
 			useRouter().push(`/assets/${(this.asset as Asset).id}`);
 			
@@ -140,6 +147,8 @@ div.gridItem
 
 div.chart
 	flex-grow: 1
-	width: 50vw
-	height: 40vh
+	width: 100%
+
+div.actual_chart
+	height: 30vh
 </style>

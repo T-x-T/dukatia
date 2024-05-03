@@ -7,6 +7,7 @@ use serde_repr::*;
 use chrono::prelude::*;
 use deadpool_postgres::Pool;
 use std::error::Error;
+use uuid::Uuid;
 use super::account;
 use super::asset::Asset;
 use crate::traits::*;
@@ -19,12 +20,23 @@ pub enum TransactionStatus {
 	Completed = 1,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Position {
-	pub id: Option<u32>,
+	pub id: Uuid,
 	pub amount: Money,
 	pub comment: Option<String>,
-	pub tag_id: Option<u32>,
+	pub tag_id: Option<Uuid>,
+}
+
+impl Default for Position {
+	fn default() -> Self {
+		return Self { 
+			id: Uuid::new_v4(),
+			amount: Money::default(),
+			comment: None,
+			tag_id: None,
+		};
+	}
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -35,16 +47,16 @@ pub struct TransactionSummary {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Transaction {
-	pub id: Option<u32>,
-	pub user_id: u32,
-	pub currency_id: Option<u32>,
-	pub account_id: u32,
-	pub recipient_id: u32,
+	pub id: Uuid,
+	pub user_id: Uuid,
+	pub currency_id: Option<Uuid>,
+	pub account_id: Uuid,
+	pub recipient_id: Uuid,
 	pub status: TransactionStatus,
 	pub timestamp: DateTime<Utc>,
 	pub total_amount: Option<Money>,
 	pub comment: Option<String>,
-	pub tag_ids: Option<Vec<u32>>,
+	pub tag_ids: Vec<Uuid>,
 	pub asset: Option<Asset>,
 	pub positions: Vec<Position>,
 }
@@ -52,68 +64,82 @@ pub struct Transaction {
 impl Default for Transaction {
 	fn default() -> Self {
 		Self { 
-			id: None,
-			user_id: 0,
+			id: Uuid::new_v4(),
+			user_id: Uuid::nil(),
 			currency_id: None,
-			account_id: 0,
-			recipient_id: 0,
+			account_id: Uuid::nil(),
+			recipient_id: Uuid::nil(),
 			status: TransactionStatus::Completed,
 			timestamp: Utc::now(),
 			total_amount: None,
 			comment: None,
-			tag_ids: None,
+			tag_ids: Vec::new(),
 			asset: None,
 			positions: Vec::new(),
 		}
 	}
 }
 
-impl Save for Transaction {
-	async fn save(mut self, pool: &Pool) -> Result<u32, Box<dyn Error>> {
-		let account = account::AccountLoader::new(pool).set_filter_id(self.account_id, NumberFilterModes::Exact).get_first().await?;
+impl Create for Transaction {
+	async fn create(mut self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		let account = account::AccountLoader::new(pool)
+			.set_filter_id(self.account_id, NumberFilterModes::Exact)
+			.get_first().await?;
 		self = self.set_currency_id(account.default_currency_id);
 
-		match self.id {
-			Some(id) => {
-				db::TransactionDbWriter::new(pool, self).replace().await?;
-				return Ok(id);
-			},
-			None => return db::TransactionDbWriter::new(pool, self).insert().await
+		return db::TransactionDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Create for Vec<Transaction> {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		if !self.iter().filter(|x| x.currency_id.is_none()).collect::<Vec<&Transaction>>().is_empty() {
+			return Err(Box::new(crate::CustomError::MissingProperty { property: "currency_id".to_string(), item_type: "Transaction".to_string()}));
 		}
+
+		return db::TransactionVecDbWriter::new(pool, self).insert().await;
+	}
+}
+
+impl Update for Transaction {
+	async fn update(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
+		let account = account::AccountLoader::new(pool)
+			.set_filter_id(self.account_id, NumberFilterModes::Exact)
+			.get_first().await?;
+		self = self.set_currency_id(account.default_currency_id);
+
+		return db::TransactionDbWriter::new(pool, self).replace().await;
 	}
 }
 
 impl Delete for Transaction {
 	async fn delete(self, pool: &Pool) -> Result<(), Box<dyn Error>> {
-		match self.id {
-			Some(_) => return db::TransactionDbWriter::new(pool, self).delete().await,
-			None => return Err(Box::new(crate::CustomError::MissingProperty { property: "id".to_string(), item_type: "Transaction".to_string() }))
-		}
+		return db::TransactionDbWriter::new(pool, self).delete().await;
 	}
 }
 
 impl Transaction {
-	pub fn set_id(mut self, id: u32) -> Self {
-		self.id = Some(id);
+	pub fn set_id(mut self, id: Uuid) -> Self {
+		self.id = id;
 		return self;
 	}
 
-	pub fn set_user_id(mut self, user_id: u32) -> Self {
+	pub fn set_user_id(mut self, user_id: Uuid) -> Self {
 		self.user_id = user_id;
 		return self;
 	}
 
-	pub fn set_currency_id(mut self, currency_id: u32) -> Self {
+	pub fn set_currency_id(mut self, currency_id: Uuid) -> Self {
 		self.currency_id = Some(currency_id);
 		return self;
 	}
 
-	pub fn set_account_id(mut self, account_id: u32) -> Self {
+	pub fn set_account_id(mut self, account_id: Uuid) -> Self {
 		self.account_id = account_id;
 		return self;
 	}
 
-	pub fn set_recipient_id(mut self, recipient_id: u32) -> Self {
+	pub fn set_recipient_id(mut self, recipient_id: Uuid) -> Self {
 		self.recipient_id = recipient_id;
 		return self;
 	}
@@ -138,12 +164,7 @@ impl Transaction {
 		return self;
 	}
 
-	pub fn set_tag_ids(mut self, tag_ids: Vec<u32>) -> Self {
-		self.tag_ids = Some(tag_ids);
-		return self;
-	}
-
-	pub fn set_tag_ids_opt(mut self, tag_ids: Option<Vec<u32>>) -> Self {
+	pub fn set_tag_ids(mut self, tag_ids: Vec<Uuid>) -> Self {
 		self.tag_ids = tag_ids;
 		return self;
 	}

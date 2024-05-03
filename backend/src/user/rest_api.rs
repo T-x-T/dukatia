@@ -1,13 +1,13 @@
-use actix_web::{post, web, HttpResponse, HttpRequest, Responder, put};
+use actix_web::{get, post, web, HttpResponse, HttpRequest, Responder, put};
 use serde::Deserialize;
 use super::super::webserver::{AppState, is_authorized};
-use super::super::user::LoginCredentials;
+use super::*;
 
 
 #[post("/api/v1/login")]
 async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
-		Ok(access_token) => return HttpResponse::Ok().body(format!("{{\"accessToken\":\"{access_token}\"}}")),
+		Ok(login_result) => return HttpResponse::Ok().body(serde_json::to_string(&login_result).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
@@ -19,12 +19,152 @@ async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Respon
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::logout(&data.pool, user_id, req.cookie("accessToken").unwrap().value().to_string()).await {
+	match User::default().set_id(user_id).logout(&data.pool, req.cookie("accessToken").unwrap().value().to_string()).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};
 }
 
+#[get("/api/v1/users/me")]
+async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+}
+
+#[get("/api/v1/users/all")]
+async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	let users = UserLoader::new(&data.pool)
+		.set_query_parameters(
+			QueryParameters::default()
+				.set_sort_property_opt(Some(FilterAndSortProperties::Name))
+				.set_sort_direction_opt(Some(SortDirection::Asc))
+			)
+		.get()
+		.await;
+
+	match users {
+		Ok(res) => {
+			let user: Vec<&User> = res.iter().filter(|x| x.id == user_id).collect();
+			
+			if user.first().unwrap().superuser {
+				return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap())
+			}
+
+			return HttpResponse::BadRequest().body("{\"error\":\"you need to be a superuser for this action\"}".to_string());
+		},
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	};
+}
+
+#[derive(Deserialize)]
+struct PostUserBody {
+	name: String,
+	superuser: bool,
+	secret: String,
+}
+
+#[post("/api/v1/users")]
+async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: HttpRequest) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(user) => {
+				if user.superuser {
+					match User::default()
+						.set_name(body.name.clone())
+						.set_superuser(body.superuser)
+						.set_secret(body.secret.clone())
+						.encrypt_secret(&data.config.pepper)
+						.create(&data.pool)
+						.await {
+							Ok(_) => return HttpResponse::Ok().body(""),
+							Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+						};	
+				}
+
+				return HttpResponse::BadRequest().body("{\"error\":\"you need to be a superuser for this action\"}".to_string());
+			},
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+}
+
+#[derive(Deserialize)]
+struct PutUserBody {
+	superuser: Option<bool>,
+	secret: Option<String>,
+	active: Option<bool>,
+}
+
+#[put("/api/v1/users/{req_user_id}")]
+async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<Uuid>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
+	};
+
+	match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(user) => {
+				if user.superuser {
+					match UserLoader::new(&data.pool)
+						.set_filter_id(*req_user_id, NumberFilterModes::Exact)
+						.get_first()
+						.await {
+							Ok(mut user_to_edit) => {
+								if body.superuser.is_some() {
+									user_to_edit.set_superuser_mut(body.superuser.unwrap());
+								}
+
+								if body.secret.is_some() {
+									user_to_edit.set_secret_mut(body.secret.clone().unwrap());
+									user_to_edit.encrypt_secret_mut(&data.config.pepper);
+								}
+
+								if body.active.is_some() {
+									if user_to_edit.id == user_id {
+										return HttpResponse::BadRequest().body("{\"error\":\"you cant disable yourself!\"}")
+									}
+
+									user_to_edit.set_active_mut(body.active.unwrap());
+								}
+
+								match user_to_edit.update(&data.pool).await {
+									Ok(()) => return HttpResponse::Ok().body(""),
+									Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+								}
+							},
+							Err(e) => return HttpResponse::NotFound().body(format!("{{\"error\":\"{e}\"}}")),
+						}
+				}
+
+				return HttpResponse::BadRequest().body("{\"error\":\"you need to be a superuser for this action\"}".to_string());
+			},
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+}
 
 #[derive(Deserialize)]
 struct PutSecretBody {
@@ -39,7 +179,15 @@ async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, r
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::update_secret(&data.config, &data.pool, body.old_secret.clone(), body.new_secret.clone(), user_id).await {
+	let user = match UserLoader::new(&data.pool)
+		.set_filter_id(user_id, NumberFilterModes::Exact)
+		.get_first()
+		.await {
+			Ok(x) => x,
+			Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		};
+
+	match user.update_secret(&data.pool, &data.config.pepper, body.old_secret.clone(), body.new_secret.clone()).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}

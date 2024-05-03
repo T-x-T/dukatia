@@ -1,24 +1,25 @@
 use super::*;
 use crate::money::Money;
+use uuid::Uuid;
 
 mod calculate_get_single_asset_total_value_over_time {
 	use super::*;
 
 	#[test]
 	fn works() {
-		let asset = Asset::default().set_id(0);
+		let asset = Asset::default().set_id(Uuid::from_u128(0));
 		let asset_valuation_history: Vec<AssetValuation> = vec![
-			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(123, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
+			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(123, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
 		];
 
 		let res = calculate_get_single_asset_total_value_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![
-				(0, Dataset { 
+				(Uuid::from_u128(0), Dataset { 
 					label: "".to_string(),
 					data: vec![
 						DataPoint { 
@@ -57,19 +58,19 @@ mod calculate_get_single_asset_single_value_over_time {
 
 	#[test]
 	fn works() {
-		let asset = Asset::default().set_id(0);
+		let asset = Asset::default().set_id(Uuid::from_u128(0));
 		let asset_valuation_history: Vec<AssetValuation> = vec![
-			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(1234, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
+			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(1234, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
 		];
 
 		let res = calculate_get_single_asset_single_value_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![
-				(0, Dataset { 
+				(Uuid::from_u128(0), Dataset { 
 					label: "".to_string(),
 					data: vec![
 						DataPoint { 
@@ -108,19 +109,19 @@ mod calculate_get_single_asset_amount_over_time {
 
 	#[test]
 	fn works() {
-		let asset = Asset::default().set_id(0);
+		let asset = Asset::default().set_id(Uuid::from_u128(0));
 		let asset_valuation_history: Vec<AssetValuation> = vec![
-			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(1234, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
-			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: 0 },
+			AssetValuation { value_per_unit: Money::from_amount(100, 100, "€".to_string()), amount: 1.0, timestamp: DateTime::parse_from_str("2023-10-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(200, 100, "€".to_string()), amount: 2.0, timestamp: DateTime::parse_from_str("2023-10-02 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(1234, 100, "€".to_string()), amount: 2.5, timestamp: DateTime::parse_from_str("2023-10-06 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
+			AssetValuation { value_per_unit: Money::from_amount(150, 100, "€".to_string()), amount: 0.0, timestamp: DateTime::parse_from_str("2023-11-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().into(), asset_id: Uuid::from_u128(0) },
 		];
 
 		let res = calculate_get_single_asset_amount_over_time(asset, &asset_valuation_history);
 
 		assert_eq!(res, IntermediateChartData {
 			datasets: vec![
-				(0, Dataset { 
+				(Uuid::from_u128(0), Dataset { 
 					label: "".to_string(),
 					data: vec![
 						DataPoint { 

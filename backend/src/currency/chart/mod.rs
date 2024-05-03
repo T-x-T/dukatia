@@ -5,6 +5,7 @@ use deadpool_postgres::Pool;
 use std::error::Error;
 use std::collections::BTreeMap;
 use chrono::prelude::*;
+use uuid::Uuid;
 
 use crate::chart::{Dataset, IntermediateChartData, DataPointMonetary, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
 use super::{CurrencyLoader, Currency};
@@ -22,7 +23,7 @@ pub async fn get_per_currency_over_time(pool: &Pool, options: ChartOptions) -> R
 
 fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Vec<Transaction>, currencies: &[Currency]) -> IntermediateChartData {
 	let mut output = IntermediateChartData::default();
-	let mut datasets_monetary: BTreeMap<u32, Vec<DataPointMonetary>> = BTreeMap::new();
+	let mut datasets_monetary: BTreeMap<Uuid, Vec<DataPointMonetary>> = BTreeMap::new();
 
 	let default = DataPointMonetary::default();
 	for transaction in transactions {
@@ -47,7 +48,7 @@ fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Ve
 		}
 	}
 
-	let mut datasets: BTreeMap<u32, Vec<DataPoint>> = BTreeMap::new();
+	let mut datasets: BTreeMap<Uuid, Vec<DataPoint>> = BTreeMap::new();
 
 	for dataset in datasets_monetary {
 		for data_point in dataset.1 {
@@ -65,7 +66,7 @@ fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Ve
 	output.datasets = BTreeMap::new();
 	for dataset in datasets {
 		let name: String = currencies.iter()
-			.filter(|x| x.id.unwrap_or_default() == dataset.0)
+			.filter(|x| x.id == dataset.0)
 			.map(|x| x.name.clone())
 			.collect();
 

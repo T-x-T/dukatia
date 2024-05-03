@@ -58,7 +58,7 @@
 			<div v-if="detailsOpen && selectedRows.length === 0" class="detailBar">
 				<TransactionDetails 
 					v-if="Object.keys(selectedRow).length > 0"
-					:transaction="selectedRow"
+					:prop_transaction="selectedRow"
 					:default_transaction="default_transaction"
 					@back="closeDetails"
 					@updateData="updateTable"
@@ -117,7 +117,7 @@ export default {
 		this.updateTransactions();
 	
 		this.selectData = {
-			options: [...this.tags.map(x => ({id: x.id ? x.id : -1, name: x.name}))],
+			options: [...this.tags.map(x => ({id: x.id?.length == 36 ? x.id : "", name: x.name}))],
 			selected: undefined,
 			label: "Tags:",
 			openTop: true
@@ -126,7 +126,7 @@ export default {
 		if (useRoute().path.split("/")[2] == "new") {
 			this.$nextTick(() => this.newTransaction());
 		} else if(useRoute().path[useRoute().path.length - 1] != "/" && Number.isInteger(Number(useRoute().path.split("/")[2]))) {
-			const id = Number(useRoute().path.split("/")[2]);
+			const id = useRoute().path.split("/")[2];
 			if(this.transactions.filter(x => x.id === id).length === 0) {
 				this.transactions.push(await $fetch(`/api/v1/transactions/${id}`));
 			}
@@ -134,27 +134,27 @@ export default {
 		}
 
 		this.default_transaction = {
-			account_id: 0,
-			currency_id: 0,
-			recipient_id: 0,
+			account_id: this.accounts[0].id,
+			currency_id: this.accounts[0].default_currency_id,
+			recipient_id: this.recipients[0].id,
 			tag_ids: [],
 			status: 1,
 			timestamp: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, -8),
 			total_amount: {
 				major: 0,
 				minor: 0,
-				minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
-				symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+				minor_in_major: this.currencies[0].minor_in_major,
+				symbol: this.currencies[0].symbol,
 				is_negative: false,
 			},
 			comment: "",
-			currency: structuredClone(toRaw(this.currencies.filter(x => x.id == 0)[0])),
+			currency: structuredClone(toRaw(this.currencies[0])),
 			positions: [{
 				amount: {
 					major: 0,
 					minor: 0,
-					minor_in_major: this.currencies.filter(c => c.id === 0)[0].minor_in_major,
-					symbol: this.currencies.filter(c => c.id === 0)[0].symbol,
+					minor_in_major: this.currencies[0].minor_in_major,
+					symbol: this.currencies[0].symbol,
 					is_negative: false,
 				},
 				comment: "",
@@ -181,7 +181,7 @@ export default {
 						sort: "desc"
 					},
 					columns: [
-						{name: "ID", type: "number", sortable: true},
+						{name: "ID", type: "number", sortable: true, hidden: true},
 						{name: "Account", type: "choice", sortable: true, options: this.accounts.map(x => ({id: x.id, name: x.name}))},
 						{name: "Recipient", type: "choice", sortable: true, options: this.recipients.map(x => ({id: x.id, name: x.name}))},
 						{name: "Asset", type: "choice", options: this.assets.map(x => ({id: x.id, name: x.name}))},
@@ -201,7 +201,7 @@ export default {
 			this.openDetailPage(row[0]);
 		},
 
-		openDetailPage(transaction_id: number) {
+		openDetailPage(transaction_id: string) {
 			const transaction = this.transactions.filter(x => x.id === transaction_id)[0];
 			this.selectedRow = {...transaction, timestamp: transaction.timestamp.slice(0, -1)};			
 			this.detailsOpen = false;
@@ -231,9 +231,9 @@ export default {
 			if(!this.selectedRows) return;
 			await Promise.all(this.selectedRows.map(async row => {
 				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
-				transaction.account_id = typeof this.batchaccount_id == "number" ? this.batchaccount_id : transaction.account_id;
-				transaction.recipient_id = typeof this.batchrecipient_id == "number" ? this.batchrecipient_id : transaction.recipient_id;
-				transaction.asset_id = typeof this.batchasset_id == "number"  ? this.batchasset_id : transaction.asset_id;
+				transaction.account_id = typeof this.batchaccount_id == "string" ? this.batchaccount_id : transaction.account_id;
+				transaction.recipient_id = typeof this.batchrecipient_id == "string" ? this.batchrecipient_id : transaction.recipient_id;
+				transaction.asset_id = typeof this.batchasset_id == "string" ? this.batchasset_id : transaction.asset_id;
 				transaction.tag_ids = this.batchtag_ids.length > 0 ? this.batchtag_ids : transaction.tag_ids;
 
 				try {
@@ -424,19 +424,15 @@ export default {
 				&sort_property=${this.query_parameters.sort_property}
 				&sort_direction=${this.query_parameters.sort_direction}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
+			if(this.query_parameters.filter_id) url += `&filter_id=${this.query_parameters.filter_id}`;
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
-			if(Number.isInteger(this.query_parameters.filter_asset_id)) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
+			if(this.query_parameters.filter_asset_id) url += `&filter_asset_id=${this.query_parameters.filter_asset_id}`;
 			if(this.query_parameters.filter_mode_asset_id) url += `&filter_mode_asset_id=${this.query_parameters.filter_mode_asset_id}`;
-			if(Number.isInteger(this.query_parameters.filter_user_id)) url += `&filter_user_id=${this.query_parameters.filter_user_id}`;
-			if(this.query_parameters.filter_mode_user_id) url += `&filter_mode_user_id=${this.query_parameters.filter_mode_user_id}`;
-			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
-			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
-			if(Number.isInteger(this.query_parameters.filter_account_id)) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
+			if(this.query_parameters.filter_account_id) url += `&filter_account_id=${this.query_parameters.filter_account_id}`;
 			if(this.query_parameters.filter_mode_account_id) url += `&filter_mode_account_id=${this.query_parameters.filter_mode_account_id}`;
-			if(Number.isInteger(this.query_parameters.filter_recipient_id)) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
+			if(this.query_parameters.filter_recipient_id) url += `&filter_recipient_id=${this.query_parameters.filter_recipient_id}`;
 			if(this.query_parameters.filter_mode_recipient_id) url += `&filter_mode_recipient_id=${this.query_parameters.filter_mode_recipient_id}`;
-			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_tag_id) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
 			if(typeof this.query_parameters.filter_total_amount == "number") url += `&filter_total_amount=${Number(this.query_parameters.filter_total_amount) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_total_amount) url += `&filter_mode_total_amount=${this.query_parameters.filter_mode_total_amount}`;
@@ -458,7 +454,7 @@ export default {
 				new Date(new Date(x.timestamp).valueOf() - (new Date(x.timestamp).getTimezoneOffset() * 60000)).toISOString().slice(0, 10),
 				`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 				x.comment,
-				this.tags.filter(y => x.tag_ids?.includes((Number.isInteger(y.id) ? y.id : -1) as number)).map(y => y.name).join(", ")
+				this.tags.filter(y => x.tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
 			];
 		}
 	}

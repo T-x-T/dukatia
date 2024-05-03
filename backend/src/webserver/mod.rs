@@ -2,6 +2,7 @@ use actix_web::{dev::Service as _, web, App, HttpServer, HttpRequest, middleware
 use std::error::Error;
 use futures_util::future::FutureExt;
 use deadpool_postgres::Pool;
+use uuid::Uuid;
 
 use super::CustomError;
 use super::config::Config;
@@ -16,6 +17,7 @@ use super::dashboard;
 use super::chart;
 use super::budget;
 use super::access_token::get_user_of_token;
+use super::demo;
 
 pub struct AppState {
 	pub config: Config,
@@ -42,6 +44,10 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(user::rest_api::post_login)
 			.service(user::rest_api::post_logout)
 			.service(user::rest_api::put_secret)
+			.service(user::rest_api::get_me)
+			.service(user::rest_api::get_all)
+			.service(user::rest_api::post)
+			.service(user::rest_api::put)
 			.service(account::rest_api::get_all)
 			.service(account::rest_api::get_by_id)
 			.service(account::rest_api::post)
@@ -86,14 +92,15 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 			.service(budget::rest_api::get_by_id)
 			.service(budget::rest_api::get_transactions)
 			.service(budget::rest_api::post)
-			.service(budget::rest_api::put);
+			.service(budget::rest_api::put)
+			.service(demo::rest_api::insert_demo_data);
 	})
 		.bind(("0.0.0.0", api_port))?
 		.run()
 		.await;
 }
 
-pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<u32, Box<dyn Error>> {
+pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<Uuid, Box<dyn Error>> {
 	if req.cookie("accessToken").is_none() {
     return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
   }

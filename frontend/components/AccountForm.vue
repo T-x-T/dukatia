@@ -4,7 +4,7 @@
 		
 		<label>
 			ID:
-			<input type="number" v-model="account.id" disabled>
+			<input type="string" v-model="account.id" disabled>
 		</label>
 		<label>
 			Name:
@@ -19,7 +19,7 @@
 		<InputMultiSelect
 			v-if="tags_select_data && Object.keys(tags_select_data).length > 0"
 			:selectData="tags_select_data"
-			@update="(selected: number[]) => account.tag_ids = selected"
+			@update="(selected: string[]) => account.tag_ids = selected"
 			style="margin-right: 5px;"
 		/>
 
@@ -37,12 +37,7 @@ export default {
 		tags_select_data: {} as SelectData | null,
 		tags: [] as Tag[],
 		currencies: [] as Currency[],
-		default_account: {
-			id: undefined,
-			default_currency_id: 0,
-			name: "",
-			tag_ids: []
-		} as Account,
+		default_account: {} as Account,
 	}),
 
 	emits: ["back", "data_saved"],
@@ -55,10 +50,18 @@ export default {
 	},
 
 	async mounted() {
-		this.account = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_account));
-
 		this.tags = await $fetch("/api/v1/tags/all");
 		this.currencies = await $fetch("/api/v1/currencies/all");
+
+		this.default_account = {
+			id: undefined,
+			default_currency_id: this.currencies[0].id,
+			name: "",
+			tag_ids: []
+		} as Account;
+
+		this.account = this.data && Object.keys(this.data).length > 0 ? this.data : structuredClone(toRaw(this.default_account));
+
 		this.update_tags_select_data();
 		(this.$refs.first_input as any).focus();
 	},
@@ -68,7 +71,7 @@ export default {
 			let res = {} as Account;
 
 			try {
-				if(typeof this.account.id == "number") {
+				if(typeof this.account.id == "string" && this.account.id.length == 36) {
 					res = await $fetch(`/api/v1/accounts/${this.account.id}`, {
 						method: "PUT",
 						body: this.get_body(),
@@ -100,7 +103,7 @@ export default {
 			this.tags_select_data = null;
 			this.$nextTick(() => {
 				this.tags_select_data = {
-					options: [...this.tags.map(x => ({id: (Number.isInteger(x.id) ? x.id : -1) as number, name: x.name}))],
+					options: [...this.tags.map(x => ({id: (typeof x.id == "string" && x.id.length == 36 ? x.id : ""), name: x.name}))],
 					selected: this.account.tag_ids,
 					label: "Tags:"
 				}

@@ -4,13 +4,21 @@ use std::fs;
 use super::config::Config;
 
 pub async fn get_connection(config: &Config) -> Pool {	
-	if !database_exists(config, &config.db_database).await {
+	let first_start = !database_exists(config, &config.db_database).await;
+	
+	if first_start {
 		create_database(config).await;
 	}
 
 	upgrade_schema_if_necessary(config).await;
 	
-	return get_pool(config);
+	let pool = get_pool(config);
+
+	if first_start {
+		crate::user::init(config, &pool).await;
+	}
+
+	return pool;
 }
 
 async fn upgrade_schema_if_necessary(config: &Config) {

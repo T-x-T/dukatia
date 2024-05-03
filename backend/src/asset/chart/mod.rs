@@ -22,6 +22,7 @@ pub async fn get_single_asset_total_value_over_time(pool: &Pool, options: ChartO
 
 	let asset = AssetLoader::new(pool)
 		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
 
@@ -40,6 +41,7 @@ pub async fn get_single_asset_single_value_over_time(pool: &Pool, options: Chart
 
 	let asset = AssetLoader::new(pool)
 		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
 
@@ -58,6 +60,7 @@ pub async fn get_single_asset_amount_over_time(pool: &Pool, options: ChartOption
 
 	let asset = AssetLoader::new(pool)
 		.set_filter_id(options.asset_id.unwrap(), NumberFilterModes::Exact)
+		.set_filter_user_id(options.user_id, NumberFilterModes::Exact)
 		.get_first()
 		.await?;
 
@@ -126,7 +129,7 @@ fn calculate_get_single_asset_total_value_over_time(asset: Asset, asset_valuatio
 	}
 
 	return IntermediateChartData {
-		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
+		datasets: vec![(asset.id, dataset)].into_iter().collect(),
 	};
 }
 
@@ -172,7 +175,7 @@ fn calculate_get_single_asset_single_value_over_time(asset: Asset, asset_valuati
 	}
 
 	return IntermediateChartData {
-		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
+		datasets: vec![(asset.id, dataset)].into_iter().collect(),
 	};
 }
 
@@ -218,6 +221,6 @@ fn calculate_get_single_asset_amount_over_time(asset: Asset, asset_valuation_his
 	}
 
 	return IntermediateChartData {
-		datasets: vec![(asset.id.unwrap_or_default(), dataset)].into_iter().collect(),
+		datasets: vec![(asset.id, dataset)].into_iter().collect(),
 	};
 }

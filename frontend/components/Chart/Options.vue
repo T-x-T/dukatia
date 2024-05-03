@@ -54,7 +54,7 @@
 		<input type="checkbox" v-model="options.only_negative" name="only_negative" @change="change_options" />
 		<br>
 		
-		<button v-if="Number.isInteger(options.id)" class="red" @click="delete_this">Delete</button>
+		<button v-if="typeof options.id == 'string' && options.id.length == 36" class="red" @click="delete_this">Delete</button>
 	</div>
 </template>
 

@@ -1,5 +1,6 @@
 use actix_web::{get, post, put, web, HttpResponse, HttpRequest, Responder};
 use serde::Deserialize;
+use uuid::Uuid;
 use crate::webserver::{AppState, is_authorized};
 use crate::traits::*;
 
@@ -7,7 +8,7 @@ use crate::traits::*;
 struct RequestParameters {
 	skip_results: Option<u32>,
 	max_results: Option<u32>,
-	filter_id: Option<u32>,
+	filter_id: Option<Uuid>,
 	filter_mode_id: Option<String>,
 	filter_name: Option<String>,
 	filter_mode_name: Option<String>,
@@ -44,6 +45,8 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	let result = super::CurrencyLoader::new(&data.pool)
 	.set_query_parameters(
 		QueryParameters::default()
+			.set_sort_property_opt(Some(FilterAndSortProperties::Name))
+			.set_sort_direction_opt(Some(SortDirection::Asc))
 			.set_max_results_opt(request_parameters.max_results)
 			.set_skip_results_opt(request_parameters.skip_results)
 			.set_filters(filters)
@@ -57,7 +60,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 #[get("/api/v1/currencies/{currency_id}")]
-async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web::Path<u32>) -> impl Responder {
+async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, currency_id: web::Path<Uuid>) -> impl Responder {
 	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -88,39 +91,63 @@ struct CurrencyPost {
 
 #[post("/api/v1/currencies")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<CurrencyPost>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::Currency::default()
-		.set_name(body.name.clone())
-		.set_minor_in_major(body.minor_in_major)
-		.set_symbol(body.symbol.clone())
-		.save(&data.pool).await;
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+    Ok(user) => {
+			if !user.superuser {
+				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to create new currencies\"}");
+			}
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
-	}
+			let result = super::Currency::default()
+				.set_name(body.name.clone())
+				.set_minor_in_major(body.minor_in_major)
+				.set_symbol(body.symbol.clone())
+				.create(&data.pool).await;
+		
+			match result {
+				Ok(id) => return HttpResponse::Ok().body(format!("{{\"id\":\"{id}\"}}")),
+				Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+			}
+		},
+    Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	}	
 }
 
 #[put("/api/v1/currencies/{currency_id}")]
-async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<CurrencyPost>, currency_id: web::Path<u32>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<CurrencyPost>, currency_id: web::Path<Uuid>) -> impl Responder {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	let result = super::Currency::default()
-		.set_id(*currency_id)
-		.set_name(body.name.clone())
-		.set_minor_in_major(body.minor_in_major)
-		.set_symbol(body.symbol.clone())
-		.save(&data.pool).await;
+	match crate::user::UserLoader::new(&data.pool).set_filter_id(user_id, NumberFilterModes::Exact).get_first().await {
+    Ok(user) => {
+			if !user.superuser {
+				return HttpResponse::BadRequest().body("{\"error\":\"youre not allowed to update existing currencies\"}");
+			}
 
-	match result {
-		Ok(_) => return HttpResponse::Ok().body(""),
+			let result = super::Currency::default()
+				.set_id(*currency_id)
+				.set_name(body.name.clone())
+				.set_minor_in_major(body.minor_in_major)
+				.set_symbol(body.symbol.clone())
+				.update(&data.pool).await;
+	
+			match result {
+				Ok(()) => return HttpResponse::Ok().body(""),
+				Err(e) => {
+					if e.to_string().starts_with("no item of type unknown found") {
+						return HttpResponse::NotFound().body(format!("{{\"error\":\"specified item of type currency not found with filter id={currency_id}\"}}"));
+					}
+					
+					return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}"));
+				}
+			}
+		},
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
 }

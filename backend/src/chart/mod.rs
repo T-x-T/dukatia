@@ -1,7 +1,6 @@
 mod db;
 pub mod rest_api;
 
-
 #[cfg(test)]
 mod test;
 
@@ -21,19 +20,20 @@ use std::error::Error;
 use std::collections::BTreeMap;
 use deadpool_postgres::Pool;
 use chrono::prelude::*;
+use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Default)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ChartOptions {
-	pub id: Option<u32>,
-	pub user_id: Option<u32>,
+	pub id: Uuid,
+	pub user_id: Uuid,
 	pub chart_type: String,
 	pub title: String,
 	pub filter_from: Option<DateTime<Utc>>,
 	pub filter_to: Option<DateTime<Utc>>,
 	pub filter_collection: Option<String>,
 	pub date_period: Option<String>,
-	pub asset_id: Option<u32>,
-	pub budget_id: Option<u32>,
+	pub asset_id: Option<Uuid>,
+	pub budget_id: Option<Uuid>,
 	pub max_items: Option<u32>,
 	pub date_range: Option<u32>,
 	pub only_positive: Option<bool>,
@@ -42,6 +42,33 @@ pub struct ChartOptions {
 	pub top_left_y: Option<u32>,
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
+	pub dashboard_id: Option<Uuid>,
+}
+
+impl Default for ChartOptions {
+	fn default() -> Self {
+		Self {
+			id: Uuid::new_v4(),
+			user_id: Uuid::nil(),
+			chart_type: String::new(),
+			title: String::new(),
+			filter_from: None,
+			filter_to: None,
+			filter_collection: None,
+			date_period: None,
+			asset_id: None,
+			budget_id: None,
+			max_items: None,
+			date_range: None,
+			only_positive: None,
+			only_negative: None,
+			top_left_x: None,
+			top_left_y: None,
+			bottom_right_x: None,
+			bottom_right_y: None,
+			dashboard_id: None,
+		}		 
+	}
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -51,7 +78,7 @@ pub struct ChartData {
 
 #[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
 pub struct IntermediateChartData {
-	pub datasets: BTreeMap<u32, Dataset>,
+	pub datasets: BTreeMap<Uuid, Dataset>,
 }
 
 #[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
@@ -80,19 +107,19 @@ pub struct DataPointMonetary {
 pub struct DataPointMonetaryMultiCurrency {
 	pub name: Option<String>,
 	pub timestamp: Option<chrono::NaiveDate>,
-	pub value: BTreeMap<u32, Money>,
+	pub value: BTreeMap<Uuid, Money>,
 	pub label: String,
 }
 
-pub async fn get_by_id(pool: &Pool, id: u32) -> Result<ChartOptions, Box<dyn Error>> {
-	return db::get_by_id(pool, id).await;
+pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: Uuid) -> Result<ChartOptions, Box<dyn Error>> {
+	return db::get_by_id(pool, id, user_id).await;
 }
 
-pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: u32) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
-	return db::get_all_charts_in_dashboard(pool, dashboard_id).await;
+pub async fn get_all_charts_in_dashboard(pool: &Pool, dashboard_id: Uuid, user_id: Uuid) -> Result<Vec<ChartOptions>, Box<dyn Error>> {
+	return db::get_all_charts_in_dashboard(pool, dashboard_id, user_id).await;
 }
 
-pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
+pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Error>> {
 	return db::add(pool, chart).await;
 }
 
@@ -100,28 +127,28 @@ pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Err
 	return db::update(pool, chart).await;
 }
 
-pub async fn delete(pool: &Pool, chart_id: u32) -> Result<(), Box<dyn Error>> {
+pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
 	return db::delete(pool, chart_id).await;
 }
 
 pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
 	let output = match options.filter_collection.clone().unwrap_or_default().as_str() {
 		"get_per_recipient_over_time" => recipient::chart::get_per_recipient_over_time(pool, options.clone()).await?,
+		"get_single_budget_utilization_history" => budget::chart::get_single_budget_utilization_history(pool, options.clone()).await?,
 		"get_all_budget_utilization_overview" => budget::chart::get_all_budget_utilization_overview(pool, options.clone()).await?,
 		"get_single_budget_current_period_utilization" => budget::chart::get_single_budget_current_period_utilization(pool, options.clone()).await?,
 		"get_single_budget_previous_period_utilization" => budget::chart::get_single_budget_previous_period_utilization(pool, options.clone()).await?,
-		"get_single_budget_utilization_history" => budget::chart::get_single_budget_utilization_history(pool, options.clone()).await?,
 		"get_single_asset_total_value_over_time" => asset::chart::get_single_asset_total_value_over_time(pool, options.clone()).await?,
 		"get_single_asset_single_value_over_time" => asset::chart::get_single_asset_single_value_over_time(pool, options.clone()).await?,
 		"get_single_asset_amount_over_time" => asset::chart::get_single_asset_amount_over_time(pool, options.clone()).await?,
 		"get_per_account_over_time" => account::chart::get_per_account_over_time(pool, options.clone()).await?,
-		"get_per_currency_over_time" => currency::chart::get_per_currency_over_time(pool, options.clone()).await?,
 		"get_earning_spending_net_over_time" => transaction::chart::get_earning_spending_net_over_time(pool, options.clone()).await?,
 		"get_per_tag_over_time" => tag::chart::get_per_tag_over_time(pool, options.clone()).await?,
+		"get_per_currency_over_time" => currency::chart::get_per_currency_over_time(pool, options.clone()).await?,
 		_ => return Err(Box::new(CustomError::InvalidItem { reason: format!("filter_collection {} doesn't exist", options.filter_collection.unwrap_or_default()) })),
 	};
 	
-	let limited_output: Vec<(u32, Dataset)>;
+	let limited_output: Vec<(Uuid, Dataset)>;
 	if options.only_positive.is_some() && options.only_positive.unwrap() {
 		limited_output = limit_output_only_positive(sort_output(output), options.max_items);
 	} else if options.only_negative.is_some() && options.only_negative.unwrap() {
@@ -159,6 +186,7 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 			.set_sort_direction_opt(Some(SortDirection::Asc))
 		)
 		.set_filter_time_range(from_date, to_date, TimeRangeFilterModes::Between)
+		.set_filter_user_id(chart.user_id, NumberFilterModes::Exact)
 		.get().await?;
 
 	return Ok(transactions);
@@ -186,23 +214,24 @@ pub fn get_date_for_period(date_period: &str, timestamp: NaiveDate) -> NaiveDate
 	}
 }
 
-fn sort_output(input: IntermediateChartData) -> Vec<(u32, Dataset)> {
+fn sort_output(input: IntermediateChartData) -> Vec<(Uuid, Dataset)> {
 	let mut datasets = Vec::from_iter(input.datasets);
 	datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
 	return datasets;
 }
 
-fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
-	let mut output: Vec<(u32, Dataset)>;
+
+fn limit_output(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
+	let mut output: Vec<(Uuid, Dataset)>;
 	
 	if limit.is_some() && input.len() > limit.unwrap() as usize {
 		if limit.unwrap() == 1 {
 			output = input.clone().into_iter().take(1).collect();
 		} else {
 			let n_from_top = (f64::from(limit.unwrap()) / 2.0).ceil() as usize;
-			let top_limited_output: Vec<(u32, Dataset)> = input.clone().into_iter().take(n_from_top).collect();
+			let top_limited_output: Vec<(Uuid, Dataset)> = input.clone().into_iter().take(n_from_top).collect();
 			input.reverse();
-			let mut bottom_limited_output: Vec<(u32, Dataset)> = input.into_iter().take(limit.unwrap() as usize - n_from_top).collect();
+			let mut bottom_limited_output: Vec<(Uuid, Dataset)> = input.into_iter().take(limit.unwrap() as usize - n_from_top).collect();
 			bottom_limited_output.reverse();
 			output = top_limited_output;
 			output.append(&mut bottom_limited_output);
@@ -214,9 +243,9 @@ fn limit_output(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32,
 	return output;
 }
 
-fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+fn limit_output_only_positive(input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
 	let default = DataPoint::default();
-	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
+	let output: Vec<(Uuid, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
 		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).take(limit.unwrap() as usize).collect()
 	} else {
 		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_positive()).collect()
@@ -225,10 +254,10 @@ fn limit_output_only_positive(input: Vec<(u32, Dataset)>, limit: Option<u32>) ->
 	return output;
 }
 
-fn limit_output_only_negative(mut input: Vec<(u32, Dataset)>, limit: Option<u32>) -> Vec<(u32, Dataset)> {
+fn limit_output_only_negative(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
 	let default = DataPoint::default();
 	input.reverse();
-	let output: Vec<(u32, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
+	let output: Vec<(Uuid, Dataset)> = if limit.is_some() && input.len() > limit.unwrap() as usize {
 		input.clone().into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).take(limit.unwrap() as usize).collect()
 	} else {
 		input.into_iter().filter(|x| x.1.data.last().unwrap_or(&default).value.is_sign_negative()).collect()

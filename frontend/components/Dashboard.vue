@@ -65,7 +65,7 @@ export default {
 
 	methods: {
 		async update() {
-			const new_charts = await $fetch("/api/v1/dashboards/0/charts");
+			const new_charts = await $fetch(`/api/v1/dashboards/${this.dashboard_data.id}/charts`);
 			this.charts = [];
 			this.$nextTick(() => this.charts = new_charts);
 		},
@@ -190,7 +190,7 @@ export default {
 		},
 
 		async save(chart: ChartOptions) {
-			if(Number.isInteger(chart.id)) {
+			if(typeof chart.id == "string" && chart.id.length == 36) {
 				await $fetch(`/api/v1/charts/${chart.id}`, {
 					method: "PUT", body: {
 						...chart,

@@ -58,7 +58,7 @@ export default {
 			let res = {} as Tag;
 
 			try {
-				if(typeof this.tag.id == "number") {
+				if(typeof this.tag.id == "string" && this.tag.id.length == 36) {
 					res = await $fetch(`/api/v1/tags/${this.tag.id}`, {
 						method: "PUT",
 						body: this.get_body(),
@@ -89,7 +89,7 @@ export default {
 			return {
 				id: this.tag.id,
 				name: this.tag.name,
-				parent_id: typeof this.tag.parent_id == "number" ? this.tag.parent_id : undefined,
+				parent_id: typeof this.tag.parent_id == "string" && this.tag.parent_id.length == 36 ? this.tag.parent_id : undefined,
 			} as Tag;
  		},
 	},

@@ -2,11 +2,11 @@ export default {};
 
 declare global {
 	type Account = {
-		id?: number,
+		id?: string,
 		name: string,
-		default_currency_id?: number,
+		default_currency_id?: string,
 		user_id?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		default_currency?: Currency,
 		balance?: number,
 	}
@@ -16,17 +16,19 @@ declare global {
 		name: string,
 		secret?: string,
 		superuser: boolean,
+		active: boolean,
+		last_logon?: string,
 	}
 
 	type Asset = {
-		id?: number,
-		user_id: number,
+		id?: string,
+		user_id?: number,
 		name: string,
 		description?: string,
-		currency_id: number,
+		currency_id: string,
 		value_per_unit?: Money,
 		amount?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		currency?: Currency,
 		total_cost_of_ownership?: TotalCostOfOwnership,
 	}
@@ -38,41 +40,41 @@ declare global {
 	}
 
 	type Currency = {
-		id?: number,
+		id?: string,
 		name: string,
 		minor_in_major: number,
 		symbol: string,
 	}
 
 	type Recipient = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
-		tag_ids?: number[],
+		tag_ids?: string[],
 	}
 
 	type Tag = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
-		parent_id?: number,
+		parent_id?: string,
 	}
 	type Transaction = {
-		id?: number,
+		id?: string,
 		user_id?: number,
-		currency_id?: number,
-		account_id: number,
-		recipient_id: number,
+		currency_id?: string,
+		account_id?: string,
+		recipient_id?: string,
 		status: TransactionStatus,
 		timestamp: string,
 		total_amount: Money,
 		comment?: string,
-		tag_ids?: number[],
+		tag_ids?: string[],
 		asset?: Asset,
 		account?: Account,
 		currency?: Currency,
 		recipient?: Recipient,
-		asset_id?: number,
+		asset_id?: string,
 		positions: Position[],
 		timestamp_string?: string,
 	}
@@ -81,18 +83,18 @@ declare global {
 		id?: number,
 		amount: Money,
 		comment?: string,
-		tag_id?: number,
+		tag_id?: string,
 	}
 
 	type Budget = {
-		id?: number,
+		id?: string,
 		name: string,
 		user_id?: number,
 		amount: Money,
 		rollover: boolean,
 		period: number,
-		filter_tag_ids: number[],
-		currency_id: number,
+		filter_tag_ids: string[],
+		currency_id: string,
 		active_from: Date,
 		active_to?: Date,
 		active_from_string?: string,
@@ -115,8 +117,8 @@ declare global {
 	}
 
 	type SelectData = {
-		options: {id: number, name: string}[],
-		selected?: number[],
+		options: {id: number | string, name: string}[],
+		selected?: number[] | string[],
 		label: string,
 		openTop?: boolean
 	}
@@ -144,9 +146,10 @@ declare global {
 	type Column = {
 		name: string,
 		type: ColumnType,
-		options?: {id?: number, name: string}[],
+		options?: {id?: number | string, name: string}[],
 		sortable?: boolean,
 		no_filter?: boolean,
+		hidden?: boolean,
 	}
 
 	type TableData = {
@@ -218,12 +221,12 @@ declare global {
 	}
 
 	type ChartOptions = {
-		id?: number,
+		id?: string,
 		chart_type: "table" | "pie" | "line",
 		title: string,
 		text_template?: string,
 		date_period: "daily" | "monthly" | "quarterly" | "yearly",
-		asset_id?: number,
+		asset_id?: string,
 		filter_collection: string,
 		max_items?: number,
 		date_range: number,
@@ -234,6 +237,7 @@ declare global {
 		disabled?: boolean,
 		only_positive: boolean,
 		only_negative: boolean,
+		dashboard_id?: string,
 	}
 
 	type QueryParameters = {
@@ -243,17 +247,17 @@ declare global {
 		sort_direction?: "asc" | "desc",
 		filter_id?: number,
 		filter_mode_id?: string,
-		filter_asset_id?: number,
+		filter_asset_id?: string,
 		filter_mode_asset_id?: string,
 		filter_user_id?: number,
 		filter_mode_user_id?: string,
-		filter_currency_id?: number,
+		filter_currency_id?: string,
 		filter_mode_currency_id?: string,
-		filter_account_id?: number,
+		filter_account_id?: string,
 		filter_mode_account_id?: string,
 		filter_recipient_id?: number,
 		filter_mode_recipient_id?: string,
-		filter_tag_id?: number,
+		filter_tag_id?: string,
 		filter_mode_tag_id?: string,
 		filter_total_amount?: number,
 		filter_mode_total_amount?: string,
@@ -280,7 +284,7 @@ declare global {
 		filter_mode_value_per_unit?: string,
 		filter_rollover?: boolean,
 		filter_mode_rollover?: string,
-		filter_filter_tag_id?: number,
+		filter_filter_tag_id?: string,
 		filter_mode_filter_tag_id?: string,
 		filter_lower_active_from?: Date,
 		filter_upper_active_from?: Date,

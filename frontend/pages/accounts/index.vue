@@ -36,7 +36,7 @@ export default {
 				sort: "asc"
 			},
 			columns: [
-				{name: "ID", type: "number"},
+				{name: "ID", type: "string", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Currency", type: "choice", options: currencies.map(x => ({id: x.id, name: x.name}))},
 				{name: "Tags", type: "choice", options: (tags.map(x => ({id: x.id, name: x.name})))},
@@ -46,7 +46,7 @@ export default {
 				x.id,
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
-				tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
+				tags.filter(t => x.tag_ids?.includes(typeof t.id == "string" && t.id.length == 36 ? t.id : "")).map(t => t.name).join(", "),
 				`${Number(x.balance) / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]))
 		};
@@ -145,7 +145,7 @@ export default {
 				x.id,
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
-				tags.filter(t => x.tag_ids?.includes(Number.isInteger(t.id) ? Number(t.id) : -1)).map(t => t.name).join(", "),
+				tags.filter(t => x.tag_ids?.includes(typeof t.id == "string" && t.id.length == 36 ? t.id : "")).map(t => t.name).join(", "),
 				`${typeof x.balance == "number" ? x.balance : 0 / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]));
 		},
@@ -155,11 +155,9 @@ export default {
 				?skip_results=${this.query_parameters.skip_results}
 				&max_results=${this.query_parameters.max_results}`;
 
-			if(Number.isInteger(this.query_parameters.filter_id)) url += `&filter_id=${this.query_parameters.filter_id}`;
-			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
-			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
+			if(this.query_parameters.filter_currency_id) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
-			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_tag_id) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
 			if(Number.isInteger(this.query_parameters.filter_balance)) url += `&filter_balance=${this.query_parameters.filter_balance}`;
 			if(this.query_parameters.filter_mode_balance) url += `&filter_mode_balance=${this.query_parameters.filter_mode_balance}`;
