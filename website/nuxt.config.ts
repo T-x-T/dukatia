@@ -4,6 +4,12 @@ export default defineNuxtConfig({
     shim: false
   },
 
+  nitro: {
+    prerender: {
+      autoSubfolderIndex: false
+    }
+  },
+
   modules: [
     "@nuxtjs/color-mode",
     "@nuxt/content"
