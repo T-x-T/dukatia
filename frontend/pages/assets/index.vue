@@ -177,7 +177,7 @@ export default {
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
 			if(this.query_parameters.filter_description) url += `&filter_description=${this.query_parameters.filter_description}`;
 			if(this.query_parameters.filter_mode_description) url += `&filter_mode_description=${this.query_parameters.filter_mode_description}`;
-			if(Number.isInteger(this.query_parameters.filter_tag_id)) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
+			if(this.query_parameters.filter_tag_id) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
 
 			return url;

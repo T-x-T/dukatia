@@ -49,7 +49,7 @@ export default {
 				{name: "ID", type: "number", hidden: true},
 				{name: "Name", type: "string"},
 				{name: "Currency", type: "choice", options: currencies.map(x => ({id: x.id, name: x.name}))},
-				{name: "Rollover", type: "string"},
+				{name: "Rollover", type: "string", no_filter: true}, //TODO: Reenable filtering when bool filters are a thing
 				{name: "Period", type: "choice", no_filter: true, options: [{id: 0, name: "Daily"}, {id: 1, name: "Weekly"}, {id: 2, name: "Monthly"}, {id: 3, name: "Quarterly"}, {id: 4, name: "Yearly"}]},
 				{name: "Active from", type: "date"},
 				{name: "Active to", type: "date"},
@@ -152,7 +152,7 @@ export default {
 					this.query_parameters.filter_mode_name = undefined;
 					break;
 				}
-				case "amount": {
+				case "total amount": {
 					this.query_parameters.filter_amount = undefined;
 					this.query_parameters.filter_mode_amount = undefined;
 					break;
@@ -179,7 +179,7 @@ export default {
 					this.query_parameters.filter_mode_active_to = undefined;
 					break;
 				}
-				case "currency_id": {
+				case "currency": {
 					this.query_parameters.filter_currency_id = undefined;
 					this.query_parameters.filter_mode_currency_id = undefined;
 					break;
@@ -224,11 +224,11 @@ export default {
 			if(this.query_parameters.filter_mode_id) url += `&filter_mode_id=${this.query_parameters.filter_mode_id}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;
-			if(Number.isInteger(this.query_parameters.filter_amount)) url += `&filter_amount=${this.query_parameters.filter_amount}`;
+			if(Number.isInteger(this.query_parameters.filter_amount)) url += `&filter_amount=${this.query_parameters.filter_amount as number * 100}`; //TODO: not using minor_in_major
 			if(this.query_parameters.filter_mode_amount) url += `&filter_mode_amount=${this.query_parameters.filter_mode_amount}`;
 			if(this.query_parameters.filter_rollover) url += `&filter_rollover=${this.query_parameters.filter_rollover}`;
 			if(this.query_parameters.filter_mode_rollover) url += `&filter_mode_rollover=${this.query_parameters.filter_mode_rollover}`;
-			if(Number.isInteger(this.query_parameters.filter_filter_tag_id)) url += `&filter_filter_tag_id=${this.query_parameters.filter_filter_tag_id}`;
+			if(this.query_parameters.filter_filter_tag_id) url += `&filter_filter_tag_id=${this.query_parameters.filter_filter_tag_id}`;
 			if(this.query_parameters.filter_mode_filter_tag_id) url += `&filter_mode_filter_tag_id=${this.query_parameters.filter_mode_filter_tag_id}`;
 			if(this.query_parameters.filter_lower_active_from) url += `&filter_lower_active_from=${new Date(this.query_parameters.filter_lower_active_from).toISOString()}`;
 			if(this.query_parameters.filter_upper_active_from) url += `&filter_upper_active_from=${new Date(this.query_parameters.filter_upper_active_from).toISOString()}`;
@@ -236,7 +236,7 @@ export default {
 			if(this.query_parameters.filter_lower_active_to) url += `&filter_lower_active_to=${new Date(this.query_parameters.filter_lower_active_to).toISOString()}`;
 			if(this.query_parameters.filter_upper_active_to) url += `&filter_upper_active_to=${new Date(this.query_parameters.filter_upper_active_to).toISOString()}`;
 			if(this.query_parameters.filter_mode_active_to) url += `&filter_mode_active_to=${this.query_parameters.filter_mode_active_to}`;
-			if(Number.isInteger(this.query_parameters.filter_currency_id)) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
+			if(this.query_parameters.filter_currency_id) url += `&filter_currency_id=${this.query_parameters.filter_currency_id}`;
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
 
 			return url;
