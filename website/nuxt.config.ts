@@ -11,7 +11,9 @@ export default defineNuxtConfig({
   css: ["assets/general.sass", "assets/_vars.sass"],
 
   content: {
-    base: "/docs",
+    api: {
+      baseURL: "/docs",
+    },
     highlight: {
       theme: "github-dark"
     }
