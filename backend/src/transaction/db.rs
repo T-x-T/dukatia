@@ -1,4 +1,5 @@
 use deadpool_postgres::Pool;
+use postgres_types::ToSql;
 use std::error::Error;
 use uuid::Uuid;
 use super::super::CustomError;
@@ -207,6 +208,132 @@ impl<'a> DbWriter<'a, Transaction> for TransactionDbWriter<'a> {
 		}
 	
 		return Ok(());
+	}
+}
+
+#[derive(Debug)]
+pub struct TransactionVecDbWriter<'a> {
+	pool: &'a Pool,
+	transactions: Vec<Transaction>,
+}
+
+impl<'a> DbWriter<'a, Vec<Transaction>> for TransactionVecDbWriter<'a> {
+	fn new(pool: &'a Pool, item: Vec<Transaction>) -> Self {
+		Self {
+			pool,
+			transactions: item,
+		}
+	}
+
+	async fn insert(self) -> Result<Uuid, Box<dyn Error>> {
+		let mut i = 1;
+		let mut query = "INSERT INTO public.transactions (id, user_id, account_id, currency_id, recipient_id, status, timestamp, comment) VALUES".to_string();
+		let mut query_options: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
+
+		for transaction in &self.transactions {
+			query = format!("{query} (${}, ${}, ${}, ${}, ${}, ${}, ${}, ${}), ", i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6, i + 7);
+			i += 8;
+			query_options.push(Box::new(transaction.id));
+			query_options.push(Box::new(transaction.user_id));
+			query_options.push(Box::new(transaction.account_id));
+			query_options.push(Box::new(transaction.currency_id.expect("no currency_id passed into transaction::db::add")));
+			query_options.push(Box::new(transaction.recipient_id));
+			query_options.push(Box::new(transaction.status as i32));
+			query_options.push(Box::new(transaction.timestamp));
+			query_options.push(Box::new(transaction.comment.clone()));
+		}
+		query.pop();
+		query = format!("{query};");
+
+		let parameter_values: Vec<_> = query_options.iter()
+			.map(|x| &**x as &(dyn ToSql + Sync))
+			.collect();
+
+		self.pool.get()
+			.await?
+			.query(query.as_str(), &parameter_values)
+			.await?;
+		
+		i = 1;
+		query = "INSERT INTO public.transaction_tags (transaction_id, tag_id) VALUES".to_string();
+		query_options = Vec::new();
+
+		for transaction in &self.transactions {
+			for tag_id in transaction.tag_ids.clone() {
+				query = format!("{query} (${}, ${}), ", i, i + 1);
+				i += 2;
+				query_options.push(Box::new(transaction.id));
+				query_options.push(Box::new(tag_id));
+			}
+		}
+		query.pop();
+		query = format!("{query};");
+
+		let parameter_values: Vec<_> = query_options.iter()
+			.map(|x| &**x as &(dyn ToSql + Sync))
+			.collect();
+
+		self.pool.get()
+			.await?
+			.query(query.as_str(), &parameter_values)
+			.await?;
+
+		i = 1;
+		query = "INSERT INTO public.asset_transactions (transaction_id, asset_id) VALUES".to_string();
+		query_options = Vec::new();
+
+		for transaction in &self.transactions {
+			if transaction.asset.is_none() {
+				continue;
+			}
+			query = format!("{query} (${}, ${}), ", i, i + 1);
+			i += 2;
+			query_options.push(Box::new(transaction.id));
+			query_options.push(Box::new(transaction.asset.clone().unwrap().id));
+		}
+		query.pop();
+		query = format!("{query};");
+
+		let parameter_values: Vec<_> = query_options.iter()
+			.map(|x| &**x as &(dyn ToSql + Sync))
+			.collect();
+
+		self.pool.get()
+			.await?
+			.query(query.as_str(), &parameter_values)
+			.await?;
+
+		i = 1;
+		query = "INSERT INTO public.transaction_positions (id, transaction_id, amount, comment, tag_id) VALUES ".to_string();
+		query_options = Vec::new();
+
+		for transaction in self.transactions {
+			for position in transaction.positions {
+				query = format!("{query} (${}, ${}, ${}, ${}, ${}),", i, i + 1, i + 2, i + 3, i + 4);
+				i += 5;
+				query_options.push(Box::new(position.id));
+				query_options.push(Box::new(transaction.id));
+				query_options.push(Box::new(position.amount.to_amount()));
+				query_options.push(Box::new(position.comment));
+				query_options.push(Box::new(position.tag_id));
+			}
+		}
+		query.pop();
+		query = format!("{query};");
+
+		let parameter_values: Vec<_> = query_options.iter()
+			.map(|x| &**x as &(dyn ToSql + Sync))
+			.collect();
+
+		self.pool.get()
+			.await?
+			.query(query.as_str(), &parameter_values)
+			.await?;
+		return Ok(Uuid::nil());
+	}
+
+	async fn replace(self) -> Result<(), Box<dyn Error>> {
+		return Err(Box::new(CustomError::InvalidActionForItem { action: "replace".to_string(), item_type: "Vec<Transaction>".to_string() }));
 	}
 }
 

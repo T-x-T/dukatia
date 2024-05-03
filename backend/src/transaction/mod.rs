@@ -91,6 +91,16 @@ impl Create for Transaction {
 	}
 }
 
+impl Create for Vec<Transaction> {
+	async fn create(self, pool: &Pool) -> Result<Uuid, Box<dyn Error>> {
+		if !self.iter().filter(|x| x.currency_id.is_none()).collect::<Vec<&Transaction>>().is_empty() {
+			return Err(Box::new(crate::CustomError::MissingProperty { property: "currency_id".to_string(), item_type: "Transaction".to_string()}));
+		}
+
+		return db::TransactionVecDbWriter::new(pool, self).insert().await;
+	}
+}
+
 impl Update for Transaction {
 	async fn update(mut self, pool: &Pool) -> Result<(), Box<dyn Error>> {
 		let account = account::AccountLoader::new(pool)
