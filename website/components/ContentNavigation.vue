@@ -23,22 +23,6 @@
 </script>
 
 <style lang="sass" scoped>
-@import "assets/_vars.sass"
 .subNavigation
 	margin-left: 1em
-
-html.dark-mode	
-	a
-		color: $dark-brightest
-		&:hover
-			color:$dark-heavydark
-		&.router-link-active
-			color:$dark-heavydark
-html.light-mode	
-	a
-		color: black
-		&:hover
-			color:$light-heavy
-		&.router-link-active
-			color:$light-heavy
 </style>
