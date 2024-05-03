@@ -6,7 +6,7 @@ description: 'Account related API endpoints'
 ## Purpose
 
 The accounts route contains all endpoints related to account management.  
-Do not confuse this route with the [users route](./user)
+Do not confuse this route with the [users route](./users)
 
 ### get all
 
