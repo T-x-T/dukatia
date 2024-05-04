@@ -5,14 +5,6 @@ html.dark-mode
   color: $dark-brightest
   ::selection
     color: $dark-bright
-  nav
-    background: $dark-darkest
-    a
-      color: $dark-brightest
-      &.active
-        color: $dark-bright
-      &:hover
-        color: $dark-bright
   select, input
     background: $dark-darker
     color: $dark-brightest
@@ -45,14 +37,6 @@ html.light-mode
   color: $light-darkest
   ::selection
     color: $light-dark
-  nav
-    background: $light-bright
-    a
-      color: $light-darkest
-      &.active
-        color: $light-darker
-      &:hover
-        color: $light-darker
   thead
     svg
       &:hover
@@ -86,7 +70,7 @@ html
   position: relative
 
 p, span
-  @extend .regular
+  @extend .semibold
 
 li
   list-style-type: none
@@ -104,6 +88,8 @@ button.important
   color: black
   font-size: 30px
   padding: 10px 29px 10px 29px
+  &:hover
+    box-shadow: 0px 0px 32px $dukatia-yellow
   
 button.less_important
   @extend .bold
@@ -113,6 +99,8 @@ button.less_important
   color: black
   font-size: 30px
   padding: 10px 29px 10px 29px
+  &:hover
+    box-shadow: 0px 0px 4px $dark-darkest
 
 
 select
@@ -161,6 +149,13 @@ tbody
     
 label
   @extend .semibold
+
+a
+  @extend .semibold
+  color: white
+  margin: 10px
+  &:hover
+    color: $dark-bright
 
 @media screen and (max-width: 800px)
   .mobile_hidden

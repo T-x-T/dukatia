@@ -1,23 +1,11 @@
 <template>
-  <nav>
-    <button class="important">Get started</button>
-    <div class="theme_selector">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg>
-    </div>
-    <NuxtLink to="/docs">Docs</NuxtLink>
-    <NuxtLink to="/">Demo</NuxtLink>
-    <NuxtLink to="/">About</NuxtLink>
-    <NuxtLink to="/">Home</NuxtLink>
-    <img src="/dukatia-beta_logo_white.svg" />
-  </nav>
-
   <main>
     <div id="introduction">
       <h1>Manage Your Finances.</h1>
       <h2>Go Dukatia.</h2>
 
       <p>Dukatia is your finance planner.<br>Track your spending, manage your assets and set smarter budgets.<br>Run it in Docker and access it from any web browser!</p>
-      <button class="important">Get started</button>
+      <button class="important" @click="navigateTo('/docs')">Get started</button>
     </div>
 
     <div id="main_image">
@@ -104,19 +92,12 @@
           <p>Installing Dukatia isn't hard. We'll show you how it's done. Alternatively, have a look at the live demo before deciding!</p>
         </div>
         <div id="buttons">
-          <button class="important">Get started</button>
-          <button class="less_important">Live Demo</button>
+          <button class="important" @click="navigateTo('/docs')">Get started</button>
+          <button class="less_important" @click="navigateTo('/demo')">Live Demo</button>
         </div>
       </div>
     </div>
   </main>
-
-  <footer>
-    <img src="/dukatia-beta_logo_white.svg" />
-    <p>Coded by TxT.  Made in Rust.</p>
-    <NuxtLink to="/privacy-policy">Privacy Policy</NuxtLink>
-    <NuxtLink to="/legal">Legal Notice</NuxtLink>
-  </footer>
 </template>
 
 <style lang="sass" scoped>
@@ -124,19 +105,10 @@
 
 main
   display: grid
-  grid-template-columns: repeat(2, 1fr)
-  grid-template-rows: 1000px
+  grid-template-columns: repeat(2, 50vw)
+  grid-template-rows: 65vh
   grid-auto-rows: 400px
   min-height: 100vh
-
-footer
-  width: 100%
-  height: 150px
-  display: flex
-  align-items: center
-  justify-content: space-around
-  img
-    height: 85px
 
 div#go_dukatia
   grid-area: 8 / 1 / 9 / 3
@@ -186,27 +158,26 @@ div.feature
   display: grid
   grid-template-columns: 1fr, 1fr
   grid-template-rows: 1fr
-  width: fit-content
   height: 340px
-  width: 780px
   border: 5px solid $dark-darker
   border-radius: 100px
   place-self: center
   svg
     grid-area: 1 / 1 / 2 / 2
     width: 188px
+    max-width: 10vw
     color: $dark-bright
-    margin-left: 65px
+    margin: min(65px, 1vw)
     justify-self: center
     align-self: center
   div.feature_text
     grid-area: 1 / 2 / 2 / 3
     width: 380px
+    max-width: 30vw
     align-self: center
     h4
       color: $dark-bright
-      font-size: 50px
-      line-height: 55px
+      font-size: min(3vw, 50px)
     p
       font-size: 26px
 
@@ -223,12 +194,15 @@ div#features_header
 
 div#main_image
   grid-area: 1 / 2 / 2 / 3
+  height: 100%
+  padding-top: 10%
   svg
-    width: 900px
+    width: 80%
 
 div#introduction
   grid-area: 1 / 1 / 2 / 2
-  padding: 132px
+  height: 100%
+  padding: 20% 0 10% 10%
   h1, h2
     font-size: 60px
     line-height: 70px
@@ -238,30 +212,6 @@ div#introduction
     margin: 20px 0 20px 0
     width: 488px
     font-size: 26px
-
-nav
-  display: flex
-  flex-direction: row-reverse
-  box-shadow: black 0px 4px 4px 0px
-  height: 192px
-  align-items: center
-  position: sticky
-  top: 0
-  button.important
-    margin: 25px 50px 25px 25px
-  img
-    height: 88px
-    left: 50px
-    top: 57px
-    position: absolute
-  a
-    @extend .bold
-    font-size: 30px
-    margin: 25px
-  .theme_selector
-    margin: 25px
-    width: 30px
-    color: white
 
 </style>
 
