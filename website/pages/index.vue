@@ -71,14 +71,14 @@
         <p>You have a bank account in a foreign currency? No problem! You can also define your own custom currencies.</p>
       </div>
     </div>
-    <div class="feature feature_tall">
+    <div class="feature">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" /></svg>
       <div class="feature_text">
         <h4>Customizable Dashboards </h4>
         <p>With the Dashboard editor you can build the Dashboards you want. This allows you to get a quick overview over the data you need.</p>
       </div>
     </div>
-    <div class="feature feature_tall">
+    <div class="feature">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
       <div class="feature_text">
         <h4>Self-hosted & Open-Source</h4>
@@ -86,7 +86,37 @@
       </div>
     </div>
 
+    <div id="for_you">
+      <h3>Dukatia Is Just for You …</h3>
+      <p>
+        … if you want to <span>easily manage</span> your finances.<br>
+        … if you <span>outgrew</span> your <span>Excel</span> spreadsheet.<br>
+        … if you search for a <span>self-hosted</span>, <span>private</span> finance planner.<br>
+        … if you like to <span>customize</span> your user experience.<br>
+        … if you are a bit <span>tech-savvy</span> and willing to self-host.<br>
+      </p>
+    </div>
+
+    <div id="go_dukatia">
+      <div id="container">
+        <div id="text">
+          <h3>Go Dukatia!</h3>
+          <p>Installing Dukatia isn't hard. We'll show you how it's done. Alternatively, have a look at the live demo before deciding!</p>
+        </div>
+        <div id="buttons">
+          <button class="important">Get started</button>
+          <button class="less_important">Live Demo</button>
+        </div>
+      </div>
+    </div>
   </main>
+
+  <footer>
+    <img src="/dukatia-beta_logo_white.svg" />
+    <p>Coded by TxT.  Made in Rust.</p>
+    <NuxtLink to="/privacy-policy">Privacy Policy</NuxtLink>
+    <NuxtLink to="/legal">Legal Notice</NuxtLink>
+  </footer>
 </template>
 
 <style lang="sass" scoped>
@@ -99,9 +129,58 @@ main
   grid-auto-rows: 400px
   min-height: 100vh
 
-div.feature_tall
-  color: white
+footer
+  width: 100%
+  height: 150px
+  display: flex
+  align-items: center
+  justify-content: space-around
+  img
+    height: 85px
 
+div#go_dukatia
+  grid-area: 8 / 1 / 9 / 3
+  width: 100%
+  padding: 25px
+  height: fit-content
+  background: $dark-bright
+  display: flex
+  justify-content: center
+  align-content: center
+  ::selection
+    color: $dark-brightest
+  div#container
+    display: grid
+    grid-template-columns: 1fr
+    grid-template-rows: 1fr, 1fr
+    column-gap: 50px
+    div
+      max-width: 400px
+    div#text
+      grid-area: 1 / 1 / 2 / 2
+      color: $dark-darkest
+      h3
+        font-size: 60px
+      p
+        font-size: 26px
+        line-height: 34px
+    div#buttons
+      grid-area: 1 / 2 / 2 / 3
+      button
+        width: 265px
+        height: 76px
+        margin: 10px
+
+div#for_you
+  grid-area: 7 / 1 / 8 / 3
+  place-self: center
+  h3
+    font-size: 60px
+  p
+    font-size: 26px
+    line-height: 45px
+  span
+    color: $dark-bright
 
 div.feature
   display: grid

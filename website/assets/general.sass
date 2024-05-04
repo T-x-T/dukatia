@@ -13,20 +13,6 @@ html.dark-mode
         color: $dark-bright
       &:hover
         color: $dark-bright
-  button
-    background: $dark-darker
-    color: $dark-brightest
-    &.red
-      &:hover
-        background: $error
-    &.green
-      &:hover
-        background: $success
-    &.orange
-      &:hover
-        background: $warn
-    &:hover
-      background: $dark-bright
   select, input
     background: $dark-darker
     color: $dark-brightest
@@ -47,33 +33,11 @@ html.dark-mode
       background: $dark-darkest
     &:hover td
       background: $dark-dark
-  div.gridItem
-    border: 2px solid $dark-dark
-  div.detailBar
-    border-left: 2px solid $dark-bright
-    @media screen and (max-width: 800px)
-      border-left: none
   div#input
     svg
       color: $dark-brightest
       &:hover
         color: $dark-bright
-  h5
-    background: $dark-darker
-  div#popup
-    background: $dark-darkest
-    border: 2px solid $dark-bright
-  div#setup_user_header
-    background: $dark-darker
-    border-bottom: 2px solid $dark-bright
-  .negative
-    color: #f90000
-  .positive
-    color: #00ff00
-  .zero
-    color: #4b89ff
-
-
 
 
 html.light-mode
@@ -89,26 +53,6 @@ html.light-mode
         color: $light-darker
       &:hover
         color: $light-darker
-  button
-    background: $light-dark
-    color: $light-darkest
-    &.red
-      &:hover
-        background: $error
-    &.green
-      &:hover
-        background: $success
-    &.orange
-      &:hover
-        background: $warn
-    &:hover
-      background: $light-bright
-  select, input
-    background: $light-dark
-    color: $light-darkest
-    border-bottom: 2px solid $light-darkest
-    &:disabled
-      opacity: 0.5
   thead
     svg
       &:hover
@@ -123,31 +67,11 @@ html.light-mode
       background: $light-medium
     &:hover td
       background: $light-dark
-  div.gridItem
-    border: 2px solid $light-darker
-  div.detailBar
-    border-left: 2px solid $light-darker
-    @media screen and (max-width: 800px)
-      border-left: none
   div#input
     svg
       color: $light-darkest
       &:hover
         color: $light-darker
-  h5
-    background: $light-dark
-  div#popup
-    background: $light-bright
-    border: 2px solid $light-darker
-  div#setup_user_header
-    background: $light-medium
-    border-bottom: 2px solid $light-darker
-  .negative
-    color: #ff0000
-  .positive
-    color: #007b00
-  .zero
-    color: #003fb7
   
 *
   margin: 0
@@ -169,22 +93,24 @@ li
 
 button
   @extend .semibold
-  padding: 1px 4px 1px 4px
-  border-radius: 0px
   border: none
-  box-shadow: 4px 4px 0px black
-  margin: 0px 6px 6px 0px
-  color: black
   cursor: pointer
   font-size: 16px
-  &:hover
-    box-shadow: 6px 6px 0px black
   
 button.important
   @extend .bold
-  border-radius: 100px !important
-  background: $dukatia-yellow !important
-  color: black !important
+  border-radius: 100px 
+  background: $dukatia-yellow
+  color: black
+  font-size: 30px
+  padding: 10px 29px 10px 29px
+  
+button.less_important
+  @extend .bold
+  border-radius: 100px 
+  border: 2px solid $dark-darkest
+  background: none
+  color: black
   font-size: 30px
   padding: 10px 29px 10px 29px
 
