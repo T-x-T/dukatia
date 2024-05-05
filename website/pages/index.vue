@@ -1,15 +1,19 @@
 <template>
   <main>
     <div id="introduction">
-      <h1>Manage Your Finances.</h1>
-      <h2>Go Dukatia.</h2>
-
-      <p>Dukatia is your finance planner.<br>Track your spending, manage your assets and set smarter budgets.<br>Run it in Docker and access it from any web browser!</p>
-      <button class="important" @click="navigateTo('/docs')">Get started</button>
+      <div id="container">
+        <h1>Manage Your Finances.</h1>
+        <h2>Go Dukatia.</h2>
+  
+        <p>Dukatia is your finance planner.<br>Track your spending, manage your assets and set smarter budgets.<br>Run it in Docker and access it from any web browser!</p>
+        <button class="important" @click="navigateTo('/docs')">Get started</button>
+      </div>
     </div>
 
     <div id="main_image">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" /></svg>
+      <div id="container">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" /></svg>
+      </div>
     </div>
 
     <div id="features_header">
@@ -156,9 +160,8 @@ div#for_you
 
 div.feature
   display: grid
-  grid-template-columns: 1fr, 1fr
-  grid-template-rows: 1fr
   height: 340px
+  width: min(700px, 90%)
   border: 5px solid $dark-darker
   border-radius: 100px
   place-self: center
@@ -181,6 +184,12 @@ div.feature
     p
       font-size: 26px
 
+html.light-mode
+  div.feature
+    border: 5px solid $light-dark
+    div.feature_text > h4
+      color: black
+
 div#features_header
   grid-area: 2 / 1 / 3 / 3
   text-align: center
@@ -195,23 +204,32 @@ div#features_header
 div#main_image
   grid-area: 1 / 2 / 2 / 3
   height: 100%
-  padding-top: 10%
-  svg
-    width: 80%
+  div#container
+    padding-top: 10%
+    height: 100%
+    svg
+      height: 80%
+
+html.light-mode
+  div#main_image, div#introduction
+    background: $light-dark
+    div#container > h2
+      color: white
 
 div#introduction
   grid-area: 1 / 1 / 2 / 2
   height: 100%
-  padding: 20% 0 10% 10%
-  h1, h2
-    font-size: 60px
-    line-height: 70px
-  h2
-    color: $dark-bright
-  p
-    margin: 20px 0 20px 0
-    width: 488px
-    font-size: 26px
+  div#container
+    padding: 20% 0 10% 10%
+    h1, h2
+      font-size: 60px
+      line-height: 70px
+    h2
+      color: $dark-bright
+    p
+      margin: 20px 0 20px 0
+      width: 488px
+      font-size: 26px
 
 </style>
 

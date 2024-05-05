@@ -20,7 +20,6 @@
 nav
   display: flex
   flex-direction: row-reverse
-  box-shadow: black 0px 4px 4px 0px
   height: 100px
   align-items: center
   position: sticky
@@ -52,6 +51,7 @@ nav
 html.dark-mode
   nav
     background: $dark-darker
+    box-shadow: black 0px 4px 4px 0px
     a, svg
       color: $dark-brightest
       &.active
@@ -61,6 +61,7 @@ html.dark-mode
 html.light-mode
   nav
     background: $light-brightest
+    box-shadow: #ddd 0px 4px 4px 0px
     a, svg
       color: $light-darkest
       &.active

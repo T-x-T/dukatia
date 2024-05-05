@@ -1,6 +1,7 @@
 <template>
 	<footer>
-    <img src="/dukatia-beta_logo_white.svg" />
+    <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg"/>
+		<img v-if="$colorMode.preference == 'light'" src="/dukatia-beta_logo.svg"/>
     <p>Coded by TxT. Made in Rust.</p>
     <div id="notices">
       <NuxtLink to="/privacy">Privacy Policy</NuxtLink>
@@ -10,6 +11,8 @@
 </template>
 
 <style lang="sass" scoped>
+@import "assets/_vars.sass"
+
 footer
   width: 100%
   height: 150px
@@ -26,4 +29,8 @@ footer
   a
     font-size: 150%
     margin-right: 30px
+
+html.light-mode
+  a
+    color: $dark-darkest
 </style>
