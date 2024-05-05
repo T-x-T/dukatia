@@ -22,7 +22,7 @@ export default {
 
   methods: {
     on_resize() {
-			this.small_device = window.innerWidth <= 800;
+			this.small_device = window.innerWidth < 1080;
 		}
   }
 }

@@ -39,12 +39,13 @@ export default {
   width: 100vw
   align-items: center
   position: fixed
-  top: 0
+  top: 0 
   display: flex
   align-items: center
-  justify-content: space-around
+  justify-content: space-between
   img
     height: 70%
+    margin-left: 20px
     &:hover
       scale: 1.05
       rotate: 5deg
@@ -52,54 +53,51 @@ export default {
   svg
     height: 60px
     padding: 3px
+    margin-right: 20px
     color: $dukatia-yellow !important
     border: 4px solid $dukatia-yellow
     border-radius: 100px
 
 #fullscreen_nav
   position: fixed
-  height: 100vh
+  min-height: 100vh
   width: 100vw
   top: 0
   left: 0
   display: flex
   flex-direction: column
+  align-items: center
   button
-    align-self: center
     font-size: 3em
     width: max-content
   img
-    margin: 10vw
+    margin: 25px
+    height: 8em
   a
     @extend .bold
-    font-size: 4em
-    margin-left: 10vw
+    font-size: min(5vh, 4em)
   div#theme_selector
-    margin: 25px
-    height: 7em
-    width: 7em
+    height: min(10vh, 7em)
     color: white
     cursor: pointer
     svg
       height: 100%
       width: 100%
   svg#close
-    margin-left: 10px
-    height: 8em
-    width: 8em    
+    height: min(10vh, 7em)
 
 html.dark-mode
   #top_nav
     background: $dark-darker
     box-shadow: black 0px 4px 4px 0px
+  #fullscreen_nav
+    background: $dark-darker
     a, svg
       color: $dark-brightest
       &.active
         color: $dark-bright
       &:hover
         color: $dark-bright
-  #fullscreen_nav
-    background: $dark-darker
 html.light-mode
   #top_nav
     background: $light-brightest
