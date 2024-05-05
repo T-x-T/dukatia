@@ -14,6 +14,27 @@
 	</nav>
 </template>
 
+<script lang="ts">
+export default {
+  data: () => ({
+    small_device: false,
+  }),
+
+  mounted() {
+		this.$nextTick(() => {
+      window.addEventListener('resize', this.on_resize);
+    });
+		this.on_resize();
+	},
+
+  methods: {
+    on_resize() {
+			this.small_device = window.innerWidth <= 800;
+		}
+  }
+}
+</script>
+
 <style lang="sass" scoped>
 @import "assets/_vars.sass"
 
@@ -21,8 +42,9 @@ nav
   display: flex
   flex-direction: row-reverse
   height: 100px
+  width: 100vw
   align-items: center
-  position: sticky
+  position: fixed
   top: 0
   button.important
     margin: 2% 2% 2% 1%
