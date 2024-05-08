@@ -11,10 +11,6 @@ html.dark-mode
     border-bottom: 2px solid $dark-dark
     &:disabled
       opacity: 0.5
-  thead
-    svg
-      &:hover
-        color: $dark-bright
   th
     background: $dark-darker
     border-bottom: 2px solid $dark-bright
@@ -23,8 +19,6 @@ html.dark-mode
       background: $dark-darker
     &:nth-child(odd) td
       background: $dark-darkest
-    &:hover td
-      background: $dark-dark
   div#input
     svg
       color: $dark-brightest
@@ -37,10 +31,6 @@ html.light-mode
   color: $light-darkest
   ::selection
     color: $light-dark
-  thead
-    svg
-      &:hover
-        color: $light-bright
   th
     background: $light-dark
     border-bottom: 2px solid $light-darkest
@@ -49,8 +39,6 @@ html.light-mode
       background: $light-bright
     &:nth-child(odd) td
       background: $light-medium
-    &:hover td
-      background: $light-dark
   div#input
     svg
       color: $light-darkest
@@ -146,6 +134,9 @@ th
 
 tbody
   @extend .regular
+
+table
+  border-spacing: 0
     
 label
   @extend .semibold

@@ -1,12 +1,6 @@
 <template>
 	<main>
-		<nav>
-			<ThemeSelector />
-		</nav>
 		<div id="left">
-			<NuxtLink to="/">
-				<h1>Dukatia</h1>
-			</NuxtLink>
 			<ContentNavigation :navigation-tree="navigation"/>
 		</div>
 		<article>
@@ -18,31 +12,27 @@
 <style lang="sass" scoped>
 main
 	display: grid
-	grid-template-columns: 1fr 1000px 1fr
+	grid-template-columns: 1fr min(1000px, 70vw) 1fr
 	grid-template-rows: 3em 1fr
-	height: 100vh
-
-nav
-	grid-area: 1 / 1 / 1 / row-end
+	min-height: 80vh
 
 article
 	grid-area: 2 / 2 / 3 / 3
-	overflow-y: scroll
 	text-align: justify
-	padding: 0 20px 100px 20px
+	padding: 10px
 
 div#left
-	justify-self: end
-	padding-right: 20px
+	padding: 10px
+	width: max-content
+	justify-self: center
 	grid-area: 2 / 1 / 3 / 2
-	h1
-		font-size: 3em
-		cursor: pointer
-		user-select: none
-		text-shadow: 4px 4px 8px black
-		text-align: center
-		&:hover
-			transform: scale(1.05) rotate(1deg)
+
+:deep(code)
+	font-family: monospace
+	font-size: 1.1em
+	span
+		font-family: monospace
+		font-size: 1.1em
 
 :deep(pre)
 	padding: 8px
@@ -52,7 +42,20 @@ div#left
 	opacity: 0.8
 
 :deep(table)
-	padding: 20px 0 20px 0
+	margin: 20px 0 20px 0
+
+:deep(th)
+	padding: 5px 20px 5px 5px
+
+:deep(td)
+	padding: 5px
+
+:deep(a)
+	margin: 0
+
+:deep(p)
+	a
+		text-decoration: underline
 
 </style>
 
