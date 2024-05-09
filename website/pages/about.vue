@@ -37,3 +37,12 @@ p#speechbubble
 		margin-left: -80px
 		margin-top: 20px
 </style>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: "Dukatia - About",
+  ogTitle: "Dukatia",
+  description: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+  ogDescription: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+})
+</script>

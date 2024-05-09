@@ -690,3 +690,12 @@ p
 div#policy
 	margin-bottom: 50vh
 </style>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: "Dukatia - Legal",
+  ogTitle: "Dukatia",
+  description: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+  ogDescription: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+})
+</script>

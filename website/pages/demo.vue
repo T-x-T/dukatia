@@ -26,3 +26,12 @@ button
 	margin: 25px 0 50vh 0
 	width: fit-content
 </style>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: "Dukatia - Demo",
+  ogTitle: "Dukatia",
+  description: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+  ogDescription: "Dukatia is your finance planner. Track your spending, manage your assets and set smarter budgets. Run it in Docker and access it from any web browser!",
+})
+</script>
