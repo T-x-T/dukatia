@@ -31,15 +31,12 @@
 					In 2021, I started Dukatia under the name “TxT's Treasury”. Since then, a lot has happened both in the backend and the frontend.<br>
 					If you want to dive into the making of Dukatia, I created a video series to document the development process.
 				</p>
-				<div id="thumbnail">
-					<div id="link">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-					</div>
-					<picture>
-						<source srcset="/about_yt_playlist_thumbnail.webp" type="image/webp">
-						<source srcset="/about_yt_playlist_thumbnail.jpg" type="image/jpeg"> 
-						<img src="/about_yt_playlist_thumbnail.jpg" alt="Youtube Playlist Thumbnail">
-					</picture>
+				<div id="link">
+					<a href="https://youtube.com/playlist?list=PLht_DnAZ_Av4MoGbcPm0I140PrOe9Yw24" target="_blank">
+						<div id="overlay">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+						</div>
+					</a>
 				</div>
 			</div>
 		</section>
@@ -121,28 +118,39 @@ section#history
 		text-align: center
 		margin-bottom: 25px
 	div#content
-		display: grid
+		display: flex
+		align-items: center
+		justify-content: center
 		gap: 50px
-		grid-template-columns: 1fr 1fr
-		div#thumbnail
-			&:hover
-				div#link
-					display: flex
-					cursor: pointer
-		img, div#thumbnail, div#link
+		p
+			max-width: min(80vw, 1000px)
+		img, div#link
 			width: 100%
 			border-radius: 50px
 		div#link
-			backdrop-filter: blur(4px)
-			position: absolute
-			display: none
-			justify-content: center
-			align-items: center
-			top: 0
-			bottom: 0
-			left: 0
-			right: 0
+			width: 100%
+			aspect-ratio: 16 / 9
+			max-width: min(80vw, 1000px)
+			background-image: url("/about_yt_playlist_thumbnail.webp")
+			background-repeat: no-repeat
+			background-size: cover
+			a
+				&:hover
+					color: unset
+			div#overlay
+				height: 100%
+				width: 100%
+				display: flex
+				justify-content: center
+				align-items: center
+			&:hover
+				cursor: pointer
+				div#overlay
+					backdrop-filter: blur(4px)
+					svg
+						display: initial
 		svg
+			display: none
 			height: 100px
 		@media screen and (max-width: 1079px)
 			grid-template-columns: 1fr
