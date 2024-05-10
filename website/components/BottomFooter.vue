@@ -29,6 +29,13 @@ footer
   a
     font-size: 150%
     margin-right: 30px
+  @media screen and (max-width: 1079px)
+    flex-direction: column
+    img, p, div
+      width: 100vw
+      text-align: center
+    a
+      margin: 15px
 
 html.light-mode
   a

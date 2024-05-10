@@ -46,6 +46,7 @@ nav
   align-items: center
   position: fixed
   top: 0
+  z-index: 1000
   button.important
     margin: 2% 2% 2% 1%
   img

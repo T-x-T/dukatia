@@ -31,11 +31,16 @@
 					In 2021, I started Dukatia under the name “TxT's Treasury”. Since then, a lot has happened both in the backend and the frontend.<br>
 					If you want to dive into the making of Dukatia, I created a video series to document the development process.
 				</p>
-				<picture>
-					<source srcset="/about_yt_playlist_thumbnail.webp" type="image/webp">
-					<source srcset="/about_yt_playlist_thumbnail.jpg" type="image/jpeg"> 
-					<img src="/about_yt_playlist_thumbnail.jpg" alt="Youtube Playlist Thumbnail">
-				</picture>
+				<div id="thumbnail">
+					<div id="link">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+					</div>
+					<picture>
+						<source srcset="/about_yt_playlist_thumbnail.webp" type="image/webp">
+						<source srcset="/about_yt_playlist_thumbnail.jpg" type="image/jpeg"> 
+						<img src="/about_yt_playlist_thumbnail.jpg" alt="Youtube Playlist Thumbnail">
+					</picture>
+				</div>
 			</div>
 		</section>
 </template>
@@ -60,6 +65,39 @@ section
 section#me
 	display: flex
 	justify-content: center
+	img#avatar
+		width: 200px
+		filter: invert(100)
+	p#speechbubble
+		width: 450px
+		padding: 25px
+		margin-left: 50px
+		border-radius: 50px
+		border: 5px solid $dark-darker
+		&::before
+			content:"\A"
+			border-style: solid
+			border-width: 50px 50px 50px 0
+			border-color: transparent $dark-darker transparent transparent
+			position: absolute
+			margin-left: -80px
+			margin-top: 20px
+	@media screen and (max-width: 1079px)
+		flex-direction: column
+		align-items: center
+		p#speechbubble
+			margin: 50px 0 0 0
+			width: 80vw
+			&::before
+				margin-left: 30vw
+				margin-top: -145px
+				border-color: $dark-darker transparent transparent
+				border-width: 50px 50px
+				transform: scaleY(-1)
+	
+html.light-mode 
+	img#avatar
+		filter: initial !important
 
 section#goals
 	display: flex
@@ -70,6 +108,12 @@ section#goals
 		color: $error
 	span
 		color: $success
+	@media screen and (max-width: 1079px)
+		flex-direction: column
+		align-items: center
+		div
+			width: 80vw
+
 
 section#history
 	margin: 50px
@@ -80,28 +124,28 @@ section#history
 		display: grid
 		gap: 50px
 		grid-template-columns: 1fr 1fr
-		img
+		div#thumbnail
+			&:hover
+				div#link
+					display: flex
+					cursor: pointer
+		img, div#thumbnail, div#link
 			width: 100%
-
-
-img#avatar
-	width: 200px
-	filter: invert(100)
-
-p#speechbubble
-	width: 450px
-	padding: 25px
-	margin-left: 50px
-	border-radius: 50px
-	border: 5px solid $dark-darker
-	&::before
-		content:"\A"
-		border-style: solid
-		border-width: 50px 50px 50px 0
-		border-color: transparent $dark-darker transparent transparent
-		position: absolute
-		margin-left: -80px
-		margin-top: 20px
+			border-radius: 50px
+		div#link
+			backdrop-filter: blur(4px)
+			position: absolute
+			display: none
+			justify-content: center
+			align-items: center
+			top: 0
+			bottom: 0
+			left: 0
+			right: 0
+		svg
+			height: 100px
+		@media screen and (max-width: 1079px)
+			grid-template-columns: 1fr
 </style>
 
 <script setup lang="ts">
