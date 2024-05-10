@@ -46,6 +46,7 @@ export default {
   justify-content: space-between
   img
     height: 70%
+    width: auto
     margin-left: 20px
     &:hover
       scale: 1.05
@@ -75,12 +76,14 @@ export default {
   img
     margin: 25px
     height: 8em
+    width: auto
     max-width: 80vw
   a
     @extend .bold
     font-size: min(5vh, 4em)
   div#theme_selector
     height: min(10vh, 7em)
+    width: auto
     color: white
     cursor: pointer
     svg
