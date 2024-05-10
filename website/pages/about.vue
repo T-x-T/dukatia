@@ -153,7 +153,7 @@ section#history
 			display: none
 			height: 100px
 		@media screen and (max-width: 1079px)
-			grid-template-columns: 1fr
+			flex-direction: column
 </style>
 
 <script setup lang="ts">
