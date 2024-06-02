@@ -3,7 +3,7 @@ title: 'REST API'
 description: 'Introduction to the REST API of dukatia'
 ---
 
-[Account](rest_api/account)
+[Accounts](rest_api/accounts)
 [Currencies](rest_api/currencies)
 [Tags](rest_api/tags)
 [Users](rest_api/users)
