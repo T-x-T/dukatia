@@ -33,6 +33,7 @@ struct RequestParameters {
 }
 
 //TODO: test filters for properties other than id
+//Docs: /dev/rest_api/budgets#get-all
 #[get("/api/v1/budgets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -88,6 +89,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	}
 }
 
+//Docs: /dev/rest_api/budgets#get-by-id
 #[get("/api/v1/budgets/{budget_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -112,6 +114,7 @@ async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, budget_id: web::
 	}
 }
 
+//Docs: /dev/rest_api/budgets#get-transactions
 #[get("/api/v1/budgets/{budget_id}/transactions")]
 async fn get_transactions(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -162,6 +165,7 @@ struct BudgetPost {
 	active_to: Option<DateTime<Utc>>,
 }
 
+//Docs: /dev/rest_api/budgets#create-budget
 #[post("/api/v1/budgets")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<BudgetPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -194,6 +198,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budge
 	}
 }
 
+//Docs: /dev/rest_api/budgets#modify-budget
 #[put("/api/v1/budgets/{budget_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<BudgetPost>, budget_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {

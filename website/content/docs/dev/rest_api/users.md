@@ -9,7 +9,7 @@ The users route contains all endpoints related to user management and login.
 
 ### login
 
-This endpoint is used to log the user in. This returns an `access_token` that can be used in future requests.
+This endpoint is used to log the user in. This returns an `access_token` that can be used in future requests.  
 
 Request:  
 `POST /api/v1/login`
