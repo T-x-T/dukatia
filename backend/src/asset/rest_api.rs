@@ -32,6 +32,7 @@ struct RequestParameters {
 }
 
 //TODO: test filters and sorting for properties other than id
+//Docs: /dev/rest_api/assets#get-all
 #[get("/api/v1/assets/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -104,7 +105,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	}
 }
 
-
+//Docs: /dev/rest_api/assets#get-by-id
 #[get("/api/v1/assets/{asset_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<Uuid>, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -137,6 +138,7 @@ struct AssetPost {
 	tag_ids: Option<Vec<Uuid>>,
 }
 
+//Docs: /dev/rest_api/assets#create-asset
 #[post("/api/v1/assets")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -158,6 +160,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Asset
 	}
 }
 
+//Docs: /dev/rest_api/assets#modify-asset
 #[put("/api/v1/assets/{asset_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetPost>, asset_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -186,6 +189,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetP
 		}
 }
 
+//Docs: /dev/rest_api/assets#delete-asset
 #[delete("/api/v1/assets/{asset_id}")]
 async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -214,7 +218,7 @@ async fn delete_by_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web
 
 
 
-
+//Docs: /dev/rest_api/assets#get-valuation-history
 #[get("/api/v1/assets/{asset_id}/valuation_history")]
 async fn get_valuation_history_by_asset_id(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -257,6 +261,7 @@ struct AssetValuationPost {
 	account_id: Option<Uuid>,
 }
 
+//Docs: /dev/rest_api/assets#replace-valuation-history
 #[post("/api/v1/assets/{asset_id}/valuation_history")]
 async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: HttpRequest, asset_id: web::Path<Uuid>, body: web::Json<Vec<AssetValuationPost>>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -306,6 +311,7 @@ async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: Http
 	}
 }
 
+//Docs: /dev/rest_api/assets#replace-valuation-history
 #[post("/api/v1/assets/{asset_id}/valuations")]
 async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetValuationPost>, asset_id: web::Path<Uuid>) -> impl Responder {
 	let asset_id = asset_id.into_inner();
