@@ -26,12 +26,12 @@ use uuid::Uuid;
 pub struct ChartOptions {
 	pub id: Uuid,
 	pub user_id: Uuid,
-	pub chart_type: String,
+	pub chart_type: String, //TODO: turn into an enum
 	pub title: String,
 	pub filter_from: Option<DateTime<Utc>>,
 	pub filter_to: Option<DateTime<Utc>>,
-	pub filter_collection: Option<String>,
-	pub date_period: Option<String>,
+	pub filter_collection: Option<String>, //TODO: turn into an enum
+	pub date_period: Option<String>, //TODO: turn into an enum
 	pub asset_id: Option<Uuid>,
 	pub budget_id: Option<Uuid>,
 	pub max_items: Option<u32>,
@@ -42,7 +42,7 @@ pub struct ChartOptions {
 	pub top_left_y: Option<u32>,
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
-	pub dashboard_id: Option<Uuid>,
+	pub dashboard_id: Option<Uuid>, //TODO: remove because pointless
 }
 
 impl Default for ChartOptions {

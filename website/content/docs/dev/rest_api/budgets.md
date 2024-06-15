@@ -248,7 +248,7 @@ Response:
 
 ### modify budget
 
-This endpoint is used to modify existing budgets.  
+This endpoint is used to modify an existing budget.  
 You need to specify the id of the budget you want to modify in the request path.
 
 Request:  

@@ -242,6 +242,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Budget
 	}
 }
 
+//Docs: /dev/rest_api/budgets#delete-budget
 #[delete("/api/v1/budgets/{budget_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, budget_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
