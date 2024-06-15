@@ -8,7 +8,7 @@ description: 'Chart related API endpoints'
 The charts route contains all endpoints related to the management of charts. They also allow you to retrieve chart data.
 
 
-## get by id
+### get by id
 
 This endpoint is used to retrieve the configuration of a single chart by its id. 
 You need to specify the id of the chart you want to retrieve in the request path.
@@ -64,7 +64,7 @@ Response:
 | dashboard_id			| the id of the dashboard this chart belongs to, in reality always null													| UUIDv4?			|
 
 
-## get all charts in dashboard
+### get all charts in dashboard
 
 This endpoint is used to retrieve the configuration of all charts that are part of a particular dashboard. 
 You need to specify the id of the dashboard you want to retrieve the charts of in the request path.
@@ -122,7 +122,7 @@ Response:
 | dashboard_id			| the id of the dashboard this chart belongs to, in reality always null													| UUIDv4?			|
 
 
-## get data of chart by id
+### get data of chart by id
 
 This endpoint is used to retrieve the data of a chart that has been created previously. 
 You need to specify the id of the chart you want to retrieve the data of in the request path.
@@ -169,7 +169,7 @@ Datapoint:
 | label							| the label of the datapoint						| label				|
 
 
-## get data of chart by filter collection
+### get data of chart by filter collection
 
 This endpoint is used to retrieve the data for a chart on demand, without having to first create a chart. 
 You need to specify the filter collection of the chart you want to retrieve the data of in the request path.
@@ -216,7 +216,7 @@ Datapoint:
 | label							| the label of the datapoint						| label				|
 
 
-## create chart
+### create chart
 
 This endpoint is used to create new charts. 
 

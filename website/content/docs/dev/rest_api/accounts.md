@@ -35,7 +35,7 @@ Response:
 | id 									| id of the account 																							| UUIDv4 		| Yes					| No					|
 | name 								| name of the account 																						| string 		| Yes					| No					|
 | default_currency_id | currency id of all newly added transactions using this account	| UUIDv4 		| Yes					| No					|
-| user_id 						| user_id that owns this account 																	| UUIDv4 		| Yes					| No					|
+| user_id 						| user_id that owns this account 																	| UUIDv4 		| No					| No					|
 | tag_ids 						| all tags assigned to this account 															| UUIDv4\[] | Yes					| No					|
 | balance							|	current balance of account in [cents](../currency)							| number?		| Yes					| No					|
 
@@ -89,6 +89,13 @@ Request:
 | name 								| name of the account 																						| string 		 |
 | default_currency_id | currency id of all newly added transactions using this account	| UUIDv4 		 |
 | tag_ids 						| all tags assigned to this account 															| UUIDv4\[]? |
+
+Response:
+```json
+{
+	"id": "525c32a8-c200-4c5d-a3c7-ef8936cc1c84"
+}
+```
 
 
 ### modify account

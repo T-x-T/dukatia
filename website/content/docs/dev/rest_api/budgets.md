@@ -58,7 +58,7 @@ Response:
 | ----------------- | --------------------------------------------------------------------------------- | ----------- | -----------	| --------- |
 | id								| the id of the budget																															| UUIDv4			|	Yes					| No				|
 | name		 					| the name of the budget																														| string			| Yes					| No				|
-| user_id						| the id of the user owning this budget																							| UUIDv4			| Yes					| No				|
+| user_id						| the id of the user owning this budget																							| UUIDv4			| No					| No				|
 | amount						| the total amount set for the budget																								| Money				| Yes					| No				|
 | rollover					| if unused budget is rolled over into the next period															| boolean 		| Yes					| No				|	
 | period						| how often the budget resets 0=daily, 1=weekly, 2=monthly, 3=quarterly, 4=yearly		| number			| No					| No				|	

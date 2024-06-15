@@ -1,6 +1,7 @@
 use actix_web::{post, web, HttpResponse, HttpRequest, Responder};
 use crate::webserver::{AppState, is_authorized};
 
+//Docs: undocumented on purpose -> move to some scope like users or something and then document
 #[post("/api/v1/insert_demo_data")]
 async fn insert_demo_data(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {

@@ -31,7 +31,7 @@ Response:
 | --------- | ----------------------------------- | --------- | ----------- | ----------- |
 | id 				| id of the tag 											| UUIDv4		| Yes					| No					|
 | name 			| name of the tag 										| string		| Yes					| No					|
-| user_id 	| user_id that owns this tag 					|	UUIDv4		| Yes					| No					|
+| user_id 	| user_id that owns this tag 					|	UUIDv4		| No					| No					|
 | parent_id | id of the parent tag, if specified	|	UUIDv4?		| Yes					| No					|
 
 
