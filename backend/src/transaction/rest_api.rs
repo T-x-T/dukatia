@@ -34,6 +34,7 @@ struct RequestParameters {
 }
 
 //TODO: test filters and sorting for properties other than id
+//Docs: /dev/rest_api/transactions#get-all
 #[get("/api/v1/transactions/all")]
 async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -122,6 +123,7 @@ async fn get_all(data: web::Data<AppState>, req: HttpRequest, request_parameters
 }
 
 //TODO: test filters and sorting for properties other than id
+//Docs: /dev/rest_api/transactions#get-summary
 #[get("/api/v1/transactions/summary")]
 async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters: web::Query<RequestParameters>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -177,6 +179,7 @@ async fn summary(data: web::Data<AppState>, req: HttpRequest, request_parameters
 	};
 }
 
+//Docs: /dev/rest_api/transactions#get-by-id
 #[get("/api/v1/transactions/{transaction_id}")]
 async fn get_by_id(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -220,6 +223,7 @@ struct PositionPost {
 	tag_id: Option<Uuid>,
 }
 
+//Docs: /dev/rest_api/transactions#create-transaction
 #[post("/api/v1/transactions")]
 async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -268,6 +272,7 @@ async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Trans
 	}
 }
 
+//Docs: /dev/rest_api/transactions#modify-transaction
 #[put("/api/v1/transactions/{transaction_id}")]
 async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<TransactionPost>, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
@@ -317,6 +322,7 @@ async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Transa
 		}
 }
 
+//Docs: /dev/rest_api/transactions#delete-transaction
 #[delete("/api/v1/transactions/{transaction_id}")]
 async fn delete(data: web::Data<AppState>, req: HttpRequest, transaction_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
