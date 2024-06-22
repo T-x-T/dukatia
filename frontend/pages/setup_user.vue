@@ -4,7 +4,7 @@
 			<div id="no_flex">
 				<h2>Welcome to</h2>
 				<img v-if="$colorMode.preference == 'dark'" src="/dukatia_logo.svg">
-				<img v-if="$colorMode.preference == 'light'" src="/dukatia_logo_white.svg">
+				<img v-else src="/dukatia_logo_white.svg">
 			</div>
 			<h4>Lets get you set up.</h4>
 		</div>
