@@ -24,8 +24,9 @@ article
 		list-style-type: initial
 
 div#left
+	margin-left: 5em
 	padding: 10px
-	width: max-content
+	width: 100%
 	justify-self: center
 	grid-area: 2 / 1 / 3 / 2
 
@@ -67,7 +68,7 @@ div#left
 
 <script setup>
 	const { data: navigation } = await useAsyncData('navigation', () => {
-		return fetchContentNavigation()
+		return fetchContentNavigation();
 	});
 </script>
 	

@@ -1,6 +1,6 @@
 ---
-title: 'Getting started'
-description: 'The starting point for getting started'
+title: 'Dukatia Documentation'
+description: 'The starting point for the Dukatia Documentation'
 ---
 
 The documentation provided here is still very new and probably contains some errors. If you find anything that is wrong or unclear, then please do not hesitate to open an issue on [Github](https://github.com/T-x-T/dukatia/issues). Thank you for helping me with improving the documentation!
