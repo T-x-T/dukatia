@@ -213,7 +213,7 @@ Datapoint:
 | name							| the name of the datapoint							| string			|
 | timestamp					| the timestamp of the datapoint				| timestamp		|
 | value							| the numerical value of the datapoint	| number			|
-| label							| the label of the datapoint						| label				|
+| label							| the label of the datapoint						| string			|
 
 
 ### create chart

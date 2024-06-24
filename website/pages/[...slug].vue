@@ -20,6 +20,8 @@ article
 	grid-area: 2 / 2 / 3 / 3
 	text-align: justify
 	padding: 10px
+	:deep(li)
+		list-style-type: initial
 
 div#left
 	padding: 10px
