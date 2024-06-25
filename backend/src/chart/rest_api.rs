@@ -68,7 +68,7 @@ async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, chart
 		chart_options.filter_to = options.to_date;
 	}
 	if options.date_period.is_some() {
-		chart_options.date_period = options.date_period.clone();
+		chart_options.date_period.clone_from(&options.date_period);
 	}
 	if options.asset_id.is_some() {
 		chart_options.asset_id = options.asset_id;
