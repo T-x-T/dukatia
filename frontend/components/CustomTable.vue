@@ -334,7 +334,7 @@ div#wrapper
 
 table
 	table-layout: fixed
-	width: 100%
+	width: 100% !important
 	border-collapse: separate
 	border-spacing: 0px
 	white-space: nowrap

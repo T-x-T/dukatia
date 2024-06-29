@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="wrapper">
 		<button id="add" class="green" @click="newAccount">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
@@ -173,4 +173,7 @@ export default {
 <style lang="sass" scoped>
 button#add
 	margin: 10px
+
+div#wrapper
+	width: 100%
 </style>	
