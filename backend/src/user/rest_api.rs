@@ -150,7 +150,7 @@ pub async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: H
 
 								if body.active.is_some() {
 									if user_to_edit.id == user_id {
-										return HttpResponse::BadRequest().body("{\"error\":\"you cant disable yourself!\"}")
+										return HttpResponse::BadRequest().body("{\"error\":\"you cant edit yourself!\"}")
 									}
 
 									user_to_edit.set_active_mut(body.active.unwrap());
