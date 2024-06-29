@@ -1520,7 +1520,7 @@
 					},
 					"expected_outcome": {
 						"status_code_equals": 400,
-						"body_equals": {"error": "you cant disable yourself!"}
+						"body_equals": {"error": "you cant edit yourself!"}
 					} 
 				},
 				{
