@@ -61,8 +61,9 @@ export default {
 						new_secret: this.newPassword 
 					}
 				});
+				this.passwordUpdateMessage = "password updated successfully";
 			} catch(e: any) {
-				this.passwordUpdateMessage = e?.data?.data?.error;
+				this.passwordUpdateMessage = e?.data?.error;
 			}
 		},
 	}
