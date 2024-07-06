@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - {{ dashboards[0].name }}</Title>
+	</Head>
+
 	<div>
 		<Dashboard 
 			:dashboard_data="dashboards[0]"

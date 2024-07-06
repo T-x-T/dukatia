@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Tags</Title>
+	</Head>
+
 	<div id="wrapper">
 		<button id="add" class="green" @click="newTag()">Add</button>
 		<CustomTable

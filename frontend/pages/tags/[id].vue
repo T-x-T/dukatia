@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Tags - {{ tagData.name }}</Title>
+	</Head>
+
 	<div id="main">
 		<TagDetails
 			v-if="loaded"

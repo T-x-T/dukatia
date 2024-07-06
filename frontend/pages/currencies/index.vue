@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Currencies</Title>
+	</Head>
+
 	<div id="wrapper">
 		<button id="add" class="green" @click="newCurrency">Add</button>
 		<CustomTable

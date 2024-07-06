@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Settings</Title>
+	</Head>
+
 	<div id="main">
 		<div class="gridItem">
 			<h3>Update Password</h3>

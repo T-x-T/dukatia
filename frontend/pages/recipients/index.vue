@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Recipients</Title>
+	</Head>
+
 	<div id="wrapper">
 		<button id="add" class="green" @click="newRecipient">Add</button>
 		<CustomTable

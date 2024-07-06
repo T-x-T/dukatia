@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Accounts</Title>
+	</Head>
+
 	<div id="wrapper">
 		<button id="add" class="green" @click="newAccount">Add</button>
 		<CustomTable

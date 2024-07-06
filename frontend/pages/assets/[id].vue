@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Assets - {{ assetData.name }}</Title>
+	</Head>
+
 	<div id="main">
 		<AssetDetails
 			v-if="loaded"
