@@ -81,6 +81,7 @@ export default {
 				this.$emit("back");
 			} else {
 				this.tag = structuredClone(toRaw(this.default_tag));
+				this.tags = await $fetch("/api/v1/tags/all");
 				(this.$refs.first_input as any).focus();
 			}
 		},
