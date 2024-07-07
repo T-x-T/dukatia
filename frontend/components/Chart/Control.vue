@@ -71,9 +71,14 @@ export default {
 					break;
 				}
 				case "1": {
-					const date_parts = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().slice(0, 10).split("-");
-					this.from_date = new Date(date_parts[1] === "1" ? `${Number(date_parts[0]) - 1}-12-01` : `${date_parts[0]}-${date_parts[1]}-1`).toISOString().slice(0, 10);
-					this.to_date = new Date(new Date(new Date(this.from_date).setMonth(new Date(this.from_date).getMonth() + 1)).setDate(0)).toISOString().slice(0, 10);
+					let from_date = new Date();
+					from_date.setMonth(from_date.getMonth() - 1)
+					from_date.setDate(1);
+					this.from_date = from_date.toISOString().slice(0, 10);
+
+					let to_date = new Date();
+					to_date.setDate(0);
+					this.to_date = to_date.toISOString().slice(0, 10);
 					break;
 				}
 				case "2": {
