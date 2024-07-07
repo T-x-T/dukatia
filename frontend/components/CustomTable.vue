@@ -133,7 +133,7 @@
 			<tbody>
 				<tr v-for="(row, row_index) in rowsForDisplay" :key="row_index" :ref="x => x = row[0]">
 					<td v-if="tableData.multiSelect"><input type="checkbox" v-model="selectedRows[row_index]" @change="updateSelectedRows"></td>
-					<td v-for="(cell, column_index) in row" :key="column_index" @click="$emit('rowClick', tableData.rows[row_index])" :class="columnsForDisplay[column_index]?.type != 'number' ? '' : parseInt(cell) < 0 ? 'negative' : parseInt(cell) > 0 ? 'positive' : 'zero'">{{cell}}</td>
+					<td v-for="(cell, column_index) in row" :key="column_index" @click="$emit('rowClick', tableData.rows[row_index])" :class="columnsForDisplay[column_index]?.type != 'number' ? '' : parseFloat(cell) < 0 ? 'negative' : parseFloat(cell) > 0 ? 'positive' : 'zero'">{{cell}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -334,7 +334,7 @@ div#wrapper
 
 table
 	table-layout: fixed
-	width: 100%
+	width: 100% !important
 	border-collapse: separate
 	border-spacing: 0px
 	white-space: nowrap
@@ -405,6 +405,8 @@ col.choice
 	width: 10em
 col.date
 	width: 20em
+col.string
+	width: 30em
 
 div#bottom_bar
 	display: flex

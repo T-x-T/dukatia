@@ -10,7 +10,7 @@
 		<div class="label_wrapper">
 			<label>
 				Account:
-				<select ref="first_input" v-model="transaction.account_id">
+				<select ref="first_input" v-model="transaction.account_id" @change="account_changed">
 					<option v-for="(account, index) in accounts" :key="index" :value="account.id">{{account.name}}</option>
 				</select>
 			</label>
@@ -157,6 +157,7 @@ export default {
 			this.update_tags_using_recipient();
 		}
 		(this.$refs.first_input as any).focus();
+		this.account_changed(); //fix for setting currency symbol when creating a new transaction
 	},
 
 	methods: {
@@ -257,6 +258,16 @@ export default {
 			this.tags = await $fetch('/api/v1/tags/all');
 			this.update_tags_select_data();
 		},
+
+		account_changed() {
+			this.transaction.positions = this.transaction.positions.map(position => {
+				const account = this.accounts.filter(x => this.transaction.account_id === x.id)[0];
+				const currency = this.currencies.filter(x => account.default_currency_id === x.id)[0];
+				position.amount.minor_in_major = currency.minor_in_major;
+				position.amount.symbol = currency.symbol;
+				return position;
+			})
+		}
 	},
 }
 </script>

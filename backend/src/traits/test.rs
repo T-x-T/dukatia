@@ -1429,7 +1429,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE timestamp BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1441,7 +1441,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE timestamp NOT BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1453,7 +1453,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE active_from BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1465,7 +1465,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE active_from NOT BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1477,7 +1477,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE active_to BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1489,7 +1489,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE active_to NOT BETWEEN $1 AND $2");
-			assert_eq!(format!("{res_values:?}"), "[-262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[-262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1502,7 +1502,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE description ILIKE $1 AND timestamp NOT BETWEEN $2 AND $3");
-			assert_eq!(format!("{res_values:?}"), "[\"test\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z]");
+			assert_eq!(format!("{res_values:?}"), "[\"test\", -262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z]");
 		}
 
 		#[test]
@@ -1544,7 +1544,7 @@ mod db_reader {
 			let (res_string, res_values) = test.get_formatted_query_parameters(None);
 			
 			assert_eq!(res_string, " WHERE id=$1 AND total_amount=$2 AND asset_id=$3 AND user_id=$4 AND currency_id=$5 AND account_id=$6 AND recipient_id=$7 AND minor_in_major=$8 AND parent_id=$9 AND default_currency_id=$10 AND balance=$11 AND amount=$12 AND amount=$13 AND value_per_unit=$14 AND $15 = ANY(tags) AND rollover=$16 AND comment ILIKE $17 AND name ILIKE $18 AND symbol ILIKE $19 AND description ILIKE $20 AND timestamp BETWEEN $21 AND $22 AND active_from BETWEEN $23 AND $24 AND active_to NOT BETWEEN $25 AND $26 ORDER BY id ASC OFFSET $27 LIMIT $28");
-			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-000000000000, 2, 00000000-0000-0000-0000-000000000003, 00000000-0000-0000-0000-000000000004, 00000000-0000-0000-0000-000000000005, 00000000-0000-0000-0000-000000000006, 00000000-0000-0000-0000-000000000007, 12, 00000000-0000-0000-0000-00000000000d, 00000000-0000-0000-0000-00000000000f, 14, 17.5, 17, 18, 00000000-0000-0000-0000-000000000008, true, \"9\", \"10\", \"11\", \"16\", -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, -262144-01-01T00:00:00Z, +262143-12-31T23:59:59.999999999Z, 50, 100]");
+			assert_eq!(format!("{res_values:?}"), "[00000000-0000-0000-0000-000000000000, 2, 00000000-0000-0000-0000-000000000003, 00000000-0000-0000-0000-000000000004, 00000000-0000-0000-0000-000000000005, 00000000-0000-0000-0000-000000000006, 00000000-0000-0000-0000-000000000007, 12, 00000000-0000-0000-0000-00000000000d, 00000000-0000-0000-0000-00000000000f, 14, 17.5, 17, 18, 00000000-0000-0000-0000-000000000008, true, \"9\", \"10\", \"11\", \"16\", -262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z, -262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z, -262143-01-01T00:00:00Z, +262142-12-31T23:59:59.999999999Z, 50, 100]");
 		}
 	}
 }

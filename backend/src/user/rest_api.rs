@@ -5,7 +5,7 @@ use super::*;
 
 //Docs: /dev/rest_api/users#login
 #[post("/api/v1/login")]
-async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
+pub async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
 		Ok(login_result) => return HttpResponse::Ok().body(serde_json::to_string(&login_result).unwrap()),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
@@ -14,7 +14,7 @@ async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>
 
 //Docs: /dev/rest_api/users#logout
 #[post("/api/v1/logout")]
-async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+pub async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -28,7 +28,7 @@ async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Respon
 
 //Docs: /dev/rest_api/users#get-me
 #[get("/api/v1/users/me")]
-async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+pub async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -45,7 +45,7 @@ async fn get_me(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 
 //Docs: /dev/rest_api/users#get-all-users
 #[get("/api/v1/users/all")]
-async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+pub async fn get_all(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -83,7 +83,7 @@ struct PostUserBody {
 
 //Docs: /dev/rest_api/users#create-user
 #[post("/api/v1/users")]
-async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: HttpRequest) -> impl Responder {
+pub async fn post(data: web::Data<AppState>, body: web::Json<PostUserBody>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -122,7 +122,7 @@ struct PutUserBody {
 
 //Docs: /dev/rest_api/users#update-user
 #[put("/api/v1/users/{req_user_id}")]
-async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<Uuid>) -> impl Responder {
+pub async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpRequest, req_user_id: web::Path<Uuid>) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
@@ -150,7 +150,7 @@ async fn put(data: web::Data<AppState>, body: web::Json<PutUserBody>, req: HttpR
 
 								if body.active.is_some() {
 									if user_to_edit.id == user_id {
-										return HttpResponse::BadRequest().body("{\"error\":\"you cant disable yourself!\"}")
+										return HttpResponse::BadRequest().body("{\"error\":\"you cant edit yourself!\"}")
 									}
 
 									user_to_edit.set_active_mut(body.active.unwrap());
@@ -179,7 +179,7 @@ struct PutSecretBody {
 
 //Docs: /dev/rest_api/users#update-user
 #[put("/api/v1/users/me/secret")]
-async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, req: HttpRequest) -> impl Responder {
+pub async fn put_secret(data: web::Data<AppState>, body: web::Json<PutSecretBody>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))

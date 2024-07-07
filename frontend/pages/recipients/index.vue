@@ -1,5 +1,9 @@
 <template>
-	<div>
+	<Head>
+		<Title>Dukatia - Recipients</Title>
+	</Head>
+
+	<div id="wrapper">
 		<button id="add" class="green" @click="newRecipient">Add</button>
 		<CustomTable
 			v-if="Object.keys(tableData).length > 0"
@@ -141,4 +145,7 @@ export default {
 <style lang="sass" scoped>
 button#add
 	margin: 10px
+
+div#wrapper
+	width: 100%
 </style>

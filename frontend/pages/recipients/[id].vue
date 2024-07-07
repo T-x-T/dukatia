@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Recipients - {{ recipientData.name }}</Title>
+	</Head>
+
 	<div>
 		<RecipientDetails 
 			v-if="loaded"

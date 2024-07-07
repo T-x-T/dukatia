@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Budgets - {{ budgetData.name }}</Title>
+	</Head>
+
 	<div>
 		<BudgetDetails 
 			v-if="loaded"

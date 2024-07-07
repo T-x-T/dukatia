@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Transactions</Title>
+	</Head>
+
 	<div id="main">		
 		<div id="table_and_details">
 			<div id="table">

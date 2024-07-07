@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Setup</Title>
+	</Head>
+
 	<div id="wrapper">
 		<div id="setup_user_header">
 			<div id="no_flex">

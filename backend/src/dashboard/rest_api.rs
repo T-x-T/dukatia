@@ -3,7 +3,7 @@ use crate::webserver::{AppState, is_authorized};
 
 //Docs: /dev/rest_api/users#get-dashboards
 #[get("/api/v1/users/me/dashboards")]
-async fn get_all_of_user(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
+pub async fn get_all_of_user(data: web::Data<AppState>, req: HttpRequest) -> impl Responder {
 	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))

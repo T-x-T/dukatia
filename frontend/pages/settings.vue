@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Settings</Title>
+	</Head>
+
 	<div id="main">
 		<div class="gridItem">
 			<h3>Update Password</h3>
@@ -61,8 +65,9 @@ export default {
 						new_secret: this.newPassword 
 					}
 				});
+				this.passwordUpdateMessage = "password updated successfully";
 			} catch(e: any) {
-				this.passwordUpdateMessage = e?.data?.data?.error;
+				this.passwordUpdateMessage = e?.data?.error;
 			}
 		},
 	}

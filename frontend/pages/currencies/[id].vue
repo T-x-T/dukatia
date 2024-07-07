@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Currencies - {{ currencyData.name }}</Title>
+	</Head>
+
 	<div>
 		<CurrencyDetails
 			v-if="loaded"

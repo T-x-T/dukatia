@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Login</Title>
+	</Head>
+
 	<div id="wrapper" v-if="show_login">
 		<h2>Login</h2>
 		<form @submit.prevent="login">

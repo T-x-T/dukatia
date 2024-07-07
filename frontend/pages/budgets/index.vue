@@ -1,4 +1,8 @@
 <template>
+	<Head>
+		<Title>Dukatia - Budgets</Title>
+	</Head>
+
 	<div>
 		<div v-if="chart_utilization_overview" class="gridItem line_chart">
 			<h3>Current period utilization overview</h3>
