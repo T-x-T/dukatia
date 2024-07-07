@@ -405,6 +405,8 @@ col.choice
 	width: 10em
 col.date
 	width: 20em
+col.string
+	width: 30em
 
 div#bottom_bar
 	display: flex
