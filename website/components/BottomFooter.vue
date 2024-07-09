@@ -1,7 +1,9 @@
 <template>
 	<footer>
-    <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg"/>
-		<img v-else src="/dukatia-beta_logo.svg"/>
+    <ClientOnly>
+      <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg"/>
+      <img v-else src="/dukatia-beta_logo.svg"/>
+    </ClientOnly>
     <p>Coded by TxT. Made in Rust.</p>
     <div id="notices">
       <NuxtLink to="/privacy">Privacy Policy</NuxtLink>

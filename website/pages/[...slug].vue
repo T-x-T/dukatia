@@ -37,7 +37,6 @@ div#left
 		font-family: monospace
 		font-size: 1.1em
 
-:deep(h3)
 	margin-top: 2em
 	margin-bottom: 0.25em
 

@@ -25,7 +25,6 @@ html.dark-mode
       &:hover
         color: $dark-bright
 
-
 html.light-mode
   background: $light-bright
   color: $light-darkest
@@ -44,7 +43,11 @@ html.light-mode
       color: $light-darkest
       &:hover
         color: $light-darker
-  
+  a
+    color: $light-darkest
+    &:hover
+      color: $light-dark
+
 *
   margin: 0
   padding: 0
@@ -68,20 +71,20 @@ button
   border: none
   cursor: pointer
   font-size: 16px
-  
+
 button.important
   @extend .bold
-  border-radius: 100px 
+  border-radius: 100px
   background: $dukatia-yellow
   color: black
   font-size: 30px
   padding: 10px 29px 10px 29px
   &:hover
     box-shadow: 0px 0px 32px $dukatia-yellow
-  
+
 button.less_important
   @extend .bold
-  border-radius: 100px 
+  border-radius: 100px
   border: 2px solid $dark-darkest
   background: none
   color: black
@@ -89,7 +92,6 @@ button.less_important
   padding: 10px 29px 10px 29px
   &:hover
     box-shadow: 0px 0px 4px $dark-darkest
-
 
 select
   @extend .semibold
@@ -127,7 +129,7 @@ h4
 
 h5
   font-size: 20px
-  
+
 th
   @extend .semibold
   font-size: 20px
@@ -137,7 +139,7 @@ tbody
 
 table
   border-spacing: 0
-    
+
 label
   @extend .semibold
 
