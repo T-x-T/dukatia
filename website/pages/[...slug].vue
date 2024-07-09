@@ -45,6 +45,7 @@ div#left
 :deep(pre)
 	padding: 8px
 	background-color: #1e1e1e
+	overflow: scroll
 
 :deep(code)
 	opacity: 0.8
