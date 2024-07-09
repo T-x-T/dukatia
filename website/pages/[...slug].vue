@@ -15,6 +15,8 @@ main
 	grid-template-columns: 1fr min(1000px, 70vw) 1fr
 	grid-template-rows: 3em 1fr
 	min-height: 80vh
+	@media screen and (max-width: 1079px)
+		display: initial
 
 article
 	grid-area: 2 / 2 / 3 / 3
