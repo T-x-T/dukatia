@@ -11,4 +11,6 @@ If you are using Unraid, then you can manually add the neccessary docker contain
 To set up a development environment refer to the [developer documentation](docs/dev)
 
 ## First time Setup
-After you successfully installed dukatia, you can go ahead and add your data!  
+After you successfully installed dukatia, you can go ahead and add your data!
+The first time a user account is logged in to, there is a choice to add demo data. This can be useful if you just want to play around without having to add your own data.
+You can also learn more about [importing your data](docs/admin/data-import).

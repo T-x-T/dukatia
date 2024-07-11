@@ -1,3 +1,4 @@
+<!-- The behavior of batch importing is documented here: /docs/admin/data-import -->
 <template>
 	<div>
 		<h3>Batch import Transactions</h3>

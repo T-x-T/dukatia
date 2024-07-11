@@ -61,10 +61,20 @@ div#left
 
 :deep(a)
 	margin: 0
+	text-decoration: underline
 
 :deep(p)
 	a
 		text-decoration: underline
+
+:deep(h2)
+	a
+		text-decoration: none
+
+div#left
+	:deep(li)
+		a
+			text-decoration: none
 
 </style>
 
