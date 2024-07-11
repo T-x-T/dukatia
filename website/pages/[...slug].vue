@@ -67,7 +67,27 @@ div#left
 	a
 		text-decoration: underline
 
+:deep(h1)
+	a
+		text-decoration: none
+
 :deep(h2)
+	a
+		text-decoration: none
+
+:deep(h3)
+	a
+		text-decoration: none
+
+:deep(h4)
+	a
+		text-decoration: none
+
+:deep(h5)
+	a
+		text-decoration: none
+
+:deep(h6)
 	a
 		text-decoration: none
 
