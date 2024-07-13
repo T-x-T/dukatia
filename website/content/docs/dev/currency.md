@@ -17,13 +17,13 @@ In the API you will mostly encounter monetary values in the following format:
 }
 ```
 
-Displaying a monetary value with this is quite simple:
+Displaying a monetary value with this is quite simple:  
 
 ```js
 const display = `${major}.${minor}${symbol}`;
 ```
 
-It is actually a little bit more complicated if you want to properly handle displaying negative amounts the have 0 as their major:  
+It is actually a little bit more complicated if you want to properly handle displaying negative amounts that have 0 as their major:  
 
 ```js
 const display = `${major >= 0 && is_negative ? "-" : ""}${major}.${minor}${symbol}`;
