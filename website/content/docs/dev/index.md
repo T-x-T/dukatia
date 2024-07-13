@@ -2,9 +2,9 @@
 title: 'Developer Documentation'
 description: 'How to develop for dukatia'
 ---
-[rest api](dev/rest_api)
-[setup dev env](dev/setup-dev-env)
 
 ## Developer Documentation
 
-go write code!!
+The developer documentation is currently focused on the rest API. All the routes are documented in the rest_api subdirectory.  
+There are some extra notes about the [types](dev/types) used in the rest API documentation.  
+I also explain a bit about how [currencies are handled](dev/currency).
