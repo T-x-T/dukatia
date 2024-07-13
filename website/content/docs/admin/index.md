@@ -7,6 +7,7 @@ description: 'Documentation aimed at admins of Dukatia'
 - [Installation with docker compose](admin/installation-docker)
 - [Installation with unrain](admin/installation-unraid)
 - [Configuration guide](admin/configuration)
+- [Manage user accounts](admin/user-management)
 
 ## Working with data
 - [Backup and restore](admin/backup)
