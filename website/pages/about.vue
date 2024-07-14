@@ -1,10 +1,5 @@
 <template>
 	<h1>About</h1>
-		<section id="me">
-			<img id="avatar" src="/avatar.svg" alt="Avatar of TheTxT" />
-			<p id="speechbubble">Hi! On the Internet I call myself TxT and I like to develop software in my spare time. Dukatia is a project that I started in 2021 when I finally grew frustrated of my old way to manage my finances - an Excel sheet.</p>
-		</section>
-
 		<section id="goals">
 			<div id="goals">
 				<h3>Goals</h3>
@@ -24,12 +19,18 @@
 			</div>
 		</section>
 
+		<section id="me">
+			<img id="avatar" src="/avatar.svg" alt="Avatar of TheTxT" />
+			<p id="speechbubble">Hi! On the Internet I call myself TxT and I like to develop software in my spare time. Dukatia is a project that I started in 2021 when I finally grew frustrated of my old way to manage my finances - an Excel sheet.</p>
+		</section>
+
 		<section id="history">
 			<h3>History</h3>
 			<div id="content">
 				<p>
 					In 2021, I started Dukatia under the name “TxT's Treasury”. Since then, a lot has happened both in the backend and the frontend.<br>
-					If you want to dive into the making of Dukatia, I created a video series to document the development process.
+					If you want to dive into the making of Dukatia, I created a video series to document the development process.<br>
+					I have also started writing about Dukatia development on my <a href="http://thetxt.io/blog#dukatia" target="_blank">blog</a>.
 				</p>
 				<div id="link">
 					<a href="https://youtube.com/playlist?list=PLht_DnAZ_Av4MoGbcPm0I140PrOe9Yw24" target="_blank">
@@ -55,6 +56,9 @@ h3
 
 p
 	font-size: 1.2em
+	a
+		margin: 0
+		text-decoration: underline
 
 section
 	margin-top: 50px
