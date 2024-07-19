@@ -40,7 +40,7 @@ Response:
 | user_id 			| id of the user that the `access_token` belongs to	| UUIDv4	|
 | first_login		| true if this was the first login of the user			| boolean	|
 
-You then need to provide the `access_token` as a cookie called accessToken for authenticated API endpoints.
+You then need to provide the `access_token` as a cookie called access_token for authenticated API endpoints.
 
 
 ### logout

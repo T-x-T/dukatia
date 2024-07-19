@@ -53,7 +53,7 @@ export default {
 					}
 				});
 				this.error = "";
-				document.cookie = `accessToken=${res.access_token};SameSite=Strict`;
+				document.cookie = `access_token=${res.access_token};SameSite=Strict`;
 				if (res.first_login) {
 					await useRouter().replace("/setup_user");
 				} else {

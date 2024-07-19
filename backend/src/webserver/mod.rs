@@ -101,10 +101,9 @@ pub async fn initialize_webserver(config: Config, pool: Pool) -> std::io::Result
 }
 
 pub async fn is_authorized(pool: &Pool, req: &HttpRequest, session_expiry_days: u32) -> Result<Uuid, Box<dyn Error>> {
-	if req.cookie("accessToken").is_none() {
-    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("accessToken")}));
+	if req.cookie("access_token").is_none() {
+    return Err(Box::new(CustomError::MissingCookie{cookie: String::from("access_token")}));
   }
-
-	#[allow(clippy::needless_question_mark)] //otherwise vscode freaks out for some reason
-	return Ok(get_user_of_token(pool, &req.cookie("accessToken").unwrap().value().to_string(), session_expiry_days).await?);
+	
+	return get_user_of_token(pool, &req.cookie("access_token").unwrap().value().to_string(), session_expiry_days).await;
 }
