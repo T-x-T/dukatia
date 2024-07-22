@@ -13,8 +13,6 @@ CREATE OR REPLACE VIEW public.deep_tags
       LEFT JOIN users u ON t.user_id = u.id
       LEFT JOIN tags pt ON t.parent_id = pt.id
     ORDER BY t.id;
-ALTER TABLE public.deep_tags
-    OWNER TO postgres;
 
 CREATE OR REPLACE VIEW public.deep_accounts
  AS
@@ -44,9 +42,6 @@ CREATE OR REPLACE VIEW public.deep_accounts
   GROUP BY a.id, c.id, u.id
   ORDER BY a.id;
 
-ALTER TABLE public.deep_accounts
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.deep_recipients
  AS
  SELECT r.id,
@@ -69,9 +64,6 @@ CREATE OR REPLACE VIEW public.deep_recipients
      LEFT JOIN deep_tags t ON rt.tag_id = t.id
   GROUP BY t.id, u.id, r.id
   ORDER BY r.id;
-
-ALTER TABLE public.deep_recipients
-    OWNER TO postgres;
 
 
 CREATE OR REPLACE VIEW public.deep_assets
@@ -104,9 +96,6 @@ CREATE OR REPLACE VIEW public.deep_assets
      LEFT JOIN deep_tags t ON at.tag_id = t.id
   GROUP BY a.id, a.name, a.description, a.value_per_unit, a.amount, c.id, u.id
   ORDER BY a.id;
-
-ALTER TABLE public.deep_assets
-    OWNER TO postgres;
 
     CREATE OR REPLACE VIEW public.deep_transactions
  AS
@@ -195,6 +184,3 @@ ALTER TABLE public.deep_assets
      LEFT JOIN deep_assets asset ON at.asset_id = asset.id
   GROUP BY t.id, c.id, u.id, a.id, a.name, a.default_currency_id, a.default_currency_name, a.default_currency_minor_in_mayor, a.default_currency_symbol, a.user_id, a.user_name, a.user_superuser, r.id, r.name, r.user_id, r.user_name, r.user_superuser, a.tag_ids, a.tag_names, a.tag_parent_ids, a.tag_parent_names, a.tag_parent_parent_ids, a.tag_parent_user_ids, a.tag_user_ids, a.tag_user_names, a.tag_user_superusers, r.tag_ids, r.tag_names, r.tag_parent_ids, r.tag_parent_names, r.tag_parent_parent_ids, r.tag_parent_user_ids, r.tag_user_ids, r.tag_user_names, r.tag_user_superusers, asset.id, asset.name, asset.description, asset.value_per_unit, asset.amount, asset.currency_id, asset.currency_name, asset.currency_symbol, asset.currency_minor_in_mayor, asset.user_id, asset.user_name, asset.user_superuser, asset.tag_ids, asset.tag_names, asset.tag_parent_ids, asset.tag_parent_names, asset.tag_parent_parent_ids, asset.tag_parent_user_ids, asset.tag_user_ids, asset.tag_user_names, asset.tag_user_superusers
   ORDER BY t.id;
-
-ALTER TABLE public.deep_transactions
-    OWNER TO postgres;

@@ -19,9 +19,6 @@ CREATE TABLE IF NOT EXISTS public."Assets"
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public."Assets"
-    OWNER to postgres;
-
 CREATE TABLE IF NOT EXISTS public."AssetAmounts"
 (
     "assetId" integer NOT NULL,
@@ -35,9 +32,6 @@ CREATE TABLE IF NOT EXISTS public."AssetAmounts"
 )
 
 TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."AssetAmounts"
-    OWNER to postgres;
 
 CREATE TABLE IF NOT EXISTS public."AssetTags"
 (
@@ -55,9 +49,6 @@ CREATE TABLE IF NOT EXISTS public."AssetTags"
 )
 
 TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."AssetTags"
-    OWNER to postgres;
 
 CREATE TABLE IF NOT EXISTS public."AssetTransactions"
 (
@@ -77,9 +68,6 @@ CREATE TABLE IF NOT EXISTS public."AssetTransactions"
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public."AssetTransactions"
-    OWNER to postgres;
-
 CREATE TABLE IF NOT EXISTS public."AssetValuations"
 (
     "assetId" integer NOT NULL,
@@ -93,9 +81,6 @@ CREATE TABLE IF NOT EXISTS public."AssetValuations"
 )
 
 TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."AssetValuations"
-    OWNER to postgres;
 
 CREATE VIEW public."AssetData"
  AS
@@ -122,10 +107,6 @@ SELECT a.id, a.name, a.description, a."userId", a."currencyId", array_agg(t."tag
 	GROUP BY a.id, aa.amount, av."valuePerUnit"
 	ORDER BY a.id;
 
-ALTER TABLE public."AssetData"
-    OWNER TO postgres;
-
-
 CREATE OR REPLACE VIEW public."TransactionData"
  AS
  SELECT tr.id,
@@ -147,6 +128,3 @@ CREATE OR REPLACE VIEW public."TransactionData"
      LEFT JOIN "Assets" a ON a.id = at."assetId"
   GROUP BY tr.id, a.id
   ORDER BY tr.id;
-
-ALTER TABLE public."TransactionData"
-    OWNER TO postgres;

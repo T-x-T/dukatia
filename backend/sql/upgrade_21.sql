@@ -42,11 +42,6 @@ CREATE OR REPLACE VIEW public.recipient_data
   GROUP BY r.id
   ORDER BY r.id;
 
-ALTER TABLE public.recipient_data
-	OWNER TO postgres;
-
-GRANT ALL ON TABLE public.recipient_data TO postgres;
-
 ALTER TABLE IF EXISTS public.recipient_tags
 	ADD PRIMARY KEY (recipient_id, tag_id);
 
@@ -111,11 +106,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.id, c.minor_in_major, c.symbol
   ORDER BY tr.id;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
-
 CREATE OR REPLACE VIEW public.account_data
  AS
  SELECT a.id,
@@ -130,11 +120,7 @@ CREATE OR REPLACE VIEW public.account_data
   GROUP BY a.id
   ORDER BY a.id;
 
-ALTER TABLE public.account_data
-    OWNER TO postgres;
 
-GRANT ALL ON TABLE public.account_data TO postgres;
---
 DROP VIEW public.recipient_data;
 
 ALTER TABLE IF EXISTS public.recipients DROP COLUMN IF EXISTS id;
@@ -217,11 +203,6 @@ CREATE OR REPLACE VIEW public.budget_data
   GROUP BY b.id, c.id
   ORDER BY b.id;
 
-ALTER TABLE public.budget_data
-    OWNER TO postgres;
-	
-GRANT ALL ON TABLE public.budget_data TO postgres;
-
 DROP VIEW public.budget_data;
 
 ALTER TABLE IF EXISTS public.budgets DROP COLUMN IF EXISTS id;
@@ -251,11 +232,6 @@ CREATE OR REPLACE VIEW public.budget_data
      LEFT JOIN currencies c ON c.id = b.currency_id
   GROUP BY b.id, c.id
   ORDER BY b.name;
-
-ALTER TABLE public.budget_data
-    OWNER TO postgres;
-	
-GRANT ALL ON TABLE public.budget_data TO postgres;
 
 
 
@@ -396,11 +372,6 @@ CREATE OR REPLACE VIEW public.asset_data
   GROUP BY a.new_id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
   ORDER BY a.new_id;
 
-ALTER TABLE public.asset_data
-  OWNER TO postgres;
-
-GRANT ALL ON TABLE public.asset_data TO postgres;
-
 CREATE OR REPLACE VIEW public.transaction_data
  AS
  SELECT tr.id,
@@ -440,11 +411,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.new_id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr.id;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
-
 CREATE OR REPLACE VIEW public.account_data
  AS
  SELECT a.id,
@@ -459,11 +425,6 @@ CREATE OR REPLACE VIEW public.account_data
   GROUP BY a.id
   ORDER BY a.id;
 
-ALTER TABLE public.account_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.account_data TO postgres;
-
 CREATE OR REPLACE VIEW public.asset_valuation_history
  AS
  SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
@@ -477,11 +438,6 @@ CREATE OR REPLACE VIEW public.asset_valuation_history
      LEFT JOIN assets a ON aa.asset_id = a.new_id
      LEFT JOIN currencies c ON a.currency_id = c.id
   ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
-
-ALTER TABLE public.asset_valuation_history
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.asset_valuation_history TO postgres;
 
 DROP VIEW IF EXISTS public.asset_data;
 DROP VIEW IF EXISTS public.asset_valuation_history;
@@ -524,11 +480,6 @@ CREATE OR REPLACE VIEW public.asset_data
   GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
   ORDER BY a.name;
 
-ALTER TABLE public.asset_data
-  OWNER TO postgres;
-
-GRANT ALL ON TABLE public.asset_data TO postgres;
-
 CREATE OR REPLACE VIEW public.asset_valuation_history
  AS
  SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
@@ -542,11 +493,6 @@ CREATE OR REPLACE VIEW public.asset_valuation_history
      LEFT JOIN assets a ON aa.asset_id = a.id
      LEFT JOIN currencies c ON a.currency_id = c.id
   ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
-
-ALTER TABLE public.asset_valuation_history
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.asset_valuation_history TO postgres;
 
 
 
@@ -648,9 +594,6 @@ CREATE OR REPLACE VIEW public.transaction_data
      LEFT JOIN currencies c ON c.id = tr.currency_id
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr.id;
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.transaction_data TO postgres;
 
 CREATE OR REPLACE VIEW public.account_data
  AS
@@ -665,9 +608,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-ALTER TABLE public.account_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.account_data TO postgres;
 
 
 
@@ -792,9 +732,6 @@ CREATE OR REPLACE VIEW public.transaction_data
      LEFT JOIN currencies c ON c.id = tr.currency_id
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr."timestamp" DESC, tr.comment;
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.transaction_data TO postgres;
 
 CREATE OR REPLACE VIEW public.account_data
  AS
@@ -809,9 +746,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-ALTER TABLE public.account_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.account_data TO postgres;
 
 CREATE INDEX transaction_positions_index_transaction_id
   ON public.transaction_positions USING btree
@@ -876,9 +810,6 @@ CREATE OR REPLACE VIEW public.transaction_data
      LEFT JOIN currencies c ON c.id = tr.currency_id
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr."timestamp" DESC, tr.comment;
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.transaction_data TO postgres;
 
 CREATE OR REPLACE VIEW public.account_data
  AS
@@ -893,9 +824,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-ALTER TABLE public.account_data
-    OWNER TO postgres;
-GRANT ALL ON TABLE public.account_data TO postgres;
 
 
 
@@ -1171,9 +1099,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr."timestamp" DESC, tr.comment;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.account_data
  AS
  SELECT a.id,
@@ -1187,11 +1112,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-
-ALTER TABLE public.account_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.account_data TO postgres;
 
 CREATE OR REPLACE VIEW public.asset_data
  AS
@@ -1225,11 +1145,6 @@ CREATE OR REPLACE VIEW public.asset_data
   GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
   ORDER BY a.name;
 
-ALTER TABLE public.asset_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.asset_data TO postgres;
-
 CREATE OR REPLACE VIEW public.budget_data
  AS
  SELECT b.id,
@@ -1250,13 +1165,6 @@ CREATE OR REPLACE VIEW public.budget_data
   GROUP BY b.id, c.id
   ORDER BY b.name;
 
-ALTER TABLE public.budget_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.budget_data TO postgres;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
-
 CREATE OR REPLACE VIEW public.recipient_data
  AS
  SELECT r.id,
@@ -1267,9 +1175,6 @@ CREATE OR REPLACE VIEW public.recipient_data
      LEFT JOIN recipient_tags t ON r.id = t.recipient_id
   GROUP BY r.id
   ORDER BY r.name;
-
-ALTER TABLE public.recipient_data
-    OWNER TO postgres;
 
 
 ALTER TABLE IF EXISTS public.tags DROP COLUMN IF EXISTS id;
@@ -1516,9 +1421,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr."timestamp" DESC, tr.comment;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.account_data
  AS
  SELECT a.id,
@@ -1532,9 +1434,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-
-ALTER TABLE public.account_data
-    OWNER TO postgres;
 
 CREATE OR REPLACE VIEW public.asset_data
  AS
@@ -1568,9 +1467,6 @@ CREATE OR REPLACE VIEW public.asset_data
   GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
   ORDER BY a.name;
 
-ALTER TABLE public.asset_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.budget_data
  AS
  SELECT b.id,
@@ -1591,9 +1487,6 @@ CREATE OR REPLACE VIEW public.budget_data
   GROUP BY b.id, c.id
   ORDER BY b.name;
 
-ALTER TABLE public.budget_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.recipient_data
  AS
  SELECT r.id,
@@ -1604,9 +1497,6 @@ CREATE OR REPLACE VIEW public.recipient_data
      LEFT JOIN recipient_tags t ON r.id = t.recipient_id
   GROUP BY r.id
   ORDER BY r.name;
-
-ALTER TABLE public.recipient_data
-    OWNER TO postgres;
 
 
 
@@ -1747,9 +1637,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.id, a.name, a.description, c.minor_in_major, c.symbol
   ORDER BY tr."timestamp" DESC, tr.comment;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.account_data
  AS
  SELECT a.id,
@@ -1763,9 +1650,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id
   ORDER BY a.name;
-
-ALTER TABLE public.account_data
-    OWNER TO postgres;
 
 CREATE OR REPLACE VIEW public.budget_data
  AS
@@ -1787,9 +1671,6 @@ CREATE OR REPLACE VIEW public.budget_data
   GROUP BY b.id, c.id
   ORDER BY b.name;
 
-ALTER TABLE public.budget_data
-    OWNER TO postgres;
-
 CREATE OR REPLACE VIEW public.asset_valuation_history
  AS
  SELECT COALESCE(aa.asset_id, av.asset_id) AS asset_id,
@@ -1803,9 +1684,6 @@ CREATE OR REPLACE VIEW public.asset_valuation_history
      LEFT JOIN assets a ON aa.asset_id = a.id
      LEFT JOIN currencies c ON a.currency_id = c.id
   ORDER BY (COALESCE(aa.asset_id, av.asset_id)), (COALESCE(aa."timestamp", av."timestamp"));
-
-ALTER TABLE public.asset_valuation_history
-    OWNER TO postgres;
 
 CREATE OR REPLACE VIEW public.asset_data
  AS
@@ -1838,6 +1716,3 @@ CREATE OR REPLACE VIEW public.asset_data
      LEFT JOIN currencies c ON a.currency_id = c.id
   GROUP BY a.id, a.name, a.description, a.user_id, a.currency_id, aa.amount, av.value_per_unit, c.minor_in_major, c.symbol
   ORDER BY a.name;
-
-ALTER TABLE public.asset_data
-    OWNER TO postgres;

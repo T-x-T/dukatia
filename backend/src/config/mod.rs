@@ -1,6 +1,6 @@
 use std::env;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Config {
 	pub db_user: String,
 	pub db_password: String,

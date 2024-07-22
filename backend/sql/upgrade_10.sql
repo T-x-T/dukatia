@@ -34,11 +34,6 @@ CREATE OR REPLACE VIEW public.transaction_data
   GROUP BY tr.id, a.id
   ORDER BY tr.id;
 
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
-
-GRANT ALL ON TABLE public.transaction_data TO postgres;
-
 DROP VIEW public.account_data;
 CREATE OR REPLACE VIEW public.account_data
     AS
@@ -52,7 +47,6 @@ CREATE OR REPLACE VIEW public.account_data
      LEFT JOIN account_tags t ON a.id = t.account_id
 	 LEFT JOIN transaction_data tr ON a.id = tr.account_id
   GROUP BY a.id;
-GRANT ALL ON TABLE public.account_data TO postgres;
 
 CREATE OR REPLACE VIEW public.deep_accounts
     AS

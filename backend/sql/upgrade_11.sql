@@ -20,4 +20,3 @@ CREATE OR REPLACE VIEW public.asset_data
      LEFT JOIN asset_tags t ON a.id = t.asset_id
   GROUP BY a.id, aa.amount, av.value_per_unit
   ORDER BY a.id;
-GRANT ALL ON TABLE public.asset_data TO postgres;

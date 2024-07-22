@@ -4,13 +4,27 @@
 			"name": "backend",
 			"description": "tests for the rest api of the backend",
 			"setup": {
-				"cmd": "docker compose -f trest.docker-compose.yml build && docker compose -f trest.docker-compose.yml up -d",
+				"cmd": "docker compose -f trest.backend.docker-compose.yml build && docker compose -f trest.backend.docker-compose.yml up -d",
 				"finished_condition": {
 					"endpoint_reachable": "/api/v1"
 				}
 			},
 			"cleanup": {
-				"cmd": "docker compose -f trest.docker-compose.yml down && rm latest"
+				"cmd": "docker compose -f trest.backend.docker-compose.yml down && rm latest"
+			},
+			"api_hostname": "http://localhost:4000"
+		},
+		{
+			"name": "backend_different_db_user",
+			"description": "tests for the rest api of the backend when not using postgres as the user",
+			"setup": {
+				"cmd": "docker compose -f trest.backend_different_db_user.docker-compose.yml build && docker compose -f trest.backend_different_db_user.docker-compose.yml up -d",
+				"finished_condition": {
+					"endpoint_reachable": "/api/v1"
+				}
+			},
+			"cleanup": {
+				"cmd": "docker compose -f trest.backend_different_db_user.docker-compose.yml down && rm latest"
 			},
 			"api_hostname": "http://localhost:4000"
 		}
