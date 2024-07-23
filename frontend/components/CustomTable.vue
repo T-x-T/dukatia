@@ -1,6 +1,6 @@
 <template>
 	<div id="wrapper" v-if="tableData && Object.keys(tableData).length > 0">
-		<table>
+		<table :class="tableData.auto_sizing ? 'auto_size' : 'fixed_size'">
 			<colgroup>
 				<col v-if="tableData.multiSelect" class="multiselect">
 				<col v-for="(header, index) in tableData.columns.filter(x => !x.hidden)" :key="index" :class="header.type">
@@ -333,7 +333,6 @@ div#wrapper
 		width: min-content
 
 table
-	table-layout: fixed
 	width: 100% !important
 	border-collapse: separate
 	border-spacing: 0px
@@ -348,8 +347,16 @@ table
 		table-layout: auto
 		width: max-content
 
+table.auto_size
+	table-layout: auto
+	td
+		padding: 0 10px 0 10px
+
+table.fixed_size
+	table-layout: fixed
+
 td
-	white-space: break-spaces
+	white-space: nowrap
 	overflow: hidden
 	text-overflow: ellipsis
 

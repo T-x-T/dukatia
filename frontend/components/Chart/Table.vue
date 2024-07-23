@@ -30,6 +30,7 @@ export default {
 			],
 			rows: [],
 			disable_pagination: true,
+			auto_sizing: true,
 		} as TableData,
 	}),
 

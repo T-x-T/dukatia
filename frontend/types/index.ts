@@ -160,6 +160,7 @@ declare global {
 		row_count?: number,
 		total_amount?: number,
 		disable_pagination?: boolean,
+		auto_sizing?: boolean,
 	}
 
 	type TableFilterOption = 

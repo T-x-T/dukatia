@@ -143,7 +143,8 @@ export default {
 							`${x.total_amount.major >= 0 && x.total_amount.is_negative ? "-" : ""}${x.total_amount.major}.${x.total_amount.minor.toString().padStart(x.total_amount.minor_in_major.toString().length - 1, "0")}${x.total_amount.symbol}`,
 							x.comment,
 							tags.filter(y => x.tag_ids?.includes(y.id?.length == 36 ? y.id : "")).map(y => y.name).join(", ")
-						]))
+						])),
+						auto_sizing: true,
 					};
 				});
 			}
