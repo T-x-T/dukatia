@@ -5054,6 +5054,44 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "insert_demo_data",
+			"tests": [
+				{
+					"name": "post of new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"cookies": {
+						"access_token": "$login_as_admin.access_token"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"name": "aaa new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "inserting demo data returns 200",
+					"endpoint": "/api/v1/insert_demo_data",
+					"method": "POST",
+					"cookies": {
+						"access_token": "$login_as_user2.access_token"
+					},
+					"before": [
+						"login_as_user2"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				}
+			]
 		}
 	]
 }
