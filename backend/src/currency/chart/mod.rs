@@ -31,7 +31,7 @@ fn calculate_get_per_currency_over_time(options: &ChartOptions, transactions: Ve
 		let transaction_total_amount = transaction.total_amount.unwrap();
 		data_point.value = Money::from_amount(data_point.value.to_amount() + transaction_total_amount.to_amount(), transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol());
 
-		let timestamp: NaiveDate = get_date_for_period(options.date_period.clone().unwrap_or_default().as_str(), transaction.timestamp.date_naive());
+		let timestamp: NaiveDate = get_date_for_period(options.date_period.unwrap_or_default(), transaction.timestamp.date_naive());
 
 		if timestamp == data_point.timestamp.unwrap_or_default() {
 			datasets_monetary.entry(transaction.currency_id.unwrap()).or_default().last_mut().unwrap().label = data_point.value.to_string();

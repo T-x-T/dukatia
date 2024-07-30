@@ -215,7 +215,7 @@ declare global {
 	}
 
 	type Dashboard = {
-		id?: number,
+		id?: string,
 		user_id: number,
 		name: string,
 		description?: string,

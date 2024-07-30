@@ -596,7 +596,7 @@ mod get_date_for_period {
 
 	#[test]
 	fn daily_period() {
-		let date_period = "daily";
+		let date_period = DatePeriod::Daily;
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 9, 5).unwrap();
 
 		let res = get_date_for_period(date_period, timestamp);
@@ -607,7 +607,7 @@ mod get_date_for_period {
 
 	#[test]
 	fn monthly_period() {
-		let date_period = "monthly";
+		let date_period = DatePeriod::Monthly;
 
 		for i in 1..12 {
 			let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, i, 5).unwrap();
@@ -621,7 +621,7 @@ mod get_date_for_period {
 
 	#[test]
 	fn quarterly_period() {
-		let date_period = "quarterly";
+		let date_period = DatePeriod::Quarterly;
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 5).unwrap();
 		let res = get_date_for_period(date_period, timestamp);
@@ -686,7 +686,7 @@ mod get_date_for_period {
 
 	#[test]
 	fn yearly_period() {
-		let date_period = "yearly";
+		let date_period = DatePeriod::Yearly;
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 5).unwrap();
 
 		let res = get_date_for_period(date_period, timestamp);

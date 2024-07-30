@@ -49,7 +49,7 @@ mod calculate_get_per_tag_over_time {
 	#[test]
 	fn data_default_chart_daily_period() {
 		let mut chart_options = ChartOptions::default();
-		chart_options.date_period = Some("daily".to_string());
+		chart_options.date_period = Some(DatePeriod::Daily);
 
 		let transactions: Vec<Transaction> = vec![
 			Transaction::default().set_id(Uuid::from_u128(0)).set_tag_ids(vec![Uuid::from_u128(0)]).set_timestamp(DateTime::parse_from_str("2020-01-01 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(12345, 100, "€".to_string())).set_currency_id(Uuid::from_u128(0)),
@@ -83,7 +83,7 @@ mod calculate_get_per_tag_over_time {
 	#[test]
 	fn data_default_chart_monthly_period() {
 		let mut chart_options = ChartOptions::default();
-		chart_options.date_period = Some("monthly".to_string());
+		chart_options.date_period = Some(DatePeriod::Monthly);
 
 		let transactions: Vec<Transaction> = vec![
 			Transaction::default().set_id(Uuid::from_u128(0)).set_tag_ids(vec![Uuid::from_u128(0)]).set_timestamp(DateTime::parse_from_str("2020-01-01 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(12345, 100, "€".to_string())).set_currency_id(Uuid::from_u128(0)),
@@ -117,7 +117,7 @@ mod calculate_get_per_tag_over_time {
 	#[test]
 	fn data_default_chart_quarterly_period() {
 		let mut chart_options = ChartOptions::default();
-		chart_options.date_period = Some("quarterly".to_string());
+		chart_options.date_period = Some(DatePeriod::Quarterly);
 
 		let transactions: Vec<Transaction> = vec![
 			Transaction::default().set_id(Uuid::from_u128(0)).set_tag_ids(vec![Uuid::from_u128(0)]).set_timestamp(DateTime::parse_from_str("2020-01-01 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(12345, 100, "€".to_string())).set_currency_id(Uuid::from_u128(0)),
@@ -151,7 +151,7 @@ mod calculate_get_per_tag_over_time {
 	#[test]
 	fn data_default_chart_yearly_period() {
 		let mut chart_options = ChartOptions::default();
-		chart_options.date_period = Some("yearly".to_string());
+		chart_options.date_period = Some(DatePeriod::Yearly);
 
 		let transactions: Vec<Transaction> = vec![
 			Transaction::default().set_id(Uuid::from_u128(0)).set_tag_ids(vec![Uuid::from_u128(0)]).set_timestamp(DateTime::parse_from_str("2020-01-01 12:34:56 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc)).set_total_amount(Money::from_amount(12345, 100, "€".to_string())).set_currency_id(Uuid::from_u128(0)),
