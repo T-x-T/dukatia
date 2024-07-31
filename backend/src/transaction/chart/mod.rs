@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use chrono::prelude::*;
 use uuid::Uuid;
 
-use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions};
 use super::Transaction;
 use crate::money::Money;
 
@@ -29,7 +29,7 @@ fn calculate_get_earning_spending_net_over_time(options: &ChartOptions, transact
 
 		let transaction_total_amount = transaction.total_amount.unwrap();
 
-		let timestamp: NaiveDate = get_date_for_period(options.date_period.unwrap_or_default(), transaction.timestamp.date_naive());
+		let timestamp: NaiveDate = options.date_period.unwrap_or_default().get_date_at_timestamp(transaction.timestamp.date_naive());
 
 		if transaction_total_amount.to_amount().is_positive() {
 			if timestamp == data_point_earning.timestamp.unwrap_or_default() {

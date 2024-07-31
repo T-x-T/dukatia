@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use chrono::prelude::*;
 use uuid::Uuid;
 
-use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions, get_date_for_period};
+use crate::chart::{Dataset, IntermediateChartData, DataPointMonetaryMultiCurrency, DataPoint, ChartOptions, get_relevant_time_sorted_transactions};
 use super::{RecipientLoader, Recipient};
 use crate::money::Money;
 use crate::transaction::Transaction;
@@ -31,7 +31,7 @@ fn calculate_get_per_recipient_over_time(options: &ChartOptions, transactions: V
 		let transaction_total_amount = transaction.total_amount.unwrap();
 		data_point.value.insert(transaction.currency_id.unwrap(), data_point.value.get(&transaction.currency_id.unwrap()).unwrap_or(&Money::from_amount(0, transaction_total_amount.get_minor_in_major(), transaction_total_amount.get_symbol())).clone() + transaction_total_amount);
 
-		let timestamp: NaiveDate = get_date_for_period(options.date_period.unwrap_or_default(), transaction.timestamp.date_naive());
+		let timestamp: NaiveDate = options.date_period.unwrap_or_default().get_date_at_timestamp(transaction.timestamp.date_naive());
 
 		let mut data_point_values: Vec<&Money> = data_point.value.values().collect();
 		data_point_values.sort_by_key(|b| std::cmp::Reverse(b.to_string()));

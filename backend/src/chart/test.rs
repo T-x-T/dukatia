@@ -496,12 +496,12 @@ mod limit_output_only_negative {
 	}
 }
 
-mod sort_output {
+mod intermediate_chart_data_sort {
 	use super::*;
 
 	#[test]
 	fn works_with_default_input() {
-		let res = sort_output(IntermediateChartData::default());
+		let res = IntermediateChartData::default().sort();
 
 		assert_eq!(res, Vec::new());
 	}
@@ -519,7 +519,7 @@ mod sort_output {
 				})
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = input.sort();
 
 		assert_eq!(res, vec![(Uuid::from_u128(0), Dataset {
 			label: String::new(), data: vec![
@@ -545,7 +545,7 @@ mod sort_output {
 				(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = input.sort();
 
 		assert_eq!(res, vec![
 			(Uuid::from_u128(5), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 300.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -575,7 +575,7 @@ mod sort_output {
 				(Uuid::from_u128(8), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 250.0, label: String::new()}]}),
 			].into_iter().collect()
 		};
-		let res = sort_output(input);
+		let res = input.sort();
 
 		assert_eq!(res, vec![
 			(Uuid::from_u128(2), Dataset {label: String::new(), data: vec![DataPoint {name: None, timestamp: None, value: 200.0, label: String::new()},DataPoint {name: None, timestamp: None, value: 900.0, label: String::new()}]}),
@@ -591,7 +591,7 @@ mod sort_output {
 	}
 }
 
-mod get_date_for_period {
+mod date_period_get_date_at_timestamp {
 	use super::*;
 
 	#[test]
@@ -599,7 +599,7 @@ mod get_date_for_period {
 		let date_period = DatePeriod::Daily;
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 9, 5).unwrap();
 
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 9, 5).unwrap();
 
 		assert_eq!(res, expected_res);
@@ -612,7 +612,7 @@ mod get_date_for_period {
 		for i in 1..12 {
 			let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, i, 5).unwrap();
 			
-			let res = get_date_for_period(date_period, timestamp);
+			let res = date_period.get_date_at_timestamp(timestamp);
 			let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, i, 1).unwrap();
 	
 			assert_eq!(res, expected_res);
@@ -624,62 +624,62 @@ mod get_date_for_period {
 		let date_period = DatePeriod::Quarterly;
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 2, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 3, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 5, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 6, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 7, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 7, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 8, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 7, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 9, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 7, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 10, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 10, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 11, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 10, 1).unwrap();
 		assert_eq!(res, expected_res);
 
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 12, 5).unwrap();
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 10, 1).unwrap();
 		assert_eq!(res, expected_res);
 	}
@@ -689,7 +689,7 @@ mod get_date_for_period {
 		let date_period = DatePeriod::Yearly;
 		let timestamp: NaiveDate = NaiveDate::from_ymd_opt(2015, 4, 5).unwrap();
 
-		let res = get_date_for_period(date_period, timestamp);
+		let res = date_period.get_date_at_timestamp(timestamp);
 		let expected_res: NaiveDate = NaiveDate::from_ymd_opt(2015, 1, 1).unwrap();
 
 		assert_eq!(res, expected_res);

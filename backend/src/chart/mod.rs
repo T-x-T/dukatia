@@ -137,6 +137,30 @@ pub enum DatePeriod {
 	Yearly,
 }
 
+impl DatePeriod {
+	pub fn get_date_at_timestamp(self, timestamp: NaiveDate) -> NaiveDate {
+		match self {
+			DatePeriod::Yearly => {
+				NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap()
+			},
+			DatePeriod::Quarterly => {
+				match timestamp.month() {
+					1..=3 => NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(),
+					4..=6 => NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(),
+					7..=9 => NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(),
+					_ => NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(),
+				}
+			},
+			DatePeriod::Monthly => {
+				NaiveDate::from_ymd_opt(timestamp.year(), timestamp.month(), 1).unwrap()
+			},
+			DatePeriod::Daily => {
+				timestamp
+			},
+		}
+	}
+}
+
 impl Display for DatePeriod {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
@@ -253,6 +277,14 @@ pub struct IntermediateChartData {
 	pub datasets: BTreeMap<Uuid, Dataset>,
 }
 
+impl IntermediateChartData {
+	fn sort(self) -> Vec<(Uuid, Dataset)> {
+		let mut datasets = Vec::from_iter(self.datasets);
+		datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
+		return datasets;
+	}
+}
+
 #[derive(Debug, Clone, Serialize, Default, PartialEq, PartialOrd)]
 pub struct Dataset {
 	pub label: String,
@@ -282,6 +314,12 @@ pub struct DataPointMonetaryMultiCurrency {
 	pub value: BTreeMap<Uuid, Money>,
 	pub label: String,
 }
+
+
+
+
+
+
 
 pub async fn get_by_id(pool: &Pool, id: Uuid, user_id: Uuid) -> Result<ChartOptions, Box<dyn Error>> {
 	return db::get_by_id(pool, id, user_id).await;
@@ -321,11 +359,11 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 	
 	let limited_output: Vec<(Uuid, Dataset)>;
 	if options.only_positive.is_some() && options.only_positive.unwrap() {
-		limited_output = limit_output_only_positive(sort_output(output), options.max_items);
+		limited_output = limit_output_only_positive(output.sort(), options.max_items);
 	} else if options.only_negative.is_some() && options.only_negative.unwrap() {
-		limited_output = limit_output_only_negative(sort_output(output), options.max_items);
+		limited_output = limit_output_only_negative(output.sort(), options.max_items);
 	} else {
-		limited_output = limit_output(sort_output(output), options.max_items);
+		limited_output = limit_output(output.sort(), options.max_items);
 	}
 	let datasets: Vec<Dataset> = limited_output.into_iter().map(|x| x.1).collect();
 
@@ -362,35 +400,6 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 
 	return Ok(transactions);
 }
-
-pub fn get_date_for_period(date_period: DatePeriod, timestamp: NaiveDate) -> NaiveDate {
-	match date_period {
-		DatePeriod::Yearly => {
-			NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap()
-		},
-		DatePeriod::Quarterly => {
-			match timestamp.month() {
-				1..=3 => NaiveDate::from_ymd_opt(timestamp.year(), 1, 1).unwrap(),
-				4..=6 => NaiveDate::from_ymd_opt(timestamp.year(), 4, 1).unwrap(),
-				7..=9 => NaiveDate::from_ymd_opt(timestamp.year(), 7, 1).unwrap(),
-				_ => NaiveDate::from_ymd_opt(timestamp.year(), 10, 1).unwrap(),
-			}
-		},
-		DatePeriod::Monthly => {
-			NaiveDate::from_ymd_opt(timestamp.year(), timestamp.month(), 1).unwrap()
-		},
-		DatePeriod::Daily => {
-			timestamp
-		},
-	}
-}
-
-fn sort_output(input: IntermediateChartData) -> Vec<(Uuid, Dataset)> {
-	let mut datasets = Vec::from_iter(input.datasets);
-	datasets.sort_by(|a, b| b.1.data.last().unwrap().value.total_cmp(&a.1.data.last().unwrap().value));
-	return datasets;
-}
-
 
 fn limit_output(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32>) -> Vec<(Uuid, Dataset)> {
 	let mut output: Vec<(Uuid, Dataset)>;
