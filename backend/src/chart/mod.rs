@@ -102,7 +102,7 @@ impl From<u32> for DateRange {
 
 impl From<i32> for DateRange {
 	fn from(value: i32) -> Self {
-		assert!(value > 0);
+		assert!(value >= 0);
 		return (value as u32).into();
 	}
 }
