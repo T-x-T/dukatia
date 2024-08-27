@@ -74,9 +74,7 @@ fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Tra
 	}
 
 
-	let mut output = IntermediateChartData::default();
-
-	output.datasets = BTreeMap::new();
+	let mut output = IntermediateChartData { datasets: BTreeMap::new() };
 	for dataset in datasets {
 		let name: String = tags.iter()
 			.filter(|x| x.id == dataset.0)
