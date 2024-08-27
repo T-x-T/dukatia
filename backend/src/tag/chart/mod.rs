@@ -22,7 +22,6 @@ pub async fn get_per_tag_over_time(pool: &Pool, options: ChartOptions) -> Result
 
 
 fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Transaction>, tags: &[Tag]) -> IntermediateChartData {
-	let mut output = IntermediateChartData::default();
 	let mut datasets_multi_currency: BTreeMap<Uuid, Vec<DataPointMonetaryMultiCurrency>> = BTreeMap::new();
 
 	let default = DataPointMonetaryMultiCurrency::default();
@@ -73,6 +72,9 @@ fn calculate_get_per_tag_over_time(options: &ChartOptions, transactions: Vec<Tra
 			);
 		}
 	}
+
+
+	let mut output = IntermediateChartData::default();
 
 	output.datasets = BTreeMap::new();
 	for dataset in datasets {
