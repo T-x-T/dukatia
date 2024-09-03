@@ -259,6 +259,7 @@ struct AssetValuationPost {
 	cost: Option<Money>,
 	total_value: Option<Money>,
 	account_id: Option<Uuid>,
+	recipient_id: Option<Uuid>,
 }
 
 //Docs: /dev/rest_api/assets#replace-valuation-history
@@ -311,7 +312,7 @@ pub async fn replace_valuation_history_of_asset(data: web::Data<AppState>, req: 
 	}
 }
 
-//Docs: /dev/rest_api/assets#replace-valuation-history
+//Docs: /dev/rest_api/assets#post-valuation
 #[post("/api/v1/assets/{asset_id}/valuations")]
 pub async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: web::Json<AssetValuationPost>, asset_id: web::Path<Uuid>) -> impl Responder {
 	let asset_id = asset_id.into_inner();
@@ -358,7 +359,7 @@ pub async fn post_valuation(data: web::Data<AppState>, req: HttpRequest, body: w
 				},
 			};
 		},
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")), //TODO: better handle case where no asset was found -> 404?
 	}
 }
 
@@ -399,7 +400,11 @@ async fn add_valuation(pool: &Pool, body: &web::Json<AssetValuationPost>, asset_
 		Money::from_amount(-((f64::from(body.value_per_unit.to_amount()) * amount_difference) as i32) - body.cost.clone().unwrap_or_default().to_amount(), body.value_per_unit.get_minor_in_major(), body.value_per_unit.get_symbol())
 	};
 
-	let recipient = crate::recipient::RecipientLoader::new(pool).set_filter_user_id(user_id, NumberFilterModes::ExactOrAlsoNull).get_first().await?; //TODO: somehow find a fitting recipient
+	let recipient_loader = crate::recipient::RecipientLoader::new(pool).set_filter_user_id(user_id, NumberFilterModes::ExactOrAlsoNull);
+	let recipient = match body.recipient_id {
+		Some(recipient_id) => recipient_loader.set_filter_id(recipient_id, NumberFilterModes::Exact).get_first().await?,
+		None => recipient_loader.get_first().await?
+	};
 
 	Transaction::default()
 		.set_account_id(body.account_id.unwrap())

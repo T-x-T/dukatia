@@ -33,6 +33,13 @@
 			</label>
 			
 			<label>
+				Recipient:
+				<select v-model="transaction_data.recipient_id">
+					<option v-for="(recipient, index) in recipients" :key="index" :value="recipient.id">{{recipient.name}}</option>
+				</select>
+			</label>
+			
+			<label>
 				Timestamp:
 				<input type="datetime-local" v-model="transaction_data.timestamp">
 			</label>
@@ -55,7 +62,8 @@
 export default {
 	data: () => ({
 		transaction_data: {} as {[key: string]: any},
-		accounts: [] as Account[]
+		accounts: [] as Account[],
+		recipients: [] as Recipient[],
 	}),
 
 	$emits: ["saved"],
@@ -69,6 +77,7 @@ export default {
 
 	async created() {
 		this.accounts = await $fetch("/api/v1/accounts/all");
+		this.recipients = await $fetch("/api/v1/recipients/all");
 		this.transaction_data = {
 			amount: 0,
 			value_per_unit: this.asset.value_per_unit,
@@ -90,7 +99,8 @@ export default {
 						timestamp: new Date(this.transaction_data.timestamp),
 						account_id: this.transaction_data.account_id,
 						cost: this.transaction_data.cost,
-						total_value: this.transaction_data.total_manually_changed ? this.transaction_data.total : null
+						total_value: this.transaction_data.total_manually_changed ? this.transaction_data.total : null,
+						recipient_id: this.transaction_data.recipient_id,
 					}
 				});
 				this.$emit("saved");
