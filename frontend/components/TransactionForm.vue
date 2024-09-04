@@ -87,7 +87,7 @@
 		</div>
 		
 		<br>
-		<button @click="transaction.positions.push({...default_data.positions[0]})">Add Position</button>
+		<button @click="transaction.positions.push({...transaction.positions[0], amount: {...transaction.positions[0].amount, major: 0, minor: 0, is_negative: false}})">Add Position</button>
 		<br>
 		<button class="green" @click="save(true)">Save</button>
 		<button class="orange" @click="$emit('back')">Cancel</button>
