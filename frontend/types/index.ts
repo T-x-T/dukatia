@@ -160,6 +160,7 @@ declare global {
 		row_count?: number,
 		total_amount?: number,
 		disable_pagination?: boolean,
+		auto_sizing?: boolean,
 	}
 
 	type TableFilterOption = 
@@ -214,7 +215,7 @@ declare global {
 	}
 
 	type Dashboard = {
-		id?: number,
+		id?: string,
 		user_id: number,
 		name: string,
 		description?: string,

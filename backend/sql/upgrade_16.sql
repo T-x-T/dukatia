@@ -21,9 +21,6 @@ CREATE TABLE IF NOT EXISTS public.budgets
         ON DELETE CASCADE
 );
 
-ALTER TABLE IF EXISTS public.budgets
-    OWNER to postgres;
-
 
 CREATE TABLE public.budget_filter_tags
 (
@@ -41,9 +38,6 @@ CREATE TABLE public.budget_filter_tags
         ON DELETE CASCADE
         NOT VALID
 );
-
-ALTER TABLE IF EXISTS public.budget_filter_tags
-    OWNER to postgres;
 
 
 CREATE VIEW public.budget_data

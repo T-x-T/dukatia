@@ -231,7 +231,7 @@ impl<'a> DbWriter<'a, Vec<Transaction>> for TransactionVecDbWriter<'a> {
 		let mut query_options: Vec<Box<(dyn ToSql + Sync)>> = Vec::new();
 
 		for transaction in &self.transactions {
-			query = format!("{query} (${}, ${}, ${}, ${}, ${}, ${}, ${}, ${}), ", i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6, i + 7);
+			query = format!("{query} (${}, ${}, ${}, ${}, ${}, ${}, ${}, ${}),", i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6, i + 7);
 			i += 8;
 			query_options.push(Box::new(transaction.id));
 			query_options.push(Box::new(transaction.user_id));
@@ -260,7 +260,7 @@ impl<'a> DbWriter<'a, Vec<Transaction>> for TransactionVecDbWriter<'a> {
 
 		for transaction in &self.transactions {
 			for tag_id in transaction.tag_ids.clone() {
-				query = format!("{query} (${}, ${}), ", i, i + 1);
+				query = format!("{query} (${}, ${}),", i, i + 1);
 				i += 2;
 				query_options.push(Box::new(transaction.id));
 				query_options.push(Box::new(tag_id));
@@ -286,7 +286,7 @@ impl<'a> DbWriter<'a, Vec<Transaction>> for TransactionVecDbWriter<'a> {
 			if transaction.asset.is_none() {
 				continue;
 			}
-			query = format!("{query} (${}, ${}), ", i, i + 1);
+			query = format!("{query} (${}, ${}),", i, i + 1);
 			i += 2;
 			query_options.push(Box::new(transaction.id));
 			query_options.push(Box::new(transaction.asset.clone().unwrap().id));

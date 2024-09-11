@@ -1,6 +1,6 @@
 {
   "name": "fronted",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "front end written in nuxt.js for dukatia",
   "main": "index.js",
   "scripts": {
@@ -9,13 +9,13 @@
     "start": "npx nuxi start"
   },
   "devDependencies": {
-    "nuxt": "3.12.2",
+    "nuxt": "3.12.3",
     "@nuxtjs/color-mode": "3.4.2",
     "chart.js": "4.4.3",
     "chartjs-adapter-date-fns": "3.0.0",
     "consola": "3.2.3",
     "date-fns": "3.6.0",
-    "sass": "1.77.6",
+    "sass": "1.77.8",
     "sass-loader": "14.2.1",
     "vue-chartjs": "5.3.1"
   }

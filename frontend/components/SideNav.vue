@@ -123,7 +123,7 @@ export default {
 			} catch(e) {
 				console.error("failed to post logout", e);
 			} finally {
-				document.cookie = "accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+				document.cookie = "access_token=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
 				location.reload();
 			}
 		},

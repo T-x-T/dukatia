@@ -84,6 +84,7 @@ export default {
 				bottom_right_y: lowest_chart_y + 2,
 				only_negative: false,
 				only_positive: false,
+				dashboard_id: this.dashboard_data.id,
 			};
 
 			await this.save(chart);

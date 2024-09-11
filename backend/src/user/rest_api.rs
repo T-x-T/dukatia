@@ -20,7 +20,7 @@ pub async fn post_logout(data: web::Data<AppState>, req: HttpRequest) -> impl Re
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match User::default().set_id(user_id).logout(&data.pool, req.cookie("accessToken").unwrap().value().to_string()).await {
+	match User::default().set_id(user_id).logout(&data.pool, req.cookie("access_token").unwrap().value().to_string()).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	};

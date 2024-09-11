@@ -68,6 +68,7 @@ export default {
 			superuser: false,
 			active: true
 		} as User,
+		me: {} as User,
 	}),
 
 	async mounted() {
@@ -99,7 +100,8 @@ export default {
 					x.superuser ? "Admin" : "User",
 					x.active ? "Active" : "Disabled",
 					x.last_logon ? x.last_logon.slice(0, 10) : "Never"
-				]))
+				])),
+				auto_sizing: true,
 			};
 		},
 

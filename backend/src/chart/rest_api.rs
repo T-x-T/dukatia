@@ -68,7 +68,7 @@ pub async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, c
 		chart_options.filter_to = options.to_date;
 	}
 	if options.date_period.is_some() {
-		chart_options.date_period.clone_from(&options.date_period);
+		chart_options.date_period.clone_from(&Some(options.date_period.as_ref().unwrap().as_str().into()));
 	}
 	if options.asset_id.is_some() {
 		chart_options.asset_id = options.asset_id;
@@ -80,7 +80,7 @@ pub async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, c
 		chart_options.max_items = options.max_items;
 	}
 	if options.date_range.is_some() {
-		chart_options.date_range = options.date_range;
+		chart_options.date_range = options.date_range.map(std::convert::Into::into);
 	}
 	if options.only_positive.is_some() {
 		chart_options.only_positive = options.only_positive;
@@ -106,16 +106,16 @@ pub async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req:
 	let chart_options = super::ChartOptions {
 		id: Uuid::nil(),
 		user_id,
-		chart_type: String::new(),
+		chart_type: super::ChartType::Line,
 		title: options.filter_collection.clone().unwrap_or_default(),
 		filter_from: options.from_date,
 		filter_to: options.to_date,
-		filter_collection: Some(path.clone()),
-		date_period: options.date_period.clone(),
+		filter_collection: Some(path.as_str().into()),
+		date_period: options.date_period.as_ref().map(|x| x.as_str().into()),
 		asset_id: options.asset_id,
 		budget_id: options.budget_id,
 		max_items: options.max_items,
-		date_range: options.date_range,
+		date_range: options.date_range.map(std::convert::Into::into),
 		only_positive: options.only_positive,
 		only_negative: options.only_negative,
 		top_left_x: None,
@@ -161,16 +161,16 @@ pub async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<C
 	let chart = super::ChartOptions {
 		id: Uuid::new_v4(),
 		user_id,
-		chart_type: body.chart_type,
+		chart_type: body.chart_type.as_str().into(),
 		title: body.title,
 		filter_from: body.filter_from,
 		filter_to: body.filter_to,
-		filter_collection: body.filter_collection,
-		date_period: body.date_period,
+		filter_collection: body.filter_collection.map(|x| x.as_str().into()),
+		date_period: body.date_period.map(|x| x.as_str().into()),
 		asset_id: None,
 		budget_id: None,
 		max_items: body.max_items,
-		date_range: body.date_range,
+		date_range: body.date_range.map(std::convert::Into::into),
 		only_positive: body.only_positive,
 		only_negative: body.only_negative,
 		top_left_x: body.top_left_x,
@@ -197,16 +197,16 @@ pub async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Ch
 	let chart = super::ChartOptions {
 		id: *chart_id,
 		user_id,
-		chart_type: body.chart_type,
+		chart_type: body.chart_type.as_str().into(),
 		title: body.title,
 		filter_from: body.filter_from,
 		filter_to: body.filter_to,
-		filter_collection: body.filter_collection,
-		date_period: body.date_period,
+		filter_collection: body.filter_collection.map(|x| x.as_str().into()),
+		date_period: body.date_period.map(|x| x.as_str().into()),
 		asset_id: None,
 		budget_id: None,
 		max_items: body.max_items,
-		date_range: body.date_range,
+		date_range: body.date_range.map(std::convert::Into::into),
 		only_positive: body.only_positive,
 		only_negative: body.only_negative,
 		top_left_x: body.top_left_x,

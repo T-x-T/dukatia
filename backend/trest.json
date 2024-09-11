@@ -4,13 +4,27 @@
 			"name": "backend",
 			"description": "tests for the rest api of the backend",
 			"setup": {
-				"cmd": "docker compose -f trest.docker-compose.yml build && docker compose -f trest.docker-compose.yml up -d",
+				"cmd": "docker compose -f trest.backend.docker-compose.yml build && docker compose -f trest.backend.docker-compose.yml up -d",
 				"finished_condition": {
 					"endpoint_reachable": "/api/v1"
 				}
 			},
 			"cleanup": {
-				"cmd": "docker compose -f trest.docker-compose.yml down && rm latest"
+				"cmd": "docker compose -f trest.backend.docker-compose.yml down && rm latest"
+			},
+			"api_hostname": "http://localhost:4000"
+		},
+		{
+			"name": "backend_different_db_user",
+			"description": "tests for the rest api of the backend when not using postgres as the user",
+			"setup": {
+				"cmd": "docker compose -f trest.backend_different_db_user.docker-compose.yml build && docker compose -f trest.backend_different_db_user.docker-compose.yml up -d",
+				"finished_condition": {
+					"endpoint_reachable": "/api/v1"
+				}
+			},
+			"cleanup": {
+				"cmd": "docker compose -f trest.backend_different_db_user.docker-compose.yml down && rm latest"
 			},
 			"api_hostname": "http://localhost:4000"
 		}
@@ -46,7 +60,7 @@
 			"name": "currency",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -257,7 +271,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -277,7 +291,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -297,7 +311,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -319,7 +333,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -332,7 +346,7 @@
 			"name": "recipients",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -542,7 +556,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test of new user"
@@ -559,7 +573,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -573,7 +587,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -588,7 +602,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test"
@@ -604,7 +618,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -618,7 +632,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -632,7 +646,7 @@
 			"name": "accounts",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -852,7 +866,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -870,7 +884,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -884,7 +898,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -899,7 +913,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -917,7 +931,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 404
@@ -929,7 +943,7 @@
 			"name": "tags",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -1203,7 +1217,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test"
@@ -1220,7 +1234,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -1233,7 +1247,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -1248,7 +1262,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -1262,7 +1276,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "PUT",
 					"body": {
@@ -1279,7 +1293,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -1296,7 +1310,7 @@
 					"endpoint": "/api/v1/users/me",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1311,7 +1325,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1326,7 +1340,7 @@
 					"endpoint": "/api/v1/users",
 					"method": "POST",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1345,7 +1359,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1372,7 +1386,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_user2.access_token"
+						"access_token": "$login_as_user2.access_token"
 					},
 					"before": [
 						"login_as_user2"
@@ -1387,7 +1401,7 @@
 					"endpoint": "/api/v1/users/%%%[[[new user can login]]]...[[[user_id]]]%%%",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1404,7 +1418,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1432,7 +1446,7 @@
 					"endpoint": "/api/v1/users/%%%[[[new user can login]]]...[[[user_id]]]%%%",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1451,7 +1465,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1478,7 +1492,7 @@
 					"endpoint": "/api/v1/users/%%%[[[new user can login]]]...[[[user_id]]]%%%",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1495,7 +1509,7 @@
 					"endpoint": "/api/v1/users/all",
 					"method": "GET",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1510,7 +1524,7 @@
 					"endpoint": "/api/v1/users/%%%[[[get me works]]]...[[[id]]]%%%",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1528,7 +1542,7 @@
 					"endpoint": "/api/v1/users/%%%[[[new user can login]]]...[[[user_id]]]%%%",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1556,7 +1570,7 @@
 					"name": "logout returns 200",
 					"endpoint": "/api/v1/logout",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1596,7 +1610,7 @@
 					"endpoint": "/api/v1/users/me/secret",
 					"method": "PUT",
 					"cookies": {
-						"accessToken": "$login_as_admin.access_token"
+						"access_token": "$login_as_admin.access_token"
 					},
 					"before": [
 						"login_as_admin"
@@ -1640,7 +1654,7 @@
 			"name": "transactions",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -2257,7 +2271,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
@@ -2289,7 +2303,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -2302,7 +2316,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2318,7 +2332,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
@@ -2349,7 +2363,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2363,7 +2377,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -2377,7 +2391,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -2391,7 +2405,7 @@
 			"name": "assets",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -2647,6 +2661,50 @@
 					}
 				},
 				{
+					"name": "post of new recipient returns 200",
+					"endpoint": "/api/v1/recipients",
+					"method": "POST",
+					"body": {
+						"name": "special"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "post of valuation with account_id and recipient returns 200",
+					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
+					"method": "POST",
+					"body": {
+						"value_per_unit": {
+							"major": 1,
+							"minor": 23,
+							"minor_in_major": 100,
+							"symbol": "€",
+							"is_negative": false
+						},
+						"amount": 20,
+						"timestamp": "2023-03-20T11:22:30Z",
+						"account_id": "%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%",
+						"recipient_id": "%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "transaction gets correctly created 1.1",
+					"endpoint": "/api/v1/transactions/all",
+					"method": "GET",
+					"expected_outcome": {
+						"status_code_equals": 200,
+						"body_equals": [
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:30Z","total_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Bought 0 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}
+						]
+					}
+				},
+				{
 					"name": "post of valuation with account_id and cost returns 200",
 					"endpoint": "/api/v1/assets/%%%[[[post of second asset returns 200]]]...[[[id]]]%%%/valuations",
 					"method": "POST",
@@ -2681,6 +2739,7 @@
 						"status_code_equals": 200,
 						"body_equals": [
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:30Z","total_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Bought 0 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}
 						]
 					}
@@ -2721,6 +2780,7 @@
 						"body_equals": [
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:30Z","total_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Bought 0 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}
 						]
 					}
@@ -2762,6 +2822,7 @@
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:30Z","total_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Bought 0 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}
 						]
 					}
@@ -2804,6 +2865,7 @@
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-23T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-22T11:22:00Z","total_amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Sold 20 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":23,"minor":60,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-21T11:22:00Z","total_amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each with additional cost of 1.00€","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-13,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]},
+							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[post of new recipient returns 200]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:30Z","total_amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":"Bought 0 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":0,"minor":0,"minor_in_major":100,"symbol":"€","is_negative":false},"comment":null,"tag_id":null}]},
 							{"id":"%%%ANY_UUID%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","account_id":"%%%[[[retrieval of all accounts works]]]...[[[id]]]%%%","recipient_id":"%%%[[[retrieval of all recipients works]]]...[[[id]]]%%%","status":1,"timestamp":"2023-03-20T11:22:00Z","total_amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":"Bought 10 units at 1.23€ each","tag_ids":[],"asset":{"id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","name":"test 1","description":"description","currency_id":"%%%[[[get euro]]]...[[[id]]]%%%","value_per_unit":null,"amount":null,"tag_ids":[],"total_cost_of_ownership":null},"positions":[{"id":"%%%ANY_UUID%%%","amount":{"major":-12,"minor":30,"minor_in_major":100,"symbol":"€","is_negative":true},"comment":null,"tag_id":null}]}
 						]
 					}
@@ -2814,7 +2876,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-20T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":30.0,"timestamp":"2023-03-21T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-22T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-23T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-24T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}]
+						"body_equals": [{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-18T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-19T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-20T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-20T11:22:30Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":30.0,"timestamp":"2023-03-21T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-22T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":20.0,"timestamp":"2023-03-23T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"},{"value_per_unit":{"major":1,"minor":23,"minor_in_major":100,"symbol":"€","is_negative":false},"amount":10.0,"timestamp":"2023-03-24T11:22:00Z","asset_id":"%%%[[[post of second asset returns 200]]]...[[[id]]]%%%"}]
 					}
 				},
 				{
@@ -2974,7 +3036,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test 7",
@@ -2993,7 +3055,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -3006,7 +3068,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3022,7 +3084,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name":"edited test",
@@ -3040,7 +3102,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3054,7 +3116,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -3068,7 +3130,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "POST",
 					"body": [
@@ -3087,7 +3149,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "POST",
 					"body": {
@@ -3120,7 +3182,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
@@ -3133,7 +3195,7 @@
 			"name": "dashboard",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -3163,7 +3225,7 @@
 			"name": "charts",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -4271,7 +4333,7 @@
 			"name": "budgets",
 			"defaults": {
 				"cookies": {
-					"accessToken": "$login_as_admin.access_token"
+					"access_token": "$login_as_admin.access_token"
 				},
 				"before": [
 					"login_as_admin"
@@ -4918,7 +4980,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "test",
@@ -4947,7 +5009,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200
@@ -4961,7 +5023,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"expected_outcome": {
 						"status_code_equals": 200,
@@ -4976,7 +5038,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"body": {
 						"name": "edited test",
@@ -5004,7 +5066,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -5018,7 +5080,7 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "GET",
 					"expected_outcome": {
@@ -5032,11 +5094,49 @@
 						"login_as_user"
 					],
 					"cookies": {
-						"accessToken": "$login_as_user.access_token"
+						"access_token": "$login_as_user.access_token"
 					},
 					"method": "DELETE",
 					"expected_outcome": {
 						"status_code_equals": 404
+					}
+				}
+			]
+		},
+		{
+			"name": "insert_demo_data",
+			"tests": [
+				{
+					"name": "post of new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"cookies": {
+						"access_token": "$login_as_admin.access_token"
+					},
+					"before": [
+						"login_as_admin"
+					],
+					"body": {
+						"name": "aaa new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "inserting demo data returns 200",
+					"endpoint": "/api/v1/insert_demo_data",
+					"method": "POST",
+					"cookies": {
+						"access_token": "$login_as_user2.access_token"
+					},
+					"before": [
+						"login_as_user2"
+					],
+					"expected_outcome": {
+						"status_code_equals": 200
 					}
 				}
 			]

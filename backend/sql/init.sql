@@ -15,19 +15,16 @@ CREATE TABLE public."AccessTokens" (
     "user" integer NOT NULL,
     token text NOT NULL
 );
-ALTER TABLE public."AccessTokens" OWNER TO postgres;
 CREATE TABLE public."AccountTags" (
     account integer NOT NULL,
     tag integer NOT NULL
 );
-ALTER TABLE public."AccountTags" OWNER TO postgres;
 CREATE TABLE public."Accounts" (
     id integer NOT NULL,
     name text NOT NULL,
     defaultcurrency integer NOT NULL,
     "user" integer
 );
-ALTER TABLE public."Accounts" OWNER TO postgres;
 ALTER TABLE public."Accounts" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Accounts_id_seq"
     START WITH 0
@@ -42,7 +39,6 @@ CREATE TABLE public."Currencies" (
     "minorinmayor" integer,
     symbol text NOT NULL
 );
-ALTER TABLE public."Currencies" OWNER TO postgres;
 ALTER TABLE public."Currencies" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Currencies_id_seq"
     START WITH 0
@@ -55,13 +51,11 @@ CREATE TABLE public."RecipientTags" (
     recipient integer NOT NULL,
     tag integer NOT NULL
 );
-ALTER TABLE public."RecipientTags" OWNER TO postgres;
 CREATE TABLE public."Recipients" (
     id integer NOT NULL,
     name text NOT NULL,
     "user" integer
 );
-ALTER TABLE public."Recipients" OWNER TO postgres;
 ALTER TABLE public."Recipients" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Recipients_id_seq"
     START WITH 0
@@ -76,7 +70,6 @@ CREATE TABLE public."Tags" (
     parent integer,
     "user" integer
 );
-ALTER TABLE public."Tags" OWNER TO postgres;
 ALTER TABLE public."Tags" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Tags_id_seq"
     START WITH 0
@@ -96,12 +89,10 @@ CREATE TABLE public."Transactions" (
     amount integer NOT NULL,
     comment text
 );
-ALTER TABLE public."Transactions" OWNER TO postgres;
 CREATE TABLE public."TransactionTags" (
     transaction integer NOT NULL,
     tag integer NOT NULL
 );
-ALTER TABLE public."TransactionTags" OWNER TO postgres;
 ALTER TABLE public."Transactions" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Transactions_id_seq"
     START WITH 0
@@ -117,7 +108,6 @@ CREATE TABLE public."Users" (
     permissions json,
     superuser boolean DEFAULT false NOT NULL
 );
-ALTER TABLE public."Users" OWNER TO postgres;
 ALTER TABLE public."Users" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
     SEQUENCE NAME public."Users_id_seq"
     START WITH 0

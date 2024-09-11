@@ -237,7 +237,8 @@ Response:
 ### replace valuation history
 
 This endpoint is used to replace the entire valuation history of an asset. Used to fix errors in past valuations.
-You need to specify the id of the asset you want to replace the valuation history of in the request path.
+You need to specify the id of the asset you want to replace the valuation history of in the request path.  
+This endpoint does not create transactions for valuations!
 
 Request:  
 `POST /api/v1/assets/{asset_id}/valuation_history`
@@ -288,7 +289,8 @@ Request:
 ### post valuation
 
 This endpoint is used to add a new valuation for a given asset.
-You need to specify the id of the asset you want to add the valuation to in the request path.
+You need to specify the id of the asset you want to add the valuation to in the request path.  
+A Transaction gets created automatically for the newly added valuation, if the account_id is set in the request body.
 
 Request:  
 `POST /api/v1/assets/{asset_id}/valuations`
@@ -319,16 +321,18 @@ Request:
 		"symbol": "€",
 		"is_negative": false
 	},
-	"account_id": "525c32a8-c200-4c5d-a3c7-ef8936cc1c84"
+	"account_id": "525c32a8-c200-4c5d-a3c7-ef8936cc1c84",
+	"recipient_id": "e3001fbc-1e28-44ad-94f6-9900be5dbc52"
 }
 ```
 
-| Property 								| Description 																																												| Type				|
-| ----------------------- | --------------------------------------------------------------------------------------------------- | ----------- |
-| value_per_unit					| the value of a single unit of this asset																														| Money				|
-| amount									| the total amount of items belonging to this asset																										| number?			|		
-| amount_change						| difference to the previous value																																		| number?			|
-| timestamp								| the time of the valuation																																						| timestamp		|
-| cost										| additional costs incurred, doesnt go into valuation calculation, but gets added to the transaction	| Money?			|
-| total_value							| overwrite the amount * value_per_unit calculation result																						| Money?			|
-| account_id							| the id of the account to use for the transaction that gets created for this valuation								| UUIDv4			|
+| Property 								| Description 																																																													| Type				|
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------	| ----------- |
+| value_per_unit					| the value of a single unit of this asset																																															| Money				|
+| amount									| the total amount of items belonging to this asset																																											| number?			|		
+| amount_change						| difference to the previous value																																																			| number?			|
+| timestamp								| the time of the valuation																																																							| timestamp		|
+| cost										| additional costs incurred, doesnt go into valuation calculation, but gets added to the transaction																		| Money?			|
+| total_value							| overwrite the amount * value_per_unit calculation result																																							| Money?			|
+| account_id							| the id of the account to use for the transaction that gets created for this valuation, if none, then no transaction gets created			| UUIDv4?			|
+| recipient_id						| the id of the recipient to use for the transaction that gets created for this valuation, if none, then arbitrary recipient get chosen	| UUIDv4?			|

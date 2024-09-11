@@ -74,9 +74,6 @@ CREATE TABLE IF NOT EXISTS public.transaction_positions
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.transaction_positions
-    OWNER to postgres;
-
 CREATE INDEX IF NOT EXISTS transaction_positions_index_transaction_id
     ON public.transaction_positions USING btree
     (transaction_id ASC NULLS LAST)
@@ -122,9 +119,6 @@ CREATE OR REPLACE VIEW public.transaction_data
      LEFT JOIN assets a ON a.id = at.asset_id
   GROUP BY tr.id, a.id
   ORDER BY tr.id;
-
-ALTER TABLE public.transaction_data
-    OWNER TO postgres;
 
 CREATE OR REPLACE VIEW public.deep_transactions
  AS
@@ -224,6 +218,3 @@ CREATE OR REPLACE VIEW public.deep_transactions
      LEFT JOIN deep_assets asset ON at.asset_id = asset.id
   GROUP BY t.id, c.id, u.id, a.id, a.name, a.default_currency_id, a.default_currency_name, a.default_currency_minor_in_mayor, a.default_currency_symbol, a.user_id, a.user_name, a.user_superuser, r.id, r.name, r.user_id, r.user_name, r.user_superuser, a.tag_ids, a.tag_names, a.tag_parent_ids, a.tag_parent_names, a.tag_parent_parent_ids, a.tag_parent_user_ids, a.tag_user_ids, a.tag_user_names, a.tag_user_superusers, r.tag_ids, r.tag_names, r.tag_parent_ids, r.tag_parent_names, r.tag_parent_parent_ids, r.tag_parent_user_ids, r.tag_user_ids, r.tag_user_names, r.tag_user_superusers, asset.id, asset.name, asset.description, asset.value_per_unit, asset.amount, asset.currency_id, asset.currency_name, asset.currency_symbol, asset.currency_minor_in_mayor, asset.user_id, asset.user_name, asset.user_superuser, asset.tag_ids, asset.tag_names, asset.tag_parent_ids, asset.tag_parent_names, asset.tag_parent_parent_ids, asset.tag_parent_user_ids, asset.tag_user_ids, asset.tag_user_names, asset.tag_user_superusers
   ORDER BY t.id;
-
-ALTER TABLE public.deep_transactions
-    OWNER TO postgres;

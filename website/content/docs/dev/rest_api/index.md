@@ -30,7 +30,7 @@ Request:
 Response:
 ```json
 {
-	"accessToken": "$accessToken"
+	"access_token": "$access_token"
 }
 ```
-You then need to provide the `accessToken` as a cookie called accessToken for authenticated API endpoints.
+You then need to provide the `access_token` as a cookie called access_token for authenticated API endpoints.
