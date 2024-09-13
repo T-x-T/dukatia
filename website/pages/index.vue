@@ -7,6 +7,7 @@
   
         <p>Dukatia is your finance planner.<br>Track your spending, manage your assets and set smarter budgets.<br>Run it in Docker and access it from any web browser!</p>
         <button class="important" @click="navigateTo('/docs')">Get started</button>
+        <button class="less_important" @click="navigateTo('/demo')">Try the live demo</button>
       </div>
 
       <div id="main_image" class="mobile_hidden">
