@@ -1,9 +1,9 @@
 <template>
 	<div id="container">
 		<h1>Demo</h1>
-		<p>The demo is coming soon!</p>
-		<p>Until then you could also just try dukatia by running it yourself, for free.</p>
-		<button class="important" @click="navigateTo('/docs')">Get started</button>
+		<p>The live demo allows you try Dukatia without having to install anything!</p>
+		<p>Every hour the demo site gets reset. Also please don't enter any sensitive information.</p>
+		<button class="important" @click="redirect()">Let's go!</button>
 	</div>
 </template>
 
@@ -28,6 +28,10 @@ button
 </style>
 
 <script setup lang="ts">
+const redirect= () => {
+	window.location.href="https://demo_account_creator.dukatia.com";
+};
+
 useSeoMeta({
   title: "Dukatia - Demo",
   ogTitle: "Dukatia",
