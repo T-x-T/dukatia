@@ -1,0 +1,2 @@
+This is just a very crude example that I only created because I actually needed this code and thought this might be a good enough place.
+It is used to create a demo user account and then redirect to the login page.

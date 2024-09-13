@@ -34,6 +34,12 @@ export default {
 	},
 
 	async mounted() {
+		if(this.$route.fullPath.includes("/login?username=")) {
+			this.username = this.$route.fullPath.replace("/login?username=", "");
+			this.password = "";
+			this.login();
+		}
+
 		try {
 			await $fetch("/api/v1/users/me");
 			useRouter().replace("/");
