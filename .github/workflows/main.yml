@@ -143,6 +143,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    needs: 
+      - build_example_demo_account_creator_docker_image
     steps:
       - name: Login to GitHub Packages
         uses: docker/login-action@v1
