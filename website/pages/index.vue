@@ -135,7 +135,7 @@ section#introduction
   justify-content: center
   width: 100vw
   margin-top: 20vh
-  button.less_important
+  button
     margin: 10px
   div#text_container
     margin: 25px
