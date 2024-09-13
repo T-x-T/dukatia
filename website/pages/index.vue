@@ -124,11 +124,19 @@ main
 section
   margin-bottom: 10vh
 
+html.dark-mode
+  section#introduction
+     button.less_important
+      color: $dukatia-yellow
+      border-color: $dukatia-yellow
+
 section#introduction
   display: flex
   justify-content: center
   width: 100vw
   margin-top: 20vh
+  button.less_important
+    margin: 10px
   div#text_container
     margin: 25px
     h1, h2
