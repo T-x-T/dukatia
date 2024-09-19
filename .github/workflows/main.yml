@@ -21,7 +21,7 @@ jobs:
           NUXT_PUBLIC_COMMIT: ${{ github.sha }}
           NUXT_PUBLIC_BRANCH: ${{ github.ref_name }}
         run: |
-          docker build -t $IMAGE_TAG .
+          docker build --build-arg NUXT_PUBLIC_COMMIT=$NUXT_PUBLIC_COMMIT --build-arg NUXT_PUBLIC_BRANCH=$NUXT_PUBLIC_BRANCH -t $IMAGE_TAG .
           docker save -o frontend_image.tar ghcr.io/t-x-t/dukatia/frontend:${{ github.ref_name }}
       - name: Save docker image
         uses: actions/upload-artifact@v4
