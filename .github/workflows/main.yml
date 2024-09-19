@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build frontend image
         working-directory: frontend
         env:
@@ -22,7 +22,7 @@ jobs:
           docker build -t $IMAGE_TAG .
           docker save -o frontend_image.tar ghcr.io/t-x-t/dukatia/frontend:${{ github.ref_name }}
       - name: Save docker image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend_image
           path: frontend/frontend_image.tar
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build backend image
         working-directory: backend
         env:
@@ -40,7 +40,7 @@ jobs:
           docker build -t $IMAGE_TAG .
           docker save -o backend_image.tar ghcr.io/t-x-t/dukatia/backend:${{ github.ref_name }}
       - name: Save docker image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend_image
           path: backend/backend_image.tar
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build backend image
         working-directory: examples/demo_account_creator
         env:
@@ -58,7 +58,7 @@ jobs:
           docker build -t $IMAGE_TAG .
           docker save -o examples_demo_account_creator_image.tar ghcr.io/t-x-t/dukatia/examples_demo_account_creator:${{ github.ref_name }}
       - name: Save docker image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: examples_demo_account_creator_image
           path: examples/demo_account_creator/examples_demo_account_creator_image.tar
@@ -69,9 +69,9 @@ jobs:
       build_backend_docker_image
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Download backend image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_image
       - name: Run trest on backend
@@ -86,14 +86,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
+        uses: actions/checkout@v4
+
       - name: Test backend
         working-directory: backend
         run: |
+          rustup toolchain install nightly --profile minimal --no-self-update
           rustup default nightly
           POSTGRES_PORT=5432 POSTGRES_HOST=127.0.0.1 cargo test -j 1
           
@@ -101,14 +99,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
+        uses: actions/checkout@v4
       - name: Run clippy on backend
         working-directory: backend
         run: |
+          rustup toolchain install nightly --profile minimal --no-self-update
           rustup default nightly
           rustup component add --toolchain nightly clippy
           cargo clippy
@@ -123,13 +118,13 @@ jobs:
       - backend_api_test_trest
     steps:
       - name: Login to GitHub Packages
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Download backend image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend_image
       - name: Push backend image
@@ -147,13 +142,13 @@ jobs:
       - build_example_demo_account_creator_docker_image
     steps:
       - name: Login to GitHub Packages
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Download examples_demo_account_creator image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: examples_demo_account_creator_image
       - name: Push backend image
@@ -174,13 +169,13 @@ jobs:
       - build_frontend_docker_image
     steps:
       - name: Login to GitHub Packages
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Download frontend image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend_image
       - name: Push frontend image
