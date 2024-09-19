@@ -1,14 +1,14 @@
 FROM node:16-alpine AS builder
 
-ARG NUXT_PUBLIC_COMMIT
-ARG NUXT_PUBLIC_BRANCH
-
 WORKDIR /frontend
 COPY . .
 RUN npm install
 RUN npm run build
 
 FROM node:16-alpine
+
+ARG NUXT_PUBLIC_COMMIT
+ARG NUXT_PUBLIC_BRANCH
 
 COPY --from=builder /frontend/.output /app/frontend
 ENV NODE_ENV=production
