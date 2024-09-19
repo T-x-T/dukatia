@@ -31,6 +31,13 @@
 		<div v-if="me.superuser" class="gridItem" id="userList">
 			<UserList />
 		</div>
+
+		<div class="gridItem">
+			<h3>Build info</h3>
+			<p>Version: {{ $config.public.version }}</p>
+			<p>Branch: {{ $config.public.branch }}</p>
+			<p>Commit: {{ $config.public.commit }}</p>
+		</div>
 	</div>
 </template>
 
