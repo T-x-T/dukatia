@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: changeme
   frontend:
-    image: ghcr.io/t-x-t/dukatia/frontend:0.21.1
+    image: ghcr.io/t-x-t/dukatia/frontend:main
     restart: always
     environment:
       NITRO_PORT: 5000
@@ -15,7 +15,7 @@ services:
     ports:
       - "127.0.0.1:80:5000"
   backend:
-    image: ghcr.io/t-x-t/dukatia/backend:0.21.1
+    image: ghcr.io/t-x-t/dukatia/backend:main
     restart: always
     environment:
       POSTGRES_HOST: postgres

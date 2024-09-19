@@ -142,6 +142,9 @@ jobs:
       packages: write
     needs: 
       - build_example_demo_account_creator_docker_image
+      - backend_test
+      - backend_clippy
+      - backend_api_test_trest
     steps:
       - name: Login to GitHub Packages
         uses: docker/login-action@v3
