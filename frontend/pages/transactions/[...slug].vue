@@ -101,6 +101,7 @@ export default {
 		total_amount: 0,
 		data_revision: 0,
 		default_transaction: {} as Transaction,
+		filters: [] as TableFilter[],
 	}),
 	
 	async mounted() {
@@ -217,6 +218,15 @@ export default {
 		},
 
 		async newTransaction() {
+			if(this.filters.length > 0) {
+				if(this.filters[0].value) {
+					this.default_transaction.account_id = this.filters[0].value as string;
+				}
+				if(this.filters[1].value) {
+					this.default_transaction.recipient_id = this.filters[1].value as string;
+				}
+			}
+
 			this.selectedRow = structuredClone(toRaw(this.default_transaction));
 
 			if(useRoute().path != "/transactions/new") {
@@ -298,7 +308,9 @@ export default {
 			await this.updateTable();
 		},
 
-		async updateFilter(property_name: string, value: any, mode: string) {
+		async updateFilter(property_name: string, value: any, mode: string, filters: TableFilter[]) {
+			this.filters = structuredClone(toRaw(filters));
+
 			property_name = property_name.toLowerCase();
 			switch(property_name) {
 				case "id": {
