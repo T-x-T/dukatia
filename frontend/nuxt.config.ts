@@ -1,3 +1,5 @@
+import pkg from "./package.json"
+
 export default defineNuxtConfig ({
   ssr: false,
   devServer: {
@@ -21,6 +23,13 @@ export default defineNuxtConfig ({
         {rel: "manifest", href: "/manifest.json"},
         {rel: "icon", type: "image/svg+xml", href: "/dukatia_signet.svg"},
       ]
+    }
+  },
+  runtimeConfig: {
+    public: {
+      version: pkg.version,
+      branch: "idk",
+      commit: "idk",
     }
   }
 })

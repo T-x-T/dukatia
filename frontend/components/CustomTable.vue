@@ -268,7 +268,7 @@ export default {
 			for(let i = 0; i < this.filters.length; i++) {
 				if(this.filters[i].type == "date") {
 					if(this.filters[i].start && this.filters[i].end) {
-						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, {lower: this.filters[i].start, upper: this.filters[i].end}, this.filters[i].option, this.filters);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
@@ -276,7 +276,7 @@ export default {
 
 				if(this.filters[i].type == "number") {
 					if(typeof this.filters[i].value == "number") {
-						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option, this.filters);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
@@ -284,7 +284,7 @@ export default {
 
 				if(this.filters[i].type == "choice") {
 					if(this.filters[i].value?.toString().length == 36 || typeof this.filters[i].value == "number") {
-						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option, this.filters);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}
@@ -292,7 +292,7 @@ export default {
 
 				if(this.filters[i].type == "string") {
 					if(this.filters[i].value || this.filters[i].empty != "anything") {
-						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option);
+						this.$emit("updateFilter", this.tableData.columns.filter(x => !x.hidden)[i].name, this.filters[i].value, this.filters[i].option, this.filters);
 					} else {
 						this.$emit("resetFilter", this.tableData.columns.filter(x => !x.hidden)[i].name);
 					}

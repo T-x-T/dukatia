@@ -49,7 +49,7 @@
 				<InputMoney
 				v-if="transaction_data.total && Object.keys(transaction_data.total).length > 0"
 					:initial_value="transaction_data.total"
-					@update="((new_value: Money) => {transaction_data.total_manually_changed = true; transaction_data.total = new_value; update_transaction_total()})"
+					@update="((new_value: Money) => {transaction_data.total_manually_changed = true; transaction_data.total = new_value})"
 					/>
 			</label>
 			
@@ -90,6 +90,14 @@ export default {
 
 	methods: {
 		async save() {
+			if(!this.transaction_data.account_id) {
+				window.alert("Please specify an account");
+				return;
+			}
+			if(!this.transaction_data.recipient_id) {
+				window.alert("Please specify a recipient");
+				return;
+			}
 			try {
 				await $fetch(`/api/v1/assets/${this.asset.id}/valuations`, {
 					method: "POST",
