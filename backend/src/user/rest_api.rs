@@ -8,7 +8,7 @@ use super::*;
 pub async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
 		Ok(login_result) => return HttpResponse::Ok().body(serde_json::to_string(&login_result).unwrap()),
-		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+		Err(_) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"the username or password is incorrect\"}}")),
 	};
 }
 
