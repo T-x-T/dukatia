@@ -369,7 +369,7 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 	}
 
 	let start_at_zero_limited_output: Vec<(Uuid, Dataset)> = if options.start_at_zero.unwrap_or_default() && options.filter_from.is_some() {
-		limit_output_start_at_zero(limited_output, options.filter_from.unwrap(), options.date_period.unwrap_or_default())
+		limit_output_start_at_zero(&limited_output, options.filter_from.unwrap(), options.date_period.unwrap_or_default())
 	} else {
 		limited_output
 	};
@@ -455,7 +455,7 @@ fn limit_output_only_negative(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32
 	return output;
 }
 
-fn limit_output_start_at_zero(input: Vec<(Uuid, Dataset)>, start: DateTime<Utc>, date_period: DatePeriod) -> Vec<(Uuid, Dataset)> {
+fn limit_output_start_at_zero(input: &[(Uuid, Dataset)], start: DateTime<Utc>, date_period: DatePeriod) -> Vec<(Uuid, Dataset)> {
 	return input.iter().map(|x| {
 		(
 			x.0,
