@@ -69,7 +69,7 @@ impl Default for ChartOptions {
 			bottom_right_x: None,
 			bottom_right_y: None,
 			dashboard_id: None,
-			start_at_zero: None,
+			start_at_zero: Some(true),
 		}		 
 	}
 }
@@ -368,7 +368,7 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 		limited_output = limit_output(output.sort(), options.max_items);
 	}
 
-	let start_at_zero_limited_output: Vec<(Uuid, Dataset)> = if options.start_at_zero.unwrap_or_default() && options.filter_from.is_some() {
+	let start_at_zero_limited_output: Vec<(Uuid, Dataset)> = if !options.start_at_zero.unwrap_or_default() && options.filter_from.is_some() {
 		limit_output_start_at_zero(&limited_output, options.filter_from.unwrap(), options.date_period.unwrap_or_default())
 	} else {
 		limited_output
@@ -386,7 +386,7 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 	let min_time = DateTime::parse_from_str("0000-01-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
 	let max_time = DateTime::parse_from_str("9999-12-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
 	
-	let from_date = if get_all || chart.start_at_zero.unwrap_or_default() {
+	let from_date = if get_all || !chart.start_at_zero.unwrap_or_default() {
 		min_time
 	} else {
 		chart.filter_from.unwrap_or(min_time)

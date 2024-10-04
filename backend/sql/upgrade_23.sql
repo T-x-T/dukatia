@@ -1,0 +1,1 @@
+UPDATE public.charts SET start_at_zero=true WHERE chart_type='line';

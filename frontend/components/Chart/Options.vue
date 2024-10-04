@@ -101,7 +101,7 @@ export default {
 				bottom_right_y: 2,
 				only_negative: false,
 				only_positive: false,
-				start_at_zero: false,
+				start_at_zero: true,
 			};
 		}
 	},

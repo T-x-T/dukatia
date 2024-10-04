@@ -85,6 +85,7 @@ export default {
 				only_negative: false,
 				only_positive: false,
 				dashboard_id: this.dashboard_data.id,
+				start_at_zero: true,
 			};
 
 			await this.save(chart);
