@@ -58,9 +58,9 @@ pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Erro
 
 	client.query(
 		"INSERT INTO public.charts 
-			(id, user_id, chart_type, title, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y, only_positive, only_negative)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);", 
-		&[&chart.id, &user_id, &chart.chart_type.to_string(), &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection.as_ref().map(std::string::ToString::to_string), &chart.date_period.as_ref().map(std::string::ToString::to_string), &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y, &chart.only_positive, &chart.only_negative]
+			(id, user_id, chart_type, title, filter_from, filter_to, filter_collection, date_period, max_items, date_range, top_left_x, top_left_y, bottom_right_x, bottom_right_y, only_positive, only_negative, start_at_zero)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);", 
+		&[&chart.id, &user_id, &chart.chart_type.to_string(), &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection.as_ref().map(std::string::ToString::to_string), &chart.date_period.as_ref().map(std::string::ToString::to_string), &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y, &chart.only_positive, &chart.only_negative, &chart.start_at_zero]
 	).await?;
 
 	if chart.dashboard_id.is_some() {
@@ -82,8 +82,8 @@ pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Err
 		.await
 		.unwrap()
 		.query(
-			"UPDATE public.charts SET chart_type=$1, title=$2, filter_from=$3, filter_to=$4, filter_collection=$5, date_period=$6, max_items=$7, date_range=$8, top_left_x=$9, top_left_y=$10, bottom_right_x=$11, bottom_right_y=$12, only_positive=$13, only_negative=$14 WHERE id=$15", 
-			&[&chart.chart_type.to_string(), &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection.as_ref().map(std::string::ToString::to_string), &chart.date_period.as_ref().map(std::string::ToString::to_string), &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y , &chart.only_positive, &chart.only_negative, &chart.id]
+			"UPDATE public.charts SET chart_type=$1, title=$2, filter_from=$3, filter_to=$4, filter_collection=$5, date_period=$6, max_items=$7, date_range=$8, top_left_x=$9, top_left_y=$10, bottom_right_x=$11, bottom_right_y=$12, only_positive=$13, only_negative=$14, start_at_zero=$15 WHERE id=$16", 
+			&[&chart.chart_type.to_string(), &chart.title, &chart.filter_from, &chart.filter_to, &chart.filter_collection.as_ref().map(std::string::ToString::to_string), &chart.date_period.as_ref().map(std::string::ToString::to_string), &max_items, &date_range, &top_left_x, &top_left_y, &bottom_right_x, &bottom_right_y , &chart.only_positive, &chart.only_negative, &chart.start_at_zero, &chart.id]
 		).await?;
 	
 	return Ok(());
@@ -116,6 +116,7 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 	let only_negative: Option<bool> = row.get(13);
 	let id: Uuid = row.get(14);
 	let user_id: Uuid = row.get(15);
+	let start_at_zero: Option<bool> = row.get(16);
 	
 	return ChartOptions {
 		id,
@@ -137,5 +138,6 @@ fn turn_row_into_chart(row: &tokio_postgres::Row) -> ChartOptions {
 		only_positive,
 		only_negative,
 		dashboard_id: None,
+		start_at_zero,
 	};
 }

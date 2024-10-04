@@ -37,7 +37,8 @@ Response:
 	"top_left_y": 2,
 	"bottom_right_x": 4,
 	"bottom_right_y": 6,
-	"dashboard_id": null
+	"dashboard_id": null,
+	"start_at_zero": false
 }
 ```
 
@@ -62,6 +63,7 @@ Response:
 | bottom_right_x		| value used for positioning chart on the dashboard grid																				| number?			|
 | bottom_right_y		| value used for positioning chart on the dashboard grid																				| number?			|
 | dashboard_id			| the id of the dashboard this chart belongs to, in reality always null													| UUIDv4?			|
+| start_at_zero			| for line charts; if the calculation should only use transactions from the time period					| boolean?		|
 
 
 ### get all charts in dashboard
@@ -94,7 +96,8 @@ Response:
 		"top_left_y": 2,
 		"bottom_right_x": 4,
 		"bottom_right_y": 6,
-		"dashboard_id": null
+		"dashboard_id": null,
+		"start_at_zero": false
 	}
 ]
 ```
@@ -120,6 +123,7 @@ Response:
 | bottom_right_x		| value used for positioning chart on the dashboard grid																				| number?			|
 | bottom_right_y		| value used for positioning chart on the dashboard grid																				| number?			|
 | dashboard_id			| the id of the dashboard this chart belongs to, in reality always null													| UUIDv4?			|
+| start_at_zero			| for line charts; if the calculation should only use transactions from the time period					| boolean?		|
 
 
 ### get data of chart by id
@@ -238,7 +242,8 @@ Request:
 	"top_left_y": 2,
 	"bottom_right_x": 4,
 	"bottom_right_y": 6,
-	"dashboard_id": null
+	"dashboard_id": null,
+	"start_at_zero": false
 }
 ```
 
@@ -259,6 +264,7 @@ Request:
 | bottom_right_x		| value used for positioning chart on the dashboard grid																				| number?			|
 | bottom_right_y		| value used for positioning chart on the dashboard grid																				| number?			|
 | dashboard_id			| the id of the dashboard this chart should be added to																					| UUIDv4?			|
+| start_at_zero			| for line charts; if the calculation should only use transactions from the time period					| boolean?		|
 
 Response:
 ```json
@@ -291,7 +297,8 @@ Request:
 	"top_left_y": 2,
 	"bottom_right_x": 4,
 	"bottom_right_y": 6,
-	"dashboard_id": null
+	"dashboard_id": null,
+	"start_at_zero": false
 }
 ```
 
@@ -312,6 +319,7 @@ Request:
 | bottom_right_x		| value used for positioning chart on the dashboard grid																				| number?			|
 | bottom_right_y		| value used for positioning chart on the dashboard grid																				| number?			|
 | dashboard_id			| the id of the dashboard this chart should be added to																					| UUIDv4?			|
+| start_at_zero			| for line charts; if the calculation should only use transactions from the time period					| boolean?		|
 
 
 ### delete chart
