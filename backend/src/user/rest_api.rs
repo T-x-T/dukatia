@@ -8,7 +8,7 @@ use super::*;
 pub async fn post_login(data: web::Data<AppState>, body: web::Json<LoginCredentials>) -> impl Responder {
 	match super::login(&data.config, &data.pool, body.into_inner()).await {
 		Ok(login_result) => return HttpResponse::Ok().body(serde_json::to_string(&login_result).unwrap()),
-		Err(_) => return HttpResponse::BadRequest().body(println!("{{\"error\":\"the given credentials are invalid\"}}")),
+		Err(_) => return HttpResponse::BadRequest().body("{\"error\":\"the given credentials are invalid\"}"),
 	};
 }
 
