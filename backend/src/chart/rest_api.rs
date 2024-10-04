@@ -46,6 +46,7 @@ struct ChartOptionsQuery {
 	only_positive: Option<bool>,
 	only_negative: Option<bool>,
 	filter_collection: Option<String>,
+	start_at_zero: Option<bool>,
 }
 
 //Docs: /dev/rest_api/charts#get-data-of-chart-by-id
@@ -88,6 +89,9 @@ pub async fn get_chart_data_by_id(data: web::Data<AppState>, req: HttpRequest, c
 	if options.only_negative.is_some() {
 		chart_options.only_negative = options.only_negative;
 	}
+	if options.start_at_zero.is_some() {
+		chart_options.start_at_zero = options.start_at_zero;
+	}
 
 	match super::get_chart_data(&data.pool, chart_options).await {
 		Ok(res) => return HttpResponse::Ok().body(serde_json::to_string(&res).unwrap()),
@@ -123,6 +127,7 @@ pub async fn get_chart_data_by_filter_collection(data: web::Data<AppState>, req:
 		bottom_right_x: None,
 		bottom_right_y: None,
 		dashboard_id: None,
+		start_at_zero: options.start_at_zero,
 	};
 
 	match super::get_chart_data(&data.pool, chart_options).await {
@@ -148,6 +153,7 @@ struct ChartPost {
 	bottom_right_x: Option<u32>,
 	bottom_right_y: Option<u32>,
 	dashboard_id: Option<Uuid>,
+	start_at_zero: Option<bool>,
 }
 
 //Docs: /dev/rest_api/charts#create-chart
@@ -178,6 +184,7 @@ pub async fn post(data: web::Data<AppState>, req: HttpRequest, body: web::Json<C
 		bottom_right_x: body.bottom_right_x,
 		bottom_right_y: body.bottom_right_y,
 		dashboard_id: body.dashboard_id,
+		start_at_zero: body.start_at_zero,
 	};
 
 	match super::add(&data.pool, &chart).await {
@@ -193,6 +200,7 @@ pub async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Ch
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}")),
 	};
+	
 	let body = body.into_inner();
 	let chart = super::ChartOptions {
 		id: *chart_id,
@@ -214,6 +222,7 @@ pub async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Ch
 		bottom_right_x: body.bottom_right_x,
 		bottom_right_y: body.bottom_right_y,
 		dashboard_id: body.dashboard_id,
+		start_at_zero: body.start_at_zero,
 	};
 
 	match super::update(&data.pool, &chart).await {

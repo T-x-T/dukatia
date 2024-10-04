@@ -53,6 +53,10 @@
 		<label for="only_negative">Only Negative:</label>
 		<input type="checkbox" v-model="options.only_negative" name="only_negative" @change="change_options" />
 		<br>
+
+		<label for="start_at_zero">Start at zero:</label>
+		<input type="checkbox" v-model="options.start_at_zero" name="start_at_zero" @change="change_options" />
+		<br>
 		
 		<button v-if="typeof options.id == 'string' && options.id.length == 36" class="red" @click="delete_this">Delete</button>
 	</div>
@@ -97,13 +101,14 @@ export default {
 				bottom_right_y: 2,
 				only_negative: false,
 				only_positive: false,
+				start_at_zero: false,
 			};
 		}
 	},
 
 	methods: {
 		async save() {
-			if(Number.isInteger(this.options.id)) {
+			if(typeof this.options.id == "string" && this.options.id.length == 36) {
 				await $fetch(`/api/v1/charts/${this.options.id}`, {
 					method: "PUT", body: {
 						...this.options,

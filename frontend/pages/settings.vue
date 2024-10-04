@@ -85,6 +85,7 @@ export default {
 div#main
 	height: 100vh
 	display: flex
+	flex-wrap: wrap
 
 div.gridItem
 	width: max-content
@@ -93,5 +94,5 @@ div.gridItem
 	margin: 10px
 
 div#userList
-	max-width: 750px
+	max-width: 800px
 </style>

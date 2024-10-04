@@ -3295,7 +3295,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per recipient in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per recipient in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3317,7 +3317,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per tag in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_tag_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding pie chart using filter_collection get_per_tag_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"Spending per tag in date range","filter_from":null,"filter_to":null,"filter_collection":"get_per_tag_over_time","date_period":null,"asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3340,7 +3340,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per recipient over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per recipient over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_recipient_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3363,7 +3363,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per account over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_account_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_account_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per account over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_account_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3386,7 +3386,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per currency over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_currency_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_per_currency_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Spending per currency over time","filter_from":null,"filter_to":null,"filter_collection":"get_per_currency_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3409,7 +3409,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Earning and spending over time","filter_from":null,"filter_to":null,"filter_collection":"get_earning_spending_net_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_earning_spending_net_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Earning and spending over time","filter_from":null,"filter_to":null,"filter_collection":"get_earning_spending_net_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3432,7 +3432,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_total_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Total value over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_total_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_total_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Total value over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_total_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3455,7 +3455,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_single_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Value over time per single unit","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_single_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_single_value_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Value over time per single unit","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_single_value_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3478,7 +3478,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Amount over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"Amount over time","filter_from":null,"filter_to":null,"filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":null,"date_range":null,"only_positive":null,"only_negative":null,"top_left_x":null,"top_left_y":null,"bottom_right_x":null,"bottom_right_y":null,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 
@@ -3514,7 +3514,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"test","filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"only_positive":true,"only_negative":false,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"line","title":"test","filter_from":"2022-03-25T11:22:00Z","filter_to":"2023-03-25T11:22:00Z","filter_collection":"get_single_asset_amount_over_time","date_period":"daily","asset_id":null,"budget_id":null,"max_items":12,"date_range":3,"only_positive":true,"only_negative":false,"top_left_x":1,"top_left_y":2,"bottom_right_x":3,"bottom_right_y":4,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{
@@ -3547,7 +3547,7 @@
 					"method": "GET",
 					"expected_outcome": {
 						"status_code_equals": 200,
-						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"test2","filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"get_per_tag_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"only_positive":false,"only_negative":true,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7,"dashboard_id":null}
+						"body_equals": {"id":"%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%","user_id":"%%%[[[get current user]]]...[[[id]]]%%%","chart_type":"pie","title":"test2","filter_from":"2021-03-25T11:22:00Z","filter_to":"2022-03-25T11:22:00Z","filter_collection":"get_per_tag_over_time","date_period":"monthly","asset_id":null,"budget_id":null,"max_items":2,"date_range":1,"only_positive":false,"only_negative":true,"top_left_x":4,"top_left_y":5,"bottom_right_x":6,"bottom_right_y":7,"dashboard_id":null,"start_at_zero":null}
 					}
 				},
 				{

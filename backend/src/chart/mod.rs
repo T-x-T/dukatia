@@ -44,6 +44,7 @@ pub struct ChartOptions {
 	pub bottom_right_x: Option<u32>,
 	pub bottom_right_y: Option<u32>,
 	pub dashboard_id: Option<Uuid>,
+	pub start_at_zero: Option<bool>,
 }
 
 impl Default for ChartOptions {
@@ -68,6 +69,7 @@ impl Default for ChartOptions {
 			bottom_right_x: None,
 			bottom_right_y: None,
 			dashboard_id: None,
+			start_at_zero: None,
 		}		 
 	}
 }
@@ -365,7 +367,14 @@ pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartD
 	} else {
 		limited_output = limit_output(output.sort(), options.max_items);
 	}
-	let datasets: Vec<Dataset> = limited_output.into_iter().map(|x| x.1).collect();
+
+	let start_at_zero_limited_output: Vec<(Uuid, Dataset)> = if options.start_at_zero.unwrap_or_default() && options.filter_from.is_some() {
+		limit_output_start_at_zero(&limited_output, options.filter_from.unwrap(), options.date_period.unwrap_or_default())
+	} else {
+		limited_output
+	};
+
+	let datasets: Vec<Dataset> = start_at_zero_limited_output.into_iter().map(|x| x.1).collect();
 
 	return Ok(ChartData {datasets});
 }
@@ -377,7 +386,7 @@ pub async fn get_relevant_time_sorted_transactions(pool: &Pool, chart: &ChartOpt
 	let min_time = DateTime::parse_from_str("0000-01-01 00:00:00 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
 	let max_time = DateTime::parse_from_str("9999-12-31 23:59:59 +0000", "%Y-%m-%d %H:%M:%S %z").unwrap().with_timezone(&Utc);
 	
-	let from_date = if get_all {
+	let from_date = if get_all || chart.start_at_zero.unwrap_or_default() {
 		min_time
 	} else {
 		chart.filter_from.unwrap_or(min_time)
@@ -444,4 +453,18 @@ fn limit_output_only_negative(mut input: Vec<(Uuid, Dataset)>, limit: Option<u32
 	};
 
 	return output;
+}
+
+fn limit_output_start_at_zero(input: &[(Uuid, Dataset)], start: DateTime<Utc>, date_period: DatePeriod) -> Vec<(Uuid, Dataset)> {
+	return input.iter().map(|x| {
+		(
+			x.0,
+			Dataset {
+				label: x.1.label.clone(),
+				data: x.1.data.iter().filter(|y| {
+					y.timestamp.is_some() && y.timestamp.unwrap() >= date_period.get_date_at_timestamp(start.date_naive())
+				}).cloned().collect()
+			}
+		)
+	}).collect();
 }

@@ -418,7 +418,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		let mut first_where_clause = true;
 
 		if self.get_query_parameters().filters.id.is_some() {
-			let property_name = get_property_name("id", &table_name);
+			let property_name = get_property_name("id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -429,7 +429,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 
 		if self.get_query_parameters().filters.total_amount.is_some() {
-			let property_name = get_property_name("total_amount", &table_name);
+			let property_name = get_property_name("total_amount", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.total_amount.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -440,7 +440,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.asset_id.is_some() {
-			let property_name = get_property_name("asset_id", &table_name);
+			let property_name = get_property_name("asset_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.asset_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -451,7 +451,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.user_id.is_some() {
-			let property_name = get_property_name("user_id", &table_name);
+			let property_name = get_property_name("user_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.user_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -462,7 +462,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.currency_id.is_some() {
-			let property_name = get_property_name("currency_id", &table_name);
+			let property_name = get_property_name("currency_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.currency_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -473,7 +473,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.account_id.is_some() {
-			let property_name = get_property_name("account_id", &table_name);
+			let property_name = get_property_name("account_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.account_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -484,7 +484,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.recipient_id.is_some() {
-			let property_name = get_property_name("recipient_id", &table_name);
+			let property_name = get_property_name("recipient_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.recipient_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -495,7 +495,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.minor_in_major.is_some() {
-			let property_name = get_property_name("minor_in_major", &table_name);
+			let property_name = get_property_name("minor_in_major", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.minor_in_major.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -506,7 +506,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.parent_id.is_some() {
-			let property_name = get_property_name("parent_id", &table_name);
+			let property_name = get_property_name("parent_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.parent_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -517,7 +517,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 
 		if self.get_query_parameters().filters.default_currency_id.is_some() {
-			let property_name = get_property_name("default_currency_id", &table_name);
+			let property_name = get_property_name("default_currency_id", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.default_currency_id.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -528,7 +528,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.balance.is_some() {
-			let property_name = get_property_name("balance", &table_name);
+			let property_name = get_property_name("balance", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.balance.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -539,7 +539,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.float_amount.is_some() {
-			let property_name = get_property_name("amount", &table_name);
+			let property_name = get_property_name("amount", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.float_amount.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -550,7 +550,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.int_amount.is_some() {
-			let property_name = get_property_name("amount", &table_name);
+			let property_name = get_property_name("amount", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.int_amount.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -561,7 +561,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.value_per_unit.is_some() {
-			let property_name = get_property_name("value_per_unit", &table_name);
+			let property_name = get_property_name("value_per_unit", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			parameters.push_str(render_number_filter_mode(self.get_query_parameters().filters.value_per_unit.unwrap().1, where_or_and, &property_name, i).as_str());
@@ -585,7 +585,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.rollover.is_some() {
-			let property_name = get_property_name("rollover", &table_name);
+			let property_name = get_property_name("rollover", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			match self.get_query_parameters().filters.rollover.unwrap().1 {
@@ -598,7 +598,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.comment.is_some() {
-			let property_name = get_property_name("comment", &table_name);
+			let property_name = get_property_name("comment", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			let res = render_string_filter_mode(self.get_query_parameters().filters.comment.clone().unwrap(), where_or_and, &property_name, i);
@@ -610,7 +610,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.name.is_some() {
-			let property_name = get_property_name("name", &table_name);
+			let property_name = get_property_name("name", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			let res = render_string_filter_mode(self.get_query_parameters().filters.name.clone().unwrap(), where_or_and, &property_name, i);
@@ -622,7 +622,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.symbol.is_some() {
-			let property_name = get_property_name("symbol", &table_name);
+			let property_name = get_property_name("symbol", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			let res = render_string_filter_mode(self.get_query_parameters().filters.symbol.clone().unwrap(), where_or_and, &property_name, i);
@@ -634,7 +634,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 		
 		if self.get_query_parameters().filters.description.is_some() {
-			let property_name = get_property_name("description", &table_name);
+			let property_name = get_property_name("description", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 			
 			let res = render_string_filter_mode(self.get_query_parameters().filters.description.clone().unwrap(), where_or_and, &property_name, i);
@@ -646,7 +646,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 
 		if self.get_query_parameters().filters.time_range.is_some() {
-			let property_name = get_property_name("timestamp", &table_name);
+			let property_name = get_property_name("timestamp", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			match self.get_query_parameters().filters.time_range.unwrap().2 {
@@ -660,7 +660,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 
 		if self.get_query_parameters().filters.active_from.is_some() {
-			let property_name = get_property_name("active_from", &table_name);
+			let property_name = get_property_name("active_from", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			match self.get_query_parameters().filters.active_from.unwrap().2 {
@@ -674,7 +674,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 		}
 
 		if self.get_query_parameters().filters.active_to.is_some() {
-			let property_name = get_property_name("active_to", &table_name);
+			let property_name = get_property_name("active_to", table_name.as_deref());
 			let where_or_and = if first_where_clause {"WHERE"} else {"AND"};
 
 			match self.get_query_parameters().filters.active_to.unwrap().2 {
@@ -694,7 +694,7 @@ pub trait DbReader<'a, T: From<Row>>: Sized {
 				Some(x) => (*x).into(),
 				None => "DESC",
 			};
-			let property_name = get_property_name(self.get_query_parameters().sort_property.unwrap().to_string().as_str(), &table_name);
+			let property_name = get_property_name(self.get_query_parameters().sort_property.unwrap().to_string().as_str(), table_name.as_deref());
 			parameters.push_str(format!(" ORDER BY {property_name} {direction}").as_str());
 		}
 
@@ -741,7 +741,7 @@ pub trait DbDeleter<'a, T>: DbWriter<'a, T> {
 	async fn delete(self) -> Result<(), Box<dyn Error>>;
 }
 
-fn get_property_name(property: &str, table_name: &Option<String>) -> String {
+fn get_property_name(property: &str, table_name: Option<&str>) -> String {
 	match table_name {
 		Some(table_name) => return format!("{table_name}.{property}"),
 		None => return property.to_string(),

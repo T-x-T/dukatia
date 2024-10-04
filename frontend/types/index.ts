@@ -239,6 +239,7 @@ declare global {
 		only_positive: boolean,
 		only_negative: boolean,
 		dashboard_id?: string,
+		start_at_zero?: boolean,
 	}
 
 	type QueryParameters = {
