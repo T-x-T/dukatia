@@ -225,7 +225,7 @@ pub async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Ch
 		start_at_zero: body.start_at_zero,
 	};
 
-	match super::update(&data.pool, &chart).await {
+	match super::update(&data.pool, &chart, user_id).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}
@@ -234,12 +234,17 @@ pub async fn put(data: web::Data<AppState>, req: HttpRequest, body: web::Json<Ch
 //Docs: /dev/rest_api/charts#delete-chart
 #[delete("/api/v1/charts/{chart_id}")]
 pub async fn delete(data: web::Data<AppState>, req: HttpRequest, chart_id: web::Path<Uuid>) -> impl Responder {
-	let _user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
+	let user_id = match is_authorized(&data.pool, &req, data.config.session_expiry_days).await {
 		Ok(x) => x,
 		Err(e) => return HttpResponse::Unauthorized().body(format!("{{\"error\":\"{e}\"}}"))
 	};
 
-	match super::delete(&data.pool, chart_id.into_inner()).await {
+	let chart = match super::get_by_id(&data.pool, chart_id.into_inner(), user_id).await {
+		Ok(x) => x,
+		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
+	};
+
+	match super::delete(&data.pool, chart, user_id).await {
 		Ok(()) => return HttpResponse::Ok().body(""),
 		Err(e) => return HttpResponse::BadRequest().body(format!("{{\"error\":\"{e}\"}}")),
 	}

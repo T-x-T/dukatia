@@ -4326,6 +4326,126 @@
 						"status_code_equals": 200,
 						"body_equals": {"datasets":[{"label":"test","data":[{"name":null,"timestamp":"2021-03-18","value":10.0,"label":"10"},{"name":null,"timestamp":"2022-03-18","value":20.0,"label":"20"}]}]}
 					}
+				},
+				{
+					"name": "add new user works",
+					"endpoint": "/api/v1/users",
+					"method": "POST",
+					"body": {
+						"name": "new user",
+						"secret": "default_pass123",
+						"superuser": false
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					} 
+				},
+				{
+					"name": "new user can post chart",
+					"endpoint": "/api/v1/charts",
+					"method": "POST",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"body": {
+						"chart_type": "pie",
+						"title": "Spending per recipient in date range",
+						"filter_collection": "get_per_recipient_over_time"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "get new current user",
+					"endpoint": "/api/v1/users/me",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"expected_outcome": {
+						"status_code_equals": 200
+					}
+				},
+				{
+					"name": "cant get chart details from other user",
+					"endpoint": "/api/v1/charts/%%%[[[adding pie chart using filter_collection get_per_recipient_over_time returns 200]]]...[[[id]]]%%%",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error": "you can only access items you own"}
+					}
+				},
+				{
+					"name": "cant retrieve chart data from other user",
+					"endpoint": "/api/v1/charts/%%%[[[adding line chart using filter_collection get_single_asset_amount_over_time returns 200]]]...[[[id]]]%%%/data?asset_id=%%%[[[post of new asset returns 200]]]...[[[id]]]%%%",
+					"method": "GET",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400,
+						"body_equals": {"error":"failed getting chart data: you can only access items you own"}
+					}
+				},
+				{
+					"name": "cant modify chart from other user",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
+					"method": "PUT",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"body": {
+						"chart_type": "pie",
+						"title": "test2",
+						"filter_from": "2021-03-25T11:22:00.000Z",
+						"filter_to": "2022-03-25T11:22:00.000Z",
+						"filter_collection": "get_per_tag_over_time",
+						"date_period": "monthly",
+						"max_items": 2,
+						"date_range": 1,
+						"top_left_x": 4,
+						"top_left_y": 5,
+						"bottom_right_x": 6,
+						"bottom_right_y": 7,
+						"only_positive": false,
+						"only_negative": true
+					},
+					"expected_outcome": {
+						"status_code_equals": 400
+					}
+				},
+				{
+					"name": "cant delete chart from other user",
+					"endpoint": "/api/v1/charts/%%%[[[adding chart with all options returns 200]]]...[[[id]]]%%%",
+					"method": "DELETE",
+					"before": [
+						"login_as_user"
+					],
+					"cookies": {
+						"access_token": "$login_as_user.access_token"
+					},
+					"expected_outcome": {
+						"status_code_equals": 400
+					}
 				}
 			]
 		},
