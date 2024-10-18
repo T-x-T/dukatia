@@ -67,7 +67,7 @@ export default {
 		update() {
 			this.no_data = this.pie.datasets.length === 0;
 
-			this.chart_data.datasets[0].data = this.pie.datasets.map((x: any) => x.data[x.data.length - 1].value);
+			this.chart_data.datasets[0].data = this.pie.datasets.map((x: any) => x.data[x.data.length - 1]?.value);
 			this.chart_data.labels = this.pie.datasets.map((x: any) => x.label);
 
 			(this as any).chart_options.plugins.tooltip.callbacks.label = (context: any) => {

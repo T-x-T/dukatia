@@ -70,7 +70,17 @@ pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Erro
 	return Ok(chart.id);
 }
 
-pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
+pub async fn update(pool: &Pool, chart: &ChartOptions, user_id: Uuid) -> Result<(), Box<dyn Error>> {
+	let orig_chart = get_by_id(pool, chart.id, user_id).await?;
+	let chart = ChartOptions {
+		user_id: orig_chart.user_id,
+		..chart.clone()
+	};
+
+	if chart.user_id != user_id {
+		return Err(Box::new(CustomError::UserIsntOwner));
+	}
+	
 	let max_items: Option<i32> = chart.max_items.map(|x| x as i32);
 	let date_range: Option<i32> = chart.date_range.map(|x| x as i32);
 	let top_left_x: Option<i32> = chart.top_left_x.map(|x| x as i32);
@@ -89,11 +99,15 @@ pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Err
 	return Ok(());
 }
 
-pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
+pub async fn delete(pool: &Pool, chart: ChartOptions, user_id: Uuid) -> Result<(), Box<dyn Error>> {
+	if chart.user_id != user_id {
+		return Err(Box::new(CustomError::UserIsntOwner));
+	}
+	
 	pool.get()
 		.await
 		.unwrap()
-		.query("DELETE FROM public.charts WHERE id=$1", &[&chart_id])
+		.query("DELETE FROM public.charts WHERE id=$1", &[&chart.id])
 		.await?;
 
 	return Ok(());

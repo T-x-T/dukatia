@@ -335,12 +335,12 @@ pub async fn add(pool: &Pool, chart: &ChartOptions) -> Result<Uuid, Box<dyn Erro
 	return db::add(pool, chart).await;
 }
 
-pub async fn update(pool: &Pool, chart: &ChartOptions) -> Result<(), Box<dyn Error>> {
-	return db::update(pool, chart).await;
+pub async fn update(pool: &Pool, chart: &ChartOptions, user_id: Uuid) -> Result<(), Box<dyn Error>> {
+	return db::update(pool, chart, user_id).await;
 }
 
-pub async fn delete(pool: &Pool, chart_id: Uuid) -> Result<(), Box<dyn Error>> {
-	return db::delete(pool, chart_id).await;
+pub async fn delete(pool: &Pool, chart: ChartOptions, user_id: Uuid) -> Result<(), Box<dyn Error>> {
+	return db::delete(pool, chart, user_id).await;
 }
 
 pub async fn get_chart_data(pool: &Pool, options: ChartOptions) -> Result<ChartData, Box<dyn Error>> {
