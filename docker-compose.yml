@@ -1,11 +1,11 @@
-version: '3.1'
-
 services:
   postgres:
     image: postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: changeme
+    volumes:
+      - "data:/var/lib/postgresql/data"
   frontend:
     image: ghcr.io/t-x-t/dukatia/frontend:main
     restart: always
@@ -27,3 +27,6 @@ services:
       - postgres
     ports:
       - "127.0.0.1:4000:4000"
+
+volumes:
+  data:
