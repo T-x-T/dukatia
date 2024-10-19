@@ -244,6 +244,7 @@ export default {
 		async applyBatchEdit() {
 			if(!this.selectedRows) return;
 			await Promise.all(this.selectedRows.map(async row => {
+				console.log(row)
 				let transaction = {...this.transactions.filter(x => row && x.id === row[0])[0]};
 				transaction.account_id = typeof this.batchaccount_id == "string" ? this.batchaccount_id : transaction.account_id;
 				transaction.recipient_id = typeof this.batchrecipient_id == "string" ? this.batchrecipient_id : transaction.recipient_id;
