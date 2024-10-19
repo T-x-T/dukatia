@@ -155,7 +155,8 @@ export default {
 <style lang="sass" scoped>
 @import "assets/_vars.sass"
 #wrapper
-	display: inline
+	display: flex
+	flex-direction: column
 
 #input
 	display: inline
@@ -171,11 +172,9 @@ export default {
 	background: rgba(0, 0, 0, 0.5)
 	backdrop-filter: blur(5px) saturate(20%)
 	box-shadow: 0px 0px 15px black
-	min-width: 250px
 	position: absolute
 	z-index: 10
-	padding: 4px 4px 4px 4px
-	margin: 0px 0px 0px 4px
+	width: 250px
 	ul
 		max-height: 33vh
 		overflow: scroll

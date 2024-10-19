@@ -25,6 +25,7 @@
 
 			<div v-if="selectedRows && selectedRows.length > 0" class="detailBar">
 				<div id="batchEdit">
+					<button class="red" @click="selectedRows = []">Back</button>
 					<div>
 						<label for="account">Account:</label>
 						<select id="account" v-model="batchaccount_id">
@@ -125,7 +126,6 @@ export default {
 			options: [...this.tags.map(x => ({id: x.id?.length == 36 ? x.id : "", name: x.name}))],
 			selected: undefined,
 			label: "Tags:",
-			openTop: true
 		}
 
 		if (useRoute().path.split("/")[2] == "new") {
@@ -489,16 +489,14 @@ div#table
 
 div.detailBar
 	padding: 10px
+	min-width: 300px
 	@media screen and (max-width: 800px)
 		position: absolute
 
 div#batchEdit
 	select
-		max-width: 10em
-	button
-		margin: 0
-		margin-left: 1em
-		height: 100%
+		width: 98%
+		margin: 1%
 
 button#add
 	margin: 10px
