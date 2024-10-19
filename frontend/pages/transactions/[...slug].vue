@@ -182,7 +182,7 @@ export default {
 					row_count: this.total_row_count,
 					total_amount: this.total_amount,
 					defaultSort: {
-						column: 4,
+						column: 3,
 						sort: "desc"
 					},
 					columns: [
