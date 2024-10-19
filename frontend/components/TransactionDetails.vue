@@ -32,6 +32,7 @@ export default {
 	async created() {
 		this.transaction = this.prop_transaction;
 		this.transaction.asset_id = this.transaction.asset?.id;
+		this.transaction.timestamp = new Date(new Date(this.transaction.timestamp).valueOf() - (new Date(this.transaction.timestamp).getTimezoneOffset() * 60000)).toISOString();
 	},
 }
 </script>

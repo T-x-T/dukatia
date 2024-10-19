@@ -141,8 +141,8 @@ export default {
 			this.data_revision += 1;
 			const local_data_revision = this.data_revision;
 			const accounts = await $fetch(this.build_request_url("/api/v1/accounts/all")) as Account[];
-			const currencies = (await useFetch("/api/v1/currencies/all")).data.value as Currency[];
-			const tags = (await useFetch("/api/v1/tags/all")).data.value as Tag[];
+			const currencies = await $fetch("/api/v1/currencies/all") as Currency[];
+			const tags = await $fetch("/api/v1/tags/all") as Tag[];
 			if(this.data_revision > local_data_revision) return;
 
 			this.tableData.rows = accounts.map(x => ([
@@ -150,7 +150,7 @@ export default {
 				x.name,
 				currencies.filter(c => c.id == x.default_currency_id)[0].name,
 				tags.filter(t => x.tag_ids?.includes(typeof t.id == "string" && t.id.length == 36 ? t.id : "")).map(t => t.name).join(", "),
-				`${typeof x.balance == "number" ? x.balance : 0 / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
+				`${Number(x.balance) / currencies.filter(c => c.id == x.default_currency_id)[0].minor_in_major}${currencies.filter(c => c.id == x.default_currency_id)[0].symbol}`
 			]));
 		},
 
@@ -163,7 +163,7 @@ export default {
 			if(this.query_parameters.filter_mode_currency_id) url += `&filter_mode_currency_id=${this.query_parameters.filter_mode_currency_id}`;
 			if(this.query_parameters.filter_tag_id) url += `&filter_tag_id=${this.query_parameters.filter_tag_id}`;
 			if(this.query_parameters.filter_mode_tag_id) url += `&filter_mode_tag_id=${this.query_parameters.filter_mode_tag_id}`;
-			if(Number.isInteger(this.query_parameters.filter_balance)) url += `&filter_balance=${this.query_parameters.filter_balance}`;
+			if(typeof this.query_parameters.filter_balance == "number") url += `&filter_balance=${Number(this.query_parameters.filter_balance) * 100}`; //TODO not using minor_in_major
 			if(this.query_parameters.filter_mode_balance) url += `&filter_mode_balance=${this.query_parameters.filter_mode_balance}`;
 			if(this.query_parameters.filter_name) url += `&filter_name=${this.query_parameters.filter_name}`;
 			if(this.query_parameters.filter_mode_name) url += `&filter_mode_name=${this.query_parameters.filter_mode_name}`;

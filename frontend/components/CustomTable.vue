@@ -224,7 +224,7 @@ export default {
 		updateSelectedRows() {
 			let selectedRowContents: Row = [];
 				this.selectedRows.forEach((selected, i) => {
-					if(selected) selectedRowContents.push({...this.rowsForDisplay[i]});
+					if(selected) selectedRowContents.push({...this.rows[i]});
 				});
 				this.$emit("rowSelect", selectedRowContents);
 		},
