@@ -489,11 +489,11 @@ div#table
 
 div.detailBar
 	padding: 10px
-	min-width: 300px
 	@media screen and (max-width: 800px)
 		position: absolute
 
 div#batchEdit
+	min-width: 300px
 	select
 		width: 98%
 		margin: 1%
