@@ -126,7 +126,7 @@ export default {
 			const raw_total = Math.round(((Number(this.transaction_data.amount) * raw_value_per_unit) + raw_cost) * -100 + Number.EPSILON) / 100;
 			
 			this.transaction_data.total = {
-				major: (raw_total / this.transaction_data.value_per_unit.minor_in_major).toFixed(0),
+				major: parseInt("" + raw_total / this.transaction_data.value_per_unit.minor_in_major),
 				minor: raw_total < 0 ? (raw_total % this.transaction_data.value_per_unit.minor_in_major) * -1 : (raw_total % this.transaction_data.value_per_unit.minor_in_major),
 				minor_in_major: this.transaction_data.value_per_unit.minor_in_major,
 				symbol: this.transaction_data.value_per_unit.symbol,
