@@ -1,8 +1,8 @@
 <template>
 	<footer>
     <ClientOnly>
-      <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg"/>
-      <img v-else src="/dukatia-beta_logo.svg"/>
+      <img v-if="$colorMode.preference == 'dark'" src="/dukatia_logo_white.svg"/>
+      <img v-else src="/dukatia_logo.svg"/>
     </ClientOnly>
     <p>Coded by TxT. Made in Rust.</p>
     <div id="notices">

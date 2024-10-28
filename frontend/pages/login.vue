@@ -6,8 +6,8 @@
 	<div id="background">
 		<div id="wrapper" v-if="show_login">
 			<a href="https://dukatia.com" target="_blank">
-				<img v-if="$colorMode.value == 'dark'" id="logo" src="/dukatia-beta_logo_white.svg" alt="logo">
-				<img v-if="$colorMode.value == 'light'" id="logo" src="/dukatia-beta_logo.svg" alt="logo">
+				<img v-if="$colorMode.value == 'dark'" id="logo" src="/dukatia_logo_white.svg" alt="logo">
+				<img v-if="$colorMode.value == 'light'" id="logo" src="/dukatia_logo.svg" alt="logo">
 			</a>
 			<form @submit.prevent="login">
 				<input type="text" v-model="username" placeholder="username">

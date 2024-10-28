@@ -2,16 +2,16 @@
 	<nav>
     <div v-if="!nav_open" id="top_nav" @click="nav_open = true">
       <ClientOnly>
-        <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg" @click="navigateTo('/')"/>
-        <img v-else src="/dukatia-beta_logo.svg" @click="navigateTo('/')"/>
+        <img v-if="$colorMode.preference == 'dark'" src="/dukatia_logo_white.svg" @click="navigateTo('/')"/>
+        <img v-else src="/dukatia_logo.svg" @click="navigateTo('/')"/>
       </ClientOnly>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" /></svg>
     </div>
     
     <div v-if="nav_open" id="fullscreen_nav">
       <ClientOnly>
-        <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg" @click="() => {navigateTo('/'); nav_open = false}"/>
-        <img v-else src="/dukatia-beta_logo.svg" @click="() => {navigateTo('/'); nav_open = false}"/>
+        <img v-if="$colorMode.preference == 'dark'" src="/dukatia_logo_white.svg" @click="() => {navigateTo('/'); nav_open = false}"/>
+        <img v-else src="/dukatia_logo.svg" @click="() => {navigateTo('/'); nav_open = false}"/>
       </ClientOnly>
       <button class="important" @click="() => {navigateTo('/docs'); nav_open = false}">Get started</button>
       <NuxtLink @click.native="nav_open = false" to="/docs">Docs</NuxtLink>

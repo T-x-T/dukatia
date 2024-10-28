@@ -2,8 +2,8 @@
 	<nav :class="hidden ? 'mobile' : ''">
 		<div id="header" v-if="!hidden || !small_device">
 			<a href="https://dukatia.com" target="_blank">
-				<img v-if="$colorMode.value == 'dark' && !collapsed" id="logo" src="/dukatia-beta_logo_white.svg" alt="logo">
-				<img v-if="$colorMode.value == 'light' && !collapsed" id="logo" src="/dukatia-beta_logo.svg" alt="logo">
+				<img v-if="$colorMode.value == 'dark' && !collapsed" id="logo" src="/dukatia_logo_white.svg" alt="logo">
+				<img v-if="$colorMode.value == 'light' && !collapsed" id="logo" src="/dukatia_logo.svg" alt="logo">
 				<img v-if="collapsed" id="logo_small" src="/dukatia_signet.svg" alt="logo">
 			</a>
 		</div>
