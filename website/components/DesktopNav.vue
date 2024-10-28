@@ -12,8 +12,8 @@
 		<NuxtLink to="/about">About</NuxtLink>
 		<NuxtLink to="/">Home</NuxtLink>
     <ClientOnly>
-      <img v-if="$colorMode.preference == 'dark'" src="/dukatia-beta_logo_white.svg" @click="navigateTo('/')"/>
-      <img v-else src="/dukatia-beta_logo.svg" @click="navigateTo('/')"/>
+      <img v-if="$colorMode.preference == 'dark'" src="/dukatia_logo_white.svg" @click="navigateTo('/')"/>
+      <img v-else src="/dukatia_logo.svg" @click="navigateTo('/')"/>
     </ClientOnly>
 	</nav>
 </template>
@@ -56,7 +56,7 @@ nav
   img
     height: 70%
     left: 2%
-    top: 15%
+    top: 10%
     position: absolute
     &:hover
       scale: 1.05
